@@ -101,3 +101,33 @@ Date: 2026-10-10 · Status: accepted (client answer to C-15)
 Decision: all six companies share one Square account; each company is a separate Square location.
 Why: client confirmed. This matches the backend's existing design: one global application id, a per-business location id with a global fallback.
 Consequences: card payment (E-7) uses `payments.square_application_id` and `payments.square_location_id` from `GET /v1/public/business`. Each company's location id must be set in the backend before go-live, or its payments land in the fallback location.
+
+## ED-016 — Hourly moves out of the core
+Date: 2026-10-10 · Status: accepted (supersedes the hourly part of ED-004)
+Decision: the core widget offers `one_way`, `airport_pickup` and `airport_dropoff` only. Hourly (hours field and Add Stops) is an add-on.
+Why: hourly pricing on the new pricing-row path is not built (backend Part 3, blocked on client question C-6). Showing it would rely on the older pricing path, which is being replaced.
+Consequences: ignore `hourly` in the service list until its add-on phase.
+
+## ED-017 — Google Maps loads once into the host page; autocomplete renders inside our Shadow DOM
+Date: 2026-10-10 · Status: accepted
+Decision: inject the Google Maps JavaScript API `<script>` into `document.head` once (the only allowed write outside our mount element). Build address autocomplete with the Places API (New) *data* API (`AutocompleteSuggestion.fetchAutocompleteSuggestions` + `AutocompleteSessionToken`) and render our own suggestion list inside the Shadow DOM.
+Why: Google's script must load globally. Google's ready-made autocomplete widget attaches its dropdown to `document.body`, outside our Shadow DOM, so it would be unstyled or broken and could clash with the host site. The data API keeps everything inside our component.
+Consequences: one session token per address-entry session (cost control). If the script is already on the page, reuse it; never load it twice.
+
+## ED-018 — Test company: Checker Yellow Cabs
+Date: 2026-10-10 · Status: accepted
+Decision: develop and test against Checker Yellow Cabs on the preview server.
+Why: in the admin panel it is the only company offering all three core services (one-way, airport pickup, airport dropoff), so every path can be tested with one key.
+Consequences: one embed key, for this company only, until go-live.
+
+## ED-019 — Service types use a temporary validated type until the backend schema is typed
+Date: 2026-10-10 · Status: accepted, temporary (until backend B-21)
+Decision: `ServiceTypeOption` in `openapi.json` is an untyped object. Until the backend publishes a typed schema, the widget defines one narrow type — `id`, `code`, `name`, optional `minimum_hours` — in `src/api/service-types.ts`, marked `// TEMPORARY until B-21`, and **validates every item at runtime**. Items that fail validation are dropped; if none remain, the widget shows its error state.
+Why: these four fields are documented in `docs/api/API_CONTRACT.md`, but generated types cannot provide them. Hand-typing without runtime checks would hide a backend change.
+Consequences: when B-21 lands with a typed schema, delete the temporary type and use the generated one.
+
+## ED-020 — Party-size limits never exceed the API schema
+Date: 2026-10-10 · Status: accepted
+Decision: the passengers and luggage dropdowns never offer a value above the maximum the OpenAPI schema accepts for `TaxiQuoteRequest` (luggage is capped at 99 there).
+Why: a value the schema rejects would make every quote for that party fail with a 400.
+Consequences: temporary limits are `min(admin limit, schema maximum)`; B-21 values are capped the same way.

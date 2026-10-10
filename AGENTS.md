@@ -34,17 +34,17 @@ Breaking any of these is a bug, even if tests pass.
 4. **Request bodies reject unknown fields with 400.** Send only schema fields.
 5. **Never retry a POST automatically.** Booking sends an `Idempotency-Key` that stays the same for the same cart and changes only when the cart changes.
 6. **Payment method is `"cash"` only** until the card-payment phase. (ED-006)
-7. **Show only these services:** `one_way`, `airport_pickup`, `airport_dropoff`, `hourly`. Ignore `round_trip` even if the API lists it. (ED-004)
+7. **Show only these services:** `one_way`, `airport_pickup`, `airport_dropoff`. Ignore `round_trip` and `hourly` even if the API lists them. (ED-004, ED-016)
 8. **Names are display text.** Never read a capacity, limit or rule from a vehicle or service name.
 9. **Request a Quote vehicles skip price-breakdown** and go straight to booking. (ED-009)
 10. **Zipcodes come from Google Places `address_components`**, never from parsing typed text. (ED-010)
-11. **All UI and CSS live inside a Shadow DOM.** No global styles, no writes to the host page outside our mount element. (ED-008)
+11. **All UI and CSS live inside a Shadow DOM.** No global styles, no writes to the host page outside our mount element — except loading the Google Maps script once (ED-017). (ED-008)
 12. **Never throw into the host page.** Catch at the mount boundary; log one `console.error`.
 13. **Output is one file:** `dist/embed.js`. No code splitting, no extra CSS file.
 14. **Nothing from `dev/` ships.** A test fails if `dist/` contains anything except `embed.js` and its sourcemap.
 15. **Dates and times use the business's timezone** from `GET /v1/public/business`, never the visitor's.
 16. **Terms & Conditions HTML is sanitised** before rendering, and hidden when null.
-17. **No secrets in the repo.** The business key and Maps key go in `.env.local` (dev) or the script tag (production). Never commit `.env*`.
+17. **No secrets in the repo.** The business key goes in `.env.local` for development and in the `data-business-key` script attribute in production. The Maps browser key is ours (one key, referrer-restricted) and comes from the build-time `VITE_MAPS_BROWSER_KEY` in both. Never commit `.env*`.
 
 ---
 
@@ -57,7 +57,7 @@ One phase at a time: **spec → build → report → review → merge**. Do not 
 | Phase | Scope | Depends on | Status |
 |---|---|---|---|
 | **E-1** | Scaffold, loader, Shadow DOM, API client, idempotency, money, timezone helpers, dev harness | — | ⬜ |
-| **E-2** | **Step 1 — Trip Details.** Service dropdown, date/time, passengers/luggage, address autocomplete with zipcode, pin button, route map, airport fields (airport, airline, flight), hourly fields (hours, stops) | E-1; BRO airport/hourly screenshots; Maps browser key | ⬜ |
+| **E-2** | **Step 1 — Trip Details.** Service dropdown, date/time, passengers/luggage, address autocomplete with zipcode, pin icon, map, airport fields (airport, airline, flight) | E-1 approved; Maps browser key | ⬜ |
 | **E-3** | **Step 2 — Choose Vehicle.** Check Pricing → quote, vehicle list with Priced / Request a Quote / Unavailable, photos, capacity, out-of-area path, back | E-2; VPS deployed (pricing migration) | ⬜ |
 | **E-4** | **Step 3 — Confirm.** Trip summary, price breakdown, car seats, special requests, customer details, Terms | E-3 | ⬜ |
 | **E-5** | **Booking.** Create Trip (cash), Request a Quote booking, confirmation screen, every error state | E-4; BRO confirmation screenshot | ⬜ |
@@ -69,10 +69,11 @@ One phase at a time: **spec → build → report → review → merge**. Do not 
 
 | Phase | Scope | Blocked by |
 |---|---|---|
-| **E-7** | Card payment (Square Web Payments SDK) | Backend B-20 pushed, client answer C-15, Square sandbox B-16 |
+| **E-7** | Card payment (Square Web Payments SDK) | Each company's Square location id, Square sandbox B-16 |
 | **E-8** | Promo codes | Backend: promos wired into the new pricing path |
 | **E-9** | Round trip | Backend I-1 resolved |
 | **E-10** | Peak/blackout display | Backend B-7 |
+| **E-11** | Hourly: hours field and Add Stops | Backend hourly pricing (Part 3, client question C-6) |
 
 ---
 

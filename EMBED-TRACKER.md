@@ -45,7 +45,7 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 0 | Planning & research | Both | 4% | ✅ Complete | 4% |
 | 1 | Project setup & docs | Widget | 4% | 🔄 API files pending | 3% |
 | 2 | Backend prep (B-20, VPS deploy, config, B-21) | Backend | 7% | 🔄 B-20 tested, not pushed | 3% |
-| 3 | E-1 Skeleton, API, money, time | Widget | 7% | 🔄 Built, in review | 0% |
+| 3 | E-1 Skeleton, API, money, time | Widget | 7% | ⬜ Next | 0% |
 | 4 | E-2 Step 1 — Trip Details | Widget | 12% | ⬜ | 0% |
 | 5 | E-3 Step 2 — Choose Vehicle | Widget + VPS | 11% | ⬜ | 0% |
 | 6 | E-4 Step 3 — Confirm & breakdown | Widget | 9% | ⬜ | 0% |
@@ -55,7 +55,7 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 10 | E-8 Promo codes | Both | 4% | ⛔ Backend promo wiring | 0% |
 | 11 | E-9 Round trip | Both | 5% | ⛔ I-1 | 0% |
 | 12 | E-10 Peak / blackout | Both | 3% | ⛔ B-7 | 0% |
-| 13 | E-11 Hourly "Add Stops" | Widget | 4% | ⏸ Deferred | 0% |
+| 13 | E-11 Hourly (hours + Add Stops) | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
 | | **Total** | | **100%** | | **10%** |
 
 Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
@@ -195,7 +195,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
-| 10 Oct 2026 | E-1 built: scaffold, loader, API layer, money, time. API files from backend 7e15a04. |
+| 10 Oct 2026 | Hourly moved to add-on E-11 (ED-016). Maps loading/autocomplete approach (ED-017). Test company Checker Yellow Cabs (ED-018). Backend Dockerfile fix and VPS sync done. |
 | 10 Oct 2026 | Add-ons weighted into the 100%. C-15 answered: one Square account, one location per company. Pin icon is decorative. Real BRO rates to be entered during backend work. |
 | 10 Oct 2026 | Q-1 to Q-3 answered (ED-011 to ED-013). Phases E-1 to E-6 core, E-7 to E-10 add-ons. Backend gap B-21: no public field for the largest vehicle capacity. |
 | 10 Oct 2026 | Tracker created. Core scope fixed: one-way, airport pickup/dropoff, hourly, cash. Round trip, promo and card are add-ons. |
