@@ -89,3 +89,15 @@ Date: 2026-10-10 · Status: accepted (answers ED-Q3); **blocked on backend B-21*
 Decision: the dropdowns go up to the largest passenger and luggage capacity among the business's active vehicles.
 Why: the client's admin controls capacity; the widget must not hardcode it.
 Consequences: **no public endpoint returns this today** — the quote only returns capacities after Check Pricing. Backend item **B-21** adds the two maximums to `GET /v1/public/business`. Until it lands, E-2 uses a temporary constant marked `// TEMPORARY until B-21` and the tracker records it.
+
+## ED-014 — The pin beside an address is decorative
+Date: 2026-10-10 · Status: accepted
+Decision: render the pin icon beside each address field with no action.
+Why: in BRO's live form it is an icon only.
+Consequences: no geolocation, no map picker.
+
+## ED-015 — One Square account, one location per company
+Date: 2026-10-10 · Status: accepted (client answer to C-15)
+Decision: all six companies share one Square account; each company is a separate Square location.
+Why: client confirmed. This matches the backend's existing design: one global application id, a per-business location id with a global fallback.
+Consequences: card payment (E-7) uses `payments.square_application_id` and `payments.square_location_id` from `GET /v1/public/business`. Each company's location id must be set in the backend before go-live, or its payments land in the fallback location.

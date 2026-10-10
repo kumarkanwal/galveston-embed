@@ -36,19 +36,29 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 
 ---
 
-## Phases
+## Progress
 
-| Phase | Scope | Status |
-|---|---|---|
-| E-1 | Scaffold, loader, API client, money, timezone | ⬜ Spec ready |
-| E-2 | Step 1 — Trip Details | ⬜ |
-| E-3 | Step 2 — Choose Vehicle | ⬜ |
-| E-4 | Step 3 — Confirm | ⬜ |
-| E-5 | Booking, confirmation, errors | ⬜ |
-| E-6 | Mobile, side-by-side test with BRO, production hosting | ⬜ |
-| E-7 to E-10 | Add-ons: card, promo, round trip, peak/blackout | ⛔ Backend dependencies |
+**Overall: 10%** ▓▓░░░░░░░░░░░░░░░░░░ · **"Built" means 100%, add-ons included.**
 
-Full phase table with dependencies: `AGENTS.md` section 3.
+| # | Phase | Side | Weight | Status | Done |
+|---|---|---|---|---|---|
+| 0 | Planning & research | Both | 4% | ✅ Complete | 4% |
+| 1 | Project setup & docs | Widget | 4% | 🔄 API files pending | 3% |
+| 2 | Backend prep (B-20, VPS deploy, config, B-21) | Backend | 7% | 🔄 B-20 tested, not pushed | 3% |
+| 3 | E-1 Skeleton, API, money, time | Widget | 7% | ⬜ Next | 0% |
+| 4 | E-2 Step 1 — Trip Details | Widget | 12% | ⬜ | 0% |
+| 5 | E-3 Step 2 — Choose Vehicle | Widget + VPS | 11% | ⬜ | 0% |
+| 6 | E-4 Step 3 — Confirm & breakdown | Widget | 9% | ⬜ | 0% |
+| 7 | E-5 Create Trip, confirmation, errors | Widget + Admin | 9% | ⬜ | 0% |
+| 8 | E-6 Mobile, side-by-side with BRO, hosting | Both | 12% | ⬜ | 0% |
+| 9 | E-7 Card payment (Square) | Both | 9% | ⛔ B-16 | 0% |
+| 10 | E-8 Promo codes | Both | 4% | ⛔ Backend promo wiring | 0% |
+| 11 | E-9 Round trip | Both | 5% | ⛔ I-1 | 0% |
+| 12 | E-10 Peak / blackout | Both | 3% | ⛔ B-7 | 0% |
+| 13 | E-11 Hourly "Add Stops" | Widget | 4% | ⏸ Deferred | 0% |
+| | **Total** | | **100%** | | **10%** |
+
+Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 ## Setup (before the widget can call the API)
 
@@ -76,7 +86,7 @@ Full phase table with dependencies: `AGENTS.md` section 3.
 | 1.3 | Passengers dropdown | ⛔ B-21 | `GET /business` (after B-21) | Max = largest passenger capacity among active vehicles (ED-013). **No public endpoint returns it yet.** Temporary constant until backend B-21 |
 | 1.4 | Luggage dropdown | ⛔ B-21 | `GET /business` (after B-21) | Max = largest luggage capacity (ED-013). Same as 1.3 |
 | 1.5 | Pickup / dropoff address autocomplete | ✅ | Google Places (browser key, S-7) | Send **both** the address text and the zipcode. **Take the zipcode from Places `address_components` (`postal_code`), never by parsing the typed text.** Why: zipcodes decide zone prices; a wrong guess is a wrong price |
-| 1.6 | Pin button beside each address | 🔍 | — | **Verify what it does in BRO** (current location? pick on map?) before building |
+| 1.6 | Pin icon beside each address | ✅ | — | Decorative icon only, no action (ED-014) |
 | 1.7 | Route map | ✅ | Quote returns `route_polyline` | Show the map; draw the route after a quote |
 | 1.8 | Airport Pickup / Dropoff fields: airport, airline, flight number | 🔍 | `GET /taxi/airports`, `GET /taxi/airlines` | Public endpoints exist (audit). **Need BRO screenshots of step 1 for both airport services** to copy the layout. Airline and flight number are required (400 names the field) |
 | 1.9 | Hourly: hours field, stops | 🔍 | `minimum_hours` on the hourly service type | **Need BRO screenshot of step 1 for Hourly.** No dropoff for hourly. Hourly uses the older pricing path, so verify one hourly quote |
@@ -123,7 +133,7 @@ Full phase table with dependencies: `AGENTS.md` section 3.
 
 | # | Item | Status | Why later / what blocks it |
 |---|---|---|---|
-| A-1 | **Card payment** (new; BRO has none) | ⛔ | Needs B-20 committed (Square ids on `/business`), C-15 answered (one Square account or six), B-16 Square sandbox test. Riskiest part — goes on a proven flow |
+| A-1 | **Card payment** (new; BRO has none) | ⛔ | C-15 answered: one Square account, one location per company (ED-015). Still needs B-20 pushed, each company's Square location id, and B-16 sandbox test |
 | A-2 | Promo code | ⛔ | Not wired into the new pricing path (D-1 report) |
 | A-3 | Round trip | ⛔ | Pricing unverified (I-1). Currently disabled for all businesses in the client's real setup |
 | A-4 | Peak / blackout display | ⏸ | Peak increases not on the new pricing path yet (B-7) |
@@ -165,14 +175,13 @@ Full phase table with dependencies: `AGENTS.md` section 3.
 3. Step 1 — Hourly
 4. Step 3 — after choosing a Request a Quote vehicle
 5. The page after Create Trip (confirmation)
-6. What the pin button beside an address does
 7. Mobile view of each step
 
 ## Open questions
 
 | # | Question | Who |
 |---|---|---|
-| Q-4 | C-15: one Square account or six? | Client |
+| Q-4 | Square location id for each of the six companies | Client |
 | Q-5 | I-1: round-trip pricing | Test on BRO's form, if the client ever enables it |
 
 ## Sources of truth
@@ -186,5 +195,6 @@ Full phase table with dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 10 Oct 2026 | Add-ons weighted into the 100%. C-15 answered: one Square account, one location per company. Pin icon is decorative. Real BRO rates to be entered during backend work. |
 | 10 Oct 2026 | Q-1 to Q-3 answered (ED-011 to ED-013). Phases E-1 to E-6 core, E-7 to E-10 add-ons. Backend gap B-21: no public field for the largest vehicle capacity. |
 | 10 Oct 2026 | Tracker created. Core scope fixed: one-way, airport pickup/dropoff, hourly, cash. Round trip, promo and card are add-ons. |
