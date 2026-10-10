@@ -5,7 +5,7 @@ function invalidMoney(amount: string): string {
   throw new Error(`Invalid money amount: ${amount}`);
 }
 
-export function formatMoney(amount: string, currency: "USD"): string {
+export function formatMoney(amount: string, currency: string): string {
   if (!MONEY_PATTERN.test(amount)) return invalidMoney(amount);
 
   const negative = amount.startsWith("-");
@@ -14,6 +14,6 @@ export function formatMoney(amount: string, currency: "USD"): string {
   const grouped = whole?.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   const sign = negative ? "-" : "";
   const symbol = currency === "USD" ? "$" : "";
-  return `${sign}${symbol}${grouped}.${cents}`;
+  return `${sign}${symbol}${grouped}.${cents} ${currency}`;
 }
 

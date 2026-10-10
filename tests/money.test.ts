@@ -8,10 +8,10 @@ describe("formatMoney", () => {
   afterEach(() => vi.unstubAllEnvs());
 
   it.each([
-    ["413.75", "$413.75"],
-    ["1413.75", "$1,413.75"],
-    ["-45.00", "-$45.00"],
-    ["0.00", "$0.00"],
+    ["413.75", "$413.75 USD"],
+    ["1413.75", "$1,413.75 USD"],
+    ["-45.00", "-$45.00 USD"],
+    ["0.00", "$0.00 USD"],
   ])("formats %s", (amount, expected) => {
     expect(formatMoney(amount, "USD")).toBe(expected);
   });

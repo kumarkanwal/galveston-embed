@@ -11,10 +11,29 @@ interface TripDetailsProps {
   client: ApiClient;
   errors: TripErrors;
   form: TripFormState;
+  formError: string | null;
+  isSubmitting: boolean;
   mapsKey: string;
-  onSubmit: (event: SubmitEvent) => void;
+  onSubmit: (event: SubmitEvent) => void | Promise<void>;
+  routePolyline: string | null;
   services: CoreService[];
   update: <Key extends keyof TripFormState>(key: Key, value: TripFormState[Key]) => void;
+}
+
+function AirportAvailability(props: {
+  hasAirlines: boolean;
+  hasAirports: boolean;
+  ready: boolean;
+}) {
+  if (!props.ready) return null;
+  return <>
+    {!props.hasAirports && <div class="form-error" role="alert">
+      No airports available, please contact us.
+    </div>}
+    {!props.hasAirlines && <div class="form-error" role="alert">
+      No airlines available, please contact us.
+    </div>}
+  </>;
 }
 
 export function TripDetails(props: TripDetailsProps) {
@@ -50,17 +69,19 @@ export function TripDetails(props: TripDetailsProps) {
         {airportData.status === "error" && <div class="form-error" role="alert">
           Airport details could not be loaded. Please try again.
         </div>}
-        {readyData !== null && !hasAirports && <div class="form-error" role="alert">
-          No airports available, please contact us.
+        <AirportAvailability ready={readyData !== null}
+          hasAirports={hasAirports} hasAirlines={hasAirlines} />
+        {props.formError !== null && <div class="form-error" role="alert">
+          {props.formError}
         </div>}
-        {readyData !== null && !hasAirlines && <div class="form-error" role="alert">
-          No airlines available, please contact us.
-        </div>}
-        <button class="check-pricing" type="submit">Check Pricing</button>
+        <button class="check-pricing" type="submit" disabled={props.isSubmitting}>
+          {props.isSubmitting ? "Checking Pricing…" : "Check Pricing"}
+        </button>
       </form>
       <MapPanel mapsKey={props.mapsKey}
         pickup={props.form.pickupAddress?.location ?? null}
-        dropoff={props.form.dropoffAddress?.location ?? null} />
+        dropoff={props.form.dropoffAddress?.location ?? null}
+        routePolyline={props.routePolyline} />
     </div>
   </section>;
 }

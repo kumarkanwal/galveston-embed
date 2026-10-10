@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ApiClient, Airline, Airport } from "../src/api/client";
 import { createApiClient } from "../src/api/client";
 import { TripDetails } from "../src/app/trip/TripDetails";
-import type { CoreServiceCode, TripFormState } from "../src/app/trip/types";
+import type { CoreServiceCode, TripErrors, TripFormState } from "../src/app/trip/types";
 
 const AIRPORTS: Airport[] = [{ id: "airport-1", name: "George Bush", code: "IAH" }];
 const AIRLINES: Airline[] = [{ id: "airline-1", name: "Example Air" }];
@@ -40,11 +40,17 @@ function mockClient(overrides: Partial<ApiClient> = {}): ApiClient {
   };
 }
 
-function renderTrip(service: CoreServiceCode, client: ApiClient): HTMLElement {
+function renderTrip(
+  service: CoreServiceCode,
+  client: ApiClient,
+  isSubmitting = false,
+  errors: TripErrors = {},
+): HTMLElement {
   const root = document.createElement("div");
   document.body.append(root);
-  render(<TripDetails client={client} errors={{}} form={formFor(service)} mapsKey=""
-    onSubmit={() => undefined} services={[...SERVICES]} update={() => undefined} />, root);
+  render(<TripDetails client={client} errors={errors} form={formFor(service)} formError={null}
+    isSubmitting={isSubmitting} mapsKey="" onSubmit={() => undefined} routePolyline={null}
+    services={[...SERVICES]} update={() => undefined} />, root);
   return root;
 }
 
@@ -105,5 +111,27 @@ describe("airport data states", () => {
     const root = renderTrip("airport_pickup", client);
     await vi.waitFor(() => expect(root.textContent).toContain("could not be loaded"));
     expect(root.textContent).not.toContain("Loading airports and airlines");
+  });
+
+});
+
+describe("airport API field errors", () => {
+  it("shows a pickup-address error beside the pickup-airport field", async () => {
+    const message = "A pickup address is required.";
+    const root = renderTrip("airport_pickup", mockClient(), false, {
+      pickupAirportId: message,
+    });
+    await vi.waitFor(() => expect(root.querySelector("#airport")).not.toBeNull());
+    expect(root.querySelector("#airport")?.getAttribute("aria-invalid")).toBe("true");
+    expect(root.textContent).toContain(message);
+  });
+});
+
+describe("pricing submission state", () => {
+  it("disables Check Pricing while a request is in flight", () => {
+    const root = renderTrip("one_way", mockClient(), true);
+    const button = root.querySelector<HTMLButtonElement>(".check-pricing");
+    expect(button?.disabled).toBe(true);
+    expect(button?.textContent).toContain("Checking Pricing");
   });
 });

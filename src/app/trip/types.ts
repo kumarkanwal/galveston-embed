@@ -1,4 +1,4 @@
-import type { Airline, Airport, TaxiQuoteRequest } from "../../api/client";
+import type { Airline, Airport } from "../../api/client";
 import type { ServiceTypeOption } from "../../api/service-types";
 
 export const CORE_SERVICE_CODES = [
@@ -48,8 +48,6 @@ export type TripField =
   | "flightNumber";
 
 export type TripErrors = Partial<Record<TripField, string>>;
-export type CheckPricingHandler = (request: TaxiQuoteRequest) => void;
-
 export interface AirportData {
   airports: Airport[];
   airlines: Airline[];

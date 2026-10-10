@@ -2,16 +2,17 @@ import { useEffect, useRef, useState } from "preact/hooks";
 
 import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM } from "../../maps/config";
 import { loadMapLibraries } from "../../maps/google-maps-loader";
+import { replaceRoute, type RouteLibraries } from "../../maps/route";
 import type { MapPoint } from "./types";
 
 interface MapPanelProps {
   dropoff: MapPoint | null;
   mapsKey: string;
   pickup: MapPoint | null;
+  routePolyline: string | null;
 }
 
-interface MapApi {
-  maps: google.maps.MapsLibrary;
+interface MapApi extends RouteLibraries {
   marker: google.maps.MarkerLibrary;
 }
 
@@ -30,9 +31,17 @@ function replaceMarkers(
 }
 
 function positionMap(
+  api: MapApi,
   map: google.maps.Map,
   points: Array<{ label: string; point: MapPoint }>,
+  routePath: google.maps.LatLng[],
 ): void {
+  if (routePath.length > 0) {
+    const bounds = new google.maps.LatLngBounds();
+    routePath.forEach((point) => bounds.extend(point));
+    map.fitBounds(bounds, 56);
+    return;
+  }
   if (points.length === 0) return;
   const firstPoint = points[0];
   if (points.length === 1 && firstPoint !== undefined) {
@@ -45,11 +54,12 @@ function positionMap(
   map.fitBounds(bounds, 56);
 }
 
-export function MapPanel({ dropoff, mapsKey, pickup }: MapPanelProps) {
+export function MapPanel({ dropoff, mapsKey, pickup, routePolyline }: MapPanelProps) {
   const container = useRef<HTMLDivElement>(null);
   const map = useRef<google.maps.Map | null>(null);
   const api = useRef<MapApi | null>(null);
   const markers = useRef<google.maps.Marker[]>([]);
+  const route = useRef<google.maps.Polyline | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
 
   useEffect(() => {
@@ -79,8 +89,10 @@ export function MapPanel({ dropoff, mapsKey, pickup }: MapPanelProps) {
       ...(dropoff === null ? [] : [{ label: "B", point: dropoff }]),
     ];
     markers.current = replaceMarkers(api.current, map.current, markers.current, points);
-    positionMap(map.current, points);
-  }, [dropoff, pickup, status]);
+    const drawn = replaceRoute(api.current, map.current, route.current, routePolyline);
+    route.current = drawn.polyline;
+    positionMap(api.current, map.current, points, drawn.path);
+  }, [dropoff, pickup, routePolyline, status]);
 
   if (status === "error") {
     return <div class="map-unavailable" role="status">
