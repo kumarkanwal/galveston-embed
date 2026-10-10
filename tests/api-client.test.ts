@@ -48,6 +48,24 @@ describe("API request setup", () => {
     expect(request?.url).toBe("https://api.test/v1/public/business");
   });
 
+  it.each([
+    ["getAirports", "/v1/public/taxi/airports"],
+    ["getAirlines", "/v1/public/taxi/airlines"],
+  ] as const)("loads public taxi data with %s", async (method, path) => {
+    const fetch = vi.fn(async (_input: Request) => jsonResponse({ data: [] }));
+    await clientWith(fetch)[method]();
+    expect(fetch.mock.calls[0]?.[0].url).toBe(`https://api.test${path}`);
+  });
+
+  it("runtime-validates service types", async () => {
+    const data = [
+      { id: "1", code: "one_way", name: "One Way Transfer" },
+      { id: "2", code: 4, name: "Broken" },
+    ];
+    const fetch = vi.fn(async (_input: Request) => jsonResponse({ data }));
+    await expect(clientWith(fetch).getServiceTypes()).resolves.toEqual([data[0]]);
+  });
+
   it("sends a POST once without automatic retries", async () => {
     const fetch = vi.fn(async (_input: Request) =>
       jsonResponse({ error: { code: "SERVER_ERROR", message: "Unavailable" } }, 503),
@@ -59,6 +77,18 @@ describe("API request setup", () => {
     expect(request?.headers.get("X-Business-Key")).toBe("bk_test");
     expect(request?.headers.get("Content-Type")).toBe("application/json");
   });
+});
+
+describe("API response validation", () => {
+  it.each(["getAirports", "getAirlines"] as const)(
+    "rejects a malformed %s response",
+    async (method) => {
+      const fetch = vi.fn(async (_input: Request) => jsonResponse({ data: { broken: true } }));
+      await expect(clientWith(fetch)[method]()).rejects.toThrow(`Invalid ${
+        method === "getAirports" ? "airports" : "airlines"
+      } response.`);
+    },
+  );
 });
 
 describe("API errors", () => {

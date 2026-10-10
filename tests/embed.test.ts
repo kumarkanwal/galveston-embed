@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Business } from "../src/api/client";
+import type { ApiClient, Business } from "../src/api/client";
 import { NetworkError, UnauthorizedError } from "../src/api/errors";
+import type { ServiceTypeOption } from "../src/api/service-types";
 import { captureScriptConfig, mountBookingWidget } from "../src/embed";
 
 const BUSINESS: Business = {
@@ -26,8 +27,20 @@ function addMount(): HTMLElement {
   return mount;
 }
 
-function clientFactory(getBusiness: () => Promise<Business>) {
-  return vi.fn(() => ({ getBusiness: vi.fn(getBusiness) }));
+function clientFactory(
+  getBusiness: () => Promise<Business>,
+  services: ServiceTypeOption[] = [
+    { id: "service-1", code: "one_way", name: "One Way Transfer" },
+  ],
+) {
+  const client: ApiClient = {
+    getBusiness: vi.fn(getBusiness),
+    getServiceTypes: vi.fn(async () => services),
+    getAirports: vi.fn(async () => []),
+    getAirlines: vi.fn(async () => []),
+    quote: vi.fn(async () => ({ out_of_service_area: false, vehicles: [] })),
+  };
+  return vi.fn(() => client);
 }
 
 beforeEach(() => {
@@ -64,7 +77,7 @@ describe("embed loader", () => {
 });
 
 describe("embed app states", () => {
-  it("renders the business name after loading", async () => {
+  it("renders trip details after loading", async () => {
     const mount = addMount();
     mountBookingWidget(
       { apiBase: "https://api.test", businessKey: "key" },
@@ -72,7 +85,21 @@ describe("embed app states", () => {
       clientFactory(async () => BUSINESS),
     );
     expect(mount.shadowRoot?.textContent).toContain("Loading booking form");
-    await vi.waitFor(() => expect(mount.shadowRoot?.textContent).toContain(BUSINESS.name));
+    await vi.waitFor(() => expect(mount.shadowRoot?.textContent).toContain("Reservations"));
+  });
+
+  it("shows contact guidance when no E-2 service is available", async () => {
+    const mount = addMount();
+    mountBookingWidget(
+      { apiBase: "https://api.test", businessKey: "key" },
+      document,
+      clientFactory(async () => BUSINESS, [
+        { id: "service-hourly", code: "hourly", name: "Hourly" },
+      ]),
+    );
+    await vi.waitFor(() => {
+      expect(mount.shadowRoot?.textContent).toContain("Online booking is not available");
+    });
   });
 
   it.each([

@@ -4,7 +4,7 @@ Each decision records **why**, so a later agent does not undo it. To change a de
 
 ## Entry template
 
-```text
+```
 ## ED-000 — Short title
 Date: YYYY-MM-DD · Status: accepted | superseded by ED-0xx
 Decision: one sentence.
@@ -131,3 +131,9 @@ Date: 2026-10-10 · Status: accepted
 Decision: the passengers and luggage dropdowns never offer a value above the maximum the OpenAPI schema accepts for `TaxiQuoteRequest` (luggage is capped at 99 there).
 Why: a value the schema rejects would make every quote for that party fail with a 400.
 Consequences: temporary limits are `min(admin limit, schema maximum)`; B-21 values are capped the same way.
+
+## ED-021 — How prices are displayed
+Date: 2026-10-10 · Status: accepted
+Decision: show money as `$90.00 USD` — dollar sign, thousands separators, two decimals, then the currency code from `GET /v1/public/business`. Formatting lives only in `src/money/`.
+Why: BRO shows the currency code after the amount ("$ 90.00 USD", "$390.00 USD"). We keep the code so customers see what they are used to, and drop BRO's inconsistent space after "$".
+Consequences: one formatter for the vehicle list, breakdown and totals. Never format money anywhere else.

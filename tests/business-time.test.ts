@@ -4,6 +4,7 @@ import {
   businessDateTimeParts,
   compareWithBusinessNow,
   formatBusinessDateTime,
+  meetsAdvanceBookingRequirement,
 } from "../src/time";
 
 describe("business timezone helpers", () => {
@@ -22,6 +23,16 @@ describe("business timezone helpers", () => {
     expect(compareWithBusinessNow("2026-06-30", "22:29", now, "America/Chicago")).toBe(-1);
     expect(compareWithBusinessNow("2026-06-30", "22:30", now, "America/Chicago")).toBe(0);
     expect(compareWithBusinessNow("2026-06-30", "22:31", now, "America/Chicago")).toBe(1);
+  });
+
+  it("checks advance hours in the business timezone", () => {
+    const now = new Date("2026-07-01T03:30:00.000Z");
+    expect(meetsAdvanceBookingRequirement(
+      "2026-07-01", "10:30", now, "America/Chicago", 12,
+    )).toBe(true);
+    expect(meetsAdvanceBookingRequirement(
+      "2026-07-01", "10:29", now, "America/Chicago", 12,
+    )).toBe(false);
   });
 });
 
