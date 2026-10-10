@@ -1,0 +1,7 @@
+packages:
+  - "."
+
+publicHoistPattern:
+  - "*"
+
+confirmModulesPurge: false
