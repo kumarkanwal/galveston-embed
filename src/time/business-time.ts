@@ -47,3 +47,16 @@ export function compareWithBusinessNow(
   return 0;
 }
 
+export function meetsAdvanceBookingRequirement(
+  date: string,
+  time: string,
+  now: Date,
+  timeZone: string,
+  advanceHours: number,
+): boolean {
+  const millisecondsPerHour = 60 * 60 * 1000;
+  const threshold = new Date(now.getTime() + advanceHours * millisecondsPerHour);
+  const minimum = businessDateTimeParts(threshold, timeZone);
+  return `${date}T${time}` >= `${minimum.date}T${minimum.time}`;
+}
+

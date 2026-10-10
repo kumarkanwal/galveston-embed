@@ -1,0 +1,62 @@
+import { meetsAdvanceBookingRequirement } from "../../time";
+import { MAX_LUGGAGE, MAX_PASSENGERS } from "./limits";
+import type { TripErrors, TripFormState } from "./types";
+
+export interface ValidationContext {
+  advanceBookingHours: number;
+  now: Date;
+  timeZone: string;
+}
+
+function validateParty(form: TripFormState, errors: TripErrors): void {
+  if (form.passengers < 1 || form.passengers > MAX_PASSENGERS) {
+    errors.passengers = "Select a valid passenger count.";
+  }
+  if (form.luggage < 0 || form.luggage > MAX_LUGGAGE) {
+    errors.luggage = "Select a valid luggage count.";
+  }
+}
+
+function validateAddresses(form: TripFormState, errors: TripErrors): void {
+  if (form.service !== "airport_pickup" && form.pickupAddress === null) {
+    errors.pickupAddress = "Choose a pickup address from the suggestions.";
+  }
+  if (form.service !== "airport_dropoff" && form.dropoffAddress === null) {
+    errors.dropoffAddress = "Choose a dropoff address from the suggestions.";
+  }
+}
+
+function validateAirport(form: TripFormState, errors: TripErrors): void {
+  if (form.service === "one_way") return;
+  if (form.service === "airport_pickup" && form.pickupAirportId === "") {
+    errors.pickupAirportId = "Select a pickup airport.";
+  }
+  if (form.service === "airport_dropoff" && form.dropoffAirportId === "") {
+    errors.dropoffAirportId = "Select a dropoff airport.";
+  }
+  if (form.airline === null) errors.airline = "Select an airline.";
+  if (form.flightNumber.trim() === "") errors.flightNumber = "Enter a flight number.";
+}
+
+export function validateTrip(
+  form: TripFormState,
+  context: ValidationContext,
+): TripErrors {
+  const errors: TripErrors = {};
+  if (form.pickupDate === "") errors.pickupDate = "Select a pickup date.";
+  if (form.pickupTime === "") errors.pickupTime = "Select a pickup time.";
+  const hasDateTime = form.pickupDate !== "" && form.pickupTime !== "";
+  if (hasDateTime && !meetsAdvanceBookingRequirement(
+    form.pickupDate,
+    form.pickupTime,
+    context.now,
+    context.timeZone,
+    context.advanceBookingHours,
+  )) {
+    errors.pickupTime = `You must book at least ${context.advanceBookingHours} hour(s) in advance.`;
+  }
+  validateParty(form, errors);
+  validateAddresses(form, errors);
+  validateAirport(form, errors);
+  return errors;
+}

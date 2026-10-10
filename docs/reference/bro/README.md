@@ -14,11 +14,12 @@ Use `<service>-step<N>-<what>.png`. One image per state.
 | `step1-service-dropdown-open.png` | Service dropdown opened | ✅ |
 | `step1-passengers-dropdown-open.png` | Passengers dropdown | ✅ |
 | `step1-luggage-dropdown-open.png` | Luggage dropdown | ✅ |
-| `airport-pickup-step1.png` | Step 1 for Airport Pickup (airport, airline, flight) | ❌ needed |
-| `airport-dropoff-step1.png` | Step 1 for Airport Dropoff | ❌ needed |
+| `step1-airport-pickup-airline-dropdown.png` | Airport Pickup with the searchable airline dropdown open | ✅ |
+| `step1-airport-dropoff-dropdown-open.png` | Airport Dropoff with the service dropdown open | ✅ |
+| `step1-airport-dropoff-addon.png` | Airport Dropoff fields added below the trip fields | ✅ |
 | `hourly-step1.png` | Step 1 for Hourly (hours, stops) | ❌ needed |
 | `step2-choose-vehicle.png` | Vehicle list with Priced / Request a Quote / Unavailable | ✅ |
-| `step3-confirm-priced.png` | Confirm page for a priced vehicle ($413.75 Sprinter) | ✅ |
+| `step3-confirm-priced.png` | Misnamed Step 1 reference; replace with the real priced Confirm screen before E-4 | ✅ temporary |
 | `step3-confirm-request-quote.png` | Confirm page after choosing a Request a Quote vehicle | ❌ needed |
 | `step4-confirmation.png` | Page after Create Trip | ❌ needed |
 | `step1-pin-button.png` | What the pin button beside an address does | ❌ needed |
@@ -27,6 +28,6 @@ Use `<service>-step<N>-<what>.png`. One image per state.
 
 ## Notes on what the screenshots show
 
-- Step 3 for the 14 PAX Mercedes Sprinter: Base Price $390.00, Fuel Surcharge $11.70, Car Seats (0) $0.00, CC Surcharge $12.05, **Total $413.75**. Our backend's regression test produces exactly this figure.
+- `step3-confirm-priced.png` currently shows a completed Step 1 state, not the Confirm page its name implies. It is useful as an E-2 visual reference but must be replaced before E-4.
 - The service dropdown lists One Way Transfer, Airport Dropoff, Airport Pickup, Hourly (6 Hour min). No Round Trip.
 - Drop from our build: the BRO site header (Menu, Login), the promo code box (for now).

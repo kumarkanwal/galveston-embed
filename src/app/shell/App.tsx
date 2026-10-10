@@ -1,19 +1,19 @@
 import { useEffect, useState } from "preact/hooks";
 
-import type { Business } from "../../api/client";
+import type { ApiClient, Business, TaxiQuoteRequest } from "../../api/client";
 import { NetworkError, UnauthorizedError } from "../../api/errors";
-
-export interface BusinessClient {
-  getBusiness(): Promise<Business>;
-}
+import type { ServiceTypeOption } from "../../api/service-types";
+import { BookingFlow } from "./BookingFlow";
 
 interface AppProps {
-  client: BusinessClient;
+  client: ApiClient;
+  mapsKey: string;
+  onCheckPricing: (request: TaxiQuoteRequest) => void;
 }
 
 type ViewState =
   | { status: "loading" }
-  | { status: "ready"; business: Business }
+  | { status: "ready"; business: Business; services: ServiceTypeOption[] }
   | { status: "unauthorized" }
   | { status: "network-error" }
   | { status: "error" };
@@ -33,15 +33,14 @@ function messageFor(state: ViewState): string {
   return "The booking form could not be loaded. Please try again.";
 }
 
-export function App({ client }: AppProps) {
+export function App({ client, mapsKey, onCheckPricing }: AppProps) {
   const [state, setState] = useState<ViewState>({ status: "loading" });
 
   useEffect(() => {
     let active = true;
-    client
-      .getBusiness()
-      .then((business) => {
-        if (active) setState({ status: "ready", business });
+    Promise.all([client.getBusiness(), client.getServiceTypes()])
+      .then(([business, services]) => {
+        if (active) setState({ status: "ready", business, services });
       })
       .catch((error: unknown) => {
         if (active) setState(failedState(error));
@@ -52,7 +51,8 @@ export function App({ client }: AppProps) {
   }, [client]);
 
   if (state.status === "ready") {
-    return <section class="widget" aria-live="polite"><h1>{state.business.name}</h1></section>;
+    return <BookingFlow business={state.business} services={state.services}
+      client={client} mapsKey={mapsKey} onCheckPricing={onCheckPricing} />;
   }
   return <section class="widget status" aria-live="polite">{messageFor(state)}</section>;
 }

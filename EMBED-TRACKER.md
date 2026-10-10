@@ -38,15 +38,15 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 
 ## Progress
 
-**Overall: 10%** ▓▓░░░░░░░░░░░░░░░░░░ · **"Built" means 100%, add-ons included.**
+**Overall: 29%** ▓▓▓▓▓▓░░░░░░░░░░░░░░ · **"Built" means 100%, add-ons included.**
 
 | # | Phase | Side | Weight | Status | Done |
 |---|---|---|---|---|---|
 | 0 | Planning & research | Both | 4% | ✅ Complete | 4% |
 | 1 | Project setup & docs | Widget | 4% | 🔄 API files pending | 3% |
 | 2 | Backend prep (B-20, VPS deploy, config, B-21) | Backend | 7% | 🔄 B-20 tested, not pushed | 3% |
-| 3 | E-1 Skeleton, API, money, time | Widget | 7% | ⬜ Next | 0% |
-| 4 | E-2 Step 1 — Trip Details | Widget | 12% | ⬜ | 0% |
+| 3 | E-1 Skeleton, API, money, time | Widget | 7% | ✅ Complete | 7% |
+| 4 | E-2 Step 1 — Trip Details | Widget | 12% | ✅ Complete | 12% |
 | 5 | E-3 Step 2 — Choose Vehicle | Widget + VPS | 11% | ⬜ | 0% |
 | 6 | E-4 Step 3 — Confirm & breakdown | Widget | 9% | ⬜ | 0% |
 | 7 | E-5 Create Trip, confirmation, errors | Widget + Admin | 9% | ⬜ | 0% |
@@ -56,7 +56,7 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 11 | E-9 Round trip | Both | 5% | ⛔ I-1 | 0% |
 | 12 | E-10 Peak / blackout | Both | 3% | ⛔ B-7 | 0% |
 | 13 | E-11 Hourly (hours + Add Stops) | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
-| | **Total** | | **100%** | | **10%** |
+| | **Total** | | **100%** | | **29%** |
 
 Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
@@ -81,16 +81,16 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 | # | Item | Status | API | Notes |
 |---|---|---|---|---|
-| 1.1 | Service dropdown | ✅ | `GET /taxi/service-types` | **Show only `one_way`, `airport_pickup`, `airport_dropoff`, `hourly`.** Ignore `round_trip` even if listed. Why: round-trip pricing is unverified (I-1); an admin tick must not show customers an unchecked price |
-| 1.2 | Pickup date and time | 🔍 | `GET /business` → `timezone`, `advance_booking_hours` | Times are in the **business's timezone**, not the visitor's browser. Verify the advance-booking message against BRO. Server enforces it; the widget check is UX only |
-| 1.3 | Passengers dropdown | ⛔ B-21 | `GET /business` (after B-21) | Max = largest passenger capacity among active vehicles (ED-013). **No public endpoint returns it yet.** Temporary constant until backend B-21 |
-| 1.4 | Luggage dropdown | ⛔ B-21 | `GET /business` (after B-21) | Max = largest luggage capacity (ED-013). Same as 1.3 |
+| 1.1 | Service dropdown | ✅ | `GET /taxi/service-types` | Show only `one_way`, `airport_pickup`, and `airport_dropoff` (ED-016). Runtime-validate the temporary service-type shape until B-21 (ED-019) |
+| 1.2 | Pickup date and time | ✅ | `GET /business` → `timezone`, `advance_booking_hours` | Times and advance-booking validation use the **business's timezone**, not the visitor's browser. Server enforcement remains authoritative |
+| 1.3 | Passengers dropdown | ✅ temporary | `GET /business` (after B-21) | Temporary maximum 74. B-21 must replace it with the largest active-vehicle capacity, capped by the request schema (ED-020) |
+| 1.4 | Luggage dropdown | ✅ temporary | `GET /business` (after B-21) | Temporary maximum 99, matching the request-schema maximum. B-21 must replace it with the smaller of the admin limit and schema maximum (ED-020) |
 | 1.5 | Pickup / dropoff address autocomplete | ✅ | Google Places (browser key, S-7) | Send **both** the address text and the zipcode. **Take the zipcode from Places `address_components` (`postal_code`), never by parsing the typed text.** Why: zipcodes decide zone prices; a wrong guess is a wrong price |
 | 1.6 | Pin icon beside each address | ✅ | — | Decorative icon only, no action (ED-014) |
-| 1.7 | Route map | ✅ | Quote returns `route_polyline` | Show the map; draw the route after a quote |
-| 1.8 | Airport Pickup / Dropoff fields: airport, airline, flight number | 🔍 | `GET /taxi/airports`, `GET /taxi/airlines` | Public endpoints exist (audit). **Need BRO screenshots of step 1 for both airport services** to copy the layout. Airline and flight number are required (400 names the field) |
-| 1.9 | Hourly: hours field, stops | 🔍 | `minimum_hours` on the hourly service type | **Need BRO screenshot of step 1 for Hourly.** No dropoff for hourly. Hourly uses the older pricing path, so verify one hourly quote |
-| 1.10 | Check Pricing | ✅ | `POST /taxi/quote` | Rate-limited after B-20; handle `429` with a friendly retry message |
+| 1.7 | Map | ✅ | Google Maps JavaScript API | Show pickup/dropoff pins. Route drawing starts in E-3 after a quote supplies `route_polyline` |
+| 1.8 | Airport Pickup / Dropoff fields: airport, airline, flight number | ✅ | `GET /taxi/airports`, `GET /taxi/airlines` | Airport is a plain select; airline is searchable. The BRO airport screenshots are present |
+| 1.9 | Hourly: hours field, stops | ⏸ E-11 | — | Removed from the core by ED-016; ignore `hourly` until its add-on phase |
+| 1.10 | Check Pricing | ✅ E-2 validation | `POST /taxi/quote` in E-3 | E-2 builds and validates the exact request. E-3 sends it and handles quote responses, including `429` |
 
 ## Step 2 — Choose Vehicle
 
@@ -170,12 +170,10 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 ## Screenshots still needed from BRO
 
-1. Step 1 — Airport Pickup
-2. Step 1 — Airport Dropoff
-3. Step 1 — Hourly
-4. Step 3 — after choosing a Request a Quote vehicle
-5. The page after Create Trip (confirmation)
-7. Mobile view of each step
+1. Step 3 — after choosing a Request a Quote vehicle
+2. The page after Create Trip (confirmation)
+3. Mobile view of each step
+4. Step 1 — Hourly, before E-11
 
 ## Open questions
 
@@ -195,6 +193,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 10 Oct 2026 | E-2 complete: core Trip Details services, business-time validation, passenger/luggage selectors, Shadow DOM Places autocomplete, map pins, airport fields, and validated handoff to E-3. E-1 was merged before this phase. |
 | 10 Oct 2026 | Hourly moved to add-on E-11 (ED-016). Maps loading/autocomplete approach (ED-017). Test company Checker Yellow Cabs (ED-018). Backend Dockerfile fix and VPS sync done. |
 | 10 Oct 2026 | Add-ons weighted into the 100%. C-15 answered: one Square account, one location per company. Pin icon is decorative. Real BRO rates to be entered during backend work. |
 | 10 Oct 2026 | Q-1 to Q-3 answered (ED-011 to ED-013). Phases E-1 to E-6 core, E-7 to E-10 add-ons. Backend gap B-21: no public field for the largest vehicle capacity. |

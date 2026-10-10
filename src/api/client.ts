@@ -1,9 +1,13 @@
 import createClient from "openapi-fetch";
 
 import type { components, paths } from "./schema";
+import { validateAirlines, validateAirports } from "./airport-data";
 import { ApiError, NetworkError, parseApiError } from "./errors";
+import { validateServiceTypes, type ServiceTypeOption } from "./service-types";
 
 export type Business = components["schemas"]["BusinessPublic"];
+export type Airport = components["schemas"]["AirportOption"];
+export type Airline = components["schemas"]["AirlineOption"];
 export type TaxiQuoteRequest = components["schemas"]["TaxiQuoteRequest"];
 export type TaxiQuoteResponse = components["schemas"]["TaxiQuoteResponse"];
 
@@ -15,6 +19,9 @@ interface ApiResult<T> {
 
 export interface ApiClient {
   getBusiness(): Promise<Business>;
+  getServiceTypes(): Promise<ServiceTypeOption[]>;
+  getAirports(): Promise<Airport[]>;
+  getAirlines(): Promise<Airline[]>;
   quote(body: TaxiQuoteRequest): Promise<TaxiQuoteResponse>;
 }
 
@@ -53,6 +60,18 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
     async getBusiness() {
       const envelope = await execute(() => client.GET("/v1/public/business"));
       return envelope.data;
+    },
+    async getServiceTypes() {
+      const envelope = await execute(() => client.GET("/v1/public/taxi/service-types"));
+      return validateServiceTypes(envelope.data);
+    },
+    async getAirports() {
+      const envelope = await execute(() => client.GET("/v1/public/taxi/airports"));
+      return validateAirports(envelope.data);
+    },
+    async getAirlines() {
+      const envelope = await execute(() => client.GET("/v1/public/taxi/airlines"));
+      return validateAirlines(envelope.data);
     },
     async quote(body) {
       const envelope = await execute(() =>
