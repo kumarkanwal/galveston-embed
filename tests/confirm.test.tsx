@@ -134,20 +134,31 @@ describe("Confirm breakdown lifetime", () => {
   });
 });
 
-describe("Confirm form", () => {
-  it("renders terms as literal text and closes the panel", async () => {
+describe("Confirm terms", () => {
+  it("opens terms independently and closes without losing form data", async () => {
     const { root } = mount();
-    const link = [...root.querySelectorAll("button")]
-      .find((button) => button.textContent?.includes("Terms"));
+    input(root, "firstName", "Ada");
+    input(root, "comments", "Call on arrival");
+    const checkbox = root.querySelector<HTMLInputElement>(
+      '[data-confirm-field="acceptedTerms"]',
+    );
+    const link = root.querySelector<HTMLButtonElement>(".terms-link");
+    expect(link?.closest("label")).toBeNull();
     link?.click();
     await vi.waitFor(() => expect(root.querySelector(".terms-panel")).not.toBeNull());
+    expect(checkbox?.checked).toBe(false);
     const panel = root.querySelector(".terms-panel");
     expect(panel?.textContent).toContain("Use <b>care</b> & arrive early.");
     expect(panel?.querySelector("b")).toBeNull();
     root.querySelector<HTMLButtonElement>(".terms-close")?.click();
     await vi.waitFor(() => expect(root.querySelector(".terms-panel")).toBeNull());
+    expect(root.querySelector<HTMLInputElement>("#firstName")?.value).toBe("Ada");
+    expect(root.querySelector<HTMLInputElement>("#comments")?.value).toBe("Call on arrival");
+    expect(link).toBe(document.activeElement);
   });
+});
 
+describe("Confirm form", () => {
   it("focuses the first error, accepts optional phone, and never books", async () => {
     const priceBreakdown = vi.fn(async () => BREAKDOWN);
     const { root } = mount(priceBreakdown);

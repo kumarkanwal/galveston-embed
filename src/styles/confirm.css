@@ -114,7 +114,7 @@
   margin: 12px 0;
 }
 
-label.terms-label {
+.terms-label {
   align-items: start;
   display: flex;
   font-size: 12px;
@@ -122,6 +122,12 @@ label.terms-label {
   font-weight: 400;
   gap: 7px;
   justify-content: flex-end;
+}
+
+.terms-copy label {
+  display: inline;
+  font: inherit;
+  margin: 0 4px 0 0;
 }
 
 .terms-label input[type="checkbox"] {
