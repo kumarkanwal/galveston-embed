@@ -38,7 +38,7 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 
 ## Progress
 
-**Overall: 49%** ▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░ · **"Built" means 100%, add-ons included.**
+**Overall: 58%** ▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░ · **"Built" means 100%, add-ons included.**
 
 | # | Phase | Side | Weight | Status | Done |
 |---|---|---|---|---|---|
@@ -49,14 +49,14 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 4 | E-2 Step 1 — Trip Details | Widget | 12% | ✅ Complete | 12% |
 | 5 | E-3 Step 2 — Choose Vehicle | Widget + VPS | 11% | ✅ Complete — address filter fixed | 11% |
 | 6 | E-4 Step 3 — Confirm & breakdown | Widget | 9% | ✅ Complete — ready for review | 9% |
-| 7 | E-5 Create Trip, confirmation, errors | Widget + Admin | 9% | ⬜ | 0% |
+| 7 | E-5 Create Trip, confirmation, errors | Widget + Admin | 9% | ✅ Complete — ready for review | 9% |
 | 8 | E-6 Mobile, side-by-side with BRO, hosting | Both | 12% | ⬜ | 0% |
 | 9 | E-7 Card payment (Square) | Both | 9% | ⛔ B-16 | 0% |
 | 10 | E-8 Promo codes | Both | 4% | ⛔ Backend promo wiring | 0% |
 | 11 | E-9 Round trip | Both | 5% | ⛔ I-1 | 0% |
 | 12 | E-10 Peak / blackout | Both | 3% | ⛔ B-7 | 0% |
 | 13 | E-11 Hourly (hours + Add Stops) | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
-| | **Total** | | **100%** | | **49%** |
+| | **Total** | | **100%** | | **58%** |
 
 Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
@@ -117,16 +117,16 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 | 3.6 | Special requests | ✅ | Booking `comments` |
 | 3.7 | First name, last name, phone, email | ✅ | Booking `customer` |
 | 3.8 | Terms & Conditions checkbox and link | ✅ | `terms_and_conditions` from `/business` may be **null**: hide the link when null and render admin-entered content as literal plain text, never `innerHTML`. `accepted_terms` must be `true` |
-| 3.9 | Create Trip (cash) | ✅ E-4 UI | Validates and builds the typed cash booking request without sending it. The booking POST and idempotency header are E-5 |
-| 3.10 | Request a Quote vehicle chosen | ⏸ E-5 | Keeps the placeholder and never calls price-breakdown. The Request a Quote confirmation screenshot is available for E-5 |
+| 3.9 | Create Trip (cash) | ✅ | Sends the E-4 cash request once with a cart-bound UUID idempotency key; retries reuse the key until the request body changes |
+| 3.10 | Request a Quote vehicle chosen | ✅ | Shows Step 3 without charges, never calls price-breakdown, and submits a zero-total manual quote request |
 | 3.11 | Back button | ✅ | Returns to step 2 |
 
 ## After booking
 
 | # | Item | Status | Notes |
 |---|---|---|---|
-| 4.1 | Confirmation screen | 🔍 | Request a Quote confirmation screenshot is available; priced-booking confirmation remains needed. Booking returns `order_number`, `status`, `total` |
-| 4.2 | Error handling | ✅ | See "Errors" below |
+| 4.1 | Confirmation screen | ✅ provisional | Uses the returned reservation number and total plus `/business` currency. Email wording appears only when `confirmation_email_sent` is true. Priced-booking wording awaits a BRO screenshot |
+| 4.2 | Error handling | ✅ | No automatic POST retry; retryable unknown outcomes reuse the same idempotency key. See "Errors" below |
 | 4.3 | Booking appears in admin Runs | 🔍 | **The end-to-end proof.** Verify after S-2 |
 
 ## Add-ons (after the core flow works)
@@ -160,11 +160,11 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 | Response | Show |
 |---|---|
 | `400 VALIDATION_ERROR` | Message on the named `field` (field may be absent) |
-| `401` | "This booking form is not configured." Log for the developer |
-| `409 REQUEST_IN_FLIGHT` | Wait; do not resubmit |
+| `401`, `403`, `404`, `503` | The API message, or a friendly fallback; never retry automatically |
+| `409 REQUEST_IN_FLIGHT` | "Your booking is still being processed. Please wait a moment and try again."; a customer retry reuses the same key |
 | `422 ADVANCE_BOOKING_VIOLATION`, `OUT_OF_SERVICE_AREA`, `VEHICLE_UNAVAILABLE`, `BELOW_MINIMUM_HOURS`, `PAYMENT_METHOD_NOT_OFFERED` | The API's `message` |
 | `429 RATE_LIMITED` | "Too many requests, please wait a moment and try again." |
-| `5xx`, network failure | Friendly retry message; no automatic retry on POST |
+| Other `5xx`, network failure | "We couldn't confirm your booking. Please try again — you will not be booked twice."; a customer retry reuses the same key |
 
 ---
 
@@ -185,6 +185,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 ## Open items
 
 - Airport quotes blocked: backend requires pickup_address although the contract uses pickup_airport_id — under investigation.
+- **B-26:** document the taxi-booking `200` idempotent replay response in OpenAPI, mark `Idempotency-Key` required there, and document server retention. This does not block the widget, which always sends a UUID and scopes a key to one unchanged request body.
 
 ## Sources of truth
 
@@ -197,6 +198,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 11 Oct 2026 | E-5 complete for review: cash booking POST with body-bound idempotency, double-submit protection, manual retry handling, Request a Quote Step 3, conditional-email confirmation screens, booking error placement, and keyboard-accessible Terms closing. Priced confirmation wording remains provisional; live preview booking/admin verification is pending. Added backend documentation item B-26. |
 | 11 Oct 2026 | E-4 complete for priced vehicles: server-owned price breakdown, ED-022 zero-line filtering, race-safe Car Seats repricing, trip summary, customer fields, plain-text terms panel, validation, and typed cash booking-request preparation without a booking POST. Legacy anchor-zone pricing ignores `car_seats` (backend I-3). |
 | 11 Oct 2026 | E-3 follow-up: kept address autocomplete US-only while excluding country, state, administrative-region and postal-code-only suggestions; cities, street addresses and places remain available. Added focused request and type-filter tests. |
 | 11 Oct 2026 | E-3 complete: one-request quote submission, quote-error mapping, Step 2 vehicle states, out-of-area handling, route rendering on the Step 1 map, preserved Back navigation, and the Step 3 placeholder. Airport quote requests remain blocked by the documented backend/contract conflict. |
