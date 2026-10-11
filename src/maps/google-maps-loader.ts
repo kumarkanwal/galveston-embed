@@ -74,15 +74,17 @@ export async function loadPlacesLibrary(
 }
 
 export async function loadMapLibraries(key: string): Promise<{
+  geometry: google.maps.GeometryLibrary;
   maps: google.maps.MapsLibrary;
   marker: google.maps.MarkerLibrary;
 }> {
   const api = await loadGoogleMaps(key);
-  const [maps, marker] = await Promise.all([
+  const [geometry, maps, marker] = await Promise.all([
+    api.maps.importLibrary("geometry") as Promise<google.maps.GeometryLibrary>,
     api.maps.importLibrary("maps") as Promise<google.maps.MapsLibrary>,
     api.maps.importLibrary("marker") as Promise<google.maps.MarkerLibrary>,
   ]);
-  return { maps, marker };
+  return { geometry, maps, marker };
 }
 
 export function resetGoogleMapsLoaderForTests(): void {

@@ -74,8 +74,10 @@ describe("API request setup", () => {
     expect(fetch).toHaveBeenCalledOnce();
     const request = fetch.mock.calls[0]?.[0];
     expect(request?.method).toBe("POST");
+    expect(request?.url).toBe("https://api.test/v1/public/taxi/quote?hide_incapable=true");
     expect(request?.headers.get("X-Business-Key")).toBe("bk_test");
     expect(request?.headers.get("Content-Type")).toBe("application/json");
+    await expect(request?.clone().json()).resolves.toEqual(QUOTE);
   });
 });
 

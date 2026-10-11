@@ -1,7 +1,7 @@
 import { h, render } from "preact";
 
 import { App } from "./app/shell/App";
-import { createApiClient, type ApiClient, type TaxiQuoteRequest } from "./api/client";
+import { createApiClient, type ApiClient } from "./api/client";
 import widgetStyles from "./styles/widget.css?inline";
 
 const MOUNT_ID = "galveston-booking";
@@ -15,10 +15,6 @@ type ClientFactory = (config: EmbedConfig) => ApiClient;
 
 function defaultClientFactory(config: EmbedConfig): ApiClient {
   return createApiClient(config);
-}
-
-function logDevelopmentRequest(request: TaxiQuoteRequest): void {
-  if (import.meta.env.DEV) console.info(JSON.stringify(request, null, 2));
 }
 
 function fallbackDevelopmentScript(documentRoot: Document): HTMLScriptElement | null {
@@ -60,7 +56,6 @@ export function mountBookingWidget(
     render(h(App, {
       client: createClient(config),
       mapsKey: import.meta.env.VITE_MAPS_BROWSER_KEY ?? "",
-      onCheckPricing: logDevelopmentRequest,
     }), appRoot);
   } catch (error: unknown) {
     reportMountError(error);

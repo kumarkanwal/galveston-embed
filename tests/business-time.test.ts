@@ -34,5 +34,19 @@ describe("business timezone helpers", () => {
       "2026-07-01", "10:29", now, "America/Chicago", 12,
     )).toBe(false);
   });
+
+  it("counts elapsed advance hours across the Chicago daylight-saving fallback", () => {
+    const firstOneThirty = new Date("2026-11-01T06:30:00.000Z");
+    expect(businessDateTimeParts(firstOneThirty, "America/Chicago")).toEqual({
+      date: "2026-11-01",
+      time: "01:30",
+    });
+    expect(meetsAdvanceBookingRequirement(
+      "2026-11-01", "02:29", firstOneThirty, "America/Chicago", 2,
+    )).toBe(false);
+    expect(meetsAdvanceBookingRequirement(
+      "2026-11-01", "02:30", firstOneThirty, "America/Chicago", 2,
+    )).toBe(true);
+  });
 });
 

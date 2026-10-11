@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 
-import type { ApiClient, Business, TaxiQuoteRequest } from "../../api/client";
+import type { ApiClient, Business } from "../../api/client";
 import { NetworkError, UnauthorizedError } from "../../api/errors";
 import type { ServiceTypeOption } from "../../api/service-types";
 import { BookingFlow } from "./BookingFlow";
@@ -8,7 +8,6 @@ import { BookingFlow } from "./BookingFlow";
 interface AppProps {
   client: ApiClient;
   mapsKey: string;
-  onCheckPricing: (request: TaxiQuoteRequest) => void;
 }
 
 type ViewState =
@@ -33,7 +32,7 @@ function messageFor(state: ViewState): string {
   return "The booking form could not be loaded. Please try again.";
 }
 
-export function App({ client, mapsKey, onCheckPricing }: AppProps) {
+export function App({ client, mapsKey }: AppProps) {
   const [state, setState] = useState<ViewState>({ status: "loading" });
 
   useEffect(() => {
@@ -52,7 +51,7 @@ export function App({ client, mapsKey, onCheckPricing }: AppProps) {
 
   if (state.status === "ready") {
     return <BookingFlow business={state.business} services={state.services}
-      client={client} mapsKey={mapsKey} onCheckPricing={onCheckPricing} />;
+      client={client} mapsKey={mapsKey} />;
   }
   return <section class="widget status" aria-live="polite">{messageFor(state)}</section>;
 }

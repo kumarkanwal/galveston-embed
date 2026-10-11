@@ -10,6 +10,7 @@ export type Airport = components["schemas"]["AirportOption"];
 export type Airline = components["schemas"]["AirlineOption"];
 export type TaxiQuoteRequest = components["schemas"]["TaxiQuoteRequest"];
 export type TaxiQuoteResponse = components["schemas"]["TaxiQuoteResponse"];
+export type QuotedVehicle = components["schemas"]["QuotedVehicle"];
 
 interface ApiResult<T> {
   data?: T;
@@ -75,7 +76,10 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
     },
     async quote(body) {
       const envelope = await execute(() =>
-        client.POST("/v1/public/taxi/quote", { body }),
+        client.POST("/v1/public/taxi/quote", {
+          body,
+          params: { query: { hide_incapable: true } },
+        }),
       );
       return envelope.data;
     },
