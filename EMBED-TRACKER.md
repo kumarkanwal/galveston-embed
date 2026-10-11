@@ -47,7 +47,7 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 2 | Backend prep (B-20, VPS deploy, config, B-21) | Backend | 7% | 🔄 B-21 pending | 3% |
 | 3 | E-1 Skeleton, API, money, time | Widget | 7% | ✅ Complete | 7% |
 | 4 | E-2 Step 1 — Trip Details | Widget | 12% | ✅ Complete | 12% |
-| 5 | E-3 Step 2 — Choose Vehicle | Widget + VPS | 11% | ✅ Complete | 11% |
+| 5 | E-3 Step 2 — Choose Vehicle | Widget + VPS | 11% | ✅ Complete — address filter fixed | 11% |
 | 6 | E-4 Step 3 — Confirm & breakdown | Widget | 9% | ⬜ | 0% |
 | 7 | E-5 Create Trip, confirmation, errors | Widget + Admin | 9% | ⬜ | 0% |
 | 8 | E-6 Mobile, side-by-side with BRO, hosting | Both | 12% | ⬜ | 0% |
@@ -85,7 +85,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 | 1.2 | Pickup date and time | ✅ | `GET /business` → `timezone`, `advance_booking_hours` | Times and advance-booking validation use the **business's timezone**, not the visitor's browser. Server enforcement remains authoritative |
 | 1.3 | Passengers dropdown | ✅ temporary | `GET /business` (after B-21) | Temporary maximum 74. B-21 must replace it with the largest active-vehicle capacity, capped by the request schema (ED-020) |
 | 1.4 | Luggage dropdown | ✅ temporary | `GET /business` (after B-21) | Temporary maximum 99, matching the request-schema maximum. B-21 must replace it with the smaller of the admin limit and schema maximum (ED-020) |
-| 1.5 | Pickup / dropoff address autocomplete | ✅ | Google Places (browser key, S-7) | Send **both** the address text and the zipcode. **Take the zipcode from Places `address_components` (`postal_code`), never by parsing the typed text.** Why: zipcodes decide zone prices; a wrong guess is a wrong price |
+| 1.5 | Pickup / dropoff address autocomplete | ✅ | Google Places (browser key, S-7) | US-only suggestions allow cities, street addresses and places such as hotels, terminals and airports; country, state, region and postal-code-only suggestions are excluded. Send **both** the address text and the zipcode. **Take the zipcode from Places `address_components` (`postal_code`), never by parsing the typed text.** Why: zipcodes decide zone prices; a wrong guess is a wrong price |
 | 1.6 | Pin icon beside each address | ✅ | — | Decorative icon only, no action (ED-014) |
 | 1.7 | Map | ✅ | Google Maps JavaScript API | Shows pickup/dropoff pins and the decoded quote route after returning from Step 2 |
 | 1.8 | Airport Pickup / Dropoff fields: airport, airline, flight number | ✅ | `GET /taxi/airports`, `GET /taxi/airlines` | Airport is a plain select; airline is searchable. The BRO airport screenshots are present |
@@ -197,6 +197,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 11 Oct 2026 | E-3 follow-up: kept address autocomplete US-only while excluding country, state, administrative-region and postal-code-only suggestions; cities, street addresses and places remain available. Added focused request and type-filter tests. |
 | 11 Oct 2026 | E-3 complete: one-request quote submission, quote-error mapping, Step 2 vehicle states, out-of-area handling, route rendering on the Step 1 map, preserved Back navigation, and the Step 3 placeholder. Airport quote requests remain blocked by the documented backend/contract conflict. |
 | 10 Oct 2026 | E-2 complete: core Trip Details services, business-time validation, passenger/luggage selectors, Shadow DOM Places autocomplete, map pins, airport fields, and validated handoff to E-3. E-1 was merged before this phase. |
 | 10 Oct 2026 | Hourly moved to add-on E-11 (ED-016). Maps loading/autocomplete approach (ED-017). Test company Checker Yellow Cabs (ED-018). Backend Dockerfile fix and VPS sync done. |

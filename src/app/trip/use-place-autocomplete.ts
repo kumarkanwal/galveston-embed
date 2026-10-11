@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 
 import { loadPlacesLibrary } from "../../maps/google-maps-loader";
-import { selectedAddressFromPlace } from "../../maps/places";
+import {
+  addressAutocompleteRequest,
+  isAllowedAddressSuggestion,
+  selectedAddressFromPlace,
+} from "../../maps/places";
 import type { SelectedAddress } from "./types";
 
 interface PlaceAutocompleteState {
@@ -33,14 +37,12 @@ export function usePlaceAutocomplete(query: string, mapsKey: string) {
     const timer = window.setTimeout(() => {
       void loadPlacesLibrary(mapsKey).then(async (library) => {
         token.current ??= new library.AutocompleteSessionToken();
-        const result = await library.AutocompleteSuggestion.fetchAutocompleteSuggestions({
-          input: query,
-          sessionToken: token.current,
-        });
+        const request = addressAutocompleteRequest(query, token.current);
+        const result = await library.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
         if (sequence.current !== requestSequence) return;
         const suggestions = result.suggestions.flatMap((item) =>
           item.placePrediction === null ? [] : [item.placePrediction],
-        );
+        ).filter(isAllowedAddressSuggestion);
         setState({ activeIndex: 0, error: null, loading: false, suggestions });
       }).catch(() => {
         if (sequence.current !== requestSequence) return;
