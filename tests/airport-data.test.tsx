@@ -23,7 +23,9 @@ function formFor(service: CoreServiceCode): TripFormState {
     pickupAddress: null,
     dropoffAddress: null,
     pickupAirportId: "",
+    pickupAirportName: "",
     dropoffAirportId: "",
+    dropoffAirportName: "",
     airline: null,
     flightNumber: "",
   };
@@ -36,6 +38,9 @@ function mockClient(overrides: Partial<ApiClient> = {}): ApiClient {
     getAirports: vi.fn(async () => AIRPORTS),
     getAirlines: vi.fn(async () => AIRLINES),
     quote: vi.fn(async () => ({ out_of_service_area: false, vehicles: [] })),
+    priceBreakdown: vi.fn(async () => ({
+      subtotal: "0.00", discount_amount: "0.00", total: "0.00", currency: "USD",
+    })),
     ...overrides,
   };
 }

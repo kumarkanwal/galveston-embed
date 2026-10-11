@@ -2,6 +2,7 @@ import { h, render } from "preact";
 
 import { App } from "./app/shell/App";
 import { createApiClient, type ApiClient } from "./api/client";
+import confirmStyles from "./styles/confirm.css?inline";
 import widgetStyles from "./styles/widget.css?inline";
 
 const MOUNT_ID = "galveston-booking";
@@ -51,7 +52,7 @@ export function mountBookingWidget(
     const shadowRoot = mountElement.attachShadow({ mode: "open" });
     const style = documentRoot.createElement("style");
     const appRoot = documentRoot.createElement("div");
-    style.textContent = widgetStyles;
+    style.textContent = `${widgetStyles}\n${confirmStyles}`;
     shadowRoot.append(style, appRoot);
     render(h(App, {
       client: createClient(config),

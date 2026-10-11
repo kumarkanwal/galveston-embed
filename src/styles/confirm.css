@@ -1,0 +1,229 @@
+.confirm-layout {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  padding-top: 24px;
+}
+
+.confirm-layout h2 {
+  font-size: 25px;
+  line-height: 1.15;
+  margin: 0 0 24px;
+}
+
+.summary-content {
+  align-items: start;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 130px minmax(0, 1fr);
+  min-height: 170px;
+}
+
+.summary-content .vehicle-photo,
+.summary-content .vehicle-photo-placeholder {
+  height: 90px;
+  margin-top: 12px;
+  width: 130px;
+}
+
+.summary-content h3 {
+  font-size: 18px;
+  line-height: 1.35;
+  margin: 3px 0 4px;
+}
+
+.summary-counts {
+  display: flex;
+  font-size: 12px;
+  gap: 9px;
+  margin-bottom: 3px;
+}
+
+.summary-address {
+  display: grid;
+  font-size: 12px;
+  gap: 6px;
+  grid-template-columns: 10px 1fr;
+  margin-top: 2px;
+}
+
+.pickup-pin {
+  color: #5cb85c;
+}
+
+.dropoff-pin {
+  color: #d9534f;
+}
+
+.charges {
+  margin-top: 38px;
+}
+
+.charges h2 {
+  border-bottom: 1px solid #cccccc;
+  margin-bottom: 0;
+  padding-bottom: 20px;
+}
+
+.charge-row {
+  border-bottom: 1px solid #eeeeee;
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+}
+
+.charge-row span:last-child {
+  margin-left: 16px;
+  white-space: nowrap;
+}
+
+.charges-status {
+  color: #666666;
+  margin: 12px 0;
+}
+
+.car-seats {
+  align-items: center;
+  border-bottom: 1px solid #cccccc;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr minmax(130px, 190px);
+  margin: 0;
+  padding: 7px 0 16px;
+}
+
+.charges-total {
+  background: var(--green);
+  color: #ffffff;
+  display: flex;
+  font-size: 18px;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding: 8px;
+}
+
+.confirm-form h2:not(:first-child) {
+  margin-top: 24px;
+}
+
+.confirm-form .field-row {
+  gap: 22px;
+}
+
+.terms-field {
+  margin: 12px 0;
+}
+
+.terms-label {
+  align-items: start;
+  display: flex;
+  font-size: 12px;
+  font-style: italic;
+  font-weight: 400;
+  gap: 7px;
+  justify-content: flex-end;
+}
+
+.terms-copy label {
+  display: inline;
+  font: inherit;
+  margin: 0 4px 0 0;
+}
+
+.terms-label input[type="checkbox"] {
+  height: auto;
+  margin: 2px 0 0;
+  width: auto;
+}
+
+.terms-link {
+  background: none;
+  border: 0;
+  color: #d9534f;
+  cursor: pointer;
+  font: inherit;
+  font-style: italic;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.terms-panel {
+  background: #ffffff;
+  border: 1px solid #cccccc;
+  box-shadow: 0 5px 15px rgb(0 0 0 / 20%);
+  margin-top: 10px;
+  padding: 16px;
+}
+
+.terms-panel h3 {
+  margin: 0 0 10px;
+}
+
+.terms-text {
+  max-height: 230px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+
+.terms-close {
+  background: var(--blue);
+  border: 1px solid #2e6da4;
+  border-radius: 3px;
+  color: #ffffff;
+  cursor: pointer;
+  margin-top: 14px;
+  padding: 6px 18px;
+}
+
+.create-trip {
+  background: var(--green);
+  border: 1px solid #4cae4c;
+  border-radius: 3px;
+  color: #ffffff;
+  cursor: pointer;
+  float: right;
+  margin-top: 88px;
+  min-height: 32px;
+  width: 50%;
+}
+
+.booking-next {
+  background: #dff0d8;
+  border: 1px solid #d6e9c6;
+  color: #3c763d;
+  padding: 10px;
+}
+
+.visually-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+@media (max-width: 760px) {
+  .confirm-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .create-trip {
+    float: none;
+    margin-top: 24px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 440px) {
+  .summary-content {
+    grid-template-columns: 92px minmax(0, 1fr);
+  }
+
+  .summary-content .vehicle-photo,
+  .summary-content .vehicle-photo-placeholder {
+    height: 64px;
+    width: 92px;
+  }
+}

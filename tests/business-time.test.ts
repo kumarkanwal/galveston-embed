@@ -4,6 +4,7 @@ import {
   businessDateTimeParts,
   compareWithBusinessNow,
   formatBusinessDateTime,
+  formatBusinessLocalDateTime,
   meetsAdvanceBookingRequirement,
 } from "../src/time";
 
@@ -23,6 +24,11 @@ describe("business timezone helpers", () => {
     expect(compareWithBusinessNow("2026-06-30", "22:29", now, "America/Chicago")).toBe(-1);
     expect(compareWithBusinessNow("2026-06-30", "22:30", now, "America/Chicago")).toBe(0);
     expect(compareWithBusinessNow("2026-06-30", "22:31", now, "America/Chicago")).toBe(1);
+  });
+
+  it("formats a stored business-local selection without the visitor timezone", () => {
+    expect(formatBusinessLocalDateTime("2026-10-12", "00:44"))
+      .toBe("Monday, October 12, 2026 at 12:44 AM");
   });
 
   it("checks advance hours in the business timezone", () => {

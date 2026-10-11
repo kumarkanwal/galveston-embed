@@ -79,7 +79,7 @@ Why: pricing is the backend's job and copies the client's admin panel. The widge
 Consequences: if a label must change (e.g. "Base fare" → "Base Price"), it changes in the backend. Never by matching label strings in the widget.
 
 ## ED-012 — Hide a zero CC Surcharge line (provisional)
-Date: 2026-10-10 · Status: accepted, provisional (answers ED-Q2)
+Date: 2026-10-10 · Status: superseded by ED-022
 Decision: when the CC Surcharge line amount is `"0.00"`, do not display it.
 Why: for cash the backend returns the line with `"0.00"`; showing a card fee to a cash customer is confusing.
 Consequences: identify the line by its `kind` and `source_id`, never by its label. To be confirmed against BRO's behaviour in the side-by-side test (phase E-6).
@@ -137,3 +137,9 @@ Date: 2026-10-10 · Status: accepted
 Decision: show money as `$90.00 USD` — dollar sign, thousands separators, two decimals, then the currency code from `GET /v1/public/business`. Formatting lives only in `src/money/`.
 Why: BRO shows the currency code after the amount ("$ 90.00 USD", "$390.00 USD"). We keep the code so customers see what they are used to, and drop BRO's inconsistent space after "$".
 Consequences: one formatter for the vehicle list, breakdown and totals. Never format money anywhere else.
+
+## ED-022 — Hide all zero-amount breakdown lines
+Date: 2026-10-11 · Status: accepted (supersedes ED-012)
+Decision: hide every price-breakdown line whose amount string is exactly `"0.00"`.
+Why: built-in lines do not have a unique machine identifier, so the widget cannot reliably identify only the CC Surcharge without matching its display label. Zero-value rows add noise and do not affect the server total.
+Consequences: compare the money string directly; never parse it, perform arithmetic, or match a line-item label. Preserve the order and exact labels of every displayed non-zero line.

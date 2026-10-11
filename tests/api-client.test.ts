@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { createApiClient, type TaxiQuoteRequest } from "../src/api/client";
+import {
+  createApiClient,
+  type TaxiPriceBreakdownRequest,
+  type TaxiQuoteRequest,
+} from "../src/api/client";
 import {
   ApiError,
   NetworkError,
@@ -24,6 +28,13 @@ const QUOTE: TaxiQuoteRequest = {
   pickup_time: "10:00:00",
   passengers: 1,
   luggage: 0,
+};
+
+const BREAKDOWN: TaxiPriceBreakdownRequest = {
+  ...QUOTE,
+  vehicle_type_id: "11111111-1111-1111-1111-111111111111",
+  payment_method: "cash",
+  car_seats: 0,
 };
 
 function jsonResponse(value: unknown, status = 200): Response {
@@ -78,6 +89,21 @@ describe("API request setup", () => {
     expect(request?.headers.get("X-Business-Key")).toBe("bk_test");
     expect(request?.headers.get("Content-Type")).toBe("application/json");
     await expect(request?.clone().json()).resolves.toEqual(QUOTE);
+  });
+
+});
+
+describe("price breakdown API", () => {
+  it("posts once without retrying", async () => {
+    const fetch = vi.fn(async (_input: Request) => jsonResponse({ data: {
+      line_items: [], subtotal: "90.00", discount_amount: "0.00",
+      total: "90.00", currency: "USD",
+    } }));
+    await clientWith(fetch).priceBreakdown(BREAKDOWN);
+    expect(fetch).toHaveBeenCalledOnce();
+    const request = fetch.mock.calls[0]?.[0];
+    expect(request?.url).toBe("https://api.test/v1/public/taxi/price-breakdown");
+    await expect(request?.clone().json()).resolves.toEqual(BREAKDOWN);
   });
 });
 

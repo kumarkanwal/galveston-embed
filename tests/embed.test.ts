@@ -39,6 +39,9 @@ function clientFactory(
     getAirports: vi.fn(async () => []),
     getAirlines: vi.fn(async () => []),
     quote: vi.fn(async () => ({ out_of_service_area: false, vehicles: [] })),
+    priceBreakdown: vi.fn(async () => ({
+      subtotal: "0.00", discount_amount: "0.00", total: "0.00", currency: "USD",
+    })),
   };
   return vi.fn(() => client);
 }

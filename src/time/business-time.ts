@@ -33,6 +33,20 @@ export function formatBusinessDateTime(instant: Date, timeZone: string): string 
   return `${date} ${time}`;
 }
 
+export function formatBusinessLocalDateTime(date: string, time: string): string {
+  // The stored fields are already business-local; UTC prevents visitor-zone conversion.
+  const businessWallTime = new Date(`${date}T${time}:00.000Z`);
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "UTC",
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(businessWallTime);
+}
+
 export function compareWithBusinessNow(
   date: string,
   time: string,
