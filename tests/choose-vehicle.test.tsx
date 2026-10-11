@@ -68,9 +68,9 @@ describe("Choose Vehicle", () => {
 
   it("renders the E-3 confirm placeholder", () => {
     const root = document.createElement("div");
-    render(<ConfirmPlaceholder vehicle={VEHICLES[0] as QuotedVehicle}
+    render(<ConfirmPlaceholder vehicle={VEHICLES[1] as QuotedVehicle}
       onBack={() => undefined} />, root);
-    expect(root.textContent).toContain("Sedan");
+    expect(root.textContent).toContain("Van");
     expect(root.textContent).toContain("Confirm — coming next");
     expect(root.querySelector('[aria-current="step"]')?.textContent).toContain("Confirm");
   });

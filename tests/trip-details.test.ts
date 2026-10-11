@@ -23,7 +23,9 @@ function formFor(service: CoreServiceCode): TripFormState {
     pickupAddress: ADDRESS,
     dropoffAddress: ADDRESS,
     pickupAirportId: "airport-pickup",
+    pickupAirportName: "Pickup Airport",
     dropoffAirportId: "airport-dropoff",
+    dropoffAirportName: "Dropoff Airport",
     airline: { id: "airline-1", name: "Example Air" },
     flightNumber: "123",
   };

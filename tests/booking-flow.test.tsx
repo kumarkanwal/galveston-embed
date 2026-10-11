@@ -28,6 +28,9 @@ function clientWith(quote: ApiClient["quote"]): ApiClient {
     getAirports: vi.fn(async () => []),
     getAirlines: vi.fn(async () => []),
     quote,
+    priceBreakdown: vi.fn(async () => ({
+      subtotal: "0.00", discount_amount: "0.00", total: "0.00", currency: "USD",
+    })),
   };
 }
 

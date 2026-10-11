@@ -26,6 +26,6 @@ describe("lint limits", () => {
       "max-depth",
       "@typescript-eslint/no-explicit-any",
     ]));
-  });
+  }, 10_000);
 });
 

@@ -33,7 +33,9 @@ function initialForm(business: Business, service: CoreServiceCode): TripFormStat
     pickupAddress: null,
     dropoffAddress: null,
     pickupAirportId: "",
+    pickupAirportName: "",
     dropoffAirportId: "",
+    dropoffAirportName: "",
     airline: null,
     flightNumber: "",
   };

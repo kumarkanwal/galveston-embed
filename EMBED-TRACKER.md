@@ -38,7 +38,7 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 
 ## Progress
 
-**Overall: 40%** ▓▓▓▓▓▓▓▓░░░░░░░░░░░░ · **"Built" means 100%, add-ons included.**
+**Overall: 49%** ▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░ · **"Built" means 100%, add-ons included.**
 
 | # | Phase | Side | Weight | Status | Done |
 |---|---|---|---|---|---|
@@ -48,7 +48,7 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 3 | E-1 Skeleton, API, money, time | Widget | 7% | ✅ Complete | 7% |
 | 4 | E-2 Step 1 — Trip Details | Widget | 12% | ✅ Complete | 12% |
 | 5 | E-3 Step 2 — Choose Vehicle | Widget + VPS | 11% | ✅ Complete — address filter fixed | 11% |
-| 6 | E-4 Step 3 — Confirm & breakdown | Widget | 9% | ⬜ | 0% |
+| 6 | E-4 Step 3 — Confirm & breakdown | Widget | 9% | ✅ Complete — ready for review | 9% |
 | 7 | E-5 Create Trip, confirmation, errors | Widget + Admin | 9% | ⬜ | 0% |
 | 8 | E-6 Mobile, side-by-side with BRO, hosting | Both | 12% | ⬜ | 0% |
 | 9 | E-7 Card payment (Square) | Both | 9% | ⛔ B-16 | 0% |
@@ -56,7 +56,7 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 11 | E-9 Round trip | Both | 5% | ⛔ I-1 | 0% |
 | 12 | E-10 Peak / blackout | Both | 3% | ⛔ B-7 | 0% |
 | 13 | E-11 Hourly (hours + Add Stops) | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
-| | **Total** | | **100%** | | **40%** |
+| | **Total** | | **100%** | | **49%** |
 
 Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
@@ -112,20 +112,20 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 | 3.1 | Trip summary | ✅ | Service, date/time, vehicle, distance (`distance_miles`), passengers, luggage, addresses |
 | 3.2 | Charges breakdown | ✅ | `POST /taxi/price-breakdown` with `payment_method: "cash"`. Display `line_items` and `total` exactly as returned |
 | 3.3 | Line-item labels | ✅ | Show exactly what the API returns (ED-011). Any label change happens in the backend |
-| 3.4 | CC surcharge line | ✅ provisional | Hide when `"0.00"` (ED-012). Identify by `kind`/`source_id`, never label. Confirm in the E-6 side-by-side test |
-| 3.5 | Car Seats dropdown (0–5) | ✅ | Send `car_seats`; re-call price-breakdown on change; show the returned total. $15 each, server-priced |
+| 3.4 | Zero-value lines | ✅ | Hide every line whose amount string is exactly `"0.00"` (ED-022); never identify lines by label |
+| 3.5 | Car Seats dropdown (0–5) | ✅ with backend gap | Send `car_seats`; re-call price-breakdown on change; ignore older responses and show only the returned total. **Legacy anchor-zone pricing ignores `car_seats` (backend I-3)** |
 | 3.6 | Special requests | ✅ | Booking `comments` |
 | 3.7 | First name, last name, phone, email | ✅ | Booking `customer` |
-| 3.8 | Terms & Conditions checkbox and link | ✅ | `terms_and_conditions` from `/business` is HTML and may be **null**: hide the link when null. **Sanitise the HTML before rendering.** `accepted_terms` must be `true` |
-| 3.9 | Create Trip (cash) | ✅ | `POST /taxi/booking` with `payment: { "method": "cash" }` and an `Idempotency-Key` header |
-| 3.10 | Request a Quote vehicle chosen | 🔍 | **Do not call price-breakdown** (it returns a validation error). Booking creates a $0 `requested` order. **Need BRO screenshot of step 3 for a Request a Quote vehicle** |
+| 3.8 | Terms & Conditions checkbox and link | ✅ | `terms_and_conditions` from `/business` may be **null**: hide the link when null and render admin-entered content as literal plain text, never `innerHTML`. `accepted_terms` must be `true` |
+| 3.9 | Create Trip (cash) | ✅ E-4 UI | Validates and builds the typed cash booking request without sending it. The booking POST and idempotency header are E-5 |
+| 3.10 | Request a Quote vehicle chosen | ⏸ E-5 | Keeps the placeholder and never calls price-breakdown. The Request a Quote confirmation screenshot is available for E-5 |
 | 3.11 | Back button | ✅ | Returns to step 2 |
 
 ## After booking
 
 | # | Item | Status | Notes |
 |---|---|---|---|
-| 4.1 | Confirmation screen | 🔍 | Booking returns `order_number`, `status`, `total`. **Need BRO screenshot of the page after Create Trip** |
+| 4.1 | Confirmation screen | 🔍 | Request a Quote confirmation screenshot is available; priced-booking confirmation remains needed. Booking returns `order_number`, `status`, `total` |
 | 4.2 | Error handling | ✅ | See "Errors" below |
 | 4.3 | Booking appears in admin Runs | 🔍 | **The end-to-end proof.** Verify after S-2 |
 
@@ -171,7 +171,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 ## Screenshots still needed from BRO
 
 1. Step 3 — after choosing a Request a Quote vehicle
-2. The page after Create Trip (confirmation)
+2. The page after a priced Create Trip (the Request a Quote confirmation is present)
 3. Mobile view of each step
 4. Step 1 — Hourly, before E-11
 
@@ -197,6 +197,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 11 Oct 2026 | E-4 complete for priced vehicles: server-owned price breakdown, ED-022 zero-line filtering, race-safe Car Seats repricing, trip summary, customer fields, plain-text terms panel, validation, and typed cash booking-request preparation without a booking POST. Legacy anchor-zone pricing ignores `car_seats` (backend I-3). |
 | 11 Oct 2026 | E-3 follow-up: kept address autocomplete US-only while excluding country, state, administrative-region and postal-code-only suggestions; cities, street addresses and places remain available. Added focused request and type-filter tests. |
 | 11 Oct 2026 | E-3 complete: one-request quote submission, quote-error mapping, Step 2 vehicle states, out-of-area handling, route rendering on the Step 1 map, preserved Back navigation, and the Step 3 placeholder. Airport quote requests remain blocked by the documented backend/contract conflict. |
 | 10 Oct 2026 | E-2 complete: core Trip Details services, business-time validation, passenger/luggage selectors, Shadow DOM Places autocomplete, map pins, airport fields, and validated handoff to E-3. E-1 was merged before this phase. |

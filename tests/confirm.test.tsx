@@ -1,0 +1,204 @@
+import { render } from "preact";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type {
+  ApiClient,
+  Business,
+  QuotedVehicle,
+  TaxiPriceBreakdownResponse,
+  TaxiQuoteResponse,
+} from "../src/api/client";
+import { ApiError, NetworkError, RateLimitedError } from "../src/api/errors";
+import { breakdownErrorMessage } from "../src/app/confirm/breakdown-error";
+import { buildBookingRequest, buildBreakdownRequest } from "../src/app/confirm/build-requests";
+import { Confirm } from "../src/app/confirm/Confirm";
+import type { ConfirmFormState } from "../src/app/confirm/types";
+import type { TripFormState } from "../src/app/trip/types";
+
+const BUSINESS = {
+  id: "business-1", name: "Island Transit", type: "taxi", currency: "USD",
+  timezone: "America/Chicago", distance_unit: "miles",
+  settings: { advance_booking_hours: 0, insurance_enabled: false,
+    insurance_pct: "0.00", payment_methods: ["cash"],
+    terms_and_conditions: "Use <b>care</b> & arrive early." },
+} satisfies Business;
+
+const TRIP: TripFormState = {
+  service: "one_way", pickupDate: "2026-10-12", pickupTime: "00:44",
+  passengers: 1, luggage: 0,
+  pickupAddress: { address: "Houston, TX", zipcode: "77002", location: { lat: 1, lng: 2 } },
+  dropoffAddress: { address: "Houston Premium Outlets", zipcode: "77433",
+    location: { lat: 3, lng: 4 } },
+  pickupAirportId: "", pickupAirportName: "", dropoffAirportId: "",
+  dropoffAirportName: "", airline: null, flightNumber: "",
+};
+
+const VEHICLE = {
+  vehicle_type_id: "11111111-1111-1111-1111-111111111111",
+  name: "SEDAN private", passenger_capacity: 3, luggage_capacity: 3,
+  photo_url: null, base_price: "90.00", pricing_basis: "distance",
+  available: true, quote_status: "priced",
+} satisfies QuotedVehicle;
+
+const QUOTE = {
+  distance_miles: "31.29", duration_minutes: 50, route_polyline: "route",
+  out_of_service_area: false, vehicles: [VEHICLE],
+} satisfies TaxiQuoteResponse;
+
+const BREAKDOWN: TaxiPriceBreakdownResponse = {
+  line_items: [
+    { label: "Base Price", amount: "90.00", kind: "base", quantity: 1 },
+    { label: "Fuel Surcharge", amount: "2.70", kind: "surcharge", quantity: 1 },
+    { label: "Unrelated Zero", amount: "0.00", kind: "charge", quantity: 1 },
+  ],
+  subtotal: "92.70", discount_amount: "0.00", total: "92.70", currency: "USD",
+};
+
+function mockClient(priceBreakdown: ApiClient["priceBreakdown"]): ApiClient {
+  return {
+    getBusiness: vi.fn(async () => BUSINESS), getServiceTypes: vi.fn(async () => []),
+    getAirports: vi.fn(async () => []), getAirlines: vi.fn(async () => []),
+    quote: vi.fn(async () => QUOTE), priceBreakdown,
+  };
+}
+
+function mount(priceBreakdown: ApiClient["priceBreakdown"] = vi.fn(async () => BREAKDOWN)) {
+  const root = document.createElement("div");
+  document.body.append(root);
+  const client = mockClient(priceBreakdown);
+  render(<Confirm business={BUSINESS} client={client} form={TRIP} onBack={() => undefined}
+    quote={QUOTE} serviceName="One Way Transfer" vehicle={VEHICLE} />, root);
+  return { client, root };
+}
+
+function input(root: HTMLElement, id: string, value: string) {
+  const element = root.querySelector<HTMLInputElement>(`#${id}`);
+  if (element === null) throw new Error(`Missing input ${id}`);
+  element.value = value;
+  element.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+beforeEach(() => document.body.replaceChildren());
+
+describe("Confirm price breakdown", () => {
+  it("requests once with the stored trip, vehicle, cash, and zero car seats", async () => {
+    const priceBreakdown = vi.fn(async () => BREAKDOWN);
+    mount(priceBreakdown);
+    await vi.waitFor(() => expect(priceBreakdown).toHaveBeenCalledOnce());
+    expect(priceBreakdown).toHaveBeenCalledWith(buildBreakdownRequest(TRIP, VEHICLE.vehicle_type_id, 0));
+  });
+
+  it("keeps API order, hides every exact zero line, and formats the server total", async () => {
+    const { root } = mount();
+    await vi.waitFor(() => expect(root.textContent).toContain("$92.70 USD"));
+    expect([...root.querySelectorAll(".charge-row")].map((row) => row.textContent))
+      .toEqual(["Base Price$90.00 USD", "Fuel Surcharge$2.70 USD"]);
+    expect(root.textContent).not.toContain("Unrelated Zero");
+    expect(root.textContent).toContain("One Way Transfer on Monday, October 12, 2026 at 12:44 AM");
+  });
+
+  it("ignores an older response after car seats trigger a newer request", async () => {
+    const resolvers: Array<(value: TaxiPriceBreakdownResponse) => void> = [];
+    const priceBreakdown = vi.fn(() => new Promise<TaxiPriceBreakdownResponse>((resolve) => {
+      resolvers.push(resolve);
+    }));
+    const { root } = mount(priceBreakdown);
+    await vi.waitFor(() => expect(priceBreakdown).toHaveBeenCalledOnce());
+    const select = root.querySelector<HTMLSelectElement>(".car-seats select");
+    if (select === null) throw new Error("Missing Car Seats select");
+    select.value = "1";
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+    await vi.waitFor(() => expect(priceBreakdown).toHaveBeenCalledTimes(2));
+    resolvers[1]?.({ ...BREAKDOWN, total: "107.70" });
+    await vi.waitFor(() => expect(root.textContent).toContain("$107.70 USD"));
+    resolvers[0]?.(BREAKDOWN);
+    await Promise.resolve();
+    expect(root.textContent).toContain("$107.70 USD");
+    expect(root.textContent).not.toContain("$92.70 USD");
+  });
+});
+
+describe("Confirm breakdown lifetime", () => {
+  it("loads a fresh breakdown after trip changes or step 3 is re-entered", async () => {
+    const priceBreakdown = vi.fn(async () => BREAKDOWN);
+    const { root, client } = mount(priceBreakdown);
+    await vi.waitFor(() => expect(priceBreakdown).toHaveBeenCalledOnce());
+    const changedTrip = { ...TRIP, passengers: 2 };
+    render(<Confirm business={BUSINESS} client={client} form={changedTrip}
+      onBack={() => undefined} quote={QUOTE} serviceName="One Way Transfer" vehicle={VEHICLE} />, root);
+    await vi.waitFor(() => expect(priceBreakdown).toHaveBeenCalledTimes(2));
+    render(null, root);
+    render(<Confirm business={BUSINESS} client={client} form={changedTrip}
+      onBack={() => undefined} quote={QUOTE} serviceName="One Way Transfer" vehicle={VEHICLE} />, root);
+    await vi.waitFor(() => expect(priceBreakdown).toHaveBeenCalledTimes(3));
+  });
+});
+
+describe("Confirm form", () => {
+  it("renders terms as literal text and closes the panel", async () => {
+    const { root } = mount();
+    const link = [...root.querySelectorAll("button")]
+      .find((button) => button.textContent?.includes("Terms"));
+    link?.click();
+    await vi.waitFor(() => expect(root.querySelector(".terms-panel")).not.toBeNull());
+    const panel = root.querySelector(".terms-panel");
+    expect(panel?.textContent).toContain("Use <b>care</b> & arrive early.");
+    expect(panel?.querySelector("b")).toBeNull();
+    root.querySelector<HTMLButtonElement>(".terms-close")?.click();
+    await vi.waitFor(() => expect(root.querySelector(".terms-panel")).toBeNull());
+  });
+
+  it("focuses the first error, accepts optional phone, and never books", async () => {
+    const priceBreakdown = vi.fn(async () => BREAKDOWN);
+    const { root } = mount(priceBreakdown);
+    await vi.waitFor(() => expect(root.textContent).toContain("$92.70 USD"));
+    root.querySelector<HTMLButtonElement>(".create-trip")?.click();
+    await vi.waitFor(() => expect(root.textContent).toContain("Enter your first name."));
+    expect(root.querySelector("#firstName")).toBe(document.activeElement);
+    input(root, "firstName", "Ada"); input(root, "lastName", "Lovelace");
+    input(root, "email", "ada@example.com"); input(root, "comments", "Call on arrival");
+    root.querySelector<HTMLInputElement>('[data-confirm-field="acceptedTerms"]')?.click();
+    await vi.waitFor(() => expect(
+      root.querySelector<HTMLInputElement>('[data-confirm-field="acceptedTerms"]')?.checked,
+    ).toBe(true));
+    root.querySelector<HTMLButtonElement>(".create-trip")?.click();
+    await vi.waitFor(() => expect(root.textContent).toContain("Booking — coming next"));
+    expect(priceBreakdown).toHaveBeenCalledOnce();
+  });
+
+  it("builds only the approved booking fields", () => {
+    const form: ConfirmFormState = { acceptedTerms: true, comments: "Call on arrival",
+      email: "ada@example.com", firstName: "Ada", lastName: "Lovelace", phone: "" };
+    const request = buildBookingRequest(TRIP, VEHICLE.vehicle_type_id, 2, form);
+    expect(request).toMatchObject({ car_seats: 2, comments: "Call on arrival",
+      customer: { first_name: "Ada", last_name: "Lovelace", email: "ada@example.com", phone: null },
+      payment: { method: "cash" }, accepted_terms: true });
+    expect(request).not.toHaveProperty("charges");
+    expect(request).not.toHaveProperty("promo_code");
+    expect(request).not.toHaveProperty("payment_method");
+  });
+});
+
+describe("breakdown errors", () => {
+  it.each([
+    [new ApiError(400, { code: "VALIDATION_ERROR", message: "Bad field", field: "pickup_date" }), "Bad field"],
+    [new ApiError(400, { code: "VALIDATION_ERROR", message: "Bad request" }), "Bad request"],
+    [new ApiError(422, { code: "VEHICLE_UNAVAILABLE", message: "Unavailable" }), "Unavailable"],
+    [new RateLimitedError({ code: "RATE_LIMITED", message: "Server" }),
+      "Too many requests, please wait a moment and try again."],
+    [new ApiError(503, { code: "SERVER_ERROR", message: "Details" }),
+      "Pricing could not be loaded. Please go back and try again."],
+    [new NetworkError(new Error("offline")),
+      "Pricing could not be loaded. Please go back and try again."],
+  ])("maps breakdown failures without retrying", (error, message) => {
+    expect(breakdownErrorMessage(error)).toBe(message);
+  });
+
+  it("shows a failed breakdown with Back and does not retry", async () => {
+    const priceBreakdown = vi.fn(async () => Promise.reject(new NetworkError(new Error("offline"))));
+    const { root } = mount(priceBreakdown);
+    await vi.waitFor(() => expect(root.textContent).toContain("Please go back and try again."));
+    expect(root.querySelector(".back-button")).not.toBeNull();
+    expect(priceBreakdown).toHaveBeenCalledOnce();
+  });
+});

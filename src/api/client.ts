@@ -11,6 +11,10 @@ export type Airline = components["schemas"]["AirlineOption"];
 export type TaxiQuoteRequest = components["schemas"]["TaxiQuoteRequest"];
 export type TaxiQuoteResponse = components["schemas"]["TaxiQuoteResponse"];
 export type QuotedVehicle = components["schemas"]["QuotedVehicle"];
+export type TaxiPriceBreakdownRequest = components["schemas"]["TaxiPriceBreakdownRequest"];
+export type TaxiPriceBreakdownResponse = components["schemas"]["TaxiPriceBreakdownResponse"];
+export type TaxiBookingRequest = components["schemas"]["TaxiBookingRequest"];
+export type BreakdownLine = components["schemas"]["BreakdownLine"];
 
 interface ApiResult<T> {
   data?: T;
@@ -24,6 +28,7 @@ export interface ApiClient {
   getAirports(): Promise<Airport[]>;
   getAirlines(): Promise<Airline[]>;
   quote(body: TaxiQuoteRequest): Promise<TaxiQuoteResponse>;
+  priceBreakdown(body: TaxiPriceBreakdownRequest): Promise<TaxiPriceBreakdownResponse>;
 }
 
 export interface ApiClientOptions {
@@ -80,6 +85,12 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
           body,
           params: { query: { hide_incapable: true } },
         }),
+      );
+      return envelope.data;
+    },
+    async priceBreakdown(body) {
+      const envelope = await execute(() =>
+        client.POST("/v1/public/taxi/price-breakdown", { body }),
       );
       return envelope.data;
     },

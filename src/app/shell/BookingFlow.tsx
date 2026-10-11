@@ -1,4 +1,5 @@
 import type { ApiClient, Business } from "../../api/client";
+import { Confirm } from "../confirm/Confirm";
 import { ConfirmPlaceholder } from "../confirm/ConfirmPlaceholder";
 import { filterCoreServices } from "../trip/service-types";
 import { TripDetails } from "../trip/TripDetails";
@@ -35,7 +36,14 @@ function BookingFlowReady(props: Omit<BookingFlowProps, "services"> & {
       onBack={flow.back} onChoose={flow.choose} />;
   }
   if (flow.state.step === 3 && flow.state.selectedVehicle !== null) {
-    return <ConfirmPlaceholder vehicle={flow.state.selectedVehicle} onBack={flow.back} />;
+    const vehicle = flow.state.selectedVehicle;
+    if (vehicle.quote_status === "request_quote") {
+      return <ConfirmPlaceholder vehicle={vehicle} onBack={flow.back} />;
+    }
+    const service = props.services.find((candidate) => candidate.code === flow.state.form.service);
+    if (flow.state.quote === null || service === undefined) return null;
+    return <Confirm business={props.business} client={props.client} form={flow.state.form}
+      onBack={flow.back} quote={flow.state.quote} serviceName={service.name} vehicle={vehicle} />;
   }
   return <TripDetails client={props.client} errors={flow.state.errors} form={flow.state.form}
     formError={flow.state.formError} isSubmitting={flow.state.isSubmitting}

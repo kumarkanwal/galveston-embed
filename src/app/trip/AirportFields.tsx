@@ -15,13 +15,18 @@ export function AirportFields(props: AirportFieldsProps) {
   if (props.form.service === "one_way") return null;
   const pickup = props.form.service === "airport_pickup";
   const airportKey = pickup ? "pickupAirportId" : "dropoffAirportId";
+  const airportNameKey = pickup ? "pickupAirportName" : "dropoffAirportName";
   const airportId = props.form[airportKey];
   const airportError = props.errors[airportKey];
+  const chooseAirport = (id: string) => {
+    props.update(airportKey, id);
+    props.update(airportNameKey, props.airports.find((airport) => airport.id === id)?.name ?? "");
+  };
   return <>
     <div class="field full-field">
       <label for="airport">{pickup ? "Pickup Airport" : "Dropoff Airport"}</label>
       <select id="airport" value={airportId} aria-invalid={airportError !== undefined}
-        onChange={(event) => props.update(airportKey, event.currentTarget.value)}>
+        onChange={(event) => chooseAirport(event.currentTarget.value)}>
         <option value="">Select an airport</option>
         {props.airports.map((airport) => <option value={airport.id}>{airport.name}</option>)}
       </select>
