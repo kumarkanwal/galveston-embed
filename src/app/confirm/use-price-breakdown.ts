@@ -6,6 +6,7 @@ import { breakdownErrorMessage } from "./breakdown-error";
 import { buildBreakdownRequest } from "./build-requests";
 
 export type BreakdownState =
+  | { status: "skipped" }
   | { status: "loading" }
   | { status: "ready"; data: TaxiPriceBreakdownResponse }
   | { status: "error"; message: string };
@@ -15,10 +16,17 @@ export function usePriceBreakdown(
   form: TripFormState,
   vehicleTypeId: string,
   carSeats: number,
+  enabled = true,
 ): BreakdownState {
-  const [state, setState] = useState<BreakdownState>({ status: "loading" });
+  const [state, setState] = useState<BreakdownState>(
+    enabled ? { status: "loading" } : { status: "skipped" },
+  );
   const latestRequest = useRef(0);
   useEffect(() => {
+    if (!enabled) {
+      setState({ status: "skipped" });
+      return;
+    }
     const requestId = latestRequest.current + 1;
     latestRequest.current = requestId;
     setState({ status: "loading" });
@@ -31,6 +39,6 @@ export function usePriceBreakdown(
           setState({ status: "error", message: breakdownErrorMessage(error) });
         }
       });
-  }, [carSeats, client, form, vehicleTypeId]);
+  }, [carSeats, client, enabled, form, vehicleTypeId]);
   return state;
 }

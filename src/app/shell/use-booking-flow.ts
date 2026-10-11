@@ -4,6 +4,7 @@ import type {
   ApiClient,
   Business,
   QuotedVehicle,
+  TaxiBookingResponse,
   TaxiQuoteResponse,
 } from "../../api/client";
 import { businessDateTimeParts } from "../../time";
@@ -13,6 +14,7 @@ import type { CoreServiceCode, TripErrors, TripFormState } from "../trip/types";
 import { validateTrip } from "../trip/validation";
 
 export interface BookingFlowState {
+  confirmation: { requestQuote: boolean; response: TaxiBookingResponse } | null;
   errors: TripErrors;
   form: TripFormState;
   formError: string | null;
@@ -43,6 +45,7 @@ function initialForm(business: Business, service: CoreServiceCode): TripFormStat
 
 function initialState(business: Business, service: CoreServiceCode): BookingFlowState {
   return {
+    confirmation: null,
     errors: {},
     form: initialForm(business, service),
     formError: null,
@@ -58,6 +61,7 @@ export function useBookingFlow(client: ApiClient, business: Business, service: C
   const requestInFlight = useRef(false);
   const update = <Key extends keyof TripFormState>(key: Key, value: TripFormState[Key]) => {
     setState((current) => ({ ...current,
+      confirmation: null,
       errors: { ...current.errors, [key]: undefined },
       form: { ...current.form, [key]: value },
       formError: null,
@@ -68,14 +72,10 @@ export function useBookingFlow(client: ApiClient, business: Business, service: C
   const submit = async (event: SubmitEvent) => {
     event.preventDefault();
     if (requestInFlight.current) return;
-    const errors = validateTrip(state.form, {
-      advanceBookingHours: business.settings.advance_booking_hours,
-      now: new Date(),
-      timeZone: business.timezone,
-    });
+    const errors = validateTrip(state.form, { now: new Date(), timeZone: business.timezone,
+      advanceBookingHours: business.settings.advance_booking_hours });
     if (Object.keys(errors).length > 0) {
-      setState((current) => ({ ...current, errors }));
-      return;
+      setState((current) => ({ ...current, errors })); return;
     }
     requestInFlight.current = true;
     const submittedForm = state.form;
@@ -98,8 +98,11 @@ export function useBookingFlow(client: ApiClient, business: Business, service: C
   };
   const back = () => setState((current) => ({ ...current, step: current.step === 3 ? 2 : 1 }));
   const choose = (vehicle: QuotedVehicle) => {
-    if (vehicle.quote_status === "unavailable") return;
-    setState((current) => ({ ...current, selectedVehicle: vehicle, step: 3 }));
+    if (vehicle.quote_status !== "unavailable") setState((current) => (
+      { ...current, selectedVehicle: vehicle, step: 3 }));
   };
-  return { state, update, submit, back, choose };
+  const complete = (response: TaxiBookingResponse, requestQuote: boolean) =>
+    setState((current) => ({ ...current, confirmation: { requestQuote, response }, quote: null,
+      selectedVehicle: null }));
+  return { state, update, submit, back, choose, complete };
 }

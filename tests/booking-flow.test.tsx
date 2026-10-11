@@ -1,7 +1,12 @@
 import { render } from "preact";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { ApiClient, Business, TaxiQuoteResponse } from "../src/api/client";
+import type {
+  ApiClient,
+  Business,
+  TaxiBookingResponse,
+  TaxiQuoteResponse,
+} from "../src/api/client";
 import { ApiError, NetworkError, RateLimitedError } from "../src/api/errors";
 import { useBookingFlow } from "../src/app/shell/use-booking-flow";
 import { quoteFailure } from "../src/app/trip/quote-error";
@@ -20,6 +25,10 @@ const QUOTE: TaxiQuoteResponse = {
   vehicles: [{ vehicle_type_id: "vehicle-1", name: "Sedan", passenger_capacity: 3,
     luggage_capacity: 2, base_price: "90.00", available: true, quote_status: "priced" }],
 };
+const BOOKED: TaxiBookingResponse = {
+  order_id: "order-1", order_number: "HVT-1", status: "confirmed", total: "90.00",
+  amount_paid: "0.00", payment_method: "cash", confirmation_email_sent: false,
+};
 
 function clientWith(quote: ApiClient["quote"]): ApiClient {
   return {
@@ -31,6 +40,7 @@ function clientWith(quote: ApiClient["quote"]): ApiClient {
     priceBreakdown: vi.fn(async () => ({
       subtotal: "0.00", discount_amount: "0.00", total: "0.00", currency: "USD",
     })),
+    book: vi.fn(),
   };
 }
 
@@ -121,6 +131,20 @@ describe("booking navigation", () => {
     expect(flow().state.selectedVehicle).toBe(vehicle);
     flow().back();
     await vi.waitFor(() => expect(flow().state.step).toBe(2));
+  });
+
+  it("clears booking selections after success", async () => {
+    render(<Harness client={clientWith(vi.fn(async () => QUOTE))} />, document.body);
+    await makeValid();
+    await flow().submit(submitEvent());
+    const vehicle = QUOTE.vehicles?.[0];
+    if (vehicle === undefined) throw new Error("Fixture vehicle missing.");
+    flow().choose(vehicle);
+    await vi.waitFor(() => expect(flow().state.selectedVehicle).toBe(vehicle));
+    flow().complete(BOOKED, false);
+    await vi.waitFor(() => expect(flow().state.confirmation?.response).toBe(BOOKED));
+    expect(flow().state.quote).toBeNull();
+    expect(flow().state.selectedVehicle).toBeNull();
   });
 });
 

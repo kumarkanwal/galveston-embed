@@ -2,7 +2,7 @@ import type { ConfirmErrors, ConfirmField, ConfirmFormState } from "./types";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const FOCUS_ORDER: ConfirmField[] = [
-  "firstName", "lastName", "phone", "email", "acceptedTerms", "breakdown",
+  "comments", "firstName", "lastName", "phone", "email", "acceptedTerms", "breakdown",
 ];
 
 export function validateConfirm(

@@ -4,14 +4,15 @@ import type {
   ApiClient,
   Business,
   QuotedVehicle,
-  TaxiBookingRequest,
+  TaxiBookingResponse,
   TaxiQuoteResponse,
 } from "../../api/client";
+import { useBookingSubmit } from "../booking/use-booking-submit";
 import { ProgressSteps } from "../trip/ProgressSteps";
 import type { TripFormState } from "../trip/types";
-import { buildBookingRequest } from "./build-requests";
 import { Charges } from "./Charges";
 import { ConfirmForm } from "./ConfirmForm";
+import { RequestQuotePrice } from "./RequestQuotePrice";
 import { TripSummary } from "./TripSummary";
 import { usePriceBreakdown } from "./use-price-breakdown";
 
@@ -20,6 +21,7 @@ interface ConfirmProps {
   client: ApiClient;
   form: TripFormState;
   onBack: () => void;
+  onBooked: (response: TaxiBookingResponse, requestQuote: boolean) => void;
   quote: TaxiQuoteResponse;
   serviceName: string;
   vehicle: QuotedVehicle;
@@ -27,12 +29,19 @@ interface ConfirmProps {
 
 export function Confirm(props: ConfirmProps) {
   const [carSeats, setCarSeats] = useState(0);
-  const [booking, setBooking] = useState<TaxiBookingRequest | null>(null);
+  const requestQuote = props.vehicle.quote_status === "request_quote";
   const breakdown = usePriceBreakdown(
-    props.client, props.form, props.vehicle.vehicle_type_id, carSeats,
+    props.client, props.form, props.vehicle.vehicle_type_id, carSeats, !requestQuote,
   );
+  const booking = useBookingSubmit({
+    carSeats,
+    client: props.client,
+    onSuccess: (response) => props.onBooked(response, requestQuote),
+    trip: props.form,
+    vehicleTypeId: props.vehicle.vehicle_type_id,
+  });
   const changeCarSeats = (count: number) => {
-    setBooking(null);
+    booking.resetFailure();
     setCarSeats(count);
   };
   return <section class="widget" aria-live="polite">
@@ -45,15 +54,18 @@ export function Confirm(props: ConfirmProps) {
       <div>
         <TripSummary form={props.form} quote={props.quote}
           serviceName={props.serviceName} vehicle={props.vehicle} />
-        <Charges carSeats={carSeats} currency={props.business.currency}
-          onCarSeatsChange={changeCarSeats} state={breakdown} />
+        {requestQuote
+          ? <RequestQuotePrice carSeats={carSeats} onCarSeatsChange={changeCarSeats}
+            outOfServiceArea={props.quote.out_of_service_area} />
+          : <Charges carSeats={carSeats} currency={props.business.currency}
+            onCarSeatsChange={changeCarSeats} state={breakdown} />}
         <button class="back-button" type="button" onClick={props.onBack}>↶ Back</button>
       </div>
-      <ConfirmForm booking={booking} breakdownReady={breakdown.status === "ready"}
-        onChange={() => setBooking(null)} terms={props.business.settings.terms_and_conditions}
-        onValid={(form) => setBooking(buildBookingRequest(
-          props.form, props.vehicle.vehicle_type_id, carSeats, form,
-        ))} />
+      <ConfirmForm breakdownReady={requestQuote || breakdown.status === "ready"}
+        buttonLabel={requestQuote ? "Request Quote" : "Create Trip"}
+        failure={booking.failure} isSubmitting={booking.isSubmitting}
+        onChange={booking.resetFailure} onValid={booking.submit}
+        terms={props.business.settings.terms_and_conditions} />
     </div>
   </section>;
 }

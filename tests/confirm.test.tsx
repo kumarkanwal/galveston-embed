@@ -58,7 +58,7 @@ function mockClient(priceBreakdown: ApiClient["priceBreakdown"]): ApiClient {
   return {
     getBusiness: vi.fn(async () => BUSINESS), getServiceTypes: vi.fn(async () => []),
     getAirports: vi.fn(async () => []), getAirlines: vi.fn(async () => []),
-    quote: vi.fn(async () => QUOTE), priceBreakdown,
+    quote: vi.fn(async () => QUOTE), priceBreakdown, book: vi.fn(),
   };
 }
 
@@ -67,7 +67,7 @@ function mount(priceBreakdown: ApiClient["priceBreakdown"] = vi.fn(async () => B
   document.body.append(root);
   const client = mockClient(priceBreakdown);
   render(<Confirm business={BUSINESS} client={client} form={TRIP} onBack={() => undefined}
-    quote={QUOTE} serviceName="One Way Transfer" vehicle={VEHICLE} />, root);
+    onBooked={() => undefined} quote={QUOTE} serviceName="One Way Transfer" vehicle={VEHICLE} />, root);
   return { client, root };
 }
 
@@ -125,11 +125,13 @@ describe("Confirm breakdown lifetime", () => {
     await vi.waitFor(() => expect(priceBreakdown).toHaveBeenCalledOnce());
     const changedTrip = { ...TRIP, passengers: 2 };
     render(<Confirm business={BUSINESS} client={client} form={changedTrip}
-      onBack={() => undefined} quote={QUOTE} serviceName="One Way Transfer" vehicle={VEHICLE} />, root);
+      onBack={() => undefined} onBooked={() => undefined} quote={QUOTE}
+      serviceName="One Way Transfer" vehicle={VEHICLE} />, root);
     await vi.waitFor(() => expect(priceBreakdown).toHaveBeenCalledTimes(2));
     render(null, root);
     render(<Confirm business={BUSINESS} client={client} form={changedTrip}
-      onBack={() => undefined} quote={QUOTE} serviceName="One Way Transfer" vehicle={VEHICLE} />, root);
+      onBack={() => undefined} onBooked={() => undefined} quote={QUOTE}
+      serviceName="One Way Transfer" vehicle={VEHICLE} />, root);
     await vi.waitFor(() => expect(priceBreakdown).toHaveBeenCalledTimes(3));
   });
 });
@@ -150,16 +152,21 @@ describe("Confirm terms", () => {
     const panel = root.querySelector(".terms-panel");
     expect(panel?.textContent).toContain("Use <b>care</b> & arrive early.");
     expect(panel?.querySelector("b")).toBeNull();
-    root.querySelector<HTMLButtonElement>(".terms-close")?.click();
+    expect(root.querySelector(".terms-close")).toBe(document.activeElement);
+    panel?.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, key: "Escape" }));
     await vi.waitFor(() => expect(root.querySelector(".terms-panel")).toBeNull());
     expect(root.querySelector<HTMLInputElement>("#firstName")?.value).toBe("Ada");
     expect(root.querySelector<HTMLInputElement>("#comments")?.value).toBe("Call on arrival");
     expect(link).toBe(document.activeElement);
+    link?.click();
+    await vi.waitFor(() => expect(root.querySelector(".terms-close")).not.toBeNull());
+    root.querySelector<HTMLButtonElement>(".terms-close")?.click();
+    await vi.waitFor(() => expect(root.querySelector(".terms-panel")).toBeNull());
   });
 });
 
 describe("Confirm form", () => {
-  it("focuses the first error, accepts optional phone, and never books", async () => {
+  it("focuses the first error and accepts optional phone", async () => {
     const priceBreakdown = vi.fn(async () => BREAKDOWN);
     const { root } = mount(priceBreakdown);
     await vi.waitFor(() => expect(root.textContent).toContain("$92.70 USD"));
@@ -173,7 +180,6 @@ describe("Confirm form", () => {
       root.querySelector<HTMLInputElement>('[data-confirm-field="acceptedTerms"]')?.checked,
     ).toBe(true));
     root.querySelector<HTMLButtonElement>(".create-trip")?.click();
-    await vi.waitFor(() => expect(root.textContent).toContain("Booking — coming next"));
     expect(priceBreakdown).toHaveBeenCalledOnce();
   });
 

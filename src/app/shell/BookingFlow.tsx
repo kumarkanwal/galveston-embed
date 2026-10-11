@@ -1,6 +1,6 @@
 import type { ApiClient, Business } from "../../api/client";
+import { Confirmation } from "../booking/Confirmation";
 import { Confirm } from "../confirm/Confirm";
-import { ConfirmPlaceholder } from "../confirm/ConfirmPlaceholder";
 import { filterCoreServices } from "../trip/service-types";
 import { TripDetails } from "../trip/TripDetails";
 import { ChooseVehicle } from "../vehicle/ChooseVehicle";
@@ -31,19 +31,22 @@ function BookingFlowReady(props: Omit<BookingFlowProps, "services"> & {
   services: ReturnType<typeof filterCoreServices>;
 }) {
   const flow = useBookingFlow(props.client, props.business, props.initialService);
+  if (flow.state.confirmation !== null) {
+    return <Confirmation currency={props.business.currency}
+      requestQuote={flow.state.confirmation.requestQuote}
+      response={flow.state.confirmation.response} />;
+  }
   if (flow.state.step === 2 && flow.state.quote !== null) {
     return <ChooseVehicle business={props.business} quote={flow.state.quote}
       onBack={flow.back} onChoose={flow.choose} />;
   }
   if (flow.state.step === 3 && flow.state.selectedVehicle !== null) {
     const vehicle = flow.state.selectedVehicle;
-    if (vehicle.quote_status === "request_quote") {
-      return <ConfirmPlaceholder vehicle={vehicle} onBack={flow.back} />;
-    }
     const service = props.services.find((candidate) => candidate.code === flow.state.form.service);
     if (flow.state.quote === null || service === undefined) return null;
     return <Confirm business={props.business} client={props.client} form={flow.state.form}
-      onBack={flow.back} quote={flow.state.quote} serviceName={service.name} vehicle={vehicle} />;
+      onBack={flow.back} onBooked={flow.complete} quote={flow.state.quote}
+      serviceName={service.name} vehicle={vehicle} />;
   }
   return <TripDetails client={props.client} errors={flow.state.errors} form={flow.state.form}
     formError={flow.state.formError} isSubmitting={flow.state.isSubmitting}
