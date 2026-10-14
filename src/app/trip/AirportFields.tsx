@@ -2,12 +2,14 @@ import type { Airline, Airport } from "../../api/client";
 import { AirlineCombobox } from "./AirlineCombobox";
 import { FieldError } from "./FieldError";
 import type { TripErrors, TripFormState } from "./types";
+import { useAirportLocation } from "./use-airport-location";
 
 interface AirportFieldsProps {
   airlines: Airline[];
   airports: Airport[];
   errors: TripErrors;
   form: TripFormState;
+  mapsKey: string;
   update: <Key extends keyof TripFormState>(key: Key, value: TripFormState[Key]) => void;
 }
 
@@ -16,8 +18,13 @@ export function AirportFields(props: AirportFieldsProps) {
   const pickup = props.form.service === "airport_pickup";
   const airportKey = pickup ? "pickupAirportId" : "dropoffAirportId";
   const airportNameKey = pickup ? "pickupAirportName" : "dropoffAirportName";
+  const airportLocationKey = pickup ? "pickupAirportLocation" : "dropoffAirportLocation";
   const airportId = props.form[airportKey];
   const airportError = props.errors[airportKey];
+  const airport = props.airports.find((item) => item.id === airportId);
+  const locationStatus = useAirportLocation(airport, props.mapsKey, (location) => {
+    props.update(airportLocationKey, location);
+  });
   const chooseAirport = (id: string) => {
     props.update(airportKey, id);
     props.update(airportNameKey, props.airports.find((airport) => airport.id === id)?.name ?? "");
@@ -31,6 +38,10 @@ export function AirportFields(props: AirportFieldsProps) {
         {props.airports.map((airport) => <option value={airport.id}>{airport.name}</option>)}
       </select>
       <FieldError id="airport-error" message={airportError} />
+      {locationStatus === "loading" && <small class="field-note">Locating airport on map…</small>}
+      {locationStatus === "error" && <small class="field-note">
+        Airport map location is unavailable. You can still check pricing.
+      </small>}
     </div>
     <div class="field-row airport-details">
       <AirlineCombobox airlines={props.airlines} value={props.form.airline}

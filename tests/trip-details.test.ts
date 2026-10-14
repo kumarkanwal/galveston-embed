@@ -24,8 +24,10 @@ function formFor(service: CoreServiceCode): TripFormState {
     dropoffAddress: ADDRESS,
     pickupAirportId: "airport-pickup",
     pickupAirportName: "Pickup Airport",
+    pickupAirportLocation: { lat: 29.99, lng: -95.34 },
     dropoffAirportId: "airport-dropoff",
     dropoffAirportName: "Dropoff Airport",
+    dropoffAirportLocation: { lat: 29.65, lng: -95.28 },
     airline: { id: "airline-1", name: "Example Air" },
     flightNumber: "123",
   };
@@ -81,13 +83,13 @@ describe("quote request builder", () => {
   });
 });
 
-describe("trip validation", () => {
-  const context = {
-    advanceBookingHours: 12,
-    now: new Date("2026-10-19T15:00:00.000Z"),
-    timeZone: "America/Chicago",
-  };
+const VALIDATION_CONTEXT = {
+  advanceBookingHours: 12,
+  now: new Date("2026-10-19T15:00:00.000Z"),
+  timeZone: "America/Chicago",
+};
 
+describe("trip field validation", () => {
   it.each([
     ["one_way", "pickupAddress"],
     ["one_way", "dropoffAddress"],
@@ -102,15 +104,39 @@ describe("trip validation", () => {
   ] as const)("requires %s.%s", (service, field) => {
     const form = formFor(service);
     Object.assign(form, { [field]: field.endsWith("Address") || field === "airline" ? null : "" });
-    expect(validateTrip(form, context)).toHaveProperty(field);
+    expect(validateTrip(form, VALIDATION_CONTEXT)).toHaveProperty(field);
   });
+});
 
+describe("trip date and time validation", () => {
   it("uses the business timezone and configured advance hours", () => {
     const form = formFor("one_way");
     form.pickupDate = "2026-10-19";
     form.pickupTime = "21:59";
-    expect(validateTrip(form, context).pickupTime).toContain("12 hour(s)");
+    expect(validateTrip(form, VALIDATION_CONTEXT).pickupTime).toContain("12 hour(s)");
     form.pickupTime = "22:00";
-    expect(validateTrip(form, context).pickupTime).toBeUndefined();
+    expect(validateTrip(form, VALIDATION_CONTEXT).pickupTime).toBeUndefined();
+  });
+
+  it("rejects past Chicago wall times even when the visitor is elsewhere", () => {
+    const form = formFor("one_way");
+    const chicagoContext = {
+      advanceBookingHours: 0,
+      now: new Date("2026-07-01T03:30:00.000Z"),
+      timeZone: "America/Chicago",
+    };
+    form.pickupDate = "2026-06-30";
+    form.pickupTime = "22:29";
+    expect(validateTrip(form, chicagoContext).pickupTime).toBe(
+      "Pickup time cannot be in the past.",
+    );
+    form.pickupTime = "22:30";
+    expect(validateTrip(form, chicagoContext).pickupTime).toBeUndefined();
+  });
+
+  it("requires customers to select a pickup time", () => {
+    const form = formFor("one_way");
+    form.pickupTime = "";
+    expect(validateTrip(form, VALIDATION_CONTEXT).pickupTime).toBe("Select a pickup time.");
   });
 });

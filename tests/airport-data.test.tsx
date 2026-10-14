@@ -24,8 +24,10 @@ function formFor(service: CoreServiceCode): TripFormState {
     dropoffAddress: null,
     pickupAirportId: "",
     pickupAirportName: "",
+    pickupAirportLocation: null,
     dropoffAirportId: "",
     dropoffAirportName: "",
+    dropoffAirportLocation: null,
     airline: null,
     flightNumber: "",
   };
@@ -55,7 +57,7 @@ function renderTrip(
   document.body.append(root);
   render(<TripDetails client={client} errors={errors} form={formFor(service)} formError={null}
     isSubmitting={isSubmitting} mapsKey="" onSubmit={() => undefined} routePolyline={null}
-    services={[...SERVICES]} update={() => undefined} />, root);
+    services={[...SERVICES]} timeZone="America/Chicago" update={() => undefined} />, root);
   return root;
 }
 

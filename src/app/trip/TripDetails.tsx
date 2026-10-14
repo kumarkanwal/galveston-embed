@@ -17,6 +17,7 @@ interface TripDetailsProps {
   onSubmit: (event: SubmitEvent) => void | Promise<void>;
   routePolyline: string | null;
   services: CoreService[];
+  timeZone: string;
   update: <Key extends keyof TripFormState>(key: Key, value: TripFormState[Key]) => void;
 }
 
@@ -36,6 +37,17 @@ function AirportAvailability(props: {
   </>;
 }
 
+function mapPoints(form: TripFormState) {
+  return {
+    pickup: form.service === "airport_pickup"
+      ? form.pickupAirportLocation
+      : form.pickupAddress?.location ?? null,
+    dropoff: form.service === "airport_dropoff"
+      ? form.dropoffAirportLocation
+      : form.dropoffAddress?.location ?? null,
+  };
+}
+
 export function TripDetails(props: TripDetailsProps) {
   const airportData = useAirportData(props.client, props.form.service);
   const address = (kind: "pickup" | "dropoff") => <AddressField
@@ -48,7 +60,8 @@ export function TripDetails(props: TripDetailsProps) {
   const hasAirlines = readyData !== null && readyData.airlines.length > 0;
   const airportFields = hasAirports && hasAirlines ? <AirportFields
     airports={readyData.airports} airlines={readyData.airlines}
-    errors={props.errors} form={props.form} update={props.update} /> : null;
+    errors={props.errors} form={props.form} mapsKey={props.mapsKey} update={props.update} /> : null;
+  const points = mapPoints(props.form);
 
   return <section class="widget" aria-live="polite">
     <header class="widget-heading">
@@ -59,7 +72,7 @@ export function TripDetails(props: TripDetailsProps) {
     <div class="trip-layout">
       <form class="trip-form" noValidate onSubmit={props.onSubmit}>
         <TripCoreFields errors={props.errors} form={props.form}
-          services={props.services} update={props.update} />
+          services={props.services} timeZone={props.timeZone} update={props.update} />
         {props.form.service === "one_way" && <>{address("pickup")}{address("dropoff")}</>}
         {props.form.service === "airport_pickup" && <>{airportFields}{address("dropoff")}</>}
         {props.form.service === "airport_dropoff" && <>{address("pickup")}{airportFields}</>}
@@ -79,8 +92,7 @@ export function TripDetails(props: TripDetailsProps) {
         </button>
       </form>
       <MapPanel mapsKey={props.mapsKey}
-        pickup={props.form.pickupAddress?.location ?? null}
-        dropoff={props.form.dropoffAddress?.location ?? null}
+        pickup={points.pickup} dropoff={points.dropoff}
         routePolyline={props.routePolyline} />
     </div>
   </section>;
