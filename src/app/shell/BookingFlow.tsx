@@ -52,5 +52,5 @@ function BookingFlowReady(props: Omit<BookingFlowProps, "services"> & {
     formError={flow.state.formError} isSubmitting={flow.state.isSubmitting}
     mapsKey={props.mapsKey} onSubmit={flow.submit}
     routePolyline={flow.state.quote?.route_polyline ?? null}
-    services={props.services} update={flow.update} />;
+    services={props.services} timeZone={props.business.timezone} update={flow.update} />;
 }

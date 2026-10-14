@@ -33,7 +33,8 @@ const TRIP: TripFormState = {
   pickupAddress: { address: "Galveston, TX", zipcode: "77550", location: { lat: 1, lng: 2 } },
   dropoffAddress: { address: "Houston, TX", zipcode: "77002", location: { lat: 3, lng: 4 } },
   pickupAirportId: "", pickupAirportName: "", dropoffAirportId: "",
-  dropoffAirportName: "", airline: null, flightNumber: "",
+  pickupAirportLocation: null, dropoffAirportName: "", dropoffAirportLocation: null,
+  airline: null, flightNumber: "",
 };
 
 const PRICED = {

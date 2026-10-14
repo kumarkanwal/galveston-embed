@@ -1,7 +1,7 @@
 import { render } from "preact";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { MapPanel } from "../src/app/trip/MapPanel";
+import { MapPanel, positionMap } from "../src/app/trip/MapPanel";
 import {
   loadGoogleMaps,
   resetGoogleMapsLoaderForTests,
@@ -60,5 +60,27 @@ describe("route rendering", () => {
     });
     expect(current.setMap).toHaveBeenCalledWith(null);
     expect(decodePath).not.toHaveBeenCalled();
+  });
+});
+
+describe("map marker bounds", () => {
+  it("fits pickup and dropoff markers together", () => {
+    const extend = vi.fn();
+    const LatLngBounds = vi.fn(class { extend = extend; });
+    vi.stubGlobal("google", { maps: { LatLngBounds } });
+    const map = {
+      fitBounds: vi.fn(),
+      setCenter: vi.fn(),
+      setZoom: vi.fn(),
+    } as unknown as google.maps.Map;
+    const points = [
+      { label: "A", point: { lat: 29.9902, lng: -95.3368 } },
+      { label: "B", point: { lat: 29.307, lng: -94.7977 } },
+    ];
+    positionMap({} as Parameters<typeof positionMap>[0], map, points, []);
+    expect(extend).toHaveBeenCalledTimes(2);
+    expect(map.fitBounds).toHaveBeenCalledOnce();
+    expect(map.setCenter).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
   });
 });

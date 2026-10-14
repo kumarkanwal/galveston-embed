@@ -30,7 +30,7 @@ function replaceMarkers(
   }));
 }
 
-function positionMap(
+export function positionMap(
   api: MapApi,
   map: google.maps.Map,
   points: Array<{ label: string; point: MapPoint }>,

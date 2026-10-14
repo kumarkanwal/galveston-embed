@@ -22,6 +22,13 @@ const BUSINESS = {
   currency: "USD",
   timezone: "America/Chicago",
   distance_unit: "miles",
+  settings: {
+    advance_booking_hours: 6,
+    insurance_enabled: false,
+    insurance_pct: "0.00",
+    payment_methods: ["cash"],
+    terms_and_conditions: "Arrive ten minutes early.",
+  },
 };
 
 const QUOTE: TaxiQuoteRequest = {
@@ -75,6 +82,7 @@ describe("API request setup", () => {
     const business = await clientWith(fetch).getBusiness();
     const request = fetch.mock.calls[0]?.[0];
     expect(business.name).toBe(BUSINESS.name);
+    expect(business.settings.terms_and_conditions).toBe("Arrive ten minutes early.");
     expect(request?.headers.get("X-Business-Key")).toBe("bk_test");
     expect(request?.headers.get("Content-Type")).toBe("application/json");
     expect(request?.url).toBe("https://api.test/v1/public/business");
