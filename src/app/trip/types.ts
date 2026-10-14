@@ -31,8 +31,10 @@ export interface TripFormState {
   dropoffAddress: SelectedAddress | null;
   pickupAirportId: string;
   pickupAirportName: string;
+  pickupAirportLocation: MapPoint | null;
   dropoffAirportId: string;
   dropoffAirportName: string;
+  dropoffAirportLocation: MapPoint | null;
   airline: Airline | null;
   flightNumber: string;
 }

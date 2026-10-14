@@ -30,7 +30,8 @@ const TRIP: TripFormState = {
   dropoffAddress: { address: "Houston Premium Outlets", zipcode: "77433",
     location: { lat: 3, lng: 4 } },
   pickupAirportId: "", pickupAirportName: "", dropoffAirportId: "",
-  dropoffAirportName: "", airline: null, flightNumber: "",
+  pickupAirportLocation: null, dropoffAirportName: "", dropoffAirportLocation: null,
+  airline: null, flightNumber: "",
 };
 
 const VEHICLE = {
@@ -62,11 +63,14 @@ function mockClient(priceBreakdown: ApiClient["priceBreakdown"]): ApiClient {
   };
 }
 
-function mount(priceBreakdown: ApiClient["priceBreakdown"] = vi.fn(async () => BREAKDOWN)) {
+function mount(
+  priceBreakdown: ApiClient["priceBreakdown"] = vi.fn(async () => BREAKDOWN),
+  business: Business = BUSINESS,
+) {
   const root = document.createElement("div");
   document.body.append(root);
   const client = mockClient(priceBreakdown);
-  render(<Confirm business={BUSINESS} client={client} form={TRIP} onBack={() => undefined}
+  render(<Confirm business={business} client={client} form={TRIP} onBack={() => undefined}
     quote={QUOTE} serviceName="One Way Transfer" vehicle={VEHICLE} />, root);
   return { client, root };
 }
@@ -155,6 +159,17 @@ describe("Confirm terms", () => {
     expect(root.querySelector<HTMLInputElement>("#firstName")?.value).toBe("Ada");
     expect(root.querySelector<HTMLInputElement>("#comments")?.value).toBe("Call on arrival");
     expect(link).toBe(document.activeElement);
+  });
+
+  it("keeps the required checkbox but hides the link when Admin has no terms", () => {
+    const business = {
+      ...BUSINESS,
+      settings: { ...BUSINESS.settings, terms_and_conditions: null },
+    } satisfies Business;
+    const { root } = mount(vi.fn(async () => BREAKDOWN), business);
+    expect(root.querySelector("[data-confirm-field='acceptedTerms']")).not.toBeNull();
+    expect(root.querySelector(".terms-link")).toBeNull();
+    expect(root.textContent).toContain("Terms & Conditions");
   });
 });
 

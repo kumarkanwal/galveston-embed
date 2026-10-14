@@ -27,18 +27,34 @@ function initialForm(business: Business, service: CoreServiceCode): TripFormStat
   return {
     service,
     pickupDate: now.date,
-    pickupTime: now.time,
+    pickupTime: "",
     passengers: 1,
     luggage: 0,
     pickupAddress: null,
     dropoffAddress: null,
     pickupAirportId: "",
     pickupAirportName: "",
+    pickupAirportLocation: null,
     dropoffAirportId: "",
     dropoffAirportName: "",
+    dropoffAirportLocation: null,
     airline: null,
     flightNumber: "",
   };
+}
+
+function updatedForm<Key extends keyof TripFormState>(
+  form: TripFormState,
+  key: Key,
+  value: TripFormState[Key],
+): TripFormState {
+  const updated = { ...form, [key]: value };
+  if (key === "service") {
+    return { ...updated, pickupAirportLocation: null, dropoffAirportLocation: null };
+  }
+  if (key === "pickupAirportId") return { ...updated, pickupAirportLocation: null };
+  if (key === "dropoffAirportId") return { ...updated, dropoffAirportLocation: null };
+  return updated;
 }
 
 function initialState(business: Business, service: CoreServiceCode): BookingFlowState {
@@ -59,7 +75,7 @@ export function useBookingFlow(client: ApiClient, business: Business, service: C
   const update = <Key extends keyof TripFormState>(key: Key, value: TripFormState[Key]) => {
     setState((current) => ({ ...current,
       errors: { ...current.errors, [key]: undefined },
-      form: { ...current.form, [key]: value },
+      form: updatedForm(current.form, key, value),
       formError: null,
       quote: null,
       selectedVehicle: null,

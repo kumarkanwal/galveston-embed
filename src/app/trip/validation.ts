@@ -1,4 +1,4 @@
-import { meetsAdvanceBookingRequirement } from "../../time";
+import { compareWithBusinessNow, meetsAdvanceBookingRequirement } from "../../time";
 import { MAX_LUGGAGE, MAX_PASSENGERS } from "./limits";
 import type { TripErrors, TripFormState } from "./types";
 
@@ -38,15 +38,21 @@ function validateAirport(form: TripFormState, errors: TripErrors): void {
   if (form.flightNumber.trim() === "") errors.flightNumber = "Enter a flight number.";
 }
 
-export function validateTrip(
+function validateDateTime(
   form: TripFormState,
+  errors: TripErrors,
   context: ValidationContext,
-): TripErrors {
-  const errors: TripErrors = {};
+): void {
   if (form.pickupDate === "") errors.pickupDate = "Select a pickup date.";
   if (form.pickupTime === "") errors.pickupTime = "Select a pickup time.";
-  const hasDateTime = form.pickupDate !== "" && form.pickupTime !== "";
-  if (hasDateTime && !meetsAdvanceBookingRequirement(
+  if (form.pickupDate === "" || form.pickupTime === "") return;
+  if (compareWithBusinessNow(
+    form.pickupDate, form.pickupTime, context.now, context.timeZone,
+  ) < 0) {
+    errors.pickupTime = "Pickup time cannot be in the past.";
+    return;
+  }
+  if (!meetsAdvanceBookingRequirement(
     form.pickupDate,
     form.pickupTime,
     context.now,
@@ -55,6 +61,14 @@ export function validateTrip(
   )) {
     errors.pickupTime = `You must book at least ${context.advanceBookingHours} hour(s) in advance.`;
   }
+}
+
+export function validateTrip(
+  form: TripFormState,
+  context: ValidationContext,
+): TripErrors {
+  const errors: TripErrors = {};
+  validateDateTime(form, errors, context);
   validateParty(form, errors);
   validateAddresses(form, errors);
   validateAirport(form, errors);
