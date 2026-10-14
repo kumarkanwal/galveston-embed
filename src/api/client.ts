@@ -14,6 +14,7 @@ export type QuotedVehicle = components["schemas"]["QuotedVehicle"];
 export type TaxiPriceBreakdownRequest = components["schemas"]["TaxiPriceBreakdownRequest"];
 export type TaxiPriceBreakdownResponse = components["schemas"]["TaxiPriceBreakdownResponse"];
 export type TaxiBookingRequest = components["schemas"]["TaxiBookingRequest"];
+export type TaxiBookingResponse = components["schemas"]["TaxiBookingResponse"];
 export type BreakdownLine = components["schemas"]["BreakdownLine"];
 
 interface ApiResult<T> {
@@ -29,6 +30,7 @@ export interface ApiClient {
   getAirlines(): Promise<Airline[]>;
   quote(body: TaxiQuoteRequest): Promise<TaxiQuoteResponse>;
   priceBreakdown(body: TaxiPriceBreakdownRequest): Promise<TaxiPriceBreakdownResponse>;
+  book(body: TaxiBookingRequest, idempotencyKey: string): Promise<TaxiBookingResponse>;
 }
 
 export interface ApiClientOptions {
@@ -92,6 +94,12 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
       const envelope = await execute(() =>
         client.POST("/v1/public/taxi/price-breakdown", { body }),
       );
+      return envelope.data;
+    },
+    async book(body, idempotencyKey) {
+      const envelope = await execute(() =>
+        client.POST("/v1/public/taxi/booking", { body,
+          headers: { "Idempotency-Key": idempotencyKey } }));
       return envelope.data;
     },
   };

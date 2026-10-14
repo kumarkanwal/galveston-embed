@@ -59,6 +59,20 @@
   margin-top: 38px;
 }
 
+.request-quote-price {
+  margin-top: 38px;
+}
+
+.request-quote-price h2 {
+  border-bottom: 1px solid #cccccc;
+  margin-bottom: 12px;
+  padding-bottom: 20px;
+}
+
+.request-quote-price .service-area-note {
+  margin-bottom: 12px;
+}
+
 .charges h2 {
   border-bottom: 1px solid #cccccc;
   margin-bottom: 0;
@@ -187,11 +201,45 @@
   width: 50%;
 }
 
-.booking-next {
+.create-trip:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.confirmation {
+  padding: 28px 24px;
+}
+
+.confirmation h1 {
+  font-size: 27px;
+  margin: 28px 0 24px;
+}
+
+.confirmation-check {
+  border: 3px solid #333333;
+  border-radius: 50%;
+  color: var(--blue);
+  display: inline-grid;
+  font-size: 15px;
+  height: 23px;
+  place-items: center;
+  vertical-align: 3px;
+  width: 23px;
+}
+
+.confirmation-notice {
   background: #dff0d8;
   border: 1px solid #d6e9c6;
   color: #3c763d;
-  padding: 10px;
+  padding: 10px 12px;
+}
+
+.confirmation-notice p {
+  margin: 0;
+}
+
+.confirmation-notice p + p {
+  margin-top: 6px;
 }
 
 .visually-hidden {

@@ -1,4 +1,4 @@
-import { useRef, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 import { FieldError } from "../trip/FieldError";
 
@@ -11,8 +11,16 @@ interface TermsAgreementProps {
 
 export function TermsAgreement(props: TermsAgreementProps) {
   const [open, setOpen] = useState(false);
+  const closeRef = useRef<HTMLButtonElement>(null);
   const linkRef = useRef<HTMLButtonElement>(null);
   const hasTerms = props.terms?.trim() !== "" && props.terms != null;
+  const close = () => {
+    setOpen(false);
+    linkRef.current?.focus();
+  };
+  useEffect(() => {
+    if (open) closeRef.current?.focus();
+  }, [open]);
   return <div class="terms-field">
     <div class="terms-label">
       <input id="accepted-terms" type="checkbox" checked={props.accepted}
@@ -29,13 +37,12 @@ export function TermsAgreement(props: TermsAgreementProps) {
     </div>
     <FieldError id="acceptedTerms-error" message={props.error} />
     {open && hasTerms && <div id="terms-panel" class="terms-panel" role="dialog"
-      aria-label="Terms & Conditions">
+      aria-label="Terms & Conditions" onKeyDown={(event) => {
+        if (event.key === "Escape") close();
+      }}>
       <h3>Terms &amp; Conditions</h3>
       <div class="terms-text">{props.terms}</div>
-      <button type="button" class="terms-close" onClick={() => {
-        setOpen(false);
-        linkRef.current?.focus();
-      }}>Close</button>
+      <button ref={closeRef} type="button" class="terms-close" onClick={close}>Close</button>
     </div>}
   </div>;
 }

@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   createApiClient,
+  type TaxiBookingRequest,
+  type TaxiBookingResponse,
   type TaxiPriceBreakdownRequest,
   type TaxiQuoteRequest,
 } from "../src/api/client";
@@ -42,6 +44,25 @@ const BREAKDOWN: TaxiPriceBreakdownRequest = {
   vehicle_type_id: "11111111-1111-1111-1111-111111111111",
   payment_method: "cash",
   car_seats: 0,
+};
+
+const BOOKING: TaxiBookingRequest = {
+  ...QUOTE,
+  vehicle_type_id: "11111111-1111-1111-1111-111111111111",
+  car_seats: 0,
+  customer: { first_name: "Ada", last_name: "Lovelace", email: "ada@example.com" },
+  payment: { method: "cash" },
+  accepted_terms: true,
+};
+
+const BOOKED: TaxiBookingResponse = {
+  order_id: "22222222-2222-2222-2222-222222222222",
+  order_number: "HVT-2026-003211",
+  status: "confirmed",
+  total: "92.70",
+  amount_paid: "0.00",
+  payment_method: "cash",
+  confirmation_email_sent: false,
 };
 
 function jsonResponse(value: unknown, status = 200): Response {
@@ -112,6 +133,18 @@ describe("price breakdown API", () => {
     const request = fetch.mock.calls[0]?.[0];
     expect(request?.url).toBe("https://api.test/v1/public/taxi/price-breakdown");
     await expect(request?.clone().json()).resolves.toEqual(BREAKDOWN);
+  });
+});
+
+describe("booking API", () => {
+  it.each([200, 201])("treats %s as success and sends the idempotency key", async (status) => {
+    const fetch = vi.fn(async (_input: Request) => jsonResponse({ data: BOOKED }, status));
+    await expect(clientWith(fetch).book(BOOKING, "booking-key")).resolves.toEqual(BOOKED);
+    expect(fetch).toHaveBeenCalledOnce();
+    const request = fetch.mock.calls[0]?.[0];
+    expect(request?.url).toBe("https://api.test/v1/public/taxi/booking");
+    expect(request?.headers.get("Idempotency-Key")).toBe("booking-key");
+    await expect(request?.clone().json()).resolves.toEqual(BOOKING);
   });
 });
 

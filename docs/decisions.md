@@ -143,3 +143,9 @@ Date: 2026-10-11 · Status: accepted (supersedes ED-012)
 Decision: hide every price-breakdown line whose amount string is exactly `"0.00"`.
 Why: built-in lines do not have a unique machine identifier, so the widget cannot reliably identify only the CC Surcharge without matching its display label. Zero-value rows add noise and do not affect the server total.
 Consequences: compare the money string directly; never parse it, perform arithmetic, or match a line-item label. Preserve the order and exact labels of every displayed non-zero line.
+
+## ED-023 — Booking retries and confirmation data
+Date: 2026-10-11 · Status: accepted
+Decision: every unchanged booking attempt reuses one UUID idempotency key; confirmation shows the response total with `/business` currency and mentions email only when `confirmation_email_sent` is true.
+Why: the backend re-prices at booking and owns the final total. Reusing the key after an unknown outcome prevents duplicate orders, while changing any request-body field must create a new attempt.
+Consequences: treat HTTP 200 and 201 booking envelopes identically; never retry automatically. `REQUEST_IN_FLIGHT` asks the customer to wait, network and non-503 5xx failures explain that retrying is safe, and API messages are retained for 401, 403, 404 and 503 responses.

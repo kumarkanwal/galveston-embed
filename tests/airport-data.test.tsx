@@ -43,6 +43,7 @@ function mockClient(overrides: Partial<ApiClient> = {}): ApiClient {
     priceBreakdown: vi.fn(async () => ({
       subtotal: "0.00", discount_amount: "0.00", total: "0.00", currency: "USD",
     })),
+    book: vi.fn(),
     ...overrides,
   };
 }

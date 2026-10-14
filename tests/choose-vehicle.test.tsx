@@ -2,7 +2,6 @@ import { render } from "preact";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Business, QuotedVehicle, TaxiQuoteResponse } from "../src/api/client";
-import { ConfirmPlaceholder } from "../src/app/confirm/ConfirmPlaceholder";
 import { ChooseVehicle } from "../src/app/vehicle/ChooseVehicle";
 
 const BUSINESS = {
@@ -64,14 +63,5 @@ describe("Choose Vehicle", () => {
     const { root } = mountQuote({ out_of_service_area: false, vehicles: [] });
     expect(root.textContent).toContain("No vehicles are available for this trip");
     expect(root.querySelector(".back-button")).not.toBeNull();
-  });
-
-  it("renders the E-3 confirm placeholder", () => {
-    const root = document.createElement("div");
-    render(<ConfirmPlaceholder vehicle={VEHICLES[1] as QuotedVehicle}
-      onBack={() => undefined} />, root);
-    expect(root.textContent).toContain("Van");
-    expect(root.textContent).toContain("Confirm — coming next");
-    expect(root.querySelector('[aria-current="step"]')?.textContent).toContain("Confirm");
   });
 });
