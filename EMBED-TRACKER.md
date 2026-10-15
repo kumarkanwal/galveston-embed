@@ -97,7 +97,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 | # | Item | Status | Notes |
 |---|---|---|---|
 | 2.1 | Vehicle list | ✅ | From the quote response `vehicles[]` |
-| 2.2 | Photo | ✅ | `photo_url`; show a placeholder when null (BRO shows "No photo available") |
+| 2.2 | Photo | ✅ | HTTPS `photo_url` images are fixed-size, lazy-loaded and contained; null, invalid, non-HTTPS and failed images use the same-size inline car placeholder |
 | 2.3 | Name and capacity icons | ✅ | **Names are display text only.** Capacity from `passenger_capacity` and `luggage_capacity`. Why: real data has a vehicle named "up to 14 pax" with capacity 9 |
 | 2.4 | Three states | ✅ | `quote_status`: `"priced"` → show price · `"request_quote"` → "Request a Quote", Choose stays active · `"unavailable"` → greyed, button reads "Unavailable" |
 | 2.5 | Base fare column | ✅ | `base_price` (string). Format only; never calculate |
@@ -209,6 +209,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 15 Oct 2026 | E-6d complete for review: Step 2 now loads only HTTPS vehicle photos, reserves fixed responsive image space, lazy-loads with the vehicle name as alt text, and replaces absent, invalid, non-HTTPS, or failed images with a neutral inline car placeholder. |
 | 15 Oct 2026 | E-6c complete for review: refreshed the approved B-29 contract, replaced the fixed Car Seats list with company Preferences, kept pricing server-owned, placed stale-preference errors under the preserved selection, and made priced confirmation wording follow `requested`/`pending` versus `confirmed`. Request a Quote shows no car-seat price, Meet & Greet remains staff-only, and no confirmation promises email. |
 | 15 Oct 2026 | E-6b complete for review: field errors stay with their controls and appear only after blur or submit; mobile controls use 44px targets and 16px text through tablet widths; keyboard focus, Terms trapping, form semantics, concise announcements, map alternatives, completed progress, and same-brand WCAG AA colours are covered by regression tests and an exact-width browser pass. |
 | 15 Oct 2026 | E-6 hardening complete for review: refreshed the pushed backend contract, removed temporary limits/service typing, persisted fingerprint-only booking idempotency across reloads, covered submission/error/embed safety, and added immediate race-safe Step 1 route previews. Live asset currently has validators but no explicit cache policy; recommend short revalidation for the stable `embed.js` URL. Mobile/BRO/hosting work remains. |

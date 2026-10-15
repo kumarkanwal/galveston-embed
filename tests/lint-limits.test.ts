@@ -48,6 +48,7 @@ function contrast(foreground: string, background: string): number {
 describe("responsive accessibility styles", () => {
   const widgetCss = readFileSync(resolve("src/styles/widget.css"), "utf8");
   const confirmCss = readFileSync(resolve("src/styles/confirm.css"), "utf8");
+  const vehicleCss = readFileSync(resolve("src/styles/vehicle.css"), "utf8");
 
   it("uses 44px targets, 16px controls, and a visible focus ring", () => {
     const tabletRules = widgetCss.slice(widgetCss.indexOf("@media (max-width: 900px)"));
@@ -68,5 +69,15 @@ describe("responsive accessibility styles", () => {
     "%s meets WCAG AA against white",
     (color) => expect(contrast(color, "#ffffff")).toBeGreaterThanOrEqual(4.5),
   );
+
+  it("reserves photo space and keeps 320px vehicle cards with 44px actions", () => {
+    const phoneRules = vehicleCss.slice(vehicleCss.indexOf("@media (max-width: 440px)"));
+    expect(vehicleCss).toMatch(/\.vehicle-photo-frame[\s\S]*height:\s*70px;[\s\S]*width:\s*110px;/);
+    expect(vehicleCss).toMatch(/\.vehicle-photo\s*\{[\s\S]*object-fit:\s*contain;/);
+    expect(phoneRules).toContain("grid-template-columns: 72px minmax(0, 1fr)");
+    expect(phoneRules).toContain("height: 50px");
+    expect(phoneRules).toContain("width: 66px");
+    expect(widgetCss).toMatch(/\.vehicle-choose,[\s\S]*min-height:\s*44px;/);
+  });
 });
 
