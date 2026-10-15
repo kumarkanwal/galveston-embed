@@ -1,4 +1,4 @@
-import type { ServiceTypeOption } from "../../api/service-types";
+import type { ServiceTypeOption } from "../../api/client";
 import {
   CORE_SERVICE_CODES,
   type CoreService,

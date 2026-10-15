@@ -15,6 +15,31 @@ surface; the admin surface (`/admin/*`) is not documented here.
 
 Read this section first if you have already built against v1.1.
 
+- **B-24 admin integration:** authorized owners and managers can reveal the
+  newest active API key named `embed`; owners can regenerate it, immediately
+  revoking every previous active `embed` key. Public authentication and the
+  `X-Business-Key` wire format are unchanged.
+- **B-27a admin service areas:** `POST /v1/admin/service-areas` returns `200`
+  and reactivates an inactive canonical duplicate, while an active duplicate
+  remains a `400` with field `value`. `DELETE /v1/admin/service-areas/{id}`
+  returns `422 LAST_SERVICE_AREA` rather than deactivating the business's final
+  active coverage rule. New rows still return `201`.
+
+### Airport locations are server-resolved
+
+- `airport_pickup` and `airport_dropoff` requests send the airport id but do not
+  send an address or zipcode for the airport side. The API resolves both from
+  that business's active airport record; any client-supplied airport-side
+  location is ignored.
+- Airport configuration without both a non-empty address and zipcode returns
+  `422 AIRPORT_ADDRESS_MISSING` before Maps is called.
+
+### Public business capacity limits
+
+- `GET /v1/public/business` now publishes `max_passengers` and
+  `max_luggage` so the booking form can bound its party-size selectors before
+  the first quote.
+
 ### Taxi pricing rows are live
 
 - Legacy `anchor_zone_prices` still win before the replacement pricing-row
@@ -198,10 +223,12 @@ All request bodies use `extra="forbid"`. **Sending an unrecognised field is a 40
 | `PAYMENT_FAILED` | 402 | The gateway declined, or the outcome is unknown |
 | `FORBIDDEN_BUSINESS_SCOPE` | 403 | Resource belongs to another business |
 | `NOT_FOUND` | 404 | No such resource (or it belongs to another business) |
+| `LAST_SERVICE_AREA` | 422 | The final active admin service-area rule cannot be deactivated |
 | `SEATS_UNAVAILABLE` | 409 | Requested seats exceed what remains |
 | `REQUEST_IN_FLIGHT` | 409 | The same `Idempotency-Key` is currently being processed |
 | `SCHEDULE_INACTIVE` | 422 | The departure was disabled or has passed |
 | `OUT_OF_SERVICE_AREA` | 422 | Outside coverage — route to the quote path |
+| `AIRPORT_ADDRESS_MISSING` | 422 | Selected airport lacks an address or zipcode |
 | `BELOW_MINIMUM_HOURS` | 422 | Hourly booking under the vehicle's minimum |
 | `VEHICLE_UNAVAILABLE` | 422 | Vehicle disabled, blacked out, or too small |
 | `ADVANCE_BOOKING_VIOLATION` | 422 | Inside the minimum advance window |
@@ -238,7 +265,9 @@ Called by both plugins on load. Supplies branding and the settings that shape th
   "payments": {
     "square_application_id": "sandbox-sq0idb-...",
     "square_location_id": "L..."
-  }
+  },
+  "max_passengers": 14,
+  "max_luggage": 20
 }}
 ```
 
@@ -250,6 +279,15 @@ Called by both plugins on load. Supplies branding and the settings that shape th
 for Web Payments SDK tokenisation. It is `null` if either identifier is not
 configured; in that case offer only the non-card methods in `payment_methods`.
 No Square access token or secret is ever returned.
+
+`max_passengers` is the largest passenger capacity among the business's active,
+enabled vehicle offerings; a disabled business assignment is excluded, and the
+value is `null` when no enabled vehicle is offered.
+
+`max_luggage` is the largest luggage capacity among the business's active,
+enabled vehicle offerings; a disabled business assignment is excluded, and the
+value is `null` when no enabled vehicle is offered. The two maxima may come from
+different vehicle types.
 
 ### `POST /v1/public/promo/validate`
 
@@ -652,7 +690,18 @@ One request shape covers all five service types; fields that do not apply are nu
   "dropoff_address": "...", "dropoff_zipcode": "77550",
   "pickup_date": "2026-08-12", "pickup_time": "16:45",
   "passengers": 6, "luggage": 5 }
+
+// request — airport dropoff
+{ "service_type": "airport_dropoff",
+  "dropoff_airport_id": "uuid",
+  "airline": "British Airways", "flight_number": "196",
+  "pickup_address": "...", "pickup_zipcode": "77550",
+  "pickup_date": "2026-08-12", "pickup_time": "16:45",
+  "passengers": 6, "luggage": 5 }
 ```
+
+For both examples, the airport-side address and zipcode come from the selected
+airport record. Do not send them from the client.
 
 ```json
 // response
@@ -703,7 +752,12 @@ flag as the per-vehicle state; use `quote_status`.
 
 #### Validation
 
-Airport services require `airline` and `flight_number` (400 naming the field). Hourly requires `hours > 0`. A return time must not precede pickup. All checks are server-side; the plugin's are UX only.
+Airport services require `airline`, `flight_number`, and the matching
+`pickup_airport_id` or `dropoff_airport_id` (400 naming the field). Only the
+non-airport side's address is required. An airport without both a configured
+address and zipcode returns 422 `AIRPORT_ADDRESS_MISSING`. Hourly requires
+`hours > 0`. A return time must not precede pickup. All checks are server-side;
+the plugin's are UX only.
 
 Rate limited per API key and client IP as documented under Authentication,
 since each request may call Google.

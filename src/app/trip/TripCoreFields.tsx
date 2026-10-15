@@ -1,10 +1,11 @@
 import { businessDateTimeParts } from "../../time";
-import { MAX_LUGGAGE, MAX_PASSENGERS } from "./limits";
+import type { PartyLimits } from "./limits";
 import type { CoreService, TripErrors, TripFormState } from "./types";
 
 interface TripCoreFieldsProps {
   errors: TripErrors;
   form: TripFormState;
+  limits: PartyLimits;
   services: CoreService[];
   timeZone: string;
   update: <Key extends keyof TripFormState>(key: Key, value: TripFormState[Key]) => void;
@@ -44,7 +45,7 @@ function DateTimeFields(props: Pick<
 }
 
 export function TripCoreFields({
-  errors, form, services, timeZone, update,
+  errors, form, limits, services, timeZone, update,
 }: TripCoreFieldsProps) {
   return <>
     <div class="field full-field">
@@ -60,7 +61,7 @@ export function TripCoreFields({
         <label for="passengers">Passengers</label>
         <select id="passengers" value={form.passengers}
           onChange={(event) => update("passengers", Number(event.currentTarget.value))}>
-          {numericOptions(MAX_PASSENGERS, 1).map((count) => <option value={count}>
+          {numericOptions(limits.passengers, 1).map((count) => <option value={count}>
             {count} {count === 1 ? "passenger" : "passengers"}
           </option>)}
         </select>
@@ -69,7 +70,7 @@ export function TripCoreFields({
         <label for="luggage">Luggage</label>
         <select id="luggage" value={form.luggage}
           onChange={(event) => update("luggage", Number(event.currentTarget.value))}>
-          {numericOptions(MAX_LUGGAGE, 0).map((count) => <option value={count}>
+          {numericOptions(limits.luggage, 0).map((count) => <option value={count}>
             {count} luggage
           </option>)}
         </select>

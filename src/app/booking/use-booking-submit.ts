@@ -1,6 +1,7 @@
 import { useRef, useState } from "preact/hooks";
 
 import type { ApiClient, TaxiBookingResponse } from "../../api/client";
+import { UnauthorizedError } from "../../api/errors";
 import { IdempotencyKeyManager } from "../../api/idempotency";
 import type { TripFormState } from "../trip/types";
 import { buildBookingRequest } from "../confirm/build-requests";
@@ -20,19 +21,24 @@ export function useBookingSubmit(options: BookingSubmitOptions) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const manager = useRef(new IdempotencyKeyManager());
   const inFlight = useRef(false);
+  const unauthorizedLogged = useRef(false);
 
   const submit = async (form: ConfirmFormState) => {
     if (inFlight.current) return;
+    inFlight.current = true;
     const body = buildBookingRequest(
       options.trip, options.vehicleTypeId, options.carSeats, form,
     );
-    const key = manager.current.getKey(body);
-    inFlight.current = true;
     setFailure(null);
     setIsSubmitting(true);
     try {
+      const key = await manager.current.getKey(body);
       options.onSuccess(await options.client.book(body, key));
     } catch (error: unknown) {
+      if (error instanceof UnauthorizedError && !unauthorizedLogged.current) {
+        unauthorizedLogged.current = true;
+        console.error("Galveston booking widget configuration was rejected.");
+      }
       setFailure(bookingFailure(error));
     } finally {
       inFlight.current = false;

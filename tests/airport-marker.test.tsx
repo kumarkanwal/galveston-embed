@@ -26,6 +26,7 @@ const AIRPORTS: Airport[] = [
 const BUSINESS = {
   id: "business-1", name: "Island Transit", type: "taxi", currency: "USD",
   timezone: "America/Chicago", distance_unit: "miles",
+  max_passengers: 8, max_luggage: 8,
   settings: { advance_booking_hours: 0, insurance_enabled: false,
     insurance_pct: "0.00", payment_methods: ["cash"] },
 } satisfies Business;
@@ -53,11 +54,12 @@ let latestFlow: Flow | undefined;
 
 function Harness({ service }: { service: CoreServiceCode }) {
   const [apiClient] = useState(client);
-  const flow = useBookingFlow(apiClient, BUSINESS, service);
+  const flow = useBookingFlow(apiClient, BUSINESS, service, { passengers: 8, luggage: 8 });
   latestFlow = flow;
   return <TripDetails client={apiClient} errors={flow.state.errors} form={flow.state.form}
     formError={flow.state.formError} isSubmitting={false} mapsKey="maps-key"
-    onSubmit={flow.submit} routePolyline={null} services={[...SERVICES]}
+    limits={{ passengers: 8, luggage: 8 }} onSubmit={flow.submit}
+    routePolyline={null} services={[...SERVICES]}
     timeZone="America/Chicago" update={flow.update} />;
 }
 

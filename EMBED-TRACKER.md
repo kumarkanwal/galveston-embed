@@ -1,6 +1,6 @@
 # Booking Widget (Embed) — Tracker
 
-**Repo:** `galveston-embed` (new, separate) · **Last updated:** 11 October 2026
+**Repo:** `galveston-embed` (new, separate) · **Last updated:** 15 October 2026
 **Talks to:** the hosted `galveston-backend` API on the VPS.
 **Replaces:** the client's live Book Rides Online (BRO) booking form.
 
@@ -38,25 +38,25 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 
 ## Progress
 
-**Overall: 58%** ▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░ · **"Built" means 100%, add-ons included.**
+**Overall: 66%** ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░ · **"Built" means 100%, add-ons included.**
 
 | # | Phase | Side | Weight | Status | Done |
 |---|---|---|---|---|---|
 | 0 | Planning & research | Both | 4% | ✅ Complete | 4% |
 | 1 | Project setup & docs | Widget | 4% | 🔄 Other setup items pending | 3% |
-| 2 | Backend prep (B-20, VPS deploy, config, B-21) | Backend | 7% | 🔄 B-21 pending | 3% |
+| 2 | Backend prep (B-20, VPS deploy, config, B-21) | Backend | 7% | ✅ Complete | 7% |
 | 3 | E-1 Skeleton, API, money, time | Widget | 7% | ✅ Complete | 7% |
 | 4 | E-2 Step 1 — Trip Details | Widget | 12% | ✅ Complete | 12% |
 | 5 | E-3 Step 2 — Choose Vehicle | Widget + VPS | 11% | ✅ Complete — address filter fixed | 11% |
 | 6 | E-4 Step 3 — Confirm & breakdown | Widget | 9% | ✅ Complete — ready for review | 9% |
-| 7 | E-5 Create Trip, confirmation, errors | Widget + Admin | 9% | ✅ Complete — ready for review | 9% |
-| 8 | E-6 Mobile, side-by-side with BRO, hosting | Both | 12% | ⬜ | 0% |
+| 7 | E-5 Create Trip, confirmation, errors | Widget + Admin | 9% | ✅ Complete — merged and verified live | 9% |
+| 8 | E-6 Mobile, side-by-side with BRO, hosting | Both | 12% | 🔄 API/hardening complete; mobile/BRO/hosting pending | 4% |
 | 9 | E-7 Card payment (Square) | Both | 9% | ⛔ B-16 | 0% |
 | 10 | E-8 Promo codes | Both | 4% | ⛔ Backend promo wiring | 0% |
 | 11 | E-9 Round trip | Both | 5% | ⛔ I-1 | 0% |
 | 12 | E-10 Peak / blackout | Both | 3% | ⛔ B-7 | 0% |
 | 13 | E-11 Hourly (hours + Add Stops) | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
-| | **Total** | | **100%** | | **58%** |
+| | **Total** | | **100%** | | **66%** |
 
 Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
@@ -67,10 +67,10 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 | S-1 | New repo `galveston-embed` | ✅ | Separate from `galveston-widgets` (old cancelled plugin; leave untouched) |
 | S-2 | **VPS runs the latest backend**, including the pricing migration `f1a2b3c4d5e6` | ✅ | Pricing migration and B-20 are deployed on the preview VPS |
 | S-3 | D-1 (contract v1.2) and B-20 pushed to `origin` | ✅ | B-20 is included in backend commit `7e15a04` |
-| S-4 | `openapi.json` copied from the backend **after B-20 is committed** | ✅ | API contract and schema were copied from backend commit `7e15a04` |
+| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ | Refreshed from backend commit `867f27b2191ca1965775d3e87536ac76c584e794` (B-21, B-24, B-25, B-27a) |
 | S-5 | Demo company API key, named `embed` | ✅ Ready when needed | Runbook: `docs/runbooks/embed-keys.md` (backend) |
 | S-6 | Developer's local address (e.g. `http://localhost:5173`) added to `CORS_ORIGINS` on the VPS | ⛔ Not yet | Otherwise the browser cannot read API responses |
-| S-7 | **Google Maps browser key**, HTTP-referrer restricted to dev address now, client sites later | 🔍 Key available; restrict it | Must be separate from the server key. Never use the server key in the browser |
+| S-7 | **Google Maps browser key**, HTTP-referrer restricted to dev address now, client sites later | 🔍 Key available; enable Routes API and restrict it | Must be separate from the server key. Maps JavaScript API, Places API (New), and Routes API are required; never use the server key in the browser |
 | S-8 | Demo company offers **cash** in `payment_methods` and allows cash bookings | 🔍 Check `GET /v1/public/business` and the `require_payment` setting | Otherwise every booking returns `422 PAYMENT_METHOD_NOT_OFFERED` |
 
 **The developer can build screens before S-2 to S-8 are done. He needs them only to connect.**
@@ -81,13 +81,13 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 | # | Item | Status | API | Notes |
 |---|---|---|---|---|
-| 1.1 | Service dropdown | ✅ | `GET /taxi/service-types` | Show only `one_way`, `airport_pickup`, and `airport_dropoff` (ED-016). Runtime-validate the temporary service-type shape until B-21 (ED-019) |
+| 1.1 | Service dropdown | ✅ | `GET /taxi/service-types` | Show only `one_way`, `airport_pickup`, and `airport_dropoff` (ED-016). Uses the generated `ServiceTypeOption` schema (ED-024) |
 | 1.2 | Pickup date and time | ✅ | `GET /business` → `timezone`, `advance_booking_hours` | Times and advance-booking validation use the **business's timezone**, not the visitor's browser. Server enforcement remains authoritative |
-| 1.3 | Passengers dropdown | ✅ temporary | `GET /business` (after B-21) | Temporary maximum 74. B-21 must replace it with the largest active-vehicle capacity, capped by the request schema (ED-020) |
-| 1.4 | Luggage dropdown | ✅ temporary | `GET /business` (after B-21) | Temporary maximum 99, matching the request-schema maximum. B-21 must replace it with the smaller of the admin limit and schema maximum (ED-020) |
+| 1.3 | Passengers dropdown | ✅ | `GET /business` → `max_passengers` | Uses the business limit capped at the request-schema maximum. Null means no vehicles are available (ED-020, ED-024) |
+| 1.4 | Luggage dropdown | ✅ | `GET /business` → `max_luggage` | Uses the business limit capped at the request-schema maximum. Null means no vehicles are available (ED-020, ED-024) |
 | 1.5 | Pickup / dropoff address autocomplete | ✅ | Google Places (browser key, S-7) | US-only suggestions allow cities, street addresses and places such as hotels, terminals and airports; country, state, region and postal-code-only suggestions are excluded. Send **both** the address text and the zipcode. **Take the zipcode from Places `address_components` (`postal_code`), never by parsing the typed text.** Why: zipcodes decide zone prices; a wrong guess is a wrong price |
 | 1.6 | Pin icon beside each address | ✅ | — | Decorative icon only, no action (ED-014) |
-| 1.7 | Map | ✅ | Google Maps JavaScript API | Shows pickup/dropoff pins and the decoded quote route after returning from Step 2 |
+| 1.7 | Map | ✅ | Google Maps JavaScript API + Routes API | Draws and updates a browser route as soon as both Step 1 endpoints are known; the decoded backend quote route takes over after pricing (ED-025) |
 | 1.8 | Airport Pickup / Dropoff fields: airport, airline, flight number | ✅ | `GET /taxi/airports`, `GET /taxi/airlines` | Airport is a plain select; airline is searchable. The BRO airport screenshots are present |
 | 1.9 | Hourly: hours field, stops | ⏸ E-11 | — | Removed from the core by ED-016; ignore `hourly` until its add-on phase |
 | 1.10 | Check Pricing | ✅ | `POST /taxi/quote?hide_incapable=true` | Sends once per click, disables while in flight, and handles quote errors without losing fields |
@@ -117,7 +117,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 | 3.6 | Special requests | ✅ | Booking `comments` |
 | 3.7 | First name, last name, phone, email | ✅ | Booking `customer` |
 | 3.8 | Terms & Conditions checkbox and link | ✅ | `terms_and_conditions` from `/business` may be **null**: hide the link when null and render admin-entered content as literal plain text, never `innerHTML`. `accepted_terms` must be `true` |
-| 3.9 | Create Trip (cash) | ✅ | Sends the E-4 cash request once with a cart-bound UUID idempotency key; retries reuse the key until the request body changes |
+| 3.9 | Create Trip (cash) | ✅ | Sends once with a request-bound UUID idempotency key. A fingerprint/key pair (no customer data) survives reloads; retries reuse it until trip, vehicle, car seats, or customer details change (ED-026) |
 | 3.10 | Request a Quote vehicle chosen | ✅ | Shows Step 3 without charges, never calls price-breakdown, and submits a zero-total manual quote request |
 | 3.11 | Back button | ✅ | Returns to step 2 |
 
@@ -126,8 +126,8 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 | # | Item | Status | Notes |
 |---|---|---|---|
 | 4.1 | Confirmation screen | ✅ provisional | Uses the returned reservation number and total plus `/business` currency. Email wording appears only when `confirmation_email_sent` is true. Priced-booking wording awaits a BRO screenshot |
-| 4.2 | Error handling | ✅ | No automatic POST retry; retryable unknown outcomes reuse the same idempotency key. See "Errors" below |
-| 4.3 | Booking appears in admin Runs | 🔍 | **The end-to-end proof.** Verify after S-2 |
+| 4.2 | Error handling | ✅ | Offline, timeout, 5xx, 429, bad-key 401 and named 422 outcomes keep the form and never retry automatically; retryable unknown outcomes reuse the same idempotency key |
+| 4.3 | Booking appears in admin Runs | ✅ | E-5 was merged into `main` and verified live |
 
 ## Add-ons (after the core flow works)
 
@@ -160,9 +160,10 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 | Response | Show |
 |---|---|
 | `400 VALIDATION_ERROR` | Message on the named `field` (field may be absent) |
-| `401`, `403`, `404`, `503` | The API message, or a friendly fallback; never retry automatically |
+| `401` | "This booking form is not configured."; one sanitized developer log, with no key |
+| `403`, `404`, `503` | The API message, or a friendly fallback; never retry automatically |
 | `409 REQUEST_IN_FLIGHT` | "Your booking is still being processed. Please wait a moment and try again."; a customer retry reuses the same key |
-| `422 ADVANCE_BOOKING_VIOLATION`, `OUT_OF_SERVICE_AREA`, `VEHICLE_UNAVAILABLE`, `BELOW_MINIMUM_HOURS`, `PAYMENT_METHOD_NOT_OFFERED` | The API's `message` |
+| `422 ADVANCE_BOOKING_VIOLATION`, `OUT_OF_SERVICE_AREA`, `VEHICLE_UNAVAILABLE`, `BELOW_MINIMUM_HOURS`, `PAYMENT_METHOD_NOT_OFFERED`, `AIRPORT_ADDRESS_MISSING` | The API's `message` |
 | `429 RATE_LIMITED` | "Too many requests, please wait a moment and try again." |
 | Other `5xx`, network failure | "We couldn't confirm your booking. Please try again — you will not be booked twice."; a customer retry reuses the same key |
 
@@ -184,13 +185,13 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 ## Open items
 
-- Airport quotes blocked: backend requires pickup_address although the contract uses pickup_airport_id — under investigation.
 - **B-26:** document the taxi-booking `200` idempotent replay response in OpenAPI, mark `Idempotency-Key` required there, and document server retention. This does not block the widget, which always sends a UUID and scopes a key to one unchanged request body.
+- **E-6 deployment:** enable Routes API on the referrer-restricted Maps browser-key project, finish mobile/BRO side-by-side verification, configure client-domain CORS, and deploy the reviewed bundle.
 
 ## Sources of truth
 
-- `galveston-backend/docs/API_CONTRACT.md` **v1.2** (commit `7e15a04`)
-- `galveston-backend/openapi.json` (commit `7e15a04`)
+- `galveston-backend/docs/API_CONTRACT.md` (commit `867f27b2191ca1965775d3e87536ac76c584e794`)
+- `galveston-backend/openapi.json` (commit `867f27b2191ca1965775d3e87536ac76c584e794`)
 - `galveston-backend/docs/PROJECT-TRACKER.md`
 - BRO screenshots in this repo
 
@@ -198,6 +199,8 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 15 Oct 2026 | E-6 hardening complete for review: refreshed the pushed backend contract, removed temporary limits/service typing, persisted fingerprint-only booking idempotency across reloads, covered submission/error/embed safety, and added immediate race-safe Step 1 route previews. Live asset currently has validators but no explicit cache policy; recommend short revalidation for the stable `embed.js` URL. Mobile/BRO/hosting work remains. |
+| 15 Oct 2026 | E-5 merged into `main` and verified live; a booking appears in admin Runs. |
 | 11 Oct 2026 | E-5 complete for review: cash booking POST with body-bound idempotency, double-submit protection, manual retry handling, Request a Quote Step 3, conditional-email confirmation screens, booking error placement, and keyboard-accessible Terms closing. Priced confirmation wording remains provisional; live preview booking/admin verification is pending. Added backend documentation item B-26. |
 | 11 Oct 2026 | E-4 complete for priced vehicles: server-owned price breakdown, ED-022 zero-line filtering, race-safe Car Seats repricing, trip summary, customer fields, plain-text terms panel, validation, and typed cash booking-request preparation without a booking POST. Legacy anchor-zone pricing ignores `car_seats` (backend I-3). |
 | 11 Oct 2026 | E-3 follow-up: kept address autocomplete US-only while excluding country, state, administrative-region and postal-code-only suggestions; cities, street addresses and places remain available. Added focused request and type-filter tests. |

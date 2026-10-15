@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 
 import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM } from "../../maps/config";
-import { loadMapLibraries } from "../../maps/google-maps-loader";
+import { loadMapLibraries, loadRouteLibrary } from "../../maps/google-maps-loader";
+import { requestPreviewRoute } from "../../maps/preview-route";
 import { replaceRoute, type RouteLibraries } from "../../maps/route";
 import type { MapPoint } from "./types";
 
@@ -15,6 +16,10 @@ interface MapPanelProps {
 interface MapApi extends RouteLibraries {
   marker: google.maps.MarkerLibrary;
 }
+
+type MapState =
+  | { status: "loading" | "error" }
+  | { api: MapApi; map: google.maps.Map; status: "ready" };
 
 function replaceMarkers(
   api: MapApi,
@@ -34,7 +39,7 @@ export function positionMap(
   api: MapApi,
   map: google.maps.Map,
   points: Array<{ label: string; point: MapPoint }>,
-  routePath: google.maps.LatLng[],
+  routePath: Array<google.maps.LatLng | google.maps.LatLngLiteral>,
 ): void {
   if (routePath.length > 0) {
     const bounds = new google.maps.LatLngBounds();
@@ -54,53 +59,82 @@ export function positionMap(
   map.fitBounds(bounds, 56);
 }
 
-export function MapPanel({ dropoff, mapsKey, pickup, routePolyline }: MapPanelProps) {
-  const container = useRef<HTMLDivElement>(null);
-  const map = useRef<google.maps.Map | null>(null);
-  const api = useRef<MapApi | null>(null);
-  const markers = useRef<google.maps.Marker[]>([]);
-  const route = useRef<google.maps.Polyline | null>(null);
-  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+function clearPolylines(polylines: google.maps.Polyline[]): void {
+  polylines.forEach((polyline) => polyline.setMap(null));
+}
 
+function useMapInstance(container: { current: HTMLDivElement | null }, mapsKey: string): MapState {
+  const [state, setState] = useState<MapState>({ status: "loading" });
   useEffect(() => {
     let active = true;
     if (container.current === null) return;
-    void loadMapLibraries(mapsKey).then((libraries) => {
+    void loadMapLibraries(mapsKey).then((api) => {
       if (!active || container.current === null) return;
-      api.current = libraries;
-      map.current = new libraries.maps.Map(container.current, {
+      const map = new api.maps.Map(container.current, {
         center: DEFAULT_MAP_CENTER,
         zoom: DEFAULT_MAP_ZOOM,
         mapTypeControl: true,
         fullscreenControl: true,
         streetViewControl: false,
       });
-      setStatus("ready");
+      setState({ api, map, status: "ready" });
     }).catch(() => {
-      if (active) setStatus("error");
+      if (active) setState({ status: "error" });
     });
     return () => { active = false; };
-  }, [mapsKey]);
+  }, [container, mapsKey]);
+  return state;
+}
+
+function useMapContents(state: MapState, props: MapPanelProps): void {
+  const markers = useRef<google.maps.Marker[]>([]);
+  const route = useRef<google.maps.Polyline[]>([]);
+  const routeRequest = useRef(0);
 
   useEffect(() => {
-    if (status !== "ready" || api.current === null || map.current === null) return;
+    if (state.status !== "ready") return;
+    const requestId = ++routeRequest.current;
     const points = [
-      ...(pickup === null ? [] : [{ label: "A", point: pickup }]),
-      ...(dropoff === null ? [] : [{ label: "B", point: dropoff }]),
+      ...(props.pickup === null ? [] : [{ label: "A", point: props.pickup }]),
+      ...(props.dropoff === null ? [] : [{ label: "B", point: props.dropoff }]),
     ];
-    markers.current = replaceMarkers(api.current, map.current, markers.current, points);
-    const drawn = replaceRoute(api.current, map.current, route.current, routePolyline);
-    route.current = drawn.polyline;
-    positionMap(api.current, map.current, points, drawn.path);
-  }, [dropoff, pickup, routePolyline, status]);
+    markers.current = replaceMarkers(state.api, state.map, markers.current, points);
+    clearPolylines(route.current);
+    route.current = [];
+    if (props.routePolyline !== null) {
+      const drawn = replaceRoute(state.api, state.map, null, props.routePolyline);
+      route.current = drawn.polyline === null ? [] : [drawn.polyline];
+      positionMap(state.api, state.map, points, drawn.path);
+      return;
+    }
+    positionMap(state.api, state.map, points, []);
+    const pickup = props.pickup;
+    const dropoff = props.dropoff;
+    if (pickup === null || dropoff === null) return;
+    void loadRouteLibrary(props.mapsKey)
+      .then((library) => requestPreviewRoute(library, pickup, dropoff))
+      .then((preview) => {
+        if (preview === null || routeRequest.current !== requestId) return;
+        preview.polylines.forEach((polyline) => polyline.setMap(state.map));
+        route.current = preview.polylines;
+        positionMap(state.api, state.map, points, preview.path);
+      })
+      .catch(() => undefined);
+  }, [props.dropoff, props.mapsKey, props.pickup, props.routePolyline, state]);
+}
 
-  if (status === "error") {
+export function MapPanel(props: MapPanelProps) {
+  const container = useRef<HTMLDivElement>(null);
+  const state = useMapInstance(container, props.mapsKey);
+  useMapContents(state, props);
+
+  if (state.status === "error") {
     return <div class="map-unavailable" role="status">
       Map and address lookup are unavailable. Please try again later.
     </div>;
   }
   return <div class="map-panel" aria-label="Trip map">
     <div class="map-canvas" ref={container} />
-    {status === "loading" && <div class="map-loading">Loading map…</div>}
+    {state.status === "loading" && <div class="map-loading">Loading map…</div>}
   </div>;
 }

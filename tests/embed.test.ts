@@ -1,8 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { ApiClient, Business } from "../src/api/client";
+import type { ApiClient, Business, ServiceTypeOption } from "../src/api/client";
 import { NetworkError, UnauthorizedError } from "../src/api/errors";
-import type { ServiceTypeOption } from "../src/api/service-types";
 import { captureScriptConfig, mountBookingWidget } from "../src/embed";
 
 const BUSINESS: Business = {
@@ -12,6 +11,8 @@ const BUSINESS: Business = {
   currency: "USD",
   timezone: "America/Chicago",
   distance_unit: "miles",
+  max_passengers: 8,
+  max_luggage: 8,
   settings: {
     advance_booking_hours: 0,
     insurance_enabled: false,
@@ -69,6 +70,18 @@ describe("embed loader", () => {
     expect(document.head.querySelector("style")).toBeNull();
   });
 
+  it("does not log the business key when mounting fails", () => {
+    addMount();
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    mountBookingWidget(
+      { apiBase: "https://api.test", businessKey: "bk_live_do_not_log" },
+      document,
+      () => { throw new Error("bk_live_do_not_log"); },
+    );
+    expect(consoleError).toHaveBeenCalledOnce();
+    expect(JSON.stringify(consoleError.mock.calls)).not.toContain("bk_live_do_not_log");
+  });
+
   it("captures the key and API base from the loading script", () => {
     const script = document.createElement("script");
     script.dataset.businessKey = "bk_live_company";
@@ -91,6 +104,42 @@ describe("embed app states", () => {
     expect(mount.shadowRoot?.textContent).toContain("Loading booking form");
     await vi.waitFor(() => expect(mount.shadowRoot?.textContent).toContain("Reservations"));
   });
+
+  it("keeps widget UI and styles isolated from host-page CSS", async () => {
+    const hostStyle = document.createElement("style");
+    hostStyle.textContent = ".widget { display: none; }";
+    document.head.append(hostStyle);
+    const mount = addMount();
+    mountBookingWidget(
+      { apiBase: "https://api.test", businessKey: "key" },
+      document,
+      clientFactory(async () => BUSINESS),
+    );
+    await vi.waitFor(() => expect(mount.shadowRoot?.querySelector(".widget")).not.toBeNull());
+    expect(document.querySelector(".widget")).toBeNull();
+    expect(mount.shadowRoot?.querySelector("style")).not.toBeNull();
+    expect(document.head.querySelectorAll("style")).toHaveLength(1);
+  });
+
+});
+
+describe("embed availability states", () => {
+
+  it.each(["max_passengers", "max_luggage"] as const)(
+    "shows contact guidance when %s is null",
+    async (field) => {
+      const mount = addMount();
+      mountBookingWidget(
+        { apiBase: "https://api.test", businessKey: "key" },
+        document,
+        clientFactory(async () => ({ ...BUSINESS, [field]: null })),
+      );
+      await vi.waitFor(() => expect(mount.shadowRoot?.textContent).toContain(
+        "No vehicles are available. Please contact us.",
+      ));
+      expect(mount.shadowRoot?.querySelector("form")).toBeNull();
+    },
+  );
 
   it("shows contact guidance when no E-2 service is available", async () => {
     const mount = addMount();

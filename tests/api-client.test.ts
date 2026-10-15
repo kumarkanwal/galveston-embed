@@ -11,6 +11,7 @@ import {
   ApiError,
   NetworkError,
   RateLimitedError,
+  RequestTimeoutError,
   RequestInFlightError,
   UnauthorizedError,
 } from "../src/api/errors";
@@ -22,6 +23,8 @@ const BUSINESS = {
   currency: "USD",
   timezone: "America/Chicago",
   distance_unit: "miles",
+  max_passengers: 8,
+  max_luggage: 8,
   settings: {
     advance_booking_hours: 6,
     insurance_enabled: false,
@@ -97,13 +100,13 @@ describe("API request setup", () => {
     expect(fetch.mock.calls[0]?.[0].url).toBe(`https://api.test${path}`);
   });
 
-  it("runtime-validates service types", async () => {
+  it("returns generated service types in API order", async () => {
     const data = [
       { id: "1", code: "one_way", name: "One Way Transfer" },
-      { id: "2", code: 4, name: "Broken" },
-    ];
+      { id: "2", code: "airport_pickup", name: "Airport Pickup" },
+    ] as const;
     const fetch = vi.fn(async (_input: Request) => jsonResponse({ data }));
-    await expect(clientWith(fetch).getServiceTypes()).resolves.toEqual([data[0]]);
+    await expect(clientWith(fetch).getServiceTypes()).resolves.toEqual(data);
   });
 
   it("sends a POST once without automatic retries", async () => {
@@ -143,8 +146,27 @@ describe("booking API", () => {
     expect(fetch).toHaveBeenCalledOnce();
     const request = fetch.mock.calls[0]?.[0];
     expect(request?.url).toBe("https://api.test/v1/public/taxi/booking");
+    expect(request?.url).not.toContain("booking-key");
+    expect(request?.url).not.toContain("bk_test");
     expect(request?.headers.get("Idempotency-Key")).toBe("booking-key");
     await expect(request?.clone().json()).resolves.toEqual(BOOKING);
+  });
+
+  it("times out once without retrying the booking POST", async () => {
+    const fetch = vi.fn((request: Request) => new Promise<Response>((_resolve, reject) => {
+      request.signal.addEventListener("abort", () => reject(new DOMException(
+        "Timed out", "AbortError",
+      )), { once: true });
+    }));
+    const client = createApiClient({
+      apiBase: "https://api.test",
+      businessKey: "bk_test",
+      fetch,
+      timeoutMs: 1,
+    });
+    await expect(client.book(BOOKING, "booking-key")).rejects
+      .toBeInstanceOf(RequestTimeoutError);
+    expect(fetch).toHaveBeenCalledOnce();
   });
 });
 

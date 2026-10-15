@@ -13,7 +13,9 @@ import {
   ApiError,
   NetworkError,
   RateLimitedError,
+  RequestTimeoutError,
   RequestInFlightError,
+  UnauthorizedError,
 } from "../src/api/errors";
 import { bookingFailure } from "../src/app/booking/booking-error";
 import { Confirmation } from "../src/app/booking/Confirmation";
@@ -23,6 +25,7 @@ import type { TripFormState } from "../src/app/trip/types";
 const BUSINESS = {
   id: "business-1", name: "Island Transit", type: "taxi", currency: "USD",
   timezone: "America/Chicago", distance_unit: "miles",
+  max_passengers: 8, max_luggage: 8,
   settings: { advance_booking_hours: 0, insurance_enabled: false,
     insurance_pct: "0.00", payment_methods: ["cash"], terms_and_conditions: "Be ready." },
 } satisfies Business;
@@ -93,7 +96,10 @@ async function fillValid(root: HTMLElement, waitForBreakdown = true) {
   root.querySelector<HTMLInputElement>('[data-confirm-field="acceptedTerms"]')?.click();
 }
 
-beforeEach(() => document.body.replaceChildren());
+beforeEach(() => {
+  document.body.replaceChildren();
+  sessionStorage.clear();
+});
 
 describe("booking submission", () => {
   it("sends once on double-click with the E-4 body and an idempotency key", async () => {
@@ -116,6 +122,24 @@ describe("booking submission", () => {
     await vi.waitFor(() => expect(onBooked).toHaveBeenCalledWith(BOOKED, false));
   });
 
+  it("sends once when Enter submission and click happen together", async () => {
+    let resolve: ((value: TaxiBookingResponse) => void) | undefined;
+    const book = vi.fn<ApiClient["book"]>(() =>
+      new Promise<TaxiBookingResponse>((done) => { resolve = done; }));
+    const { root } = mount(book);
+    await fillValid(root);
+    root.querySelector("form")?.dispatchEvent(new Event("submit", {
+      bubbles: true, cancelable: true,
+    }));
+    root.querySelector<HTMLButtonElement>(".create-trip")?.click();
+    await vi.waitFor(() => expect(book).toHaveBeenCalledOnce());
+    resolve?.(BOOKED);
+  });
+
+});
+
+describe("booking idempotency", () => {
+
   it("reuses the key on retry and changes it after a field edit", async () => {
     const book = vi.fn<ApiClient["book"]>(async () =>
       Promise.reject(new NetworkError(new Error("offline"))));
@@ -136,6 +160,20 @@ describe("booking submission", () => {
     await vi.waitFor(() => expect(book).toHaveBeenCalledTimes(3));
     expect(book.mock.calls[2]?.[1]).not.toBe(book.mock.calls[1]?.[1]);
     expect(root.querySelector<HTMLInputElement>("#email")?.value).toBe("ada@example.com");
+  });
+
+  it("reuses the successful attempt key after the confirmation page is left", async () => {
+    const book = vi.fn<ApiClient["book"]>(async () => BOOKED);
+    const first = mount(book);
+    await fillValid(first.root);
+    first.root.querySelector<HTMLButtonElement>(".create-trip")?.click();
+    await vi.waitFor(() => expect(book).toHaveBeenCalledOnce());
+
+    const revisited = mount(book);
+    await fillValid(revisited.root);
+    revisited.root.querySelector<HTMLButtonElement>(".create-trip")?.click();
+    await vi.waitFor(() => expect(book).toHaveBeenCalledTimes(2));
+    expect(book.mock.calls[1]?.[1]).toBe(book.mock.calls[0]?.[1]);
   });
 
 });
@@ -189,16 +227,57 @@ describe("booking errors", () => {
     [new NetworkError(new Error("offline")), "not be booked twice"],
     [new ApiError(500, { code: "SERVER_ERROR", message: "Internal" }), "not be booked twice"],
     [new ApiError(503, { code: "BOOKING_UNAVAILABLE", message: "Try later" }), "Try later"],
-    [new ApiError(401, { code: "UNAUTHENTICATED", message: "Not configured" }), "Not configured"],
+    [new UnauthorizedError({ code: "UNAUTHENTICATED", message: "Server detail" }),
+      "This booking form is not configured."],
   ])("maps the failure without retrying", (error, message) => {
     expect(bookingFailure(error).message).toContain(message);
   });
 
+});
+
+describe("booking error details", () => {
   it("maps a customer field error beside the field", () => {
     const error = new ApiError(400, {
       code: "VALIDATION_ERROR", message: "Email is invalid", field: "customer.email",
     });
     expect(bookingFailure(error)).toEqual({ field: "email", message: "Email is invalid" });
+  });
+
+});
+
+describe("booking error submission", () => {
+  it.each([
+    [new NetworkError(new Error("offline")), "not be booked twice"],
+    [new RequestTimeoutError(new Error("timeout")), "not be booked twice"],
+    [new ApiError(500, { code: "SERVER_ERROR", message: "Internal" }), "not be booked twice"],
+    [new RateLimitedError({ code: "RATE_LIMITED", message: "Server" }), "Too many requests"],
+    [new UnauthorizedError({ code: "UNAUTHENTICATED", message: "Server" }), "not configured"],
+    [new ApiError(422, { code: "ADVANCE_BOOKING_VIOLATION", message: "Choose a later time." }),
+      "Choose a later time."],
+    [new ApiError(422, { code: "VEHICLE_UNAVAILABLE", message: "Choose another vehicle." }),
+      "Choose another vehicle."],
+    [new ApiError(422, { code: "PAYMENT_METHOD_NOT_OFFERED", message: "Cash is unavailable." }),
+      "Cash is unavailable."],
+    [new ApiError(422, { code: "AIRPORT_ADDRESS_MISSING", message: "Select an airport." }),
+      "Select an airport."],
+  ])("keeps the form and never automatically retries %#", async (error, message) => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const book = vi.fn<ApiClient["book"]>(async () => Promise.reject(error));
+    const { root } = mount(book);
+    await fillValid(root);
+    enter(root, "comments", "Call on arrival");
+    root.querySelector<HTMLButtonElement>(".create-trip")?.click();
+    await vi.waitFor(() => expect(root.textContent).toContain(message));
+    expect(root.querySelector<HTMLInputElement>("#firstName")?.value).toBe("Ada");
+    expect(root.querySelector<HTMLInputElement>("#comments")?.value).toBe("Call on arrival");
+    expect(book).toHaveBeenCalledOnce();
+    if (error instanceof UnauthorizedError) {
+      expect(consoleError).toHaveBeenCalledWith(
+        "Galveston booking widget configuration was rejected.",
+      );
+      expect(JSON.stringify(consoleError.mock.calls)).not.toContain("bk_");
+    }
+    consoleError.mockRestore();
   });
 });
 

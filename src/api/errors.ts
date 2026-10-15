@@ -46,6 +46,13 @@ export class NetworkError extends Error {
   }
 }
 
+export class RequestTimeoutError extends NetworkError {
+  constructor(cause: unknown) {
+    super(cause);
+    this.name = "RequestTimeoutError";
+  }
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }

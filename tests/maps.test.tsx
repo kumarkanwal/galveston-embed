@@ -9,6 +9,7 @@ import {
 import { replaceRoute, type RouteLibraries } from "../src/maps/route";
 
 beforeEach(() => {
+  vi.unstubAllGlobals();
   document.head.querySelectorAll("script[src^='https://maps.googleapis.com/maps/api/js']")
     .forEach((script) => script.remove());
   resetGoogleMapsLoaderForTests();
@@ -22,7 +23,6 @@ describe("Google Maps failure", () => {
 
   it("keeps a usable widget notice when the map cannot load", async () => {
     const root = document.createElement("div");
-    document.body.append(root);
     render(<MapPanel mapsKey="" pickup={null} dropoff={null} routePolyline={null} />, root);
     await vi.waitFor(() => expect(root.textContent).toContain("address lookup are unavailable"));
     expect(root.querySelector(".map-canvas")).toBeNull();

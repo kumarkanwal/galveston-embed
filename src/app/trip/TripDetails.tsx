@@ -4,6 +4,7 @@ import { AirportFields } from "./AirportFields";
 import { MapPanel } from "./MapPanel";
 import { ProgressSteps } from "./ProgressSteps";
 import { TripCoreFields } from "./TripCoreFields";
+import type { PartyLimits } from "./limits";
 import type { CoreService, TripErrors, TripFormState } from "./types";
 import { useAirportData } from "./use-airport-data";
 
@@ -13,6 +14,7 @@ interface TripDetailsProps {
   form: TripFormState;
   formError: string | null;
   isSubmitting: boolean;
+  limits: PartyLimits;
   mapsKey: string;
   onSubmit: (event: SubmitEvent) => void | Promise<void>;
   routePolyline: string | null;
@@ -37,7 +39,7 @@ function AirportAvailability(props: {
   </>;
 }
 
-function mapPoints(form: TripFormState) {
+export function tripMapPoints(form: TripFormState) {
   return {
     pickup: form.service === "airport_pickup"
       ? form.pickupAirportLocation
@@ -61,7 +63,7 @@ export function TripDetails(props: TripDetailsProps) {
   const airportFields = hasAirports && hasAirlines ? <AirportFields
     airports={readyData.airports} airlines={readyData.airlines}
     errors={props.errors} form={props.form} mapsKey={props.mapsKey} update={props.update} /> : null;
-  const points = mapPoints(props.form);
+  const points = tripMapPoints(props.form);
 
   return <section class="widget" aria-live="polite">
     <header class="widget-heading">
@@ -72,6 +74,7 @@ export function TripDetails(props: TripDetailsProps) {
     <div class="trip-layout">
       <form class="trip-form" noValidate onSubmit={props.onSubmit}>
         <TripCoreFields errors={props.errors} form={props.form}
+          limits={props.limits}
           services={props.services} timeZone={props.timeZone} update={props.update} />
         {props.form.service === "one_way" && <>{address("pickup")}{address("dropoff")}</>}
         {props.form.service === "airport_pickup" && <>{airportFields}{address("dropoff")}</>}

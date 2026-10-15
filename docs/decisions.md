@@ -149,3 +149,21 @@ Date: 2026-10-11 · Status: accepted
 Decision: every unchanged booking attempt reuses one UUID idempotency key; confirmation shows the response total with `/business` currency and mentions email only when `confirmation_email_sent` is true.
 Why: the backend re-prices at booking and owns the final total. Reusing the key after an unknown outcome prevents duplicate orders, while changing any request-body field must create a new attempt.
 Consequences: treat HTTP 200 and 201 booking envelopes identically; never retry automatically. `REQUEST_IN_FLIGHT` asks the customer to wait, network and non-503 5xx failures explain that retrying is safe, and API messages are retained for 401, 403, 404 and 503 responses.
+
+## ED-024 — Backend-owned party limits and service types
+Date: 2026-10-15 · Status: accepted (resolves ED-013 and supersedes ED-019)
+Decision: use generated `BusinessPublic.max_passengers`, `max_luggage`, and `ServiceTypeOption` types from the refreshed backend schema.
+Why: backend B-21 now publishes the capacities and a typed service option, so the temporary 74/99 limits and hand-written validated type are no longer needed.
+Consequences: cap each business limit at the corresponding `TaxiQuoteRequest` schema maximum (ED-020). If either business limit is null, do not show a booking form; explain that no vehicles are available.
+
+## ED-025 — Step 1 route preview uses the browser Routes library
+Date: 2026-10-15 · Status: accepted
+Decision: request a driving path with the Google Maps JavaScript Routes library as soon as both Step 1 endpoints have coordinates; use the backend quote polyline after pricing.
+Why: before Check Pricing there is no quote and therefore no server route polyline. A browser route preview matches BRO's immediate feedback without moving pricing authority into the widget.
+Consequences: the Maps browser-key project needs Maps JavaScript API and Routes API enabled. Endpoint changes replace the preview, stale responses are ignored, and preview failure never blocks quoting or booking.
+
+## ED-026 — Persist only the booking-attempt fingerprint and key
+Date: 2026-10-15 · Status: accepted (extends ED-023)
+Decision: keep the SHA-256 request fingerprint and its UUID idempotency key in `sessionStorage`, with no request body or customer fields.
+Why: a reload during an uncertain booking POST must retain the same attempt key, but browser storage must not duplicate customer data.
+Consequences: an unchanged request reuses its key across reloads and navigation; changing trip, vehicle, car seats, or customer details creates a new fingerprint and key. Storage failures fall back safely to the in-memory behavior.

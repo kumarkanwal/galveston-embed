@@ -1,10 +1,10 @@
-import type { ApiClient, Business } from "../../api/client";
+import type { ApiClient, Business, ServiceTypeOption } from "../../api/client";
 import { Confirmation } from "../booking/Confirmation";
 import { Confirm } from "../confirm/Confirm";
 import { filterCoreServices } from "../trip/service-types";
 import { TripDetails } from "../trip/TripDetails";
 import { ChooseVehicle } from "../vehicle/ChooseVehicle";
-import type { ServiceTypeOption } from "../../api/service-types";
+import { partyLimits, type PartyLimits } from "../trip/limits";
 import { useBookingFlow } from "./use-booking-flow";
 
 interface BookingFlowProps {
@@ -16,6 +16,12 @@ interface BookingFlowProps {
 
 export function BookingFlow(props: BookingFlowProps) {
   const services = filterCoreServices(props.services);
+  const limits = partyLimits(props.business);
+  if (limits === null) {
+    return <section class="widget status" aria-live="polite">
+      No vehicles are available. Please contact us.
+    </section>;
+  }
   if (services.length === 0) {
     return <section class="widget status" aria-live="polite">
       Online booking is not available. Please contact us.
@@ -23,14 +29,16 @@ export function BookingFlow(props: BookingFlowProps) {
   }
   const firstService = services[0];
   if (firstService === undefined) return null;
-  return <BookingFlowReady {...props} initialService={firstService.code} services={services} />;
+  return <BookingFlowReady {...props} initialService={firstService.code}
+    limits={limits} services={services} />;
 }
 
 function BookingFlowReady(props: Omit<BookingFlowProps, "services"> & {
   initialService: ReturnType<typeof filterCoreServices>[number]["code"];
+  limits: PartyLimits;
   services: ReturnType<typeof filterCoreServices>;
 }) {
-  const flow = useBookingFlow(props.client, props.business, props.initialService);
+  const flow = useBookingFlow(props.client, props.business, props.initialService, props.limits);
   if (flow.state.confirmation !== null) {
     return <Confirmation currency={props.business.currency}
       requestQuote={flow.state.confirmation.requestQuote}
@@ -51,6 +59,7 @@ function BookingFlowReady(props: Omit<BookingFlowProps, "services"> & {
   return <TripDetails client={props.client} errors={flow.state.errors} form={flow.state.form}
     formError={flow.state.formError} isSubmitting={flow.state.isSubmitting}
     mapsKey={props.mapsKey} onSubmit={flow.submit}
+    limits={props.limits}
     routePolyline={flow.state.quote?.route_polyline ?? null}
     services={props.services} timeZone={props.business.timezone} update={flow.update} />;
 }

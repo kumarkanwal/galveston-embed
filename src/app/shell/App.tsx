@@ -1,8 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 
-import type { ApiClient, Business } from "../../api/client";
+import type { ApiClient, Business, ServiceTypeOption } from "../../api/client";
 import { NetworkError, UnauthorizedError } from "../../api/errors";
-import type { ServiceTypeOption } from "../../api/service-types";
 import { BookingFlow } from "./BookingFlow";
 
 interface AppProps {

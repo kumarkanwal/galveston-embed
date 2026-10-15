@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { buildQuoteRequest } from "../src/app/trip/build-quote-request";
+import { tripMapPoints } from "../src/app/trip/TripDetails";
 import type { CoreServiceCode, TripFormState } from "../src/app/trip/types";
 import { validateTrip } from "../src/app/trip/validation";
 
@@ -83,8 +84,27 @@ describe("quote request builder", () => {
   });
 });
 
+describe("step-one map endpoints", () => {
+  it("uses both selected address coordinates for one-way", () => {
+    const form = formFor("one_way");
+    expect(tripMapPoints(form)).toEqual({
+      pickup: form.pickupAddress?.location,
+      dropoff: form.dropoffAddress?.location,
+    });
+  });
+
+  it.each([
+    ["airport_pickup", "pickup", "pickupAirportLocation"],
+    ["airport_dropoff", "dropoff", "dropoffAirportLocation"],
+  ] as const)("uses the selected airport coordinates for %s", (service, side, field) => {
+    const form = formFor(service);
+    expect(tripMapPoints(form)[side]).toBe(form[field]);
+  });
+});
+
 const VALIDATION_CONTEXT = {
   advanceBookingHours: 12,
+  limits: { passengers: 8, luggage: 8 },
   now: new Date("2026-10-19T15:00:00.000Z"),
   timeZone: "America/Chicago",
 };
@@ -122,6 +142,7 @@ describe("trip date and time validation", () => {
     const form = formFor("one_way");
     const chicagoContext = {
       advanceBookingHours: 0,
+      limits: { passengers: 8, luggage: 8 },
       now: new Date("2026-07-01T03:30:00.000Z"),
       timeZone: "America/Chicago",
     };
