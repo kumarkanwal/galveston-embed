@@ -106,6 +106,22 @@
   padding: 7px 0 16px;
 }
 
+.car-seats label {
+  margin: 0;
+}
+
+.car-seats small {
+  color: #666666;
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.car-seats .field-error {
+  grid-column: 2;
+}
+
 .charges-total {
   background: var(--green);
   color: #ffffff;

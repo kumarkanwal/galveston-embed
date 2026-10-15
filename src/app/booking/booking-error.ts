@@ -16,6 +16,7 @@ const UNKNOWN_OUTCOME = "We couldn't confirm your booking. Please try again — 
 
 const FIELD_MAP: Record<string, ConfirmField> = {
   accepted_terms: "acceptedTerms",
+  car_seats: "carSeats",
   comments: "comments",
   "customer.email": "email",
   "customer.first_name": "firstName",

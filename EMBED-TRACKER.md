@@ -50,7 +50,7 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 5 | E-3 Step 2 — Choose Vehicle | Widget + VPS | 11% | ✅ Complete — address filter fixed | 11% |
 | 6 | E-4 Step 3 — Confirm & breakdown | Widget | 9% | ✅ Complete — ready for review | 9% |
 | 7 | E-5 Create Trip, confirmation, errors | Widget + Admin | 9% | ✅ Complete — merged and verified live | 9% |
-| 8 | E-6 Mobile, side-by-side with BRO, hosting | Both | 12% | 🔄 E-6b form/a11y/mobile pass complete; BRO/hosting pending | 4% |
+| 8 | E-6 Mobile, side-by-side with BRO, hosting | Both | 12% | 🔄 E-6c company Car Seats complete; BRO/hosting pending | 4% |
 | 9 | E-7 Card payment (Square) | Both | 9% | ⛔ B-16 | 0% |
 | 10 | E-8 Promo codes | Both | 4% | ⛔ Backend promo wiring | 0% |
 | 11 | E-9 Round trip | Both | 5% | ⛔ I-1 | 0% |
@@ -113,7 +113,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 | 3.2 | Charges breakdown | ✅ | `POST /taxi/price-breakdown` with `payment_method: "cash"`. Display `line_items` and `total` exactly as returned |
 | 3.3 | Line-item labels | ✅ | Show exactly what the API returns (ED-011). Any label change happens in the backend |
 | 3.4 | Zero-value lines | ✅ | Hide every line whose amount string is exactly `"0.00"` (ED-022); never identify lines by label |
-| 3.5 | Car Seats dropdown (0–5) | ✅ with backend gap | Send `car_seats`; re-call price-breakdown on change; ignore older responses and show only the returned total. **Legacy anchor-zone pricing ignores `car_seats` (backend I-3)** |
+| 3.5 | Company-configured Car Seats | ✅ with backend gap | `/business` settings show or hide the control, set options `0..max_car_seats`, and provide the per-seat label. Send only top-level `car_seats`; re-call price-breakdown on change; server lines and totals remain authoritative. A stale-preference 400 stays under the control without changing the customer's choice. Request a Quote shows no price. **Legacy anchor-zone/hourly pricing still ignores top-level `car_seats` (backend I-3).** |
 | 3.6 | Special requests | ✅ | Booking `comments` |
 | 3.7 | First name, last name, phone, email | ✅ | Booking `customer` |
 | 3.8 | Terms & Conditions checkbox and link | ✅ | `terms_and_conditions` from `/business` may be **null**: hide the link when null and render admin-entered content as literal plain text, never `innerHTML`. `accepted_terms` must be `true` |
@@ -125,7 +125,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 | # | Item | Status | Notes |
 |---|---|---|---|
-| 4.1 | Confirmation screen | ✅ provisional | Uses the returned reservation number and total plus `/business` currency. Email wording appears only when `confirmation_email_sent` is true. Priced-booking wording awaits a BRO screenshot |
+| 4.1 | Confirmation screen | ✅ provisional | Uses the returned reservation number and total plus `/business` currency. Priced `requested`/`pending` responses say the company will confirm; `confirmed` keeps the submitted-reservation wording; Request a Quote keeps its pending-reservation wording. No status promises an email. Priced wording awaits a BRO screenshot |
 | 4.2 | Error handling | ✅ | Offline, timeout, 5xx, 429, bad-key 401 and named 422 outcomes keep the form and never retry automatically; retryable unknown outcomes reuse the same idempotency key |
 | 4.3 | Booking appears in admin Runs | ✅ | E-5 was merged into `main` and verified live |
 
@@ -176,6 +176,16 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 3. Mobile view of each step
 4. Step 1 — Hourly, before E-11
 
+## E-6c differences from BRO
+
+- Car Seats is controlled by each company's Preferences instead of always
+  showing BRO's fixed `0–5` list.
+- Priced vehicles show the company's configured per-seat price as a label; the
+  charge and total still come only from the backend price breakdown.
+- Request-a-Quote vehicles use the configured Car Seats options but deliberately
+  show no car-seat price.
+- Meet & Greet is not shown because it is a staff-only option.
+
 ## Open questions
 
 | # | Question | Who |
@@ -190,8 +200,8 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 ## Sources of truth
 
-- `galveston-backend/docs/API_CONTRACT.md` (commit `867f27b2191ca1965775d3e87536ac76c584e794`)
-- `galveston-backend/openapi.json` (commit `867f27b2191ca1965775d3e87536ac76c584e794`)
+- `galveston-backend/docs/API_CONTRACT.md` (commit `9438c3d4f4f334e0a8ffd277bee15b988272ea17`)
+- `galveston-backend/openapi.json` (commit `9438c3d4f4f334e0a8ffd277bee15b988272ea17`)
 - `galveston-backend/docs/PROJECT-TRACKER.md`
 - BRO screenshots in this repo
 
@@ -199,6 +209,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 15 Oct 2026 | E-6c complete for review: refreshed the approved B-29 contract, replaced the fixed Car Seats list with company Preferences, kept pricing server-owned, placed stale-preference errors under the preserved selection, and made priced confirmation wording follow `requested`/`pending` versus `confirmed`. Request a Quote shows no car-seat price, Meet & Greet remains staff-only, and no confirmation promises email. |
 | 15 Oct 2026 | E-6b complete for review: field errors stay with their controls and appear only after blur or submit; mobile controls use 44px targets and 16px text through tablet widths; keyboard focus, Terms trapping, form semantics, concise announcements, map alternatives, completed progress, and same-brand WCAG AA colours are covered by regression tests and an exact-width browser pass. |
 | 15 Oct 2026 | E-6 hardening complete for review: refreshed the pushed backend contract, removed temporary limits/service typing, persisted fingerprint-only booking idempotency across reloads, covered submission/error/embed safety, and added immediate race-safe Step 1 route previews. Live asset currently has validators but no explicit cache policy; recommend short revalidation for the stable `embed.js` URL. Mobile/BRO/hosting work remains. |
 | 15 Oct 2026 | E-5 merged into `main` and verified live; a booking appears in admin Runs. |

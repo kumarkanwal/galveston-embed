@@ -1,7 +1,10 @@
 import { CarSeatsField } from "./Charges";
 
 interface RequestQuotePriceProps {
+  carSeatError: string | undefined;
+  carSeatMax: number;
   carSeats: number;
+  currency: string;
   onCarSeatsChange: (count: number) => void;
   outOfServiceArea: boolean;
 }
@@ -13,6 +16,8 @@ export function RequestQuotePrice(props: RequestQuotePriceProps) {
       This trip is outside our standard service area. We'll send you a quote.
     </div>}
     <p><strong>Request a Quote</strong> — we'll send you a quote for this trip.</p>
-    <CarSeatsField carSeats={props.carSeats} onCarSeatsChange={props.onCarSeatsChange} />
+    <CarSeatsField carSeatError={props.carSeatError} carSeatMax={props.carSeatMax}
+      carSeatPrice={undefined} carSeats={props.carSeats} currency={props.currency}
+      onCarSeatsChange={props.onCarSeatsChange} />
   </section>;
 }

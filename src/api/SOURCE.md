@@ -4,7 +4,7 @@
 | Field | Value |
 |---|---|
 | Copied from | `galveston-backend/openapi.json` |
-| Backend commit | `867f27b2191ca1965775d3e87536ac76c584e794` |
-| Copied on | `2026-10-14` |
+| Backend commit | `9438c3d4f4f334e0a8ffd277bee15b988272ea17` |
+| Copied on | `2026-10-15` |
 
 Refresh only after a complete backend change is committed and pushed.
