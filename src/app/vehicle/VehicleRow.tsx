@@ -38,6 +38,7 @@ export function VehicleRow({ currency, onChoose, vehicle }: VehicleRowProps) {
     </div>
     <div class="vehicle-fare">{fare(vehicle, currency)}</div>
     <button class="vehicle-choose" type="button" disabled={unavailable}
+      aria-label={unavailable ? `${vehicle.name} unavailable` : `Choose ${vehicle.name}`}
       onClick={() => onChoose(vehicle)}>{unavailable ? "Unavailable" : "Choose"}</button>
   </article>;
 }

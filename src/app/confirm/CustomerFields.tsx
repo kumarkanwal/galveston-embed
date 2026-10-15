@@ -2,6 +2,7 @@ import { FieldError } from "../trip/FieldError";
 import type { ConfirmErrors, ConfirmFormState } from "./types";
 
 interface CustomerFieldsProps {
+  blur: (field: keyof ConfirmFormState) => void;
   errors: ConfirmErrors;
   form: ConfirmFormState;
   update: <Key extends keyof ConfirmFormState>(key: Key, value: ConfirmFormState[Key]) => void;
@@ -15,6 +16,7 @@ interface TextFieldProps {
   placeholder: string;
   value: string;
   update: CustomerFieldsProps["update"];
+  blur: CustomerFieldsProps["blur"];
 }
 
 function TextField(props: TextFieldProps) {
@@ -26,6 +28,7 @@ function TextField(props: TextFieldProps) {
   const input = <input id={props.field} data-confirm-field={props.field}
     value={props.value} placeholder={props.placeholder}
     {...length} aria-invalid={props.error !== undefined} {...describedBy}
+    onBlur={() => props.blur(props.field)}
     onInput={(event) => props.update(props.field, event.currentTarget.value)} />;
   return <div class="field">
     <label for={props.field}>{props.label}</label>
@@ -34,17 +37,17 @@ function TextField(props: TextFieldProps) {
   </div>;
 }
 
-export function CustomerFields({ errors, form, update }: CustomerFieldsProps) {
+export function CustomerFields({ blur, errors, form, update }: CustomerFieldsProps) {
   return <>
     <div class="field-row">
       <TextField field="firstName" label="First Name" placeholder="First Name" maxLength={100}
-        value={form.firstName} error={errors.firstName} update={update} />
+        value={form.firstName} error={errors.firstName} blur={blur} update={update} />
       <TextField field="lastName" label="Last Name" placeholder="Last Name" maxLength={100}
-        value={form.lastName} error={errors.lastName} update={update} />
+        value={form.lastName} error={errors.lastName} blur={blur} update={update} />
     </div>
     <TextField field="phone" label="Phone" placeholder="Phone" maxLength={50}
-      value={form.phone} error={errors.phone} update={update} />
+      value={form.phone} error={errors.phone} blur={blur} update={update} />
     <TextField field="email" label="Email" placeholder="Email address"
-      maxLength={undefined} value={form.email} error={errors.email} update={update} />
+      maxLength={undefined} value={form.email} error={errors.email} blur={blur} update={update} />
   </>;
 }

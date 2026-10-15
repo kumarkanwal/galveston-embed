@@ -1,4 +1,5 @@
 import { render } from "preact";
+import { act } from "preact/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Business, QuotedVehicle, TaxiQuoteResponse } from "../src/api/client";
@@ -50,9 +51,23 @@ describe("Choose Vehicle", () => {
     expect(root.textContent).toContain("Request a Quote");
     const buttons = [...root.querySelectorAll<HTMLButtonElement>(".vehicle-choose")];
     expect(buttons.map((button) => button.textContent)).toEqual(["Choose", "Choose", "Unavailable"]);
+    expect(buttons.map((button) => button.getAttribute("aria-label")))
+      .toEqual(["Choose Sedan", "Choose Van", "Bus unavailable"]);
     expect(buttons[2]?.disabled).toBe(true);
     buttons[0]?.click();
     expect(onChoose).toHaveBeenCalledWith(VEHICLES[0]);
+  });
+
+  it("moves focus to the step heading when navigation opens the step", async () => {
+    const focus = vi.spyOn(HTMLElement.prototype, "focus");
+    const root = document.createElement("div");
+    document.body.append(root);
+    act(() => render(<ChooseVehicle autoFocusHeading business={BUSINESS}
+      quote={{ out_of_service_area: false, vehicles: VEHICLES }}
+      onBack={() => undefined} onChoose={() => undefined} />, root));
+    const heading = root.querySelector(".step-title");
+    await vi.waitFor(() => expect(focus).toHaveBeenCalled());
+    expect(focus.mock.instances).toContain(heading);
   });
 
   it("shows the out-of-area notice and still lists vehicles", () => {

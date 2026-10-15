@@ -58,7 +58,7 @@ function Harness({ service }: { service: CoreServiceCode }) {
   latestFlow = flow;
   return <TripDetails client={apiClient} errors={flow.state.errors} form={flow.state.form}
     formError={flow.state.formError} isSubmitting={false} mapsKey="maps-key"
-    limits={{ passengers: 8, luggage: 8 }} onSubmit={flow.submit}
+    limits={{ passengers: 8, luggage: 8 }} onFieldBlur={flow.blur} onSubmit={flow.submit}
     routePolyline={null} services={[...SERVICES]}
     timeZone="America/Chicago" update={flow.update} />;
 }

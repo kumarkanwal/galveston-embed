@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState } from "preact/hooks";
 
 import type { Airline } from "../../api/client";
 import { FieldError } from "./FieldError";
+import { comboboxOptionId } from "./combobox-a11y";
 
 interface AirlineComboboxProps {
   airlines: Airline[];
   error: string | undefined;
+  onBlur: () => void;
   onChange: (airline: Airline | null) => void;
   value: Airline | null;
 }
@@ -25,6 +27,7 @@ function AirlineOptions(props: {
 }) {
   return <ul class="options" id="airline-options" role="listbox">
     {props.matches.map((airline, index) => <li role="option"
+      id={comboboxOptionId("airline-options", index)}
       aria-selected={index === props.activeIndex}
       class={index === props.activeIndex ? "active" : ""}
       onMouseDown={(event) => event.preventDefault()}
@@ -36,16 +39,12 @@ export function AirlineCombobox(props: AirlineComboboxProps) {
   const [query, setQuery] = useState(props.value?.name ?? "");
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
-  const matches = useMemo(
-    () => matchingAirlines(props.airlines, query),
-    [props.airlines, query],
-  );
+  const matches = useMemo(() => matchingAirlines(props.airlines, query),
+    [props.airlines, query]);
   useEffect(() => setQuery(props.value?.name ?? ""), [props.value]);
 
   const choose = (airline: Airline) => {
-    props.onChange(airline);
-    setQuery(airline.name);
-    setOpen(false);
+    props.onChange(airline); setQuery(airline.name); setOpen(false);
   };
   const move = (direction: number) => {
     const next = Math.max(0, Math.min(matches.length - 1, activeIndex + direction));
@@ -66,9 +65,12 @@ export function AirlineCombobox(props: AirlineComboboxProps) {
     <label for="airline">Airline</label>
     <div class="input-with-icon">
       <input id="airline" role="combobox" value={query} aria-expanded={open}
-        aria-controls="airline-options" aria-invalid={props.error !== undefined}
+        aria-controls="airline-options" aria-autocomplete="list"
+        aria-activedescendant={open && matches[activeIndex] !== undefined
+          ? comboboxOptionId("airline-options", activeIndex) : undefined}
+        aria-invalid={props.error !== undefined}
         aria-describedby={props.error === undefined ? undefined : "airline-error"}
-        onFocus={() => setOpen(true)} onKeyDown={keyDown}
+        onBlur={props.onBlur} onFocus={() => setOpen(true)} onKeyDown={keyDown}
         onInput={(event) => {
           setQuery(event.currentTarget.value);
           props.onChange(null);

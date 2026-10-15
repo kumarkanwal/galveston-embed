@@ -8,8 +8,10 @@ import type { MapPoint } from "./types";
 
 interface MapPanelProps {
   dropoff: MapPoint | null;
+  dropoffLabel?: string;
   mapsKey: string;
   pickup: MapPoint | null;
+  pickupLabel?: string;
   routePolyline: string | null;
 }
 
@@ -128,13 +130,16 @@ export function MapPanel(props: MapPanelProps) {
   const state = useMapInstance(container, props.mapsKey);
   useMapContents(state, props);
 
-  if (state.status === "error") {
-    return <div class="map-unavailable" role="status">
+  const description = `Pickup: ${props.pickupLabel ?? "Not selected"}. `
+    + `Dropoff: ${props.dropoffLabel ?? "Not selected"}.`;
+  return <div class="map-panel" role="group" aria-label="Trip map"
+    aria-describedby="trip-map-description">
+    <p class="visually-hidden" id="trip-map-description">{description}</p>
+    {state.status === "error" ? <div class="map-unavailable" role="status">
       Map and address lookup are unavailable. Please try again later.
-    </div>;
-  }
-  return <div class="map-panel" aria-label="Trip map">
-    <div class="map-canvas" ref={container} />
-    {state.status === "loading" && <div class="map-loading">Loading map…</div>}
+    </div> : <>
+      <div class="map-canvas" ref={container} />
+      {state.status === "loading" && <div class="map-loading" role="status">Loading map…</div>}
+    </>}
   </div>;
 }

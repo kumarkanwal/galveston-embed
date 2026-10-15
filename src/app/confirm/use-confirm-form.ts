@@ -25,6 +25,10 @@ export function useConfirmForm(
     setForm((current) => ({ ...current, [key]: value }));
     setErrors((current) => ({ ...current, [key]: undefined }));
   };
+  const blur = (field: keyof ConfirmFormState) => {
+    const message = validateConfirm(form, breakdownReady)[field];
+    setErrors((current) => ({ ...current, [field]: message }));
+  };
   const submit = (event: SubmitEvent) => {
     event.preventDefault();
     const nextErrors = validateConfirm(form, breakdownReady);
@@ -36,5 +40,5 @@ export function useConfirmForm(
     }
     onValid(form);
   };
-  return { errors, form, formRef, submit, update };
+  return { blur, errors, form, formRef, submit, update };
 }

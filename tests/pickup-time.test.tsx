@@ -72,9 +72,27 @@ describe("pickup date and time controls", () => {
     expect(time?.min).toBe("");
   });
 
-  it("shows the explicit-time validation message", () => {
+  it("shows the explicit-time validation message", async () => {
     const root = mount();
+    const focus = vi.spyOn(HTMLElement.prototype, "focus");
     act(() => root.querySelector<HTMLButtonElement>(".check-pricing")?.click());
     expect(root.textContent).toContain("Select a pickup time.");
+    const error = root.querySelector("#pickup-time-error");
+    expect(error?.parentElement?.querySelector("#pickup-time")).not.toBeNull();
+    await vi.waitFor(() => expect(focus).toHaveBeenCalled());
+    expect(focus.mock.instances).toContain(root.querySelector("#pickup-time"));
+    expect(root.querySelector("#pickup-time")?.getAttribute("aria-describedby"))
+      .toBe("pickup-time-error");
+    expect(error?.querySelector(".error-icon")?.getAttribute("aria-hidden")).toBe("true");
+    expect(root.querySelector("#pickup-date-error")).toBeNull();
+  });
+
+  it("hides errors initially and shows only a blurred field's error", () => {
+    const root = mount();
+    expect(root.querySelector(".field-error")).toBeNull();
+    const time = root.querySelector<HTMLInputElement>("#pickup-time");
+    act(() => { time?.dispatchEvent(new FocusEvent("blur", { bubbles: true })); });
+    expect(root.querySelector("#pickup-time-error")?.textContent).toBe("Select a pickup time.");
+    expect(root.querySelector("#pickup-date-error")).toBeNull();
   });
 });

@@ -1,23 +1,28 @@
 import type { Business, QuotedVehicle, TaxiQuoteResponse } from "../../api/client";
+import { useEffect, useRef } from "preact/hooks";
 import { ProgressSteps } from "../trip/ProgressSteps";
 import { VehicleRow } from "./VehicleRow";
 
 interface ChooseVehicleProps {
+  autoFocusHeading?: boolean;
   business: Business;
   onBack: () => void;
   onChoose: (vehicle: QuotedVehicle) => void;
   quote: TaxiQuoteResponse;
 }
-
 export function ChooseVehicle(props: ChooseVehicleProps) {
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const vehicles = props.quote.vehicles ?? [];
+  useEffect(() => {
+    if (props.autoFocusHeading) headingRef.current?.focus();
+  }, [props.autoFocusHeading]);
   return <section class="widget">
     <header class="widget-heading">
       <h1>Reservations</h1>
       <p>Book a trip or request a quote by filling out the form below.</p>
     </header>
     <ProgressSteps activeStep={2} />
-    <h2 class="step-title">Choose Your Vehicle Type</h2>
+    <h2 class="step-title" ref={headingRef} tabIndex={-1}>Choose Your Vehicle Type</h2>
     {props.quote.out_of_service_area && <div class="service-area-note" role="status">
       This trip is outside our standard service area. Choose a vehicle and we'll send you a quote.
     </div>}

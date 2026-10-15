@@ -67,11 +67,13 @@ function mockClient(priceBreakdown: ApiClient["priceBreakdown"]): ApiClient {
 function mount(
   priceBreakdown: ApiClient["priceBreakdown"] = vi.fn(async () => BREAKDOWN),
   business: Business = BUSINESS,
+  autoFocusHeading = false,
 ) {
   const root = document.createElement("div");
   document.body.append(root);
   const client = mockClient(priceBreakdown);
-  render(<Confirm business={business} client={client} form={TRIP} onBack={() => undefined}
+  render(<Confirm autoFocusHeading={autoFocusHeading}
+    business={business} client={client} form={TRIP} onBack={() => undefined}
     onBooked={() => undefined} quote={QUOTE} serviceName="One Way Transfer" vehicle={VEHICLE} />, root);
   return { client, root };
 }
@@ -155,9 +157,19 @@ describe("Confirm terms", () => {
     await vi.waitFor(() => expect(root.querySelector(".terms-panel")).not.toBeNull());
     expect(checkbox?.checked).toBe(false);
     const panel = root.querySelector(".terms-panel");
+    expect(panel?.getAttribute("aria-modal")).toBe("true");
+    expect(panel?.getAttribute("aria-labelledby")).toBe("terms-heading");
     expect(panel?.textContent).toContain("Use <b>care</b> & arrive early.");
     expect(panel?.querySelector("b")).toBeNull();
     expect(root.querySelector(".terms-close")).toBe(document.activeElement);
+    panel?.querySelector(".terms-close")?.dispatchEvent(new KeyboardEvent("keydown", {
+      bubbles: true, key: "Tab",
+    }));
+    expect(panel?.querySelector(".terms-text")).toBe(document.activeElement);
+    panel?.querySelector(".terms-text")?.dispatchEvent(new KeyboardEvent("keydown", {
+      bubbles: true, key: "Tab", shiftKey: true,
+    }));
+    expect(panel?.querySelector(".terms-close")).toBe(document.activeElement);
     panel?.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, key: "Escape" }));
     await vi.waitFor(() => expect(root.querySelector(".terms-panel")).toBeNull());
     expect(root.querySelector<HTMLInputElement>("#firstName")?.value).toBe("Ada");
@@ -182,6 +194,24 @@ describe("Confirm terms", () => {
 });
 
 describe("Confirm form", () => {
+  it("moves focus to the step heading when navigation opens the step", async () => {
+    const { root } = mount(vi.fn(async () => BREAKDOWN), BUSINESS, true);
+    await vi.waitFor(() => expect(root.querySelector(".trip-summary h2"))
+      .toBe(document.activeElement));
+  });
+
+  it("hides errors initially and validates only a field after blur", async () => {
+    const { root } = mount();
+    await vi.waitFor(() => expect(root.textContent).toContain("$92.70 USD"));
+    expect(root.querySelector(".field-error")).toBeNull();
+    const firstName = root.querySelector<HTMLInputElement>("#firstName");
+    firstName?.dispatchEvent(new FocusEvent("blur", { bubbles: true }));
+    await vi.waitFor(() => expect(root.querySelector("#firstName-error")?.textContent)
+      .toBe("Enter your first name."));
+    expect(root.querySelector("#lastName-error")).toBeNull();
+    expect(root.querySelector("#email-error")).toBeNull();
+  });
+
   it("focuses the first error and accepts optional phone", async () => {
     const priceBreakdown = vi.fn(async () => BREAKDOWN);
     const { root } = mount(priceBreakdown);
@@ -197,6 +227,25 @@ describe("Confirm form", () => {
     ).toBe(true));
     root.querySelector<HTMLButtonElement>(".create-trip")?.click();
     expect(priceBreakdown).toHaveBeenCalledOnce();
+  });
+});
+
+describe("Confirm field error placement", () => {
+  it("renders submit errors inside their corresponding fields", async () => {
+    const { root } = mount();
+    await vi.waitFor(() => expect(root.textContent).toContain("$92.70 USD"));
+    root.querySelector<HTMLButtonElement>(".create-trip")?.click();
+    await vi.waitFor(() => expect(root.querySelector("#firstName-error")).not.toBeNull());
+    for (const [inputId, errorId] of [
+      ["firstName", "firstName-error"], ["lastName", "lastName-error"],
+      ["email", "email-error"], ["accepted-terms", "acceptedTerms-error"],
+    ]) {
+      const input = root.querySelector(`#${inputId}`);
+      const error = root.querySelector(`#${errorId}`);
+      expect(input?.closest(".field, .terms-field")?.contains(error ?? null)).toBe(true);
+      expect(input?.getAttribute("aria-describedby")).toBe(errorId);
+      expect(error?.querySelector(".error-icon")).not.toBeNull();
+    }
   });
 
   it("builds only the approved booking fields", () => {

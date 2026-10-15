@@ -50,7 +50,7 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 5 | E-3 Step 2 — Choose Vehicle | Widget + VPS | 11% | ✅ Complete — address filter fixed | 11% |
 | 6 | E-4 Step 3 — Confirm & breakdown | Widget | 9% | ✅ Complete — ready for review | 9% |
 | 7 | E-5 Create Trip, confirmation, errors | Widget + Admin | 9% | ✅ Complete — merged and verified live | 9% |
-| 8 | E-6 Mobile, side-by-side with BRO, hosting | Both | 12% | 🔄 API/hardening complete; mobile/BRO/hosting pending | 4% |
+| 8 | E-6 Mobile, side-by-side with BRO, hosting | Both | 12% | 🔄 E-6b form/a11y/mobile pass complete; BRO/hosting pending | 4% |
 | 9 | E-7 Card payment (Square) | Both | 9% | ⛔ B-16 | 0% |
 | 10 | E-8 Promo codes | Both | 4% | ⛔ Backend promo wiring | 0% |
 | 11 | E-9 Round trip | Both | 5% | ⛔ I-1 | 0% |
@@ -186,7 +186,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 ## Open items
 
 - **B-26:** document the taxi-booking `200` idempotent replay response in OpenAPI, mark `Idempotency-Key` required there, and document server retention. This does not block the widget, which always sends a UUID and scopes a key to one unchanged request body.
-- **E-6 deployment:** enable Routes API on the referrer-restricted Maps browser-key project, finish mobile/BRO side-by-side verification, configure client-domain CORS, and deploy the reviewed bundle.
+- **E-6 deployment:** enable Routes API on the referrer-restricted Maps browser-key project, finish BRO side-by-side verification, configure client-domain CORS, and deploy the reviewed bundle.
 
 ## Sources of truth
 
@@ -199,6 +199,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 15 Oct 2026 | E-6b complete for review: field errors stay with their controls and appear only after blur or submit; mobile controls use 44px targets and 16px text through tablet widths; keyboard focus, Terms trapping, form semantics, concise announcements, map alternatives, completed progress, and same-brand WCAG AA colours are covered by regression tests and an exact-width browser pass. |
 | 15 Oct 2026 | E-6 hardening complete for review: refreshed the pushed backend contract, removed temporary limits/service typing, persisted fingerprint-only booking idempotency across reloads, covered submission/error/embed safety, and added immediate race-safe Step 1 route previews. Live asset currently has validators but no explicit cache policy; recommend short revalidation for the stable `embed.js` URL. Mobile/BRO/hosting work remains. |
 | 15 Oct 2026 | E-5 merged into `main` and verified live; a booking appears in admin Runs. |
 | 11 Oct 2026 | E-5 complete for review: cash booking POST with body-bound idempotency, double-submit protection, manual retry handling, Request a Quote Step 3, conditional-email confirmation screens, booking error placement, and keyboard-accessible Terms closing. Priced confirmation wording remains provisional; live preview booking/admin verification is pending. Added backend documentation item B-26. |

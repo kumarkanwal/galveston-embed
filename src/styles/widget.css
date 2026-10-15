@@ -2,7 +2,9 @@
   --blue: #337ab7;
   --border: #cccccc;
   --error: #a94442;
-  --green: #5cb85c;
+  --green: #2f7d32;
+  --green-hover: #256528;
+  --muted: #6b6b6b;
   color: #222222;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
@@ -46,15 +48,15 @@
 
 .progress li {
   border-top: 4px solid #eeeeee;
-  color: #b1b1b1;
+  color: var(--muted);
   font-size: 11px;
   padding-top: 17px;
   position: relative;
   text-align: center;
 }
 
-.progress li span {
-  background: #777777;
+.progress li .step-number {
+  background: var(--muted);
   border-radius: 3px;
   color: #ffffff;
   font-size: 13px;
@@ -69,10 +71,10 @@
 
 .progress li.active {
   border-top-color: var(--blue);
-  color: #aaaaaa;
+  color: var(--muted);
 }
 
-.progress li.active span {
+.progress li.active .step-number {
   background: var(--blue);
 }
 
@@ -128,6 +130,11 @@ select:focus {
   border-color: #66afe9;
   box-shadow: 0 0 4px rgb(102 175 233 / 55%);
   outline: none;
+}
+
+.widget :where(input, select, button, [tabindex]):focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
 }
 
 input[aria-invalid="true"],
@@ -195,6 +202,39 @@ select[aria-invalid="true"] {
   color: var(--error);
 }
 
+.field-error,
+.form-error {
+  align-items: flex-start;
+  display: flex;
+  gap: 6px;
+}
+
+.error-note {
+  align-items: flex-start;
+  display: flex;
+  gap: 6px;
+}
+
+.error-icon {
+  align-items: center;
+  border: 1px solid currentcolor;
+  border-radius: 50%;
+  display: inline-flex;
+  flex: 0 0 15px;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  height: 15px;
+  justify-content: center;
+  line-height: 1;
+  margin-top: 1px;
+  width: 15px;
+}
+
+.error-icon::before {
+  content: "!";
+}
+
 .advance-error,
 .form-error {
   background: #f2dede;
@@ -217,8 +257,7 @@ select[aria-invalid="true"] {
 
 .check-pricing:hover,
 .check-pricing:focus {
-  background: #449d44;
-  outline: 2px solid transparent;
+  background: var(--green-hover);
 }
 
 .check-pricing:disabled,
@@ -250,7 +289,7 @@ select[aria-invalid="true"] {
 }
 
 .vehicle-headings {
-  color: #aaaaaa;
+  color: var(--muted);
   font-size: 11px;
   padding: 0 12px 7px;
 }
@@ -270,7 +309,7 @@ select[aria-invalid="true"] {
 }
 
 .vehicle-row.unavailable {
-  color: #aaaaaa;
+  color: var(--muted);
 }
 
 .vehicle-photo,
@@ -287,7 +326,7 @@ select[aria-invalid="true"] {
   align-items: center;
   background: #eeeeee;
   border-radius: 50%;
-  color: #777777;
+  color: var(--muted);
   display: flex;
   font-size: 11px;
   font-weight: 700;
@@ -417,6 +456,31 @@ select[aria-invalid="true"] {
   .vehicle-choose {
     grid-column: 3;
     grid-row: 1 / 3;
+  }
+}
+
+@media (max-width: 900px) {
+  input,
+  select {
+    font-size: 16px;
+    height: 44px;
+  }
+
+  button,
+  .options li {
+    min-height: 44px;
+  }
+
+  .check-pricing,
+  .vehicle-choose,
+  .back-button,
+  .create-trip,
+  .terms-close {
+    min-height: 44px;
+  }
+
+  .input-with-icon {
+    grid-template-columns: minmax(0, 1fr) 44px;
   }
 }
 

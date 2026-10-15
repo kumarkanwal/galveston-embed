@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 import type {
   ApiClient,
@@ -17,6 +17,7 @@ import { TripSummary } from "./TripSummary";
 import { usePriceBreakdown } from "./use-price-breakdown";
 
 interface ConfirmProps {
+  autoFocusHeading?: boolean;
   business: Business;
   client: ApiClient;
   form: TripFormState;
@@ -28,6 +29,7 @@ interface ConfirmProps {
 }
 
 export function Confirm(props: ConfirmProps) {
+  const sectionRef = useRef<HTMLElement>(null);
   const [carSeats, setCarSeats] = useState(0);
   const requestQuote = props.vehicle.quote_status === "request_quote";
   const breakdown = usePriceBreakdown(
@@ -44,7 +46,12 @@ export function Confirm(props: ConfirmProps) {
     booking.resetFailure();
     setCarSeats(count);
   };
-  return <section class="widget" aria-live="polite">
+  useEffect(() => {
+    if (props.autoFocusHeading) {
+      sectionRef.current?.querySelector<HTMLElement>(".trip-summary h2")?.focus();
+    }
+  }, [props.autoFocusHeading]);
+  return <section class="widget" ref={sectionRef}>
     <header class="widget-heading">
       <h1>Reservations</h1>
       <p>Book a trip or request a quote by filling out the form below.</p>
