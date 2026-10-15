@@ -44,314 +44,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/public/business": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Business
-         * @description The business behind the API key, with the settings the booking form needs.
-         */
-        get: operations["get_business_v1_public_business_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/public/shuttle/locations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Locations
-         * @description The From and To dropdown contents, grouped by category.
-         */
-        get: operations["get_locations_v1_public_shuttle_locations_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/public/shuttle/search": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Search
-         * @description Bookable departures for a day, with the seven-day price strip.
-         */
-        get: operations["search_v1_public_shuttle_search_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/public/shuttle/search/return": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Search Return
-         * @description Return options with server-owned chronology annotations, for "Add Return".
-         *
-         *     The from and to parameters are the OUTBOUND direction, as the plugin already
-         *     holds them; this endpoint reverses them.
-         */
-        get: operations["search_return_v1_public_shuttle_search_return_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/public/shuttle/quote": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Quote
-         * @description Price a cart. Holds nothing, writes nothing, safe to call repeatedly.
-         */
-        post: operations["quote_v1_public_shuttle_quote_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/public/shuttle/booking": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Create Booking
-         * @description Commit a cart: hold the seats, take payment, confirm the booking.
-         *
-         *     Send an Idempotency-Key. Without one the server derives a key from the
-         *     request contents, which catches a double-click but not a deliberate retry
-         *     after a network drop.
-         */
-        post: operations["create_booking_v1_public_shuttle_booking_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/public/taxi/service-types": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Service Types
-         * @description The services this business offers, in configured order.
-         */
-        get: operations["get_service_types_v1_public_taxi_service_types_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/public/taxi/airports": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Airports
-         * @description The airports this business serves.
-         */
-        get: operations["get_airports_v1_public_taxi_airports_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/public/taxi/airlines": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Airlines
-         * @description The airline dropdown for airport pickups and dropoffs.
-         */
-        get: operations["get_airlines_v1_public_taxi_airlines_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/public/taxi/charges": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Charges
-         * @description The extras a customer may add at checkout. Admin-only charges never appear.
-         */
-        get: operations["get_charges_v1_public_taxi_charges_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/public/taxi/quote": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Quote
-         * @description Price every vehicle for a journey, and say which can serve it.
-         *
-         *     A trip the maps provider cannot place, or one outside the configured service
-         *     area, comes back as a 200 with out_of_service_area set and no prices. That
-         *     is a normal business outcome -- the plugin offers a manual quote -- and not
-         *     an error the customer should see as a failure.
-         */
-        post: operations["quote_v1_public_taxi_quote_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/public/taxi/price-breakdown": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Price Breakdown
-         * @description Itemise the chosen vehicle's price after the customer picks extras.
-         *
-         *     Safe to call repeatedly: it writes nothing, holds nothing and consumes no
-         *     promo use. The customer is toggling extras on this screen, so it will be.
-         */
-        post: operations["price_breakdown_v1_public_taxi_price_breakdown_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/public/taxi/booking": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Create Booking
-         * @description Commit a taxi journey: write the order, take payment, confirm it.
-         *
-         *     The Idempotency-Key header is required. A trip that could not be priced is
-         *     still booked, as a zero-total request for staff to quote by hand -- that is
-         *     the manual path, not a failure.
-         */
-        post: operations["create_booking_v1_public_taxi_booking_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/public/promo/validate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Validate
-         * @description Check a promo code and preview its discount.
-         *
-         *     Returns 200 with valid=false for a bad code rather than an error status:
-         *     this runs while the customer types, and the plugin needs inline feedback
-         *     rather than a failed request on every keystroke.
-         *
-         *     The subtotal in the request only sizes the preview. It never prices a
-         *     booking; the quote and booking endpoints recalculate from the database.
-         *
-         *     Both throttle dimensions live in the service, not here.
-         */
-        post: operations["validate_v1_public_promo_validate_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/v1/admin/account-holder": {
         parameters: {
             query?: never;
@@ -374,58 +66,6 @@ export interface paths {
          * @description Update and audit the singleton without changing any tenant.
          */
         patch: operations["update_account_holder_v1_admin_account_holder_patch"];
-        trace?: never;
-    };
-    "/v1/admin/airports": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Airports
-         * @description List scoped airport configuration.
-         */
-        get: operations["list_airports_v1_admin_airports_get"];
-        put?: never;
-        /**
-         * Create Airport
-         * @description Create one selected-business airport.
-         */
-        post: operations["create_airport_v1_admin_airports_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/airports/{airport_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Airport
-         * @description Return one scoped airport.
-         */
-        get: operations["get_airport_v1_admin_airports__airport_id__get"];
-        put?: never;
-        post?: never;
-        /**
-         * Deactivate Airport
-         * @description Deactivate and disclose affected future bookings.
-         */
-        delete: operations["deactivate_airport_v1_admin_airports__airport_id__delete"];
-        options?: never;
-        head?: never;
-        /**
-         * Update Airport
-         * @description Edit one scoped airport.
-         */
-        patch: operations["update_airport_v1_admin_airports__airport_id__patch"];
         trace?: never;
     };
     "/v1/admin/airlines": {
@@ -480,6 +120,78 @@ export interface paths {
         patch: operations["update_airline_v1_admin_airlines__airline_id__patch"];
         trace?: never;
     };
+    "/v1/admin/airports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Airports
+         * @description List scoped airport configuration.
+         */
+        get: operations["list_airports_v1_admin_airports_get"];
+        put?: never;
+        /**
+         * Create Airport
+         * @description Create one selected-business airport.
+         */
+        post: operations["create_airport_v1_admin_airports_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/airports/{airport_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Airport
+         * @description Return one scoped airport.
+         */
+        get: operations["get_airport_v1_admin_airports__airport_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Deactivate Airport
+         * @description Deactivate and disclose affected future bookings.
+         */
+        delete: operations["deactivate_airport_v1_admin_airports__airport_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update Airport
+         * @description Edit one scoped airport.
+         */
+        patch: operations["update_airport_v1_admin_airports__airport_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/api-keys/{key_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Revoke Api Key
+         * @description Soft revoke with explicit prefix and last-key confirmation; clear auth caches now.
+         */
+        delete: operations["revoke_api_key_v1_admin_api_keys__key_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/auth/login": {
         parameters: {
             query?: never;
@@ -494,26 +206,6 @@ export interface paths {
          * @description Exchange credentials for an access and refresh token pair.
          */
         post: operations["login_v1_admin_auth_login_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/auth/refresh": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Refresh
-         * @description Exchange a refresh token for a new access token.
-         */
-        post: operations["refresh_v1_admin_auth_refresh_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -554,6 +246,26 @@ export interface paths {
         get: operations["me_v1_admin_auth_me_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh
+         * @description Exchange a refresh token for a new access token.
+         */
+        post: operations["refresh_v1_admin_auth_refresh_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -604,7 +316,51 @@ export interface paths {
         patch: operations["update_business_v1_admin_businesses__business_uuid__patch"];
         trace?: never;
     };
-    "/v1/admin/reservations/{booking_id}/assign": {
+    "/v1/admin/businesses/{business_uuid}/api-keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Api Keys
+         * @description Include revoked history, never recoverable credentials.
+         */
+        get: operations["list_api_keys_v1_admin_businesses__business_uuid__api_keys_get"];
+        put?: never;
+        /**
+         * Create Api Key
+         * @description Create a hashed and encrypted credential without permitting intermediary caches.
+         */
+        post: operations["create_api_key_v1_admin_businesses__business_uuid__api_keys_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/businesses/{business_uuid}/embed-key": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reveal Embed Key
+         * @description Reveal the newest active key named embed, or require regeneration.
+         */
+        get: operations["reveal_embed_key_v1_admin_businesses__business_uuid__embed_key_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/businesses/{business_uuid}/embed-key/regenerate": {
         parameters: {
             query?: never;
             header?: never;
@@ -614,17 +370,17 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Assign Reservation
-         * @description Assign or unassign one run and return any overlap warnings.
+         * Regenerate Embed Key
+         * @description Replace every active embed key and warn that old sites stop working.
          */
-        post: operations["assign_reservation_v1_admin_reservations__booking_id__assign_post"];
+        post: operations["regenerate_embed_key_v1_admin_businesses__business_uuid__embed_key_regenerate_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/v1/admin/drivers": {
+    "/v1/admin/businesses/{business_uuid}/integration": {
         parameters: {
             query?: never;
             header?: never;
@@ -632,10 +388,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Assignable Drivers
-         * @description Return active drivers for one selected business.
+         * Get Integration
+         * @description Provide the shortcode, deployment URL, key count and CORS host check.
          */
-        get: operations["assignable_drivers_v1_admin_drivers_get"];
+        get: operations["get_integration_v1_admin_businesses__business_uuid__integration_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -644,7 +400,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/admin/vehicles/assignable": {
+    "/v1/admin/businesses/{business_uuid}/settings": {
         parameters: {
             query?: never;
             header?: never;
@@ -652,12 +408,152 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Assignable Vehicles
-         * @description Return active physical vehicles for one selected business.
+         * Get Settings
+         * @description Read one selected business's complete masked settings.
          */
-        get: operations["assignable_vehicles_v1_admin_vehicles_assignable_get"];
+        get: operations["get_settings_v1_admin_businesses__business_uuid__settings_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/businesses/{business_uuid}/settings/booking": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Booking Settings
+         * @description Edit advance notice, hold duration and operational booking thresholds.
+         */
+        patch: operations["update_booking_settings_v1_admin_businesses__business_uuid__settings_booking_patch"];
+        trace?: never;
+    };
+    "/v1/admin/businesses/{business_uuid}/settings/cancellation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Cancellation Settings
+         * @description Edit the processing fee and shared cancellation/purchase notice window.
+         */
+        patch: operations["update_cancellation_settings_v1_admin_businesses__business_uuid__settings_cancellation_patch"];
+        trace?: never;
+    };
+    "/v1/admin/businesses/{business_uuid}/settings/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Email Settings
+         * @description Write-only encrypted SMTP password plus delivery-policy settings.
+         */
+        patch: operations["update_email_settings_v1_admin_businesses__business_uuid__settings_email_patch"];
+        trace?: never;
+    };
+    "/v1/admin/businesses/{business_uuid}/settings/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Preferences Settings
+         * @description Edit taxi car-seat and staff-only Meet & Greet preferences.
+         */
+        patch: operations["update_preferences_settings_v1_admin_businesses__business_uuid__settings_preferences_patch"];
+        trace?: never;
+    };
+    "/v1/admin/businesses/{business_uuid}/settings/pricing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Pricing Settings
+         * @description Edit protection, round-trip discounts and offered payment configuration.
+         */
+        patch: operations["update_pricing_settings_v1_admin_businesses__business_uuid__settings_pricing_patch"];
+        trace?: never;
+    };
+    "/v1/admin/businesses/{business_uuid}/settings/terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Terms Settings
+         * @description Store at most 100 KiB of sanitized HTML; confirmation emails belong to Phase 11.
+         */
+        patch: operations["update_terms_settings_v1_admin_businesses__business_uuid__settings_terms_patch"];
+        trace?: never;
+    };
+    "/v1/admin/businesses/{business_uuid}/settings/test-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test Email Settings
+         * @description Send a fixed message; five attempts/hour/business, including failed sends.
+         */
+        post: operations["test_email_settings_v1_admin_businesses__business_uuid__settings_test_email_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -708,7 +604,31 @@ export interface paths {
         patch: operations["update_calendar_note_v1_admin_calendar_notes__note_id__patch"];
         trace?: never;
     };
-    "/v1/admin/reservations/{booking_id}/emails": {
+    "/v1/admin/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Categories
+         * @description List scoped public-picker category configuration.
+         */
+        get: operations["list_categories_v1_admin_categories_get"];
+        put?: never;
+        /**
+         * Create Category
+         * @description Create one selected-business location category.
+         */
+        post: operations["create_category_v1_admin_categories_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/categories/order": {
         parameters: {
             query?: never;
             header?: never;
@@ -716,51 +636,11 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put?: never;
         /**
-         * Queue Reservation Email
-         * @description Queue one reservation-panel email action.
+         * Reorder Categories
+         * @description Save the category drag-and-drop order in one transaction.
          */
-        post: operations["queue_reservation_email_v1_admin_reservations__booking_id__emails_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/reservations/{booking_id}/dispatch-sms": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Queue Dispatch Sms
-         * @description Queue one SMS for the assigned driver.
-         */
-        post: operations["queue_dispatch_sms_v1_admin_reservations__booking_id__dispatch_sms_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/emails": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Emails
-         * @description Return a filterable page of tenant-safe email history.
-         */
-        get: operations["list_emails_v1_admin_emails_get"];
-        put?: never;
+        put: operations["reorder_categories_v1_admin_categories_order_put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -768,7 +648,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/admin/emails/{email_id}": {
+    "/v1/admin/categories/{category_id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -776,16 +656,76 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Email Detail
-         * @description Return one email's full stored queue payload.
+         * Get Category
+         * @description Return one tenant-owned category.
          */
-        get: operations["email_detail_v1_admin_emails__email_id__get"];
+        get: operations["get_category_v1_admin_categories__category_id__get"];
         put?: never;
         post?: never;
+        /**
+         * Deactivate Category
+         * @description Deactivate a category and report active locations hidden by it.
+         */
+        delete: operations["deactivate_category_v1_admin_categories__category_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update Category
+         * @description Edit category presentation without bypassing deactivation warnings.
+         */
+        patch: operations["update_category_v1_admin_categories__category_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/charges": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Charges
+         * @description List fixed extras, including whether staff or customers may apply them.
+         */
+        get: operations["list_charges_v1_admin_charges_get"];
+        put?: never;
+        /**
+         * Create Charge
+         * @description Create an extra; to_base attracts percentages while on_top does not.
+         */
+        post: operations["create_charge_v1_admin_charges_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/charges/{charge_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Charge
+         * @description Return one tenant-owned charge.
+         */
+        get: operations["get_charge_v1_admin_charges__charge_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Deactivate Charge
+         * @description Deactivate rather than deleting a historically referenced charge.
+         */
+        delete: operations["deactivate_charge_v1_admin_charges__charge_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update Charge
+         * @description Edit amount and application semantics without repricing old bookings.
+         */
+        patch: operations["update_charge_v1_admin_charges__charge_id__patch"];
         trace?: never;
     };
     "/v1/admin/customers": {
@@ -860,6 +800,86 @@ export interface paths {
         patch: operations["update_customer_v1_admin_customers__customer_id__patch"];
         trace?: never;
     };
+    "/v1/admin/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Dashboard
+         * @description Return every operations widget in one scoped response.
+         */
+        get: operations["dashboard_v1_admin_dashboard_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/drivers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Assignable Drivers
+         * @description Return active drivers for one selected business.
+         */
+        get: operations["assignable_drivers_v1_admin_drivers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/emails": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Emails
+         * @description Return a filterable page of tenant-safe email history.
+         */
+        get: operations["list_emails_v1_admin_emails_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/emails/{email_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Email Detail
+         * @description Return one email's full stored queue payload.
+         */
+        get: operations["email_detail_v1_admin_emails__email_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/lead-sources": {
         parameters: {
             query?: never;
@@ -908,7 +928,7 @@ export interface paths {
         patch: operations["update_lead_source_v1_admin_lead_sources__source_id__patch"];
         trace?: never;
     };
-    "/v1/admin/dashboard": {
+    "/v1/admin/locations": {
         parameters: {
             query?: never;
             header?: never;
@@ -916,159 +936,23 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Dashboard
-         * @description Return every operations widget in one scoped response.
+         * List Locations
+         * @description List locations and optionally count active routes touching each one.
          */
-        get: operations["dashboard_v1_admin_dashboard_get"];
+        get: operations["list_locations_v1_admin_locations_get"];
         put?: never;
-        post?: never;
+        /**
+         * Create Location
+         * @description Create a location; requires_address controls public street-address collection.
+         */
+        post: operations["create_location_v1_admin_locations_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/v1/admin/vehicles": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Vehicles
-         * @description List physical vehicles, optionally by upcoming registration expiry.
-         */
-        get: operations["list_vehicles_v1_admin_vehicles_get"];
-        put?: never;
-        /**
-         * Create Vehicle
-         * @description Create one physical vehicle for the selected business.
-         */
-        post: operations["create_vehicle_v1_admin_vehicles_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/vehicles/{vehicle_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Vehicle
-         * @description Return one tenant-owned physical vehicle.
-         */
-        get: operations["get_vehicle_v1_admin_vehicles__vehicle_id__get"];
-        put?: never;
-        post?: never;
-        /**
-         * Deactivate Vehicle
-         * @description Deactivate a physical vehicle and return affected future runs.
-         */
-        delete: operations["deactivate_vehicle_v1_admin_vehicles__vehicle_id__delete"];
-        options?: never;
-        head?: never;
-        /**
-         * Update Vehicle
-         * @description Edit one tenant-owned physical vehicle.
-         */
-        patch: operations["update_vehicle_v1_admin_vehicles__vehicle_id__patch"];
-        trace?: never;
-    };
-    "/v1/admin/settings/global": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Global Settings
-         * @description Owner only. These fixed typed values seed NEW businesses, not existing ones.
-         */
-        get: operations["get_global_settings_v1_admin_settings_global_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Update Global Settings
-         * @description Unknown keys are rejected. Existing businesses retain their explicit policies.
-         */
-        patch: operations["update_global_settings_v1_admin_settings_global_patch"];
-        trace?: never;
-    };
-    "/v1/admin/businesses/{business_uuid}/integration": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Integration
-         * @description Provide the shortcode, deployment URL, key count and CORS host check.
-         */
-        get: operations["get_integration_v1_admin_businesses__business_uuid__integration_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/businesses/{business_uuid}/api-keys": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Api Keys
-         * @description Include revoked history, never recoverable credentials.
-         */
-        get: operations["list_api_keys_v1_admin_businesses__business_uuid__api_keys_get"];
-        put?: never;
-        /**
-         * Create Api Key
-         * @description Create a hashed and encrypted credential without permitting intermediary caches.
-         */
-        post: operations["create_api_key_v1_admin_businesses__business_uuid__api_keys_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/businesses/{business_uuid}/embed-key": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Reveal Embed Key
-         * @description Reveal the newest active key named embed, or require regeneration.
-         */
-        get: operations["reveal_embed_key_v1_admin_businesses__business_uuid__embed_key_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/businesses/{business_uuid}/embed-key/regenerate": {
+    "/v1/admin/locations/order": {
         parameters: {
             query?: never;
             header?: never;
@@ -1076,33 +960,61 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put?: never;
         /**
-         * Regenerate Embed Key
-         * @description Replace every active embed key and warn that old sites stop working.
+         * Reorder Locations
+         * @description Save location positions without changing their category membership.
          */
-        post: operations["regenerate_embed_key_v1_admin_businesses__business_uuid__embed_key_regenerate_post"];
+        put: operations["reorder_locations_v1_admin_locations_order_put"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/v1/admin/api-keys/{key_id}": {
+    "/v1/admin/locations/{location_id}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Get Location
+         * @description Return one tenant-owned pickup location.
+         */
+        get: operations["get_location_v1_admin_locations__location_id__get"];
         put?: never;
         post?: never;
         /**
-         * Revoke Api Key
-         * @description Soft revoke with explicit prefix and last-key confirmation; clear auth caches now.
+         * Deactivate Location
+         * @description Deactivate a location and disclose every active route it removes publicly.
          */
-        delete: operations["revoke_api_key_v1_admin_api_keys__key_id__delete"];
+        delete: operations["deactivate_location_v1_admin_locations__location_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update Location
+         * @description Edit a location and its public address requirement.
+         */
+        patch: operations["update_location_v1_admin_locations__location_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/my/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Reservation History
+         * @description Return past runs assigned to the calling driver.
+         */
+        get: operations["my_reservation_history_v1_admin_my_history_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1146,130 +1058,6 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/my/history": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * My Reservation History
-         * @description Return past runs assigned to the calling driver.
-         */
-        get: operations["my_reservation_history_v1_admin_my_history_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/charges": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Charges
-         * @description List fixed extras, including whether staff or customers may apply them.
-         */
-        get: operations["list_charges_v1_admin_charges_get"];
-        put?: never;
-        /**
-         * Create Charge
-         * @description Create an extra; to_base attracts percentages while on_top does not.
-         */
-        post: operations["create_charge_v1_admin_charges_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/charges/{charge_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Charge
-         * @description Return one tenant-owned charge.
-         */
-        get: operations["get_charge_v1_admin_charges__charge_id__get"];
-        put?: never;
-        post?: never;
-        /**
-         * Deactivate Charge
-         * @description Deactivate rather than deleting a historically referenced charge.
-         */
-        delete: operations["deactivate_charge_v1_admin_charges__charge_id__delete"];
-        options?: never;
-        head?: never;
-        /**
-         * Update Charge
-         * @description Edit amount and application semantics without repricing old bookings.
-         */
-        patch: operations["update_charge_v1_admin_charges__charge_id__patch"];
-        trace?: never;
-    };
-    "/v1/admin/surcharges": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Surcharges
-         * @description List non-compounding percentages applied to each eligible fare base.
-         */
-        get: operations["list_surcharges_v1_admin_surcharges_get"];
-        put?: never;
-        /**
-         * Create Surcharge
-         * @description Create a percentage that never compounds with another surcharge.
-         */
-        post: operations["create_surcharge_v1_admin_surcharges_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/surcharges/{surcharge_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Surcharge
-         * @description Return one tenant-owned surcharge.
-         */
-        get: operations["get_surcharge_v1_admin_surcharges__surcharge_id__get"];
-        put?: never;
-        post?: never;
-        /**
-         * Deactivate Surcharge
-         * @description Soft-deactivate a surcharge so historical references remain valid.
-         */
-        delete: operations["deactivate_surcharge_v1_admin_surcharges__surcharge_id__delete"];
-        options?: never;
-        head?: never;
-        /**
-         * Update Surcharge
-         * @description Edit a current percentage without touching historical totals.
-         */
-        patch: operations["update_surcharge_v1_admin_surcharges__surcharge_id__patch"];
         trace?: never;
     };
     "/v1/admin/peak-rules": {
@@ -1344,6 +1132,58 @@ export interface paths {
         patch: operations["update_peak_rule_v1_admin_peak_rules__rule_id__patch"];
         trace?: never;
     };
+    "/v1/admin/pricing-anchors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Anchors
+         * @description List named anchors in the validated business scope.
+         */
+        get: operations["list_anchors_v1_admin_pricing_anchors_get"];
+        put?: never;
+        /**
+         * Create Anchor
+         * @description Create a named zipcode anchor.
+         */
+        post: operations["create_anchor_v1_admin_pricing_anchors_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/pricing-anchors/{anchor_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Anchor
+         * @description Return one tenant-owned anchor.
+         */
+        get: operations["get_anchor_v1_admin_pricing_anchors__anchor_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Deactivate Anchor
+         * @description Soft-deactivate and explain which fares are hidden, not cascaded away.
+         */
+        delete: operations["deactivate_anchor_v1_admin_pricing_anchors__anchor_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update Anchor
+         * @description Edit an anchor; retained fares return on reactivation.
+         */
+        patch: operations["update_anchor_v1_admin_pricing_anchors__anchor_id__patch"];
+        trace?: never;
+    };
     "/v1/admin/promo-codes": {
         parameters: {
             query?: never;
@@ -1362,26 +1202,6 @@ export interface paths {
          * @description Create a normalized code; used_count cannot be supplied by clients.
          */
         post: operations["create_promo_code_v1_admin_promo_codes_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/promo-codes/{promo_id}/usage": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Promo Code Usage
-         * @description List immutable order discounts attributed to one tenant-owned code.
-         */
-        get: operations["promo_code_usage_v1_admin_promo_codes__promo_id__usage_get"];
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1414,6 +1234,602 @@ export interface paths {
          * @description Edit future redemptions without changing historical order discounts.
          */
         patch: operations["update_promo_code_v1_admin_promo_codes__promo_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/promo-codes/{promo_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Promo Code Usage
+         * @description List immutable order discounts attributed to one tenant-owned code.
+         */
+        get: operations["promo_code_usage_v1_admin_promo_codes__promo_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reservations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Reservations
+         * @description Return a flat, paginated Runs list under the resolved business scope.
+         */
+        get: operations["list_reservations_v1_admin_reservations_get"];
+        put?: never;
+        /**
+         * Create Manual Reservation
+         * @description Create one unpaid reservation in the selected business.
+         */
+        post: operations["create_manual_reservation_v1_admin_reservations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reservations/calendar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Calendar
+         * @description Return one server-resolved calendar view with events and notes.
+         */
+        get: operations["calendar_v1_admin_reservations_calendar_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reservations/calendar/{booking_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Calendar Popover
+         * @description Return details for one in-scope calendar block.
+         */
+        get: operations["calendar_popover_v1_admin_reservations_calendar__booking_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reservations/counts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reservation Counts
+         * @description Return badges and a scope-wide refresh signal without loading either list.
+         *
+         *     Changes usually appear within ~30 s, at most ~60 s. PostgreSQL updated_at
+         *     records transaction-start time: an older-started transaction committing
+         *     later can evade this best-effort banner. This is not a version cursor.
+         */
+        get: operations["reservation_counts_v1_admin_reservations_counts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reservations/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pending Reservations
+         * @description Return customer requests waiting for manual attention, oldest first.
+         */
+        get: operations["pending_reservations_v1_admin_reservations_pending_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reservations/{booking_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reservation Detail
+         * @description Return the full type-adaptive reservation detail.
+         */
+        get: operations["reservation_detail_v1_admin_reservations__booking_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Cancel Reservation
+         * @description Cancel one run or every run in its order without initiating a refund.
+         */
+        delete: operations["cancel_reservation_v1_admin_reservations__booking_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Edit Reservation
+         * @description Correct operational fields without implicit repricing.
+         */
+        patch: operations["edit_reservation_v1_admin_reservations__booking_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/reservations/{booking_id}/assign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Assign Reservation
+         * @description Assign or unassign one run and return any overlap warnings.
+         */
+        post: operations["assign_reservation_v1_admin_reservations__booking_id__assign_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reservations/{booking_id}/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reservation Audit
+         * @description Return explicit human operations associated with one reservation.
+         */
+        get: operations["reservation_audit_v1_admin_reservations__booking_id__audit_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reservations/{booking_id}/charges": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Reservation Charge
+         * @description Attach one configured staff charge snapshot.
+         */
+        post: operations["add_reservation_charge_v1_admin_reservations__booking_id__charges_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reservations/{booking_id}/charges/{booking_charge_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Reservation Charge
+         * @description Remove one staff charge snapshot and reverse its contribution.
+         */
+        delete: operations["delete_reservation_charge_v1_admin_reservations__booking_id__charges__booking_charge_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reservations/{booking_id}/check-pricing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check Reservation Pricing
+         * @description Compare stored totals with current configuration using stored distance.
+         */
+        post: operations["check_reservation_pricing_v1_admin_reservations__booking_id__check_pricing_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reservations/{booking_id}/copy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Copy Reservation
+         * @description Create a fresh, currently priced reservation from one stored journey.
+         */
+        post: operations["copy_reservation_v1_admin_reservations__booking_id__copy_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reservations/{booking_id}/dispatch-sms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Queue Dispatch Sms
+         * @description Queue one SMS for the assigned driver.
+         */
+        post: operations["queue_dispatch_sms_v1_admin_reservations__booking_id__dispatch_sms_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reservations/{booking_id}/emails": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Queue Reservation Email
+         * @description Queue one reservation-panel email action.
+         */
+        post: operations["queue_reservation_email_v1_admin_reservations__booking_id__emails_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reservations/{booking_id}/payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Change Manual Payment
+         * @description Record or reverse money collected outside Square.
+         */
+        patch: operations["change_manual_payment_v1_admin_reservations__booking_id__payment_patch"];
+        trace?: never;
+    };
+    "/v1/admin/reservations/{booking_id}/price": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Override Reservation Price
+         * @description Store an explained owner/manager price override.
+         */
+        patch: operations["override_reservation_price_v1_admin_reservations__booking_id__price_patch"];
+        trace?: never;
+    };
+    "/v1/admin/reservations/{booking_id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Change Reservation Status
+         * @description Apply one allowed status transition.
+         */
+        patch: operations["change_reservation_status_v1_admin_reservations__booking_id__status_patch"];
+        trace?: never;
+    };
+    "/v1/admin/reservations/{booking_id}/trip-sheet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reservation Trip Sheet
+         * @description Return the office trip sheet as structured JSON or printable text.
+         */
+        get: operations["reservation_trip_sheet_v1_admin_reservations__booking_id__trip_sheet_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/routes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Routes
+         * @description List scoped directed routes with their configured passenger fares.
+         */
+        get: operations["list_routes_v1_admin_routes_get"];
+        put?: never;
+        /**
+         * Create Route
+         * @description Create one selected-business shuttle route.
+         */
+        post: operations["create_route_v1_admin_routes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/routes/{route_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Route
+         * @description Return one tenant-owned route and its current fares.
+         */
+        get: operations["get_route_v1_admin_routes__route_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Deactivate Route
+         * @description Deactivate without cascading and disclose affected future inventory.
+         */
+        delete: operations["deactivate_route_v1_admin_routes__route_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update Route
+         * @description Edit route endpoints, duration, or customer-facing service label.
+         */
+        patch: operations["update_route_v1_admin_routes__route_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/routes/{route_id}/prices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Route Prices
+         * @description Replace fares: an omitted passenger type is unavailable; 0.00 is free.
+         */
+        put: operations["set_route_prices_v1_admin_routes__route_id__prices_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/routes/{route_id}/reverse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reverse Route
+         * @description Create the mirror direction and optionally copy fares as a starting point.
+         */
+        post: operations["reverse_route_v1_admin_routes__route_id__reverse_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/schedules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Schedules
+         * @description List departures, defaulting to the next 14 business-local days.
+         */
+        get: operations["list_schedules_v1_admin_schedules_get"];
+        put?: never;
+        /**
+         * Create Schedule
+         * @description Create one dated departure with immediately searchable capacity.
+         */
+        post: operations["create_schedule_v1_admin_schedules_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/schedules/bulk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Bulk Create Schedules
+         * @description Create up to 2,000 departures in one transaction and one bulk insert.
+         */
+        post: operations["bulk_create_schedules_v1_admin_schedules_bulk_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/schedules/bulk-capacity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Bulk Update Schedule Capacity
+         * @description Change capacity under ordered locks, reporting unsafe rows as skipped.
+         */
+        patch: operations["bulk_update_schedule_capacity_v1_admin_schedules_bulk_capacity_patch"];
+        trace?: never;
+    };
+    "/v1/admin/schedules/bulk-preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview Schedules
+         * @description Preview the exact recurring cross product without writing anything.
+         */
+        post: operations["preview_schedules_v1_admin_schedules_bulk_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/schedules/{schedule_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Deactivate Schedule
+         * @description Deactivate without unassigning bookings; booked departures need confirmation.
+         */
+        delete: operations["deactivate_schedule_v1_admin_schedules__schedule_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update Schedule
+         * @description Edit a departure under lock, with explicit booked-customer confirmation.
+         */
+        patch: operations["update_schedule_v1_admin_schedules__schedule_id__patch"];
         trace?: never;
     };
     "/v1/admin/service-areas": {
@@ -1508,430 +1924,6 @@ export interface paths {
         patch: operations["update_service_area_v1_admin_service_areas__area_id__patch"];
         trace?: never;
     };
-    "/v1/admin/reservations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Reservations
-         * @description Return a flat, paginated Runs list under the resolved business scope.
-         */
-        get: operations["list_reservations_v1_admin_reservations_get"];
-        put?: never;
-        /**
-         * Create Manual Reservation
-         * @description Create one unpaid reservation in the selected business.
-         */
-        post: operations["create_manual_reservation_v1_admin_reservations_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/reservations/{booking_id}/copy": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Copy Reservation
-         * @description Create a fresh, currently priced reservation from one stored journey.
-         */
-        post: operations["copy_reservation_v1_admin_reservations__booking_id__copy_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/reservations/calendar": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Calendar
-         * @description Return one server-resolved calendar view with events and notes.
-         */
-        get: operations["calendar_v1_admin_reservations_calendar_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/reservations/pending": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Pending Reservations
-         * @description Return customer requests waiting for manual attention, oldest first.
-         */
-        get: operations["pending_reservations_v1_admin_reservations_pending_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/reservations/counts": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Reservation Counts
-         * @description Return badges and a scope-wide refresh signal without loading either list.
-         *
-         *     Changes usually appear within ~30 s, at most ~60 s. PostgreSQL updated_at
-         *     records transaction-start time: an older-started transaction committing
-         *     later can evade this best-effort banner. This is not a version cursor.
-         */
-        get: operations["reservation_counts_v1_admin_reservations_counts_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/reservations/calendar/{booking_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Calendar Popover
-         * @description Return details for one in-scope calendar block.
-         */
-        get: operations["calendar_popover_v1_admin_reservations_calendar__booking_id__get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/reservations/{booking_id}/audit": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Reservation Audit
-         * @description Return explicit human operations associated with one reservation.
-         */
-        get: operations["reservation_audit_v1_admin_reservations__booking_id__audit_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/reservations/{booking_id}/trip-sheet": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Reservation Trip Sheet
-         * @description Return the office trip sheet as structured JSON or printable text.
-         */
-        get: operations["reservation_trip_sheet_v1_admin_reservations__booking_id__trip_sheet_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/reservations/{booking_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Reservation Detail
-         * @description Return the full type-adaptive reservation detail.
-         */
-        get: operations["reservation_detail_v1_admin_reservations__booking_id__get"];
-        put?: never;
-        post?: never;
-        /**
-         * Cancel Reservation
-         * @description Cancel one run or every run in its order without initiating a refund.
-         */
-        delete: operations["cancel_reservation_v1_admin_reservations__booking_id__delete"];
-        options?: never;
-        head?: never;
-        /**
-         * Edit Reservation
-         * @description Correct operational fields without implicit repricing.
-         */
-        patch: operations["edit_reservation_v1_admin_reservations__booking_id__patch"];
-        trace?: never;
-    };
-    "/v1/admin/reservations/{booking_id}/status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Change Reservation Status
-         * @description Apply one allowed status transition.
-         */
-        patch: operations["change_reservation_status_v1_admin_reservations__booking_id__status_patch"];
-        trace?: never;
-    };
-    "/v1/admin/reservations/{booking_id}/check-pricing": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Check Reservation Pricing
-         * @description Compare stored totals with current configuration using stored distance.
-         */
-        post: operations["check_reservation_pricing_v1_admin_reservations__booking_id__check_pricing_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/reservations/{booking_id}/price": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Override Reservation Price
-         * @description Store an explained owner/manager price override.
-         */
-        patch: operations["override_reservation_price_v1_admin_reservations__booking_id__price_patch"];
-        trace?: never;
-    };
-    "/v1/admin/reservations/{booking_id}/payment": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Change Manual Payment
-         * @description Record or reverse money collected outside Square.
-         */
-        patch: operations["change_manual_payment_v1_admin_reservations__booking_id__payment_patch"];
-        trace?: never;
-    };
-    "/v1/admin/reservations/{booking_id}/charges": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Add Reservation Charge
-         * @description Attach one configured staff charge snapshot.
-         */
-        post: operations["add_reservation_charge_v1_admin_reservations__booking_id__charges_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/reservations/{booking_id}/charges/{booking_charge_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Delete Reservation Charge
-         * @description Remove one staff charge snapshot and reverse its contribution.
-         */
-        delete: operations["delete_reservation_charge_v1_admin_reservations__booking_id__charges__booking_charge_id__delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/schedules": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Schedules
-         * @description List departures, defaulting to the next 14 business-local days.
-         */
-        get: operations["list_schedules_v1_admin_schedules_get"];
-        put?: never;
-        /**
-         * Create Schedule
-         * @description Create one dated departure with immediately searchable capacity.
-         */
-        post: operations["create_schedule_v1_admin_schedules_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/schedules/bulk-preview": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Preview Schedules
-         * @description Preview the exact recurring cross product without writing anything.
-         */
-        post: operations["preview_schedules_v1_admin_schedules_bulk_preview_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/schedules/bulk": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Bulk Create Schedules
-         * @description Create up to 2,000 departures in one transaction and one bulk insert.
-         */
-        post: operations["bulk_create_schedules_v1_admin_schedules_bulk_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/schedules/bulk-capacity": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Bulk Update Schedule Capacity
-         * @description Change capacity under ordered locks, reporting unsafe rows as skipped.
-         */
-        patch: operations["bulk_update_schedule_capacity_v1_admin_schedules_bulk_capacity_patch"];
-        trace?: never;
-    };
-    "/v1/admin/schedules/{schedule_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Deactivate Schedule
-         * @description Deactivate without unassigning bookings; booked departures need confirmation.
-         */
-        delete: operations["deactivate_schedule_v1_admin_schedules__schedule_id__delete"];
-        options?: never;
-        head?: never;
-        /**
-         * Update Schedule
-         * @description Edit a departure under lock, with explicit booked-customer confirmation.
-         */
-        patch: operations["update_schedule_v1_admin_schedules__schedule_id__patch"];
-        trace?: never;
-    };
     "/v1/admin/service-types": {
         parameters: {
             query?: never;
@@ -1992,7 +1984,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/admin/businesses/{business_uuid}/settings": {
+    "/v1/admin/settings/global": {
         parameters: {
             query?: never;
             header?: never;
@@ -2000,139 +1992,47 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get Settings
-         * @description Read one selected business's complete masked settings.
+         * Get Global Settings
+         * @description Owner only. These fixed typed values seed NEW businesses, not existing ones.
          */
-        get: operations["get_settings_v1_admin_businesses__business_uuid__settings_get"];
+        get: operations["get_global_settings_v1_admin_settings_global_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Global Settings
+         * @description Unknown keys are rejected. Existing businesses retain their explicit policies.
+         */
+        patch: operations["update_global_settings_v1_admin_settings_global_patch"];
+        trace?: never;
+    };
+    "/v1/admin/surcharges": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Surcharges
+         * @description List non-compounding percentages applied to each eligible fare base.
+         */
+        get: operations["list_surcharges_v1_admin_surcharges_get"];
+        put?: never;
+        /**
+         * Create Surcharge
+         * @description Create a percentage that never compounds with another surcharge.
+         */
+        post: operations["create_surcharge_v1_admin_surcharges_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/v1/admin/businesses/{business_uuid}/settings/booking": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Update Booking Settings
-         * @description Edit advance notice, hold duration and operational booking thresholds.
-         */
-        patch: operations["update_booking_settings_v1_admin_businesses__business_uuid__settings_booking_patch"];
-        trace?: never;
-    };
-    "/v1/admin/businesses/{business_uuid}/settings/pricing": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Update Pricing Settings
-         * @description Edit protection, round-trip discounts and offered payment configuration.
-         */
-        patch: operations["update_pricing_settings_v1_admin_businesses__business_uuid__settings_pricing_patch"];
-        trace?: never;
-    };
-    "/v1/admin/businesses/{business_uuid}/settings/cancellation": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Update Cancellation Settings
-         * @description Edit the processing fee and shared cancellation/purchase notice window.
-         */
-        patch: operations["update_cancellation_settings_v1_admin_businesses__business_uuid__settings_cancellation_patch"];
-        trace?: never;
-    };
-    "/v1/admin/businesses/{business_uuid}/settings/email": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Update Email Settings
-         * @description Write-only SMTP password; sanitised footers; Phase 13 owns encryption at rest.
-         */
-        patch: operations["update_email_settings_v1_admin_businesses__business_uuid__settings_email_patch"];
-        trace?: never;
-    };
-    "/v1/admin/businesses/{business_uuid}/settings/terms": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Update Terms Settings
-         * @description Store at most 100 KiB of sanitized HTML; confirmation emails belong to Phase 11.
-         */
-        patch: operations["update_terms_settings_v1_admin_businesses__business_uuid__settings_terms_patch"];
-        trace?: never;
-    };
-    "/v1/admin/businesses/{business_uuid}/settings/test-email": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Test Email Settings
-         * @description Send a fixed message; five attempts/hour/business, including failed sends.
-         */
-        post: operations["test_email_settings_v1_admin_businesses__business_uuid__settings_test_email_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/categories": {
+    "/v1/admin/surcharges/{surcharge_id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -2140,232 +2040,24 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List Categories
-         * @description List scoped public-picker category configuration.
+         * Get Surcharge
+         * @description Return one tenant-owned surcharge.
          */
-        get: operations["list_categories_v1_admin_categories_get"];
-        put?: never;
-        /**
-         * Create Category
-         * @description Create one selected-business location category.
-         */
-        post: operations["create_category_v1_admin_categories_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/categories/order": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Reorder Categories
-         * @description Save the category drag-and-drop order in one transaction.
-         */
-        put: operations["reorder_categories_v1_admin_categories_order_put"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/categories/{category_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Category
-         * @description Return one tenant-owned category.
-         */
-        get: operations["get_category_v1_admin_categories__category_id__get"];
+        get: operations["get_surcharge_v1_admin_surcharges__surcharge_id__get"];
         put?: never;
         post?: never;
         /**
-         * Deactivate Category
-         * @description Deactivate a category and report active locations hidden by it.
+         * Deactivate Surcharge
+         * @description Soft-deactivate a surcharge so historical references remain valid.
          */
-        delete: operations["deactivate_category_v1_admin_categories__category_id__delete"];
+        delete: operations["deactivate_surcharge_v1_admin_surcharges__surcharge_id__delete"];
         options?: never;
         head?: never;
         /**
-         * Update Category
-         * @description Edit category presentation without bypassing deactivation warnings.
+         * Update Surcharge
+         * @description Edit a current percentage without touching historical totals.
          */
-        patch: operations["update_category_v1_admin_categories__category_id__patch"];
-        trace?: never;
-    };
-    "/v1/admin/locations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Locations
-         * @description List locations and optionally count active routes touching each one.
-         */
-        get: operations["list_locations_v1_admin_locations_get"];
-        put?: never;
-        /**
-         * Create Location
-         * @description Create a location; requires_address controls public street-address collection.
-         */
-        post: operations["create_location_v1_admin_locations_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/locations/order": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Reorder Locations
-         * @description Save location positions without changing their category membership.
-         */
-        put: operations["reorder_locations_v1_admin_locations_order_put"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/locations/{location_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Location
-         * @description Return one tenant-owned pickup location.
-         */
-        get: operations["get_location_v1_admin_locations__location_id__get"];
-        put?: never;
-        post?: never;
-        /**
-         * Deactivate Location
-         * @description Deactivate a location and disclose every active route it removes publicly.
-         */
-        delete: operations["deactivate_location_v1_admin_locations__location_id__delete"];
-        options?: never;
-        head?: never;
-        /**
-         * Update Location
-         * @description Edit a location and its public address requirement.
-         */
-        patch: operations["update_location_v1_admin_locations__location_id__patch"];
-        trace?: never;
-    };
-    "/v1/admin/routes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Routes
-         * @description List scoped directed routes with their configured passenger fares.
-         */
-        get: operations["list_routes_v1_admin_routes_get"];
-        put?: never;
-        /**
-         * Create Route
-         * @description Create one selected-business shuttle route.
-         */
-        post: operations["create_route_v1_admin_routes_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/routes/{route_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Route
-         * @description Return one tenant-owned route and its current fares.
-         */
-        get: operations["get_route_v1_admin_routes__route_id__get"];
-        put?: never;
-        post?: never;
-        /**
-         * Deactivate Route
-         * @description Deactivate without cascading and disclose affected future inventory.
-         */
-        delete: operations["deactivate_route_v1_admin_routes__route_id__delete"];
-        options?: never;
-        head?: never;
-        /**
-         * Update Route
-         * @description Edit route endpoints, duration, or customer-facing service label.
-         */
-        patch: operations["update_route_v1_admin_routes__route_id__patch"];
-        trace?: never;
-    };
-    "/v1/admin/routes/{route_id}/prices": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Set Route Prices
-         * @description Replace fares: an omitted passenger type is unavailable; 0.00 is free.
-         */
-        put: operations["set_route_prices_v1_admin_routes__route_id__prices_put"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/routes/{route_id}/reverse": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Reverse Route
-         * @description Create the mirror direction and optionally copy fares as a starting point.
-         */
-        post: operations["reverse_route_v1_admin_routes__route_id__reverse_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
+        patch: operations["update_surcharge_v1_admin_surcharges__surcharge_id__patch"];
         trace?: never;
     };
     "/v1/admin/team": {
@@ -2572,7 +2264,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/admin/pricing-anchors": {
+    "/v1/admin/vehicles": {
         parameters: {
             query?: never;
             header?: never;
@@ -2580,23 +2272,23 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List Anchors
-         * @description List named anchors in the validated business scope.
+         * List Vehicles
+         * @description List physical vehicles, optionally by upcoming registration expiry.
          */
-        get: operations["list_anchors_v1_admin_pricing_anchors_get"];
+        get: operations["list_vehicles_v1_admin_vehicles_get"];
         put?: never;
         /**
-         * Create Anchor
-         * @description Create a named zipcode anchor.
+         * Create Vehicle
+         * @description Create one physical vehicle for the selected business.
          */
-        post: operations["create_anchor_v1_admin_pricing_anchors_post"];
+        post: operations["create_vehicle_v1_admin_vehicles_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/v1/admin/pricing-anchors/{anchor_id}": {
+    "/v1/admin/vehicles/assignable": {
         parameters: {
             query?: never;
             header?: never;
@@ -2604,24 +2296,44 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get Anchor
-         * @description Return one tenant-owned anchor.
+         * Assignable Vehicles
+         * @description Return active physical vehicles for one selected business.
          */
-        get: operations["get_anchor_v1_admin_pricing_anchors__anchor_id__get"];
+        get: operations["assignable_vehicles_v1_admin_vehicles_assignable_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/vehicles/{vehicle_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Vehicle
+         * @description Return one tenant-owned physical vehicle.
+         */
+        get: operations["get_vehicle_v1_admin_vehicles__vehicle_id__get"];
         put?: never;
         post?: never;
         /**
-         * Deactivate Anchor
-         * @description Soft-deactivate and explain which fares are hidden, not cascaded away.
+         * Deactivate Vehicle
+         * @description Deactivate a physical vehicle and return affected future runs.
          */
-        delete: operations["deactivate_anchor_v1_admin_pricing_anchors__anchor_id__delete"];
+        delete: operations["deactivate_vehicle_v1_admin_vehicles__vehicle_id__delete"];
         options?: never;
         head?: never;
         /**
-         * Update Anchor
-         * @description Edit an anchor; retained fares return on reactivation.
+         * Update Vehicle
+         * @description Edit one tenant-owned physical vehicle.
          */
-        patch: operations["update_anchor_v1_admin_pricing_anchors__anchor_id__patch"];
+        patch: operations["update_vehicle_v1_admin_vehicles__vehicle_id__patch"];
         trace?: never;
     };
     "/v1/admin/zone-prices": {
@@ -2648,26 +2360,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/admin/zone-prices/import": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Import Zone Prices
-         * @description Owner-only whole-file validation; dry-run returns the complete replace plan.
-         */
-        post: operations["import_zone_prices_v1_admin_zone_prices_import_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/v1/admin/zone-prices/export": {
         parameters: {
             query?: never;
@@ -2682,6 +2374,26 @@ export interface paths {
         get: operations["export_zone_prices_v1_admin_zone_prices_export_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/zone-prices/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import Zone Prices
+         * @description Owner-only whole-file validation; dry-run returns the complete replace plan.
+         */
+        post: operations["import_zone_prices_v1_admin_zone_prices_import_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2736,6 +2448,314 @@ export interface paths {
         patch: operations["update_zone_price_v1_admin_zone_prices__zone_id__patch"];
         trace?: never;
     };
+    "/v1/public/business": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Business
+         * @description The business behind the API key, with the settings the booking form needs.
+         */
+        get: operations["get_business_v1_public_business_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/public/promo/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Validate
+         * @description Check a promo code and preview its discount.
+         *
+         *     Returns 200 with valid=false for a bad code rather than an error status:
+         *     this runs while the customer types, and the plugin needs inline feedback
+         *     rather than a failed request on every keystroke.
+         *
+         *     The subtotal in the request only sizes the preview. It never prices a
+         *     booking; the quote and booking endpoints recalculate from the database.
+         *
+         *     Both throttle dimensions live in the service, not here.
+         */
+        post: operations["validate_v1_public_promo_validate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/public/shuttle/booking": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Booking
+         * @description Commit a cart: hold the seats, take payment, confirm the booking.
+         *
+         *     Send an Idempotency-Key. Without one the server derives a key from the
+         *     request contents, which catches a double-click but not a deliberate retry
+         *     after a network drop.
+         */
+        post: operations["create_booking_v1_public_shuttle_booking_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/public/shuttle/locations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Locations
+         * @description The From and To dropdown contents, grouped by category.
+         */
+        get: operations["get_locations_v1_public_shuttle_locations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/public/shuttle/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Quote
+         * @description Price a cart. Holds nothing, writes nothing, safe to call repeatedly.
+         */
+        post: operations["quote_v1_public_shuttle_quote_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/public/shuttle/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search
+         * @description Bookable departures for a day, with the seven-day price strip.
+         */
+        get: operations["search_v1_public_shuttle_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/public/shuttle/search/return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search Return
+         * @description Return options with server-owned chronology annotations, for "Add Return".
+         *
+         *     The from and to parameters are the OUTBOUND direction, as the plugin already
+         *     holds them; this endpoint reverses them.
+         */
+        get: operations["search_return_v1_public_shuttle_search_return_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/public/taxi/airlines": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Airlines
+         * @description The airline dropdown for airport pickups and dropoffs.
+         */
+        get: operations["get_airlines_v1_public_taxi_airlines_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/public/taxi/airports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Airports
+         * @description The airports this business serves.
+         */
+        get: operations["get_airports_v1_public_taxi_airports_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/public/taxi/booking": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Booking
+         * @description Commit a taxi journey: write the order, take payment, confirm it.
+         *
+         *     The Idempotency-Key header is required. A trip that could not be priced is
+         *     still booked, as a zero-total request for staff to quote by hand -- that is
+         *     the manual path, not a failure.
+         */
+        post: operations["create_booking_v1_public_taxi_booking_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/public/taxi/charges": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Charges
+         * @description The extras a customer may add at checkout. Admin-only charges never appear.
+         */
+        get: operations["get_charges_v1_public_taxi_charges_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/public/taxi/price-breakdown": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Price Breakdown
+         * @description Itemise the chosen vehicle's price after the customer picks extras.
+         *
+         *     Safe to call repeatedly: it writes nothing, holds nothing and consumes no
+         *     promo use. The customer is toggling extras on this screen, so it will be.
+         */
+        post: operations["price_breakdown_v1_public_taxi_price_breakdown_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/public/taxi/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Quote
+         * @description Price every vehicle for a journey, and say which can serve it.
+         *
+         *     A trip the maps provider cannot place, or one outside the configured service
+         *     area, comes back as a 200 with out_of_service_area set and no prices. That
+         *     is a normal business outcome -- the plugin offers a manual quote -- and not
+         *     an error the customer should see as a failure.
+         */
+        post: operations["quote_v1_public_taxi_quote_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/public/taxi/service-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Service Types
+         * @description The services this business offers, in configured order.
+         */
+        get: operations["get_service_types_v1_public_taxi_service_types_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/webhooks/square": {
         parameters: {
             query?: never;
@@ -2765,31 +2785,16 @@ export interface components {
          * @description Global company/contact information that never enters tenant switching.
          */
         AccountHolderResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
+            /** Address */
+            address: string | null;
+            /** City */
+            city: string | null;
             /** Company Name */
             company_name: string | null;
             /** Contact First Name */
             contact_first_name: string | null;
             /** Contact Last Name */
             contact_last_name: string | null;
-            /** Email */
-            email: string | null;
-            /** Phone */
-            phone: string | null;
-            /** Secondary Phone */
-            secondary_phone: string | null;
-            /** Address */
-            address: string | null;
-            /** City */
-            city: string | null;
-            /** State */
-            state: string | null;
-            /** Zip */
-            zip: string | null;
             /** Country */
             country: string | null;
             /**
@@ -2797,39 +2802,54 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /** Email */
+            email: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Phone */
+            phone: string | null;
+            /** Secondary Phone */
+            secondary_phone: string | null;
+            /** State */
+            state: string | null;
             /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
+            /** Zip */
+            zip: string | null;
         };
         /**
          * AccountHolderUpdate
          * @description PATCH fields are optional so unconfigured account details can stay null.
          */
         AccountHolderUpdate: {
+            /** Address */
+            address?: string | null;
+            /** City */
+            city?: string | null;
             /** Company Name */
             company_name?: string | null;
             /** Contact First Name */
             contact_first_name?: string | null;
             /** Contact Last Name */
             contact_last_name?: string | null;
+            /** Country */
+            country?: string | null;
             /** Email */
             email?: string | null;
             /** Phone */
             phone?: string | null;
             /** Secondary Phone */
             secondary_phone?: string | null;
-            /** Address */
-            address?: string | null;
-            /** City */
-            city?: string | null;
             /** State */
             state?: string | null;
             /** Zip */
             zip?: string | null;
-            /** Country */
-            country?: string | null;
         };
         /**
          * AdminChargeCreate
@@ -2873,30 +2893,30 @@ export interface components {
          * @description An active route hidden when its endpoint location is deactivated.
          */
         AffectedRoute: {
+            /** From Location Name */
+            from_location_name: string;
             /**
              * Id
              * Format: uuid
              */
             id: string;
-            /** From Location Name */
-            from_location_name: string;
-            /** To Location Name */
-            to_location_name: string;
             /** Service Label */
             service_label: string;
+            /** To Location Name */
+            to_location_name: string;
         };
         /**
          * AirlineCreate
          * @description One airline offered in the selected business's dropdown.
          */
         AirlineCreate: {
-            /** Name */
-            name: string;
             /**
              * Is Active
              * @default true
              */
             is_active: boolean;
+            /** Name */
+            name: string;
         };
         /**
          * AirlineOption
@@ -2917,24 +2937,24 @@ export interface components {
          */
         AirlineResult: {
             /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Name */
-            name: string;
-            /** Is Active */
-            is_active: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Name */
+            name: string;
             /**
              * Updated At
              * Format: date-time
@@ -2946,10 +2966,10 @@ export interface components {
          * @description Partial airline presentation edits.
          */
         AirlineUpdate: {
-            /** Name */
-            name?: string | null;
             /** Is Active */
             is_active?: boolean | null;
+            /** Name */
+            name?: string | null;
         };
         /**
          * AirportBookingWarning
@@ -2981,63 +3001,65 @@ export interface components {
          * @description One airport offered by the selected taxi business.
          */
         AirportCreate: {
-            /** Name */
-            name: string;
-            /** Code */
-            code?: string | null;
             /** Address */
             address?: string | null;
-            /** Zipcode */
-            zipcode?: string | null;
+            /** Code */
+            code?: string | null;
             /**
              * Is Active
              * @default true
              */
             is_active: boolean;
+            /** Name */
+            name: string;
+            /** Zipcode */
+            zipcode?: string | null;
         };
         /**
          * AirportDeactivationResult
          * @description Deactivated airport plus future bookings needing staff attention.
          */
         AirportDeactivationResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
+            /** Address */
+            address: string | null;
+            /** Affected Upcoming Bookings */
+            affected_upcoming_bookings: components["schemas"]["AirportBookingWarning"][];
             /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Name */
-            name: string;
             /** Code */
             code: string | null;
-            /** Address */
-            address: string | null;
-            /** Zipcode */
-            zipcode: string | null;
-            /** Is Active */
-            is_active: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
             /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Name */
+            name: string;
+            /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
-            /** Affected Upcoming Bookings */
-            affected_upcoming_bookings: components["schemas"]["AirportBookingWarning"][];
+            /** Zipcode */
+            zipcode: string | null;
         };
         /**
          * AirportOption
          * @description One airport the business serves.
          */
         AirportOption: {
+            /** Code */
+            code?: string | null;
             /**
              * Id
              * Format: uuid
@@ -3045,111 +3067,109 @@ export interface components {
             id: string;
             /** Name */
             name: string;
-            /** Code */
-            code?: string | null;
         };
         /**
          * AirportResult
          * @description One tenant-owned airport dropdown row.
          */
         AirportResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
+            /** Address */
+            address: string | null;
             /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Name */
-            name: string;
             /** Code */
             code: string | null;
-            /** Address */
-            address: string | null;
-            /** Zipcode */
-            zipcode: string | null;
-            /** Is Active */
-            is_active: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
             /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Name */
+            name: string;
+            /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
+            /** Zipcode */
+            zipcode: string | null;
         };
         /**
          * AirportUpdate
          * @description Partial airport presentation edits.
          */
         AirportUpdate: {
-            /** Name */
-            name?: string | null;
-            /** Code */
-            code?: string | null;
             /** Address */
             address?: string | null;
-            /** Zipcode */
-            zipcode?: string | null;
+            /** Code */
+            code?: string | null;
             /** Is Active */
             is_active?: boolean | null;
+            /** Name */
+            name?: string | null;
+            /** Zipcode */
+            zipcode?: string | null;
         };
         /**
          * AnchorCreate
          * @description Create a named anchor without introducing a directional fare model.
          */
         AnchorCreate: {
-            /** Name */
-            name: string;
-            /** Zipcode */
-            zipcode: string;
             /**
              * Is Active
              * @default true
              */
             is_active: boolean;
+            /** Name */
+            name: string;
+            /** Zipcode */
+            zipcode: string;
         };
         /**
          * AnchorDeactivationResult
          * @description Explain the prices hidden by soft deactivation, not a hard-delete cascade.
          */
         AnchorDeactivationResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
+            /** Affected Zone Price Count */
+            affected_zone_price_count: number;
             /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Name */
-            name: string;
-            /** Zipcode */
-            zipcode: string;
-            /** Is Active */
-            is_active: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
             /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Name */
+            name: string;
+            /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
-            /** Affected Zone Price Count */
-            affected_zone_price_count: number;
             /** Warning */
             warning: string;
+            /** Zipcode */
+            zipcode: string;
         };
         /**
          * AnchorResult
@@ -3157,43 +3177,43 @@ export interface components {
          */
         AnchorResult: {
             /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Name */
-            name: string;
-            /** Zipcode */
-            zipcode: string;
-            /** Is Active */
-            is_active: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
             /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Name */
+            name: string;
+            /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
+            /** Zipcode */
+            zipcode: string;
         };
         /**
          * AnchorUpdate
          * @description Partially edit an anchor; DELETE owns impact-warning deactivation.
          */
         AnchorUpdate: {
+            /** Is Active */
+            is_active?: boolean | null;
             /** Name */
             name?: string | null;
             /** Zipcode */
             zipcode?: string | null;
-            /** Is Active */
-            is_active?: boolean | null;
         };
         /**
          * ApiKeyCreate
@@ -3209,33 +3229,33 @@ export interface components {
          */
         ApiKeyCreatedResult: {
             /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Name */
-            name: string;
-            /** Key Prefix */
-            key_prefix: string;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /** Last Used At */
-            last_used_at: string | null;
-            /** Revoked At */
-            revoked_at: string | null;
-            /** Created By Admin Id */
-            created_by_admin_id: string | null;
-            /** Raw Key */
-            raw_key: string;
-            /**
              * Can Be Revealed Again
              * @default true
              * @constant
              */
             can_be_revealed_again: true;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Created By Admin Id */
+            created_by_admin_id: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Key Prefix */
+            key_prefix: string;
+            /** Last Used At */
+            last_used_at: string | null;
+            /** Name */
+            name: string;
+            /** Raw Key */
+            raw_key: string;
+            /** Revoked At */
+            revoked_at: string | null;
         };
         /**
          * ApiKeyResult
@@ -3243,38 +3263,38 @@ export interface components {
          */
         ApiKeyResult: {
             /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Name */
-            name: string;
-            /** Key Prefix */
-            key_prefix: string;
-            /**
              * Created At
              * Format: date-time
              */
             created_at: string;
-            /** Last Used At */
-            last_used_at: string | null;
-            /** Revoked At */
-            revoked_at: string | null;
             /** Created By Admin Id */
             created_by_admin_id: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Key Prefix */
+            key_prefix: string;
+            /** Last Used At */
+            last_used_at: string | null;
+            /** Name */
+            name: string;
+            /** Revoked At */
+            revoked_at: string | null;
         };
         /**
          * ApiKeyRevoke
          * @description Typing the stored identifying fragment confirms exactly which key goes offline.
          */
         ApiKeyRevoke: {
-            /** Key Prefix */
-            key_prefix: string;
             /**
              * Confirm Last Key
              * @default false
              */
             confirm_last_key: boolean;
+            /** Key Prefix */
+            key_prefix: string;
         };
         /**
          * AssignableDriver
@@ -3299,14 +3319,14 @@ export interface components {
              * Format: uuid
              */
             id: string;
-            /** Name */
-            name: string;
+            /** License Plate */
+            license_plate: string | null;
             /** Make */
             make: string | null;
             /** Model */
             model: string | null;
-            /** License Plate */
-            license_plate: string | null;
+            /** Name */
+            name: string;
         };
         /**
          * AssignmentConflict
@@ -3318,12 +3338,12 @@ export interface components {
              * Format: uuid
              */
             booking_id: string;
+            /** End */
+            end: string | null;
             /** Order Number */
             order_number: string;
             /** Start */
             start: string;
-            /** End */
-            end: string | null;
         };
         /**
          * AssignmentRequest
@@ -3340,10 +3360,10 @@ export interface components {
          * @description Saved assignment and non-blocking conflict warnings.
          */
         AssignmentResult: {
-            driver: components["schemas"]["AssignmentSummary"];
-            vehicle: components["schemas"]["AssignmentSummary"];
             /** Conflicts */
             conflicts: components["schemas"]["AssignmentConflict"][];
+            driver: components["schemas"]["AssignmentSummary"];
+            vehicle: components["schemas"]["AssignmentSummary"];
         };
         /**
          * AssignmentSummary
@@ -3360,39 +3380,39 @@ export interface components {
          * @description One explicit staff mutation associated with an order's booking rows.
          */
         AuditTrailItem: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Actor Admin Id */
-            actor_admin_id: string | null;
-            /** Actor Type */
-            actor_type: string;
-            /** Actor Name */
-            actor_name: string | null;
             /** Action */
             action: string;
-            /** Entity Table */
-            entity_table: string;
-            /**
-             * Entity Id
-             * Format: uuid
-             */
-            entity_id: string;
+            /** Actor Admin Id */
+            actor_admin_id: string | null;
+            /** Actor Name */
+            actor_name: string | null;
+            /** Actor Type */
+            actor_type: string;
             /** Changes */
             changes: {
                 [key: string]: unknown;
             } | null;
-            /** Ip Address */
-            ip_address: string | null;
-            /** Request Id */
-            request_id: string | null;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Entity Id
+             * Format: uuid
+             */
+            entity_id: string;
+            /** Entity Table */
+            entity_table: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Ip Address */
+            ip_address: string | null;
+            /** Request Id */
+            request_id: string | null;
         };
         /**
          * BookedLeg
@@ -3421,32 +3441,38 @@ export interface components {
          *     charges what it computes; there is nothing here for a client to influence.
          */
         BookingRequest: {
-            /** Legs */
-            legs: components["schemas"]["QuoteLegRequest"][];
-            customer: components["schemas"]["CustomerDetails"];
-            payment: components["schemas"]["PaymentDetails"];
             /**
              * Accepted Terms
              * @default false
              */
             accepted_terms: boolean;
+            /** Address */
+            address?: string | null;
+            /** Comments */
+            comments?: string | null;
+            customer: components["schemas"]["CustomerDetails"];
             /**
              * Insurance Selected
              * @default false
              */
             insurance_selected: boolean;
+            /** Legs */
+            legs: components["schemas"]["QuoteLegRequest"][];
+            payment: components["schemas"]["PaymentDetails"];
             /** Promo Code */
             promo_code?: string | null;
-            /** Comments */
-            comments?: string | null;
-            /** Address */
-            address?: string | null;
         };
         /**
          * BookingResponse
          * @description The result of a successful booking.
          */
         BookingResponse: {
+            /** Amount Paid */
+            amount_paid: string;
+            /** Confirmation Email Sent */
+            confirmation_email_sent: boolean;
+            /** Legs */
+            legs: components["schemas"]["BookedLeg"][];
             /**
              * Order Id
              * Format: uuid
@@ -3458,12 +3484,6 @@ export interface components {
             status: string;
             /** Total */
             total: string;
-            /** Amount Paid */
-            amount_paid: string;
-            /** Legs */
-            legs: components["schemas"]["BookedLeg"][];
-            /** Confirmation Email Sent */
-            confirmation_email_sent: boolean;
         };
         /**
          * BookingSettingsUpdate
@@ -3472,22 +3492,20 @@ export interface components {
         BookingSettingsUpdate: {
             /** Advance Booking Hours */
             advance_booking_hours?: number | null;
+            /** Low Seat Warning Threshold */
+            low_seat_warning_threshold?: number | null;
             /** Return Minimum Gap Minutes */
             return_minimum_gap_minutes?: number | null;
             /** Seat Hold Minutes */
             seat_hold_minutes?: number | null;
-            /** Low Seat Warning Threshold */
-            low_seat_warning_threshold?: number | null;
-            /** Taxi Auto Confirm */
-            taxi_auto_confirm?: boolean | null;
             /** Shuttle Prepay Required */
             shuttle_prepay_required?: boolean | null;
-            /** Reminder Days Before */
-            reminder_days_before?: number | null;
             /** Sms Confirmation Enabled */
             sms_confirmation_enabled?: boolean | null;
             /** Sms Dispatch Enabled */
             sms_dispatch_enabled?: boolean | null;
+            /** Taxi Auto Confirm */
+            taxi_auto_confirm?: boolean | null;
         };
         /**
          * BookingStatus
@@ -3514,21 +3532,21 @@ export interface components {
          *     admin needs to explain a total months later.
          */
         BreakdownLine: {
-            /** Label */
-            label: string;
             /** Amount */
             amount: string;
             /** Kind */
             kind: string;
+            /** Label */
+            label: string;
             /**
              * Quantity
              * @default 1
              */
             quantity: number;
-            /** Unit Price */
-            unit_price?: string | null;
             /** Source Id */
             source_id?: string | null;
+            /** Unit Price */
+            unit_price?: string | null;
         };
         /**
          * BusinessListDetail
@@ -3551,180 +3569,207 @@ export interface components {
          * @description A business as the WordPress plugins see it.
          */
         BusinessPublic: {
+            /** Brand Color */
+            brand_color?: string | null;
+            /** Currency */
+            currency: string;
+            /** Distance Unit */
+            distance_unit: string;
             /**
              * Id
              * Format: uuid
              */
             id: string;
-            /** Name */
-            name: string;
-            /** Type */
-            type: string;
-            /** Currency */
-            currency: string;
-            /** Timezone */
-            timezone: string;
-            /** Distance Unit */
-            distance_unit: string;
             /** Logo Url */
             logo_url?: string | null;
-            /** Brand Color */
-            brand_color?: string | null;
+            /** Max Luggage */
+            max_luggage?: number | null;
+            /** Max Passengers */
+            max_passengers?: number | null;
+            /** Name */
+            name: string;
+            payments?: components["schemas"]["BusinessPaymentsPublic"] | null;
             /**
              * @default {
              *       "advance_booking_hours": 0,
+             *       "car_seat_price": "15.00",
              *       "insurance_enabled": false,
              *       "insurance_pct": "0.00",
+             *       "max_car_seats": 5,
+             *       "offer_car_seats": true,
              *       "payment_methods": []
              *     }
              */
             settings: components["schemas"]["BusinessSettingsPublic"];
-            payments?: components["schemas"]["BusinessPaymentsPublic"] | null;
-            /** Max Passengers */
-            max_passengers?: number | null;
-            /** Max Luggage */
-            max_luggage?: number | null;
+            /** Timezone */
+            timezone: string;
+            /** Type */
+            type: string;
         };
         /**
          * BusinessResult
          * @description Company presentation, excluding provider credentials and order counters.
          */
         BusinessResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Name */
-            name: string;
-            /** Slug */
-            slug: string;
-            type: components["schemas"]["BusinessType"];
-            /** Is Active */
-            is_active: boolean;
-            /** Order Prefix */
-            order_prefix: string;
-            /** Website Url */
-            website_url: string | null;
-            /** Contact Email */
-            contact_email: string | null;
-            /** Phone */
-            phone: string | null;
             /** Address */
             address: string | null;
-            /** City */
-            city: string | null;
-            /** State */
-            state: string | null;
-            /** Zip */
-            zip: string | null;
-            /** Country */
-            country: string | null;
-            /** Logo Url */
-            logo_url: string | null;
             /** Brand Color */
             brand_color: string | null;
-            /** Date Format */
-            date_format: string | null;
-            /** Timezone */
-            timezone: string;
-            /** Currency */
-            currency: string;
-            /** Distance Unit */
-            distance_unit: string;
-            /** Gratuity Pct */
-            gratuity_pct: string;
-            /** Fuel Surcharge Pct */
-            fuel_surcharge_pct: string;
-            /** Sales Tax Pct */
-            sales_tax_pct: string;
+            /** City */
+            city: string | null;
+            /** Contact Email */
+            contact_email: string | null;
+            /** Country */
+            country: string | null;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /** Currency */
+            currency: string;
+            /** Date Format */
+            date_format: string | null;
+            /** Distance Unit */
+            distance_unit: string;
+            /** Fuel Surcharge Pct */
+            fuel_surcharge_pct: string;
+            /** Gratuity Pct */
+            gratuity_pct: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Logo Url */
+            logo_url: string | null;
+            /** Name */
+            name: string;
+            /** Order Prefix */
+            order_prefix: string;
+            /** Phone */
+            phone: string | null;
+            /** Sales Tax Pct */
+            sales_tax_pct: string;
+            /** Slug */
+            slug: string;
+            /** State */
+            state: string | null;
+            /** Timezone */
+            timezone: string;
+            type: components["schemas"]["BusinessType"];
             /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
+            /** Website Url */
+            website_url: string | null;
+            /** Zip */
+            zip: string | null;
         };
         /**
          * BusinessSettingsMutationResult
          * @description Surface operational warnings while returning the same masked field set.
          */
         BusinessSettingsMutationResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
+            /** Advance Booking Hours */
+            advance_booking_hours: number;
+            /** Alerts Email */
+            alerts_email: string | null;
+            /** Auto Confirm Card Payments */
+            auto_confirm_card_payments: boolean;
             /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Advance Booking Hours */
-            advance_booking_hours: number;
-            /** Return Minimum Gap Minutes */
-            return_minimum_gap_minutes: number;
-            /** Seat Hold Minutes */
-            seat_hold_minutes: number;
-            /** Low Seat Warning Threshold */
-            low_seat_warning_threshold: number;
-            /** Taxi Auto Confirm */
-            taxi_auto_confirm: boolean;
-            /** Shuttle Prepay Required */
-            shuttle_prepay_required: boolean;
-            /** Reminder Days Before */
-            reminder_days_before: number;
-            /** Sms Confirmation Enabled */
-            sms_confirmation_enabled: boolean;
-            /** Sms Dispatch Enabled */
-            sms_dispatch_enabled: boolean;
-            /** Insurance Enabled */
-            insurance_enabled: boolean;
-            /** Insurance Pct */
-            insurance_pct: string;
-            /** Round Trip Discount Pct */
-            round_trip_discount_pct: string;
-            /** Require Payment */
-            require_payment: boolean;
-            payment_capture_type: components["schemas"]["PaymentCaptureType"] | null;
-            deposit_type: components["schemas"]["DepositType"];
-            /** Deposit Value */
-            deposit_value: string;
-            /** Payment Methods */
-            payment_methods: string[];
             /** Cancellation Fee Pct */
             cancellation_fee_pct: string;
             /** Cancellation Notice Hours */
             cancellation_notice_hours: number;
-            /** Smtp Host */
-            smtp_host: string | null;
-            /** Smtp Port */
-            smtp_port: number | null;
-            /** Smtp User */
-            smtp_user: string | null;
-            /** Smtp Password Set */
-            smtp_password_set: boolean;
-            /** Bcc Email */
-            bcc_email: string | null;
-            /** Footer Quote */
-            footer_quote: string | null;
-            /** Footer Confirmation */
-            footer_confirmation: string | null;
-            /** Footer Receipt */
-            footer_receipt: string | null;
-            /** Footer Invoice */
-            footer_invoice: string | null;
-            /** Terms And Conditions */
-            terms_and_conditions: string | null;
+            /** Car Seat Price */
+            car_seat_price: string;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /** Customer Reminder Enabled */
+            customer_reminder_enabled: boolean;
+            /** Customer Reminder Hours */
+            customer_reminder_hours: number;
+            deposit_type: components["schemas"]["DepositType"];
+            /** Deposit Value */
+            deposit_value: string;
+            /** Driver Reminder Enabled */
+            driver_reminder_enabled: boolean;
+            /** Driver Reminder Hours */
+            driver_reminder_hours: number;
+            /** Footer Confirmation */
+            footer_confirmation: string | null;
+            /** Footer Invoice */
+            footer_invoice: string | null;
+            /** Footer Quote */
+            footer_quote: string | null;
+            /** Footer Receipt */
+            footer_receipt: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Insurance Enabled */
+            insurance_enabled: boolean;
+            /** Insurance Pct */
+            insurance_pct: string;
+            /** Low Seat Warning Threshold */
+            low_seat_warning_threshold: number;
+            /** Max Car Seats */
+            max_car_seats: number;
+            /** Meet Greet Enabled */
+            meet_greet_enabled: boolean;
+            /** Meet Greet Price */
+            meet_greet_price: string;
+            /** Offer Car Seats */
+            offer_car_seats: boolean;
+            payment_capture_type: components["schemas"]["PaymentCaptureType"] | null;
+            /** Payment Methods */
+            payment_methods: string[];
+            /** Require Payment */
+            require_payment: boolean;
+            /** Return Minimum Gap Minutes */
+            return_minimum_gap_minutes: number;
+            /** Round Trip Discount Pct */
+            round_trip_discount_pct: string;
+            /** Seat Hold Minutes */
+            seat_hold_minutes: number;
+            /** Shuttle Prepay Required */
+            shuttle_prepay_required: boolean;
+            /** Sms Confirmation Enabled */
+            sms_confirmation_enabled: boolean;
+            /** Sms Dispatch Enabled */
+            sms_dispatch_enabled: boolean;
+            /** Smtp From Email */
+            smtp_from_email: string | null;
+            /** Smtp From Name */
+            smtp_from_name: string;
+            /** Smtp Host */
+            smtp_host: string | null;
+            /** Smtp Password Set */
+            smtp_password_set: boolean;
+            /** Smtp Port */
+            smtp_port: number | null;
+            /** Smtp Use Ssl */
+            smtp_use_ssl: boolean;
+            /** Smtp User */
+            smtp_user: string | null;
+            /** Taxi Auto Confirm */
+            taxi_auto_confirm: boolean;
+            /** Terms And Conditions */
+            terms_and_conditions: string | null;
             /**
              * Updated At
              * Format: date-time
@@ -3744,6 +3789,11 @@ export interface components {
              */
             advance_booking_hours: number;
             /**
+             * Car Seat Price
+             * @default 15.00
+             */
+            car_seat_price: string;
+            /**
              * Insurance Enabled
              * @default false
              */
@@ -3753,6 +3803,16 @@ export interface components {
              * @default 0.00
              */
             insurance_pct: string;
+            /**
+             * Max Car Seats
+             * @default 5
+             */
+            max_car_seats: number;
+            /**
+             * Offer Car Seats
+             * @default true
+             */
+            offer_car_seats: boolean;
             /**
              * Payment Methods
              * @default []
@@ -3766,80 +3826,104 @@ export interface components {
          * @description Masked settings; insurance_* is labelled Missed Shuttle Protection in the UI.
          *
          *     Eligibility is manually assessed, not checked by these configuration fields.
-         *     SMTP storage remains plaintext until Phase 13 encryption at rest.
+         *     SMTP credentials remain write-only and encrypted at rest.
          */
         BusinessSettingsResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
+            /** Advance Booking Hours */
+            advance_booking_hours: number;
+            /** Alerts Email */
+            alerts_email: string | null;
+            /** Auto Confirm Card Payments */
+            auto_confirm_card_payments: boolean;
             /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Advance Booking Hours */
-            advance_booking_hours: number;
-            /** Return Minimum Gap Minutes */
-            return_minimum_gap_minutes: number;
-            /** Seat Hold Minutes */
-            seat_hold_minutes: number;
-            /** Low Seat Warning Threshold */
-            low_seat_warning_threshold: number;
-            /** Taxi Auto Confirm */
-            taxi_auto_confirm: boolean;
-            /** Shuttle Prepay Required */
-            shuttle_prepay_required: boolean;
-            /** Reminder Days Before */
-            reminder_days_before: number;
-            /** Sms Confirmation Enabled */
-            sms_confirmation_enabled: boolean;
-            /** Sms Dispatch Enabled */
-            sms_dispatch_enabled: boolean;
-            /** Insurance Enabled */
-            insurance_enabled: boolean;
-            /** Insurance Pct */
-            insurance_pct: string;
-            /** Round Trip Discount Pct */
-            round_trip_discount_pct: string;
-            /** Require Payment */
-            require_payment: boolean;
-            payment_capture_type: components["schemas"]["PaymentCaptureType"] | null;
-            deposit_type: components["schemas"]["DepositType"];
-            /** Deposit Value */
-            deposit_value: string;
-            /** Payment Methods */
-            payment_methods: string[];
             /** Cancellation Fee Pct */
             cancellation_fee_pct: string;
             /** Cancellation Notice Hours */
             cancellation_notice_hours: number;
-            /** Smtp Host */
-            smtp_host: string | null;
-            /** Smtp Port */
-            smtp_port: number | null;
-            /** Smtp User */
-            smtp_user: string | null;
-            /** Smtp Password Set */
-            smtp_password_set: boolean;
-            /** Bcc Email */
-            bcc_email: string | null;
-            /** Footer Quote */
-            footer_quote: string | null;
-            /** Footer Confirmation */
-            footer_confirmation: string | null;
-            /** Footer Receipt */
-            footer_receipt: string | null;
-            /** Footer Invoice */
-            footer_invoice: string | null;
-            /** Terms And Conditions */
-            terms_and_conditions: string | null;
+            /** Car Seat Price */
+            car_seat_price: string;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /** Customer Reminder Enabled */
+            customer_reminder_enabled: boolean;
+            /** Customer Reminder Hours */
+            customer_reminder_hours: number;
+            deposit_type: components["schemas"]["DepositType"];
+            /** Deposit Value */
+            deposit_value: string;
+            /** Driver Reminder Enabled */
+            driver_reminder_enabled: boolean;
+            /** Driver Reminder Hours */
+            driver_reminder_hours: number;
+            /** Footer Confirmation */
+            footer_confirmation: string | null;
+            /** Footer Invoice */
+            footer_invoice: string | null;
+            /** Footer Quote */
+            footer_quote: string | null;
+            /** Footer Receipt */
+            footer_receipt: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Insurance Enabled */
+            insurance_enabled: boolean;
+            /** Insurance Pct */
+            insurance_pct: string;
+            /** Low Seat Warning Threshold */
+            low_seat_warning_threshold: number;
+            /** Max Car Seats */
+            max_car_seats: number;
+            /** Meet Greet Enabled */
+            meet_greet_enabled: boolean;
+            /** Meet Greet Price */
+            meet_greet_price: string;
+            /** Offer Car Seats */
+            offer_car_seats: boolean;
+            payment_capture_type: components["schemas"]["PaymentCaptureType"] | null;
+            /** Payment Methods */
+            payment_methods: string[];
+            /** Require Payment */
+            require_payment: boolean;
+            /** Return Minimum Gap Minutes */
+            return_minimum_gap_minutes: number;
+            /** Round Trip Discount Pct */
+            round_trip_discount_pct: string;
+            /** Seat Hold Minutes */
+            seat_hold_minutes: number;
+            /** Shuttle Prepay Required */
+            shuttle_prepay_required: boolean;
+            /** Sms Confirmation Enabled */
+            sms_confirmation_enabled: boolean;
+            /** Sms Dispatch Enabled */
+            sms_dispatch_enabled: boolean;
+            /** Smtp From Email */
+            smtp_from_email: string | null;
+            /** Smtp From Name */
+            smtp_from_name: string;
+            /** Smtp Host */
+            smtp_host: string | null;
+            /** Smtp Password Set */
+            smtp_password_set: boolean;
+            /** Smtp Port */
+            smtp_port: number | null;
+            /** Smtp Use Ssl */
+            smtp_use_ssl: boolean;
+            /** Smtp User */
+            smtp_user: string | null;
+            /** Taxi Auto Confirm */
+            taxi_auto_confirm: boolean;
+            /** Terms And Conditions */
+            terms_and_conditions: string | null;
             /**
              * Updated At
              * Format: date-time
@@ -3851,6 +3935,8 @@ export interface components {
          * @description One business a staff member may act on.
          */
         BusinessSummary: {
+            /** Currency */
+            currency: string;
             /**
              * Id
              * Format: uuid
@@ -3858,11 +3944,9 @@ export interface components {
             id: string;
             /** Name */
             name: string;
-            type: components["schemas"]["BusinessType"];
             /** Timezone */
             timezone: string;
-            /** Currency */
-            currency: string;
+            type: components["schemas"]["BusinessType"];
         };
         /**
          * BusinessSwitcher
@@ -3874,13 +3958,13 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /** Is Active */
+            is_active: boolean;
             /** Name */
             name: string;
             /** Slug */
             slug: string;
             type: components["schemas"]["BusinessType"];
-            /** Is Active */
-            is_active: boolean;
         };
         /**
          * BusinessType
@@ -3893,114 +3977,110 @@ export interface components {
          * @description Identity changes need owner permission and explicit acknowledgement.
          */
         BusinessUpdate: {
-            /** Name */
-            name?: string | null;
-            /** Website Url */
-            website_url?: string | null;
-            /** Contact Email */
-            contact_email?: string | null;
-            /** Phone */
-            phone?: string | null;
             /** Address */
             address?: string | null;
-            /** City */
-            city?: string | null;
-            /** State */
-            state?: string | null;
-            /** Zip */
-            zip?: string | null;
-            /** Country */
-            country?: string | null;
-            /** Logo Url */
-            logo_url?: string | null;
             /** Brand Color */
             brand_color?: string | null;
-            /** Date Format */
-            date_format?: string | null;
-            /** Slug */
-            slug?: string | null;
-            type?: components["schemas"]["BusinessType"] | null;
-            /** Order Prefix */
-            order_prefix?: string | null;
-            /** Timezone */
-            timezone?: string | null;
-            /** Currency */
-            currency?: string | null;
-            /** Distance Unit */
-            distance_unit?: ("mi" | "km") | null;
-            /** Gratuity Pct */
-            gratuity_pct?: string | null;
-            /** Fuel Surcharge Pct */
-            fuel_surcharge_pct?: string | null;
-            /** Sales Tax Pct */
-            sales_tax_pct?: string | null;
-            /** Confirm Slug Change */
-            confirm_slug_change?: boolean;
-            /** Confirm Timezone Change */
-            confirm_timezone_change?: boolean;
+            /** City */
+            city?: string | null;
             /** Confirm Currency Change */
             confirm_currency_change?: boolean;
             /** Confirm Distance Unit Change */
             confirm_distance_unit_change?: boolean;
+            /** Confirm Slug Change */
+            confirm_slug_change?: boolean;
+            /** Confirm Timezone Change */
+            confirm_timezone_change?: boolean;
+            /** Contact Email */
+            contact_email?: string | null;
+            /** Country */
+            country?: string | null;
+            /** Currency */
+            currency?: string | null;
+            /** Date Format */
+            date_format?: string | null;
+            /** Distance Unit */
+            distance_unit?: ("mi" | "km") | null;
+            /** Fuel Surcharge Pct */
+            fuel_surcharge_pct?: string | null;
+            /** Gratuity Pct */
+            gratuity_pct?: string | null;
+            /** Logo Url */
+            logo_url?: string | null;
+            /** Name */
+            name?: string | null;
+            /** Order Prefix */
+            order_prefix?: string | null;
+            /** Phone */
+            phone?: string | null;
+            /** Sales Tax Pct */
+            sales_tax_pct?: string | null;
+            /** Slug */
+            slug?: string | null;
+            /** State */
+            state?: string | null;
+            /** Timezone */
+            timezone?: string | null;
+            type?: components["schemas"]["BusinessType"] | null;
+            /** Website Url */
+            website_url?: string | null;
+            /** Zip */
+            zip?: string | null;
         };
         /**
          * BusinessUpdateResult
          * @description Warnings explain consequences without rewriting historical reservations.
          */
         BusinessUpdateResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Name */
-            name: string;
-            /** Slug */
-            slug: string;
-            type: components["schemas"]["BusinessType"];
-            /** Is Active */
-            is_active: boolean;
-            /** Order Prefix */
-            order_prefix: string;
-            /** Website Url */
-            website_url: string | null;
-            /** Contact Email */
-            contact_email: string | null;
-            /** Phone */
-            phone: string | null;
             /** Address */
             address: string | null;
-            /** City */
-            city: string | null;
-            /** State */
-            state: string | null;
-            /** Zip */
-            zip: string | null;
-            /** Country */
-            country: string | null;
-            /** Logo Url */
-            logo_url: string | null;
             /** Brand Color */
             brand_color: string | null;
-            /** Date Format */
-            date_format: string | null;
-            /** Timezone */
-            timezone: string;
-            /** Currency */
-            currency: string;
-            /** Distance Unit */
-            distance_unit: string;
-            /** Gratuity Pct */
-            gratuity_pct: string;
-            /** Fuel Surcharge Pct */
-            fuel_surcharge_pct: string;
-            /** Sales Tax Pct */
-            sales_tax_pct: string;
+            /** City */
+            city: string | null;
+            /** Contact Email */
+            contact_email: string | null;
+            /** Country */
+            country: string | null;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /** Currency */
+            currency: string;
+            /** Date Format */
+            date_format: string | null;
+            /** Distance Unit */
+            distance_unit: string;
+            /** Fuel Surcharge Pct */
+            fuel_surcharge_pct: string;
+            /** Gratuity Pct */
+            gratuity_pct: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Logo Url */
+            logo_url: string | null;
+            /** Name */
+            name: string;
+            /** Order Prefix */
+            order_prefix: string;
+            /** Phone */
+            phone: string | null;
+            /** Sales Tax Pct */
+            sales_tax_pct: string;
+            /** Slug */
+            slug: string;
+            /** State */
+            state: string | null;
+            /** Timezone */
+            timezone: string;
+            type: components["schemas"]["BusinessType"];
             /**
              * Updated At
              * Format: date-time
@@ -4008,6 +4088,10 @@ export interface components {
             updated_at: string;
             /** Warnings */
             warnings?: string[];
+            /** Website Url */
+            website_url: string | null;
+            /** Zip */
+            zip: string | null;
         };
         /**
          * CalendarEvent
@@ -4019,26 +4103,26 @@ export interface components {
              * Format: uuid
              */
             booking_id: string;
+            business_type: components["schemas"]["BusinessType"];
+            /** Driver Name */
+            driver_name: string | null;
+            /** End */
+            end: string | null;
             /** Order Number */
             order_number: string;
+            order_status: components["schemas"]["OrderStatus"];
+            /** Passenger */
+            passenger: string;
+            /** Run Notes */
+            run_notes: string | null;
             /**
              * Start
              * Format: date-time
              */
             start: string;
-            /** End */
-            end: string | null;
-            /** Passenger */
-            passenger: string;
-            /** Driver Name */
-            driver_name: string | null;
+            status: components["schemas"]["BookingStatus"];
             /** Vehicle Name */
             vehicle_name: string | null;
-            status: components["schemas"]["BookingStatus"];
-            business_type: components["schemas"]["BusinessType"];
-            order_status: components["schemas"]["OrderStatus"];
-            /** Run Notes */
-            run_notes: string | null;
         };
         /**
          * CalendarNoteCreate
@@ -4050,13 +4134,13 @@ export interface components {
              * Format: uuid
              */
             business_id: string;
+            /** Note */
+            note: string;
             /**
              * Note Date
              * Format: date
              */
             note_date: string;
-            /** Note */
-            note: string;
         };
         /**
          * CalendarNoteResult
@@ -4064,33 +4148,28 @@ export interface components {
          */
         CalendarNoteResult: {
             /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
             /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Note */
+            note: string;
+            /**
              * Note Date
              * Format: date
              */
             note_date: string;
-            /** Note */
-            note: string;
         };
         /**
          * CalendarNoteRow
          * @description A tenant calendar note inside the resolved range.
          */
         CalendarNoteRow: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
             /**
              * Business Id
              * Format: uuid
@@ -4099,12 +4178,17 @@ export interface components {
             /** Business Name */
             business_name: string;
             /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Note */
+            note: string;
+            /**
              * Note Date
              * Format: date
              */
             note_date: string;
-            /** Note */
-            note: string;
         };
         /**
          * CalendarNoteUpdate
@@ -4119,23 +4203,23 @@ export interface components {
          * @description Calendar events and notes for one fully resolved view window.
          */
         CalendarPayload: {
-            /**
-             * View
-             * @enum {string}
-             */
-            view: "month" | "week" | "day" | "list";
-            range: components["schemas"]["CalendarRange"];
+            /** Count */
+            count?: number | null;
             /** Events */
             events: components["schemas"]["CalendarEvent"][];
             /** Notes */
             notes: components["schemas"]["CalendarNoteRow"][];
+            range: components["schemas"]["CalendarRange"];
             /**
              * Truncated
              * @default false
              */
             truncated: boolean;
-            /** Count */
-            count?: number | null;
+            /**
+             * View
+             * @enum {string}
+             */
+            view: "month" | "week" | "day" | "list";
         };
         /**
          * CalendarPopover
@@ -4147,27 +4231,27 @@ export interface components {
              * Format: uuid
              */
             booking_id: string;
-            /** Order Number */
-            order_number: string;
             /** Client */
             client: string;
+            /** Driver Name */
+            driver_name: string | null;
+            /** Dropoff Address */
+            dropoff_address: string | null;
+            /** End */
+            end: string | null;
+            /** Order Number */
+            order_number: string;
+            order_status: components["schemas"]["OrderStatus"];
+            /** Pickup Address */
+            pickup_address: string | null;
             /**
              * Start
              * Format: date-time
              */
             start: string;
-            /** End */
-            end: string | null;
-            /** Pickup Address */
-            pickup_address: string | null;
-            /** Dropoff Address */
-            dropoff_address: string | null;
+            status: components["schemas"]["BookingStatus"];
             /** Vehicle Name */
             vehicle_name: string | null;
-            /** Driver Name */
-            driver_name: string | null;
-            status: components["schemas"]["BookingStatus"];
-            order_status: components["schemas"]["OrderStatus"];
         };
         /**
          * CalendarRange
@@ -4190,34 +4274,34 @@ export interface components {
          * @description The operational reason and optional customer notification.
          */
         CancellationRequest: {
-            /** Reason */
-            reason: string;
             /**
              * Notify Customer
              * @default false
              */
             notify_customer: boolean;
+            /** Reason */
+            reason: string;
         };
         /**
          * CancellationResponse
          * @description Cancellation result including the recorded refund obligation.
          */
         CancellationResponse: {
+            /** Already Cancelled */
+            already_cancelled: boolean;
+            /** Booking Ids */
+            booking_ids: string[];
+            /** Cancellation Fee */
+            cancellation_fee: string;
             /**
              * Order Id
              * Format: uuid
              */
             order_id: string;
-            /** Booking Ids */
-            booking_ids: string[];
-            /** Already Cancelled */
-            already_cancelled: boolean;
-            /** Seats Released */
-            seats_released: number;
-            /** Cancellation Fee */
-            cancellation_fee: string;
             /** Refund Outstanding */
             refund_outstanding: string;
+            /** Seats Released */
+            seats_released: number;
         };
         /**
          * CancellationSettingsUpdate
@@ -4247,6 +4331,11 @@ export interface components {
          * @description Create one group in the public From/To picker.
          */
         CategoryCreate: {
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean;
             /** Name */
             name: string;
             /**
@@ -4254,45 +4343,40 @@ export interface components {
              * @default 0
              */
             sort_order: number;
-            /**
-             * Is Active
-             * @default true
-             */
-            is_active: boolean;
         };
         /**
          * CategoryDeactivationResult
          * @description A deactivated category and the active locations it hides.
          */
         CategoryDeactivationResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
+            /** Affected Active Location Count */
+            affected_active_location_count: number;
             /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Name */
-            name: string;
-            /** Sort Order */
-            sort_order: number;
-            /** Is Active */
-            is_active: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
             /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Name */
+            name: string;
+            /** Sort Order */
+            sort_order: number;
+            /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
-            /** Affected Active Location Count */
-            affected_active_location_count: number;
         };
         /**
          * CategoryReorder
@@ -4308,26 +4392,26 @@ export interface components {
          */
         CategoryResult: {
             /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Name */
-            name: string;
-            /** Sort Order */
-            sort_order: number;
-            /** Is Active */
-            is_active: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Name */
+            name: string;
+            /** Sort Order */
+            sort_order: number;
             /**
              * Updated At
              * Format: date-time
@@ -4339,12 +4423,12 @@ export interface components {
          * @description Edit category presentation; DELETE owns warning-bearing deactivation.
          */
         CategoryUpdate: {
+            /** Is Active */
+            is_active?: boolean | null;
             /** Name */
             name?: string | null;
             /** Sort Order */
             sort_order?: number | null;
-            /** Is Active */
-            is_active?: boolean | null;
         };
         /**
          * ChargeAppliedBy
@@ -4370,12 +4454,15 @@ export interface components {
          *     booking-level unit-price override.
          */
         ChargeCreate: {
-            /** Name */
-            name: string;
             /** Amount */
             amount: string;
-            calc_type: components["schemas"]["ChargeCalcType"];
             applied_by: components["schemas"]["ChargeAppliedBy"];
+            calc_type: components["schemas"]["ChargeCalcType"];
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean;
             /**
              * Is Per Unit
              * @default false
@@ -4383,54 +4470,51 @@ export interface components {
             is_per_unit: boolean;
             /** Max Quantity */
             max_quantity?: number | null;
-            /**
-             * Is Active
-             * @default true
-             */
-            is_active: boolean;
+            /** Name */
+            name: string;
         };
         /**
          * ChargeDetail
          * @description Immutable order totals plus traceable lines.
          */
         ChargeDetail: {
-            /** Line Items */
-            line_items: components["schemas"]["ChargeLine"][];
-            /** Subtotal */
-            subtotal: string;
-            /** Discount Amount */
-            discount_amount: string;
-            /** Total */
-            total: string;
             /** Amount Paid */
             amount_paid: string;
             /** Currency */
             currency: string;
+            /** Discount Amount */
+            discount_amount: string;
+            /** Line Items */
+            line_items: components["schemas"]["ChargeLine"][];
             /** Price Overridden */
             price_overridden: boolean;
+            /** Subtotal */
+            subtotal: string;
+            /** Total */
+            total: string;
         };
         /**
          * ChargeLine
          * @description One persisted or synthetic presentation line.
          */
         ChargeLine: {
-            /** Label */
-            label: string;
             /** Amount */
             amount: string;
-            /** Kind */
-            kind: string;
-            /** Quantity */
-            quantity: number;
-            /** Unit Price */
-            unit_price: string | null;
-            /** Source Id */
-            source_id: string | null;
             /**
              * Booking Charge Id
              * @description Present only for a staff-added charge that the admin charge DELETE accepts.
              */
             booking_charge_id?: string | null;
+            /** Kind */
+            kind: string;
+            /** Label */
+            label: string;
+            /** Quantity */
+            quantity: number;
+            /** Source Id */
+            source_id: string | null;
+            /** Unit Price */
+            unit_price: string | null;
         };
         ChargeOption: {
             [key: string]: unknown;
@@ -4440,33 +4524,33 @@ export interface components {
          * @description One current fixed-amount pricing modifier.
          */
         ChargeResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
+            /** Amount */
+            amount: string;
+            applied_by: components["schemas"]["ChargeAppliedBy"];
             /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Name */
-            name: string;
-            /** Amount */
-            amount: string;
             calc_type: components["schemas"]["ChargeCalcType"];
-            applied_by: components["schemas"]["ChargeAppliedBy"];
-            /** Is Per Unit */
-            is_per_unit: boolean;
-            /** Max Quantity */
-            max_quantity: number | null;
-            /** Is Active */
-            is_active: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Is Per Unit */
+            is_per_unit: boolean;
+            /** Max Quantity */
+            max_quantity: number | null;
+            /** Name */
+            name: string;
             /**
              * Updated At
              * Format: date-time
@@ -4478,24 +4562,29 @@ export interface components {
          * @description Edit a charge; DELETE owns warning-free soft deactivation.
          */
         ChargeUpdate: {
-            /** Name */
-            name?: string | null;
             /** Amount */
             amount?: string | null;
-            calc_type?: components["schemas"]["ChargeCalcType"] | null;
             applied_by?: components["schemas"]["ChargeAppliedBy"] | null;
+            calc_type?: components["schemas"]["ChargeCalcType"] | null;
+            /** Is Active */
+            is_active?: boolean | null;
             /** Is Per Unit */
             is_per_unit?: boolean | null;
             /** Max Quantity */
             max_quantity?: number | null;
-            /** Is Active */
-            is_active?: boolean | null;
+            /** Name */
+            name?: string | null;
         };
         /**
          * CopyTripRequest
          * @description The new departure requested for an otherwise copied journey.
          */
         CopyTripRequest: {
+            /**
+             * Copy Charges
+             * @default true
+             */
+            copy_charges: boolean;
             /**
              * Pickup Date
              * Format: date
@@ -4509,11 +4598,6 @@ export interface components {
             /** Schedule Id */
             schedule_id?: string | null;
             /**
-             * Copy Charges
-             * @default true
-             */
-            copy_charges: boolean;
-            /**
              * Status
              * @default confirmed
              * @enum {string}
@@ -4525,6 +4609,10 @@ export interface components {
          * @description Identifiers and newly calculated money for the copied reservation.
          */
         CopyTripResult: {
+            /** Amount Paid */
+            amount_paid: string;
+            /** Booking Ids */
+            booking_ids: string[];
             /**
              * Order Id
              * Format: uuid
@@ -4532,35 +4620,33 @@ export interface components {
             order_id: string;
             /** Order Number */
             order_number: string;
-            /** Booking Ids */
-            booking_ids: string[];
             /** Status */
             status: string;
             /** Total */
             total: string;
-            /** Amount Paid */
-            amount_paid: string;
         };
         /**
          * CreatedBy
          * @description Whether checkout or a named staff member created the order.
          */
         CreatedBy: {
+            /** Admin Id */
+            admin_id: string | null;
+            /** Name */
+            name: string | null;
             /**
              * Type
              * @enum {string}
              */
             type: "customer" | "admin";
-            /** Admin Id */
-            admin_id: string | null;
-            /** Name */
-            name: string | null;
         };
         /**
          * CsvDocument
          * @description CSV bytes represented as UTF-8 text inside the standard resource envelope.
          */
         CsvDocument: {
+            /** Content */
+            content: string;
             /** Filename */
             filename: string;
             /**
@@ -4568,14 +4654,18 @@ export interface components {
              * @default text/csv; charset=utf-8
              */
             media_type: string;
-            /** Content */
-            content: string;
         };
         /**
          * CurrentUser
          * @description The authenticated staff member, as the dashboard needs them.
          */
         CurrentUser: {
+            /** Businesses */
+            businesses: components["schemas"]["BusinessSummary"][];
+            /** Client Phone Visible */
+            client_phone_visible: boolean;
+            /** Email */
+            email: string;
             /**
              * Id
              * Format: uuid
@@ -4583,15 +4673,9 @@ export interface components {
             id: string;
             /** Name */
             name: string;
-            /** Email */
-            email: string;
-            role: components["schemas"]["AdminRole"];
-            /** Client Phone Visible */
-            client_phone_visible: boolean;
             /** Permissions */
             permissions: components["schemas"]["Permission"][];
-            /** Businesses */
-            businesses: components["schemas"]["BusinessSummary"][];
+            role: components["schemas"]["AdminRole"];
         };
         /**
          * CustomerBooking
@@ -4599,139 +4683,139 @@ export interface components {
          */
         CustomerBooking: {
             /**
-             * Order Id
-             * Format: uuid
-             */
-            order_id: string;
-            /** Order Number */
-            order_number: string;
-            /**
-             * Date
-             * Format: date
-             */
-            date: string;
-            /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
             /** Business Name */
             business_name: string;
+            /** Currency */
+            currency: string;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /**
+             * Order Id
+             * Format: uuid
+             */
+            order_id: string;
+            /** Order Number */
+            order_number: string;
             /** Status */
             status: string;
             /** Total */
             total: string;
-            /** Currency */
-            currency: string;
         };
         /**
          * CustomerCreate
          * @description A complete profile acquired by the selected business.
          */
         CustomerCreate: {
-            /** @default individual */
-            type: components["schemas"]["CustomerType"];
-            /** Company Name */
-            company_name?: string | null;
-            /** First Name */
-            first_name: string;
-            /** Last Name */
-            last_name: string;
-            /** Email */
-            email?: string | null;
-            /** Phone Primary */
-            phone_primary?: string | null;
-            /** Phone Work */
-            phone_work?: string | null;
-            /** Phone Other */
-            phone_other?: string | null;
             /** Address */
             address?: string | null;
             /** City */
             city?: string | null;
-            /** State */
-            state?: string | null;
-            /** Zip */
-            zip?: string | null;
+            /** Company Name */
+            company_name?: string | null;
+            /** Email */
+            email?: string | null;
+            /** First Name */
+            first_name: string;
             /**
              * Is Vip
              * @default false
              */
             is_vip: boolean;
-            /** Notes */
-            notes?: string | null;
+            /** Last Name */
+            last_name: string;
             /** Lead Source Id */
             lead_source_id?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Phone Other */
+            phone_other?: string | null;
+            /** Phone Primary */
+            phone_primary?: string | null;
+            /** Phone Work */
+            phone_work?: string | null;
+            /** State */
+            state?: string | null;
+            /** @default individual */
+            type: components["schemas"]["CustomerType"];
+            /** Zip */
+            zip?: string | null;
         };
         /**
          * CustomerDetail
          * @description Customer profile plus only the caller's visible order history.
          */
         CustomerDetail: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            type: components["schemas"]["CustomerType"];
-            /** Company Name */
-            company_name: string | null;
-            /** First Name */
-            first_name: string;
-            /** Last Name */
-            last_name: string;
-            /** Email */
-            email: string | null;
-            /** Phone Primary */
-            phone_primary?: string | null;
-            /** Phone Work */
-            phone_work?: string | null;
-            /** Phone Other */
-            phone_other?: string | null;
             /** Address */
             address: string | null;
+            /** Bookings */
+            bookings: components["schemas"]["CustomerBooking"][];
             /** City */
             city: string | null;
-            /** State */
-            state: string | null;
-            /** Zip */
-            zip: string | null;
-            /** Is Vip */
-            is_vip: boolean;
-            /** Notes */
-            notes: string | null;
-            /** Lead Source Id */
-            lead_source_id: string | null;
-            /** Lead Source Name */
-            lead_source_name: string | null;
+            /** Company Name */
+            company_name: string | null;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /** Email */
+            email: string | null;
+            /** First Name */
+            first_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Vip */
+            is_vip: boolean;
+            /** Last Name */
+            last_name: string;
+            /** Lead Source Id */
+            lead_source_id: string | null;
+            /** Lead Source Name */
+            lead_source_name: string | null;
+            meta: components["schemas"]["Meta"];
+            /** Notes */
+            notes: string | null;
+            /** Phone Other */
+            phone_other?: string | null;
+            /** Phone Primary */
+            phone_primary?: string | null;
+            /** Phone Work */
+            phone_work?: string | null;
+            /** State */
+            state: string | null;
+            type: components["schemas"]["CustomerType"];
             /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
-            /** Bookings */
-            bookings: components["schemas"]["CustomerBooking"][];
-            meta: components["schemas"]["Meta"];
+            /** Zip */
+            zip: string | null;
         };
         /**
          * CustomerDetails
          * @description Who is travelling, as typed into the booking form.
          */
         CustomerDetails: {
-            /** First Name */
-            first_name: string;
-            /** Last Name */
-            last_name: string;
             /**
              * Email
              * Format: email
              */
             email: string;
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string;
             /** Phone */
             phone?: string | null;
         };
@@ -4740,52 +4824,52 @@ export interface components {
          * @description One customer profile with scoped acquisition-source context.
          */
         CustomerResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            type: components["schemas"]["CustomerType"];
-            /** Company Name */
-            company_name: string | null;
-            /** First Name */
-            first_name: string;
-            /** Last Name */
-            last_name: string;
-            /** Email */
-            email: string | null;
-            /** Phone Primary */
-            phone_primary?: string | null;
-            /** Phone Work */
-            phone_work?: string | null;
-            /** Phone Other */
-            phone_other?: string | null;
             /** Address */
             address: string | null;
             /** City */
             city: string | null;
-            /** State */
-            state: string | null;
-            /** Zip */
-            zip: string | null;
-            /** Is Vip */
-            is_vip: boolean;
-            /** Notes */
-            notes: string | null;
-            /** Lead Source Id */
-            lead_source_id: string | null;
-            /** Lead Source Name */
-            lead_source_name: string | null;
+            /** Company Name */
+            company_name: string | null;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /** Email */
+            email: string | null;
+            /** First Name */
+            first_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Vip */
+            is_vip: boolean;
+            /** Last Name */
+            last_name: string;
+            /** Lead Source Id */
+            lead_source_id: string | null;
+            /** Lead Source Name */
+            lead_source_name: string | null;
+            /** Notes */
+            notes: string | null;
+            /** Phone Other */
+            phone_other?: string | null;
+            /** Phone Primary */
+            phone_primary?: string | null;
+            /** Phone Work */
+            phone_work?: string | null;
+            /** State */
+            state: string | null;
+            type: components["schemas"]["CustomerType"];
             /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
+            /** Zip */
+            zip: string | null;
         };
         /**
          * CustomerType
@@ -4798,59 +4882,66 @@ export interface components {
          * @description Partial customer edits; the service validates the resulting full row.
          */
         CustomerUpdate: {
-            type?: components["schemas"]["CustomerType"] | null;
-            /** Company Name */
-            company_name?: string | null;
-            /** First Name */
-            first_name?: string | null;
-            /** Last Name */
-            last_name?: string | null;
-            /** Email */
-            email?: string | null;
-            /** Phone Primary */
-            phone_primary?: string | null;
-            /** Phone Work */
-            phone_work?: string | null;
-            /** Phone Other */
-            phone_other?: string | null;
             /** Address */
             address?: string | null;
             /** City */
             city?: string | null;
-            /** State */
-            state?: string | null;
-            /** Zip */
-            zip?: string | null;
+            /** Company Name */
+            company_name?: string | null;
+            /** Email */
+            email?: string | null;
+            /** First Name */
+            first_name?: string | null;
             /** Is Vip */
             is_vip?: boolean | null;
-            /** Notes */
-            notes?: string | null;
+            /** Last Name */
+            last_name?: string | null;
             /** Lead Source Id */
             lead_source_id?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Phone Other */
+            phone_other?: string | null;
+            /** Phone Primary */
+            phone_primary?: string | null;
+            /** Phone Work */
+            phone_work?: string | null;
+            /** State */
+            state?: string | null;
+            type?: components["schemas"]["CustomerType"] | null;
+            /** Zip */
+            zip?: string | null;
         };
         /**
          * DashboardPayload
          * @description All widgets rendered together by the operations dashboard.
          */
         DashboardPayload: {
-            /** Outlook */
-            outlook: components["schemas"]["OutlookDay"][];
-            /** Reservations */
-            reservations: components["schemas"]["DashboardReservation"][];
             billed: components["schemas"]["MoneyTotal"];
-            not_billed: components["schemas"]["MoneyTotal"];
             /** Driver Run Count */
             driver_run_count: components["schemas"]["LabelCount"][];
-            /** Vehicle Run Count */
-            vehicle_run_count: components["schemas"]["LabelCount"][];
+            not_billed: components["schemas"]["MoneyTotal"];
+            /** Outlook */
+            outlook: components["schemas"]["OutlookDay"][];
             /** Recent Emails */
             recent_emails: components["schemas"]["RecentEmail"][];
+            /** Reservations */
+            reservations: components["schemas"]["DashboardReservation"][];
+            /** Vehicle Run Count */
+            vehicle_run_count: components["schemas"]["LabelCount"][];
         };
         /**
          * DashboardReservation
          * @description A compact upcoming run shown on the dashboard.
          */
         DashboardReservation: {
+            /**
+             * Booking Id
+             * Format: uuid
+             */
+            booking_id: string;
+            /** Booking Number */
+            booking_number: string;
             /**
              * Business Id
              * Format: uuid
@@ -4860,65 +4951,58 @@ export interface components {
             business_name: string;
             business_type: components["schemas"]["BusinessType"];
             /**
-             * Booking Id
-             * Format: uuid
-             */
-            booking_id: string;
-            /** Booking Number */
-            booking_number: string;
-            /**
              * Date
              * Format: date
              */
             date: string;
-            /** Time */
-            time: string | null;
+            order_status: components["schemas"]["OrderStatus"];
             /** Passenger */
             passenger: string;
             status: components["schemas"]["BookingStatus"];
-            order_status: components["schemas"]["OrderStatus"];
+            /** Time */
+            time: string | null;
         };
         /**
          * DateStripEntry
          * @description One day in the seven-day strip above the results.
          */
         DateStripEntry: {
+            /** Available */
+            available: boolean;
             /** Date */
             date: string;
             /** From Price */
             from_price?: string | null;
-            /** Available */
-            available: boolean;
         };
         /**
          * Departure
          * @description A departure the customer may inspect, with return chronology made explicit.
          */
         Departure: {
+            /** Duration Minutes */
+            duration_minutes: number;
+            /** End Time */
+            end_time?: string | null;
+            /** From Price */
+            from_price: string;
+            /** Low Seat Warning */
+            low_seat_warning?: string | null;
+            prices: components["schemas"]["PassengerPrices"];
             /**
              * Schedule Id
              * Format: uuid
              */
             schedule_id: string;
-            /** Start Time */
-            start_time: string;
-            /** End Time */
-            end_time?: string | null;
-            /** Duration Minutes */
-            duration_minutes: number;
-            /** Service Label */
-            service_label: string;
-            /** From Price */
-            from_price: string;
-            prices: components["schemas"]["PassengerPrices"];
-            /** Total For Selection */
-            total_for_selection: string;
             /** Seats Remaining */
             seats_remaining: number;
-            /** Low Seat Warning */
-            low_seat_warning?: string | null;
             /** Selectable */
             selectable: boolean;
+            /** Service Label */
+            service_label: string;
+            /** Start Time */
+            start_time: string;
+            /** Total For Selection */
+            total_for_selection: string;
             /** Unselectable Reason */
             unselectable_reason: string | null;
         };
@@ -4947,45 +5031,45 @@ export interface components {
          * @description Customer data needed by dispatch and customer service.
          */
         DetailCustomer: {
+            /** Email */
+            email: string | null;
+            /** First Name */
+            first_name: string;
             /**
              * Id
              * Format: uuid
              */
             id: string;
-            /** First Name */
-            first_name: string;
-            /** Last Name */
-            last_name: string;
-            /** Email */
-            email: string | null;
-            /** Phone Primary */
-            phone_primary?: string | null;
             /** Is Vip */
             is_vip: boolean;
+            /** Last Name */
+            last_name: string;
             /** Lead Source */
             lead_source: string | null;
             /** Notes */
             notes: string | null;
+            /** Phone Primary */
+            phone_primary?: string | null;
         };
         /**
          * DetailDispatch
          * @description Vehicle and driver assignment.
          */
         DetailDispatch: {
-            vehicle: components["schemas"]["AssignmentSummary"];
             driver: components["schemas"]["AssignmentSummary"];
+            vehicle: components["schemas"]["AssignmentSummary"];
         };
         /**
          * DetailNotes
          * @description The three note audiences kept separate on a run.
          */
         DetailNotes: {
-            /** Run Notes */
-            run_notes: string | null;
-            /** Driver Notes */
-            driver_notes: string | null;
             /** Additional Notes */
             additional_notes: string | null;
+            /** Driver Notes */
+            driver_notes: string | null;
+            /** Run Notes */
+            run_notes: string | null;
         };
         /**
          * DiscountType
@@ -4999,6 +5083,12 @@ export interface components {
          */
         DriverRunRow: {
             /**
+             * Booking Id
+             * Format: uuid
+             */
+            booking_id: string;
+            booking_type: components["schemas"]["BookingType"];
+            /**
              * Business Id
              * Format: uuid
              */
@@ -5006,11 +5096,14 @@ export interface components {
             /** Business Name */
             business_name: string;
             business_type: components["schemas"]["BusinessType"];
-            /**
-             * Booking Id
-             * Format: uuid
-             */
-            booking_id: string;
+            /** Driver Notes */
+            driver_notes: string | null;
+            /** Dropoff Address */
+            dropoff_address: string | null;
+            /** Dropoff Time */
+            dropoff_time: string | null;
+            /** Leg */
+            leg: ("outbound" | "return") | null;
             /**
              * Order Id
              * Format: uuid
@@ -5018,9 +5111,9 @@ export interface components {
             order_id: string;
             /** Order Number */
             order_number: string;
-            booking_type: components["schemas"]["BookingType"];
-            /** Leg */
-            leg: ("outbound" | "return") | null;
+            passenger: components["schemas"]["RunPassenger"];
+            /** Pickup Address */
+            pickup_address: string | null;
             /**
              * Pickup Date
              * Format: date
@@ -5028,19 +5121,10 @@ export interface components {
             pickup_date: string;
             /** Pickup Time */
             pickup_time: string | null;
-            /** Dropoff Time */
-            dropoff_time: string | null;
-            passenger: components["schemas"]["RunPassenger"];
-            /** Pickup Address */
-            pickup_address: string | null;
-            /** Dropoff Address */
-            dropoff_address: string | null;
-            vehicle: components["schemas"]["AssignmentSummary"];
             /** Run Notes */
             run_notes: string | null;
-            /** Driver Notes */
-            driver_notes: string | null;
             status: components["schemas"]["BookingStatus"];
+            vehicle: components["schemas"]["AssignmentSummary"];
         };
         /**
          * DriverTripSheet
@@ -5052,20 +5136,20 @@ export interface components {
              * Format: uuid
              */
             booking_id: string;
-            /** Order Number */
-            order_number: string;
             business: components["schemas"]["TripSheetBusiness"];
-            pickup: components["schemas"]["TripSheetPickup"];
-            dropoff: components["schemas"]["TripSheetDropoff"];
-            passenger: components["schemas"]["TripSheetPassenger"];
-            vehicle: components["schemas"]["TripSheetVehicle"];
-            driver: components["schemas"]["TripSheetDriver"];
             charges_summary: components["schemas"]["TripSheetCharges"];
+            driver: components["schemas"]["TripSheetDriver"];
+            dropoff: components["schemas"]["TripSheetDropoff"];
             /**
              * Generated At
              * Format: date-time
              */
             generated_at: string;
+            /** Order Number */
+            order_number: string;
+            passenger: components["schemas"]["TripSheetPassenger"];
+            pickup: components["schemas"]["TripSheetPickup"];
+            vehicle: components["schemas"]["TripSheetVehicle"];
         };
         /**
          * EmailActionRequest
@@ -5083,150 +5167,176 @@ export interface components {
          * @description Whether one action has ever been sent.
          */
         EmailActionState: {
-            /** Sent */
-            sent: boolean;
             /** Last Sent At */
             last_sent_at: string | null;
+            /** Sent */
+            sent: boolean;
         };
         /**
          * EmailActions
          * @description The five buttons shown by the client detail screen.
          */
         EmailActions: {
-            quote: components["schemas"]["EmailActionState"];
             confirmation: components["schemas"]["EmailActionState"];
             deposit_receipt: components["schemas"]["EmailActionState"];
-            total_receipt: components["schemas"]["EmailActionState"];
             dispatch: components["schemas"]["EmailActionState"];
+            quote: components["schemas"]["EmailActionState"];
+            total_receipt: components["schemas"]["EmailActionState"];
         };
         /**
          * EmailHistory
          * @description One queued or delivered message.
          */
         EmailHistory: {
+            /** Email Type */
+            email_type: string;
             /**
              * Id
              * Format: uuid
              */
             id: string;
-            /** Email Type */
-            email_type: string;
-            /** Subject */
-            subject: string | null;
-            /** To Email */
-            to_email: string;
+            /** Sent At */
+            sent_at: string | null;
             /** Sent By */
             sent_by: string | null;
             /** Status */
             status: string;
-            /** Sent At */
-            sent_at: string | null;
+            /** Subject */
+            subject: string | null;
+            /** To Email */
+            to_email: string;
         };
         /**
          * EmailLogDetail
          * @description The history row plus the full payload queued for rendering.
          */
         EmailLogDetail: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
+            /** Booking Id */
+            booking_id: string | null;
             /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Order Id */
-            order_id: string | null;
-            /** Order Number */
-            order_number: string | null;
-            /** Customer Name */
-            customer_name: string | null;
-            /** Email Type */
-            email_type: string;
-            /** To Email */
-            to_email: string;
-            /** Subject */
-            subject: string | null;
-            /** Sent By */
-            sent_by: string | null;
-            /** Status */
-            status: string;
-            /** Sent At */
-            sent_at: string | null;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /** Customer Name */
+            customer_name: string | null;
+            /** Email Type */
+            email_type: string;
+            /** Error */
+            error: string | null;
+            /** Fallback Used */
+            fallback_used: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Order Id */
+            order_id: string | null;
+            /** Order Number */
+            order_number: string | null;
             /** Payload */
             payload: {
                 [key: string]: unknown;
             } | null;
+            /** Sent At */
+            sent_at: string | null;
+            /** Sent By */
+            sent_by: string | null;
+            /** Status */
+            status: string;
+            /** Subject */
+            subject: string | null;
+            /** To Email */
+            to_email: string;
         };
         /**
          * EmailLogItem
          * @description One filterable row in the admin email history.
          */
         EmailLogItem: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
+            /** Booking Id */
+            booking_id: string | null;
             /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Order Id */
-            order_id: string | null;
-            /** Order Number */
-            order_number: string | null;
-            /** Customer Name */
-            customer_name: string | null;
-            /** Email Type */
-            email_type: string;
-            /** To Email */
-            to_email: string;
-            /** Subject */
-            subject: string | null;
-            /** Sent By */
-            sent_by: string | null;
-            /** Status */
-            status: string;
-            /** Sent At */
-            sent_at: string | null;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /** Customer Name */
+            customer_name: string | null;
+            /** Email Type */
+            email_type: string;
+            /** Fallback Used */
+            fallback_used: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Order Id */
+            order_id: string | null;
+            /** Order Number */
+            order_number: string | null;
+            /** Sent At */
+            sent_at: string | null;
+            /** Sent By */
+            sent_by: string | null;
+            /** Status */
+            status: string;
+            /** Subject */
+            subject: string | null;
+            /** To Email */
+            to_email: string;
         };
         /**
          * EmailSettingsUpdate
-         * @description Null clears a field; SMTP plaintext storage awaits Phase 13 encryption at rest.
+         * @description Nullable text fields clear overrides; the SMTP password is always write-only.
          */
         EmailSettingsUpdate: {
-            /** Smtp Host */
-            smtp_host?: string | null;
-            /** Smtp Port */
-            smtp_port?: number | null;
-            /** Smtp User */
-            smtp_user?: string | null;
-            /** Smtp Password */
-            smtp_password?: string | null;
-            /** Bcc Email */
-            bcc_email?: string | null;
-            /** Footer Quote */
-            footer_quote?: string | null;
+            /** Alerts Email */
+            alerts_email?: string | null;
+            /** Auto Confirm Card Payments */
+            auto_confirm_card_payments?: boolean | null;
+            /** Customer Reminder Enabled */
+            customer_reminder_enabled?: boolean | null;
+            /** Customer Reminder Hours */
+            customer_reminder_hours?: number | null;
+            /** Driver Reminder Enabled */
+            driver_reminder_enabled?: boolean | null;
+            /** Driver Reminder Hours */
+            driver_reminder_hours?: number | null;
             /** Footer Confirmation */
             footer_confirmation?: string | null;
-            /** Footer Receipt */
-            footer_receipt?: string | null;
             /** Footer Invoice */
             footer_invoice?: string | null;
+            /** Footer Quote */
+            footer_quote?: string | null;
+            /** Footer Receipt */
+            footer_receipt?: string | null;
+            /** Smtp From Email */
+            smtp_from_email?: string | null;
+            /** Smtp From Name */
+            smtp_from_name?: string | null;
+            /** Smtp Host */
+            smtp_host?: string | null;
+            /** Smtp Password */
+            smtp_password?: string | null;
+            /** Smtp Port */
+            smtp_port?: number | null;
+            /** Smtp Use Ssl */
+            smtp_use_ssl?: boolean | null;
+            /** Smtp User */
+            smtp_user?: string | null;
         };
         /**
          * EmbedKeyRegeneratedResult
@@ -5640,10 +5750,10 @@ export interface components {
         ErrorDetail: {
             /** Code */
             code: string;
-            /** Message */
-            message: string;
             /** Field */
             field?: string | null;
+            /** Message */
+            message: string;
         };
         /**
          * ErrorEnvelope
@@ -5667,54 +5777,18 @@ export interface components {
          *     large for what is left.
          */
         FilteredSummary: {
-            /** Total Scheduled */
-            total_scheduled: number;
             /** Excluded Insufficient Seats */
             excluded_insufficient_seats: number;
             /** Max Seats Available */
             max_seats_available: number;
+            /** Total Scheduled */
+            total_scheduled: number;
         };
         /**
          * GlobalSettingsResult
          * @description Defaults for NEW business provisioning only; never retroactive inheritance.
          */
         GlobalSettingsResult: {
-            /**
-             * Default Timezone
-             * @default America/Chicago
-             */
-            default_timezone: string;
-            /**
-             * Default Currency
-             * @default USD
-             */
-            default_currency: string;
-            /**
-             * Default Distance Unit
-             * @default mi
-             * @enum {string}
-             */
-            default_distance_unit: "mi" | "km";
-            /**
-             * Default Date Format
-             * @default MM/DD/YYYY
-             */
-            default_date_format: string;
-            /**
-             * Default Gratuity Pct
-             * @default 0.00
-             */
-            default_gratuity_pct: string;
-            /**
-             * Default Fuel Surcharge Pct
-             * @default 0.00
-             */
-            default_fuel_surcharge_pct: string;
-            /**
-             * Default Sales Tax Pct
-             * @default 0.00
-             */
-            default_sales_tax_pct: string;
             /**
              * Default Advance Booking Hours
              * @default 0
@@ -5730,35 +5804,71 @@ export interface components {
              * @default 48
              */
             default_cancellation_notice_hours: number;
+            /**
+             * Default Currency
+             * @default USD
+             */
+            default_currency: string;
+            /**
+             * Default Date Format
+             * @default MM/DD/YYYY
+             */
+            default_date_format: string;
+            /**
+             * Default Distance Unit
+             * @default mi
+             * @enum {string}
+             */
+            default_distance_unit: "mi" | "km";
+            /**
+             * Default Fuel Surcharge Pct
+             * @default 0.00
+             */
+            default_fuel_surcharge_pct: string;
+            /**
+             * Default Gratuity Pct
+             * @default 0.00
+             */
+            default_gratuity_pct: string;
+            /**
+             * Default Sales Tax Pct
+             * @default 0.00
+             */
+            default_sales_tax_pct: string;
+            /**
+             * Default Timezone
+             * @default America/Chicago
+             */
+            default_timezone: string;
         };
         /**
          * GlobalSettingsUpdate
          * @description PATCH uses only explicitly supplied fields; unknown keys explain the fixed set.
          */
         GlobalSettingsUpdate: {
-            /** Default Timezone */
-            default_timezone?: string;
-            /** Default Currency */
-            default_currency?: string;
-            /**
-             * Default Distance Unit
-             * @enum {string}
-             */
-            default_distance_unit?: "mi" | "km";
-            /** Default Date Format */
-            default_date_format?: string;
-            /** Default Gratuity Pct */
-            default_gratuity_pct?: string;
-            /** Default Fuel Surcharge Pct */
-            default_fuel_surcharge_pct?: string;
-            /** Default Sales Tax Pct */
-            default_sales_tax_pct?: string;
             /** Default Advance Booking Hours */
             default_advance_booking_hours?: number;
             /** Default Cancellation Fee Pct */
             default_cancellation_fee_pct?: string;
             /** Default Cancellation Notice Hours */
             default_cancellation_notice_hours?: number;
+            /** Default Currency */
+            default_currency?: string;
+            /** Default Date Format */
+            default_date_format?: string;
+            /**
+             * Default Distance Unit
+             * @enum {string}
+             */
+            default_distance_unit?: "mi" | "km";
+            /** Default Fuel Surcharge Pct */
+            default_fuel_surcharge_pct?: string;
+            /** Default Gratuity Pct */
+            default_gratuity_pct?: string;
+            /** Default Sales Tax Pct */
+            default_sales_tax_pct?: string;
+            /** Default Timezone */
+            default_timezone?: string;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -5787,28 +5897,28 @@ export interface components {
          * @description No Square credentials, SMTP settings or inferred request-host deployment URLs.
          */
         IntegrationResult: {
-            /** Shortcode */
-            shortcode: string;
+            /** Active Key Count */
+            active_key_count: number;
             /** Api Base Url */
             api_base_url: string;
             business_type: components["schemas"]["BusinessType"];
-            /** Active Key Count */
-            active_key_count: number;
             /**
              * Cors Configured
              * @description Hostname match only; browser CORS also requires the correct scheme and port.
              */
             cors_configured: boolean;
+            /** Shortcode */
+            shortcode: string;
         };
         /**
          * LabelCount
          * @description A dashboard grouping label and number of runs.
          */
         LabelCount: {
-            /** Label */
-            label: string;
             /** Count */
             count: number;
+            /** Label */
+            label: string;
         };
         /**
          * LeadSourceCreate
@@ -5824,24 +5934,24 @@ export interface components {
          */
         LeadSourceResult: {
             /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Name */
-            name: string;
-            /** Is Active */
-            is_active: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Name */
+            name: string;
             /**
              * Updated At
              * Format: date-time
@@ -5853,10 +5963,10 @@ export interface components {
          * @description Editable lead-source presentation and availability.
          */
         LeadSourceUpdate: {
-            /** Name */
-            name?: string | null;
             /** Is Active */
             is_active?: boolean | null;
+            /** Name */
+            name?: string | null;
         };
         /** ListEnvelope[AirlineResult] */
         ListEnvelope_AirlineResult_: {
@@ -6036,34 +6146,33 @@ export interface components {
              * Format: uuid
              */
             category_id: string;
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean;
             /** Name */
             name: string;
-            /**
-             * Sort Order
-             * @default 0
-             */
-            sort_order: number;
             /**
              * Requires Address
              * @default false
              */
             requires_address: boolean;
             /**
-             * Is Active
-             * @default true
+             * Sort Order
+             * @default 0
              */
-            is_active: boolean;
+            sort_order: number;
         };
         /**
          * LocationDeactivationResult
          * @description A deactivated location plus routes that cease to be publicly reachable.
          */
         LocationDeactivationResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
+            /** Active Route Count */
+            active_route_count?: number | null;
+            /** Affected Routes */
+            affected_routes: components["schemas"]["AffectedRoute"][];
             /**
              * Business Id
              * Format: uuid
@@ -6076,41 +6185,42 @@ export interface components {
             category_id: string;
             /** Category Name */
             category_name: string;
-            /** Name */
-            name: string;
-            /** Sort Order */
-            sort_order: number;
-            /** Requires Address */
-            requires_address: boolean;
-            /** Is Active */
-            is_active: boolean;
-            /** Active Route Count */
-            active_route_count?: number | null;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
             /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Name */
+            name: string;
+            /** Requires Address */
+            requires_address: boolean;
+            /** Sort Order */
+            sort_order: number;
+            /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
-            /** Affected Routes */
-            affected_routes: components["schemas"]["AffectedRoute"][];
         };
         /**
          * LocationGroup
          * @description A category and the locations under it.
          */
         LocationGroup: {
+            /** Category */
+            category: string;
             /**
              * Category Id
              * Format: uuid
              */
             category_id: string;
-            /** Category */
-            category: string;
             /** Locations */
             locations: components["schemas"]["LocationOption"][];
         };
@@ -6145,11 +6255,8 @@ export interface components {
          * @description One location and optional active-route impact count.
          */
         LocationResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
+            /** Active Route Count */
+            active_route_count?: number | null;
             /**
              * Business Id
              * Format: uuid
@@ -6162,21 +6269,24 @@ export interface components {
             category_id: string;
             /** Category Name */
             category_name: string;
-            /** Name */
-            name: string;
-            /** Sort Order */
-            sort_order: number;
-            /** Requires Address */
-            requires_address: boolean;
-            /** Is Active */
-            is_active: boolean;
-            /** Active Route Count */
-            active_route_count?: number | null;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Name */
+            name: string;
+            /** Requires Address */
+            requires_address: boolean;
+            /** Sort Order */
+            sort_order: number;
             /**
              * Updated At
              * Format: date-time
@@ -6190,14 +6300,14 @@ export interface components {
         LocationUpdate: {
             /** Category Id */
             category_id?: string | null;
-            /** Name */
-            name?: string | null;
-            /** Sort Order */
-            sort_order?: number | null;
-            /** Requires Address */
-            requires_address?: boolean | null;
             /** Is Active */
             is_active?: boolean | null;
+            /** Name */
+            name?: string | null;
+            /** Requires Address */
+            requires_address?: boolean | null;
+            /** Sort Order */
+            sort_order?: number | null;
         };
         /**
          * LoginRequest
@@ -6217,12 +6327,12 @@ export interface components {
          * @description A successful login: tokens plus everything needed to render the shell.
          */
         LoginResponse: {
-            /** Token */
-            token: string;
-            /** Refresh Token */
-            refresh_token: string;
             /** Expires In */
             expires_in: number;
+            /** Refresh Token */
+            refresh_token: string;
+            /** Token */
+            token: string;
             user: components["schemas"]["CurrentUser"];
         };
         /**
@@ -6238,68 +6348,53 @@ export interface components {
          * @description One unpaid admin booking, with type-specific fields validated by the service.
          */
         ManualBookingCreate: {
-            /**
-             * Business Id
-             * Format: uuid
-             */
-            business_id: string;
+            /** Airline */
+            airline?: string | null;
             /**
              * Booking Type
              * @enum {string}
              */
             booking_type: "shuttle" | "taxi";
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            charges?: components["schemas"]["ManualCharges"];
             customer: components["schemas"]["ManualCustomer"];
-            /** Service Type Id */
-            service_type_id?: string | null;
-            /** Vehicle Type Id */
-            vehicle_type_id?: string | null;
-            /** Schedule Id */
-            schedule_id?: string | null;
-            /** Pickup Date */
-            pickup_date?: string | null;
-            /** Pickup Time */
-            pickup_time?: string | null;
-            /** Return Date */
-            return_date?: string | null;
-            /** Return Time */
-            return_time?: string | null;
-            /** Pickup Address */
-            pickup_address?: string | null;
-            /** Dropoff Address */
-            dropoff_address?: string | null;
-            /** Pickup Zipcode */
-            pickup_zipcode?: string | null;
-            /** Dropoff Zipcode */
-            dropoff_zipcode?: string | null;
+            dispatch?: components["schemas"]["ManualDispatch"];
             /** Distance Miles */
             distance_miles?: string | null;
+            /** Dropoff Address */
+            dropoff_address?: string | null;
+            /** Dropoff Zipcode */
+            dropoff_zipcode?: string | null;
             /** Duration Minutes */
             duration_minutes?: number | null;
-            /**
-             * Passengers
-             * @default 1
-             */
-            passengers: number;
+            /** Flight Number */
+            flight_number?: string | null;
+            /** Hours */
+            hours?: number | null;
+            /** Lead Source Id */
+            lead_source_id?: string | null;
             /**
              * Luggage
              * @default 0
              */
             luggage: number;
-            /** Hours */
-            hours?: number | null;
-            /** Stops */
-            stops?: {
-                [key: string]: unknown;
-            }[] | null;
-            /** Airline */
-            airline?: string | null;
-            /** Flight Number */
-            flight_number?: string | null;
             /**
-             * Pax Senior
-             * @default 0
+             * Meet And Greet
+             * @default false
              */
-            pax_senior: number;
+            meet_and_greet: boolean;
+            /** Meet And Greet Amount */
+            meet_and_greet_amount?: string | null;
+            notes?: components["schemas"]["ManualBookingNotes"];
+            /**
+             * Passengers
+             * @default 1
+             */
+            passengers: number;
             /**
              * Pax Adult
              * @default 0
@@ -6310,35 +6405,61 @@ export interface components {
              * @default 0
              */
             pax_child: number;
-            notes?: components["schemas"]["ManualBookingNotes"];
-            dispatch?: components["schemas"]["ManualDispatch"];
-            charges?: components["schemas"]["ManualCharges"];
-            /** Lead Source Id */
-            lead_source_id?: string | null;
+            /**
+             * Pax Senior
+             * @default 0
+             */
+            pax_senior: number;
+            /** Pickup Address */
+            pickup_address?: string | null;
+            /** Pickup Date */
+            pickup_date?: string | null;
+            /** Pickup Time */
+            pickup_time?: string | null;
+            /** Pickup Zipcode */
+            pickup_zipcode?: string | null;
+            /** Return Date */
+            return_date?: string | null;
+            /** Return Time */
+            return_time?: string | null;
+            /** Schedule Id */
+            schedule_id?: string | null;
+            /** Service Type Id */
+            service_type_id?: string | null;
             /**
              * Status
              * @default confirmed
              * @enum {string}
              */
             status: "requested" | "quoted" | "confirmed";
+            /** Stops */
+            stops?: {
+                [key: string]: unknown;
+            }[] | null;
+            /** Vehicle Type Id */
+            vehicle_type_id?: string | null;
         };
         /**
          * ManualBookingNotes
          * @description The three deliberately separate operational note audiences.
          */
         ManualBookingNotes: {
-            /** Run Notes */
-            run_notes?: string | null;
-            /** Driver Notes */
-            driver_notes?: string | null;
             /** Additional Notes */
             additional_notes?: string | null;
+            /** Driver Notes */
+            driver_notes?: string | null;
+            /** Run Notes */
+            run_notes?: string | null;
         };
         /**
          * ManualBookingResult
          * @description Identifiers and immutable money snapshot returned after creation.
          */
         ManualBookingResult: {
+            /** Amount Paid */
+            amount_paid: string;
+            /** Booking Ids */
+            booking_ids: string[];
             /**
              * Order Id
              * Format: uuid
@@ -6346,28 +6467,24 @@ export interface components {
             order_id: string;
             /** Order Number */
             order_number: string;
-            /** Booking Ids */
-            booking_ids: string[];
             /** Status */
             status: string;
             /** Total */
             total: string;
-            /** Amount Paid */
-            amount_paid: string;
         };
         /**
          * ManualCharges
          * @description Choose configured calculation or an explicit staff-entered snapshot.
          */
         ManualCharges: {
+            /** Line Items */
+            line_items?: components["schemas"]["ManualLineItem"][];
             /**
              * Mode
              * @default calculated
              * @enum {string}
              */
             mode: "calculated" | "manual";
-            /** Line Items */
-            line_items?: components["schemas"]["ManualLineItem"][];
             /** Total */
             total?: string | null;
         };
@@ -6376,14 +6493,14 @@ export interface components {
          * @description Either an existing customer id or the details needed to create one.
          */
         ManualCustomer: {
-            /** Id */
-            id?: string | null;
-            /** First Name */
-            first_name?: string | null;
-            /** Last Name */
-            last_name?: string | null;
             /** Email */
             email?: string | null;
+            /** First Name */
+            first_name?: string | null;
+            /** Id */
+            id?: string | null;
+            /** Last Name */
+            last_name?: string | null;
             /** Phone */
             phone?: string | null;
         };
@@ -6392,32 +6509,32 @@ export interface components {
          * @description Optional per-run resources selected on the creation form.
          */
         ManualDispatch: {
-            /** Vehicle Id */
-            vehicle_id?: string | null;
             /** Driver Id */
             driver_id?: string | null;
+            /** Vehicle Id */
+            vehicle_id?: string | null;
         };
         /**
          * ManualLineItem
          * @description One human-entered price explanation stored with the order.
          */
         ManualLineItem: {
-            /** Label */
-            label: string;
             /** Amount */
             amount: string;
+            /** Label */
+            label: string;
         };
         /**
          * ManualPaymentChange
          * @description Record or reverse a staff-observed cash-like collection.
          */
         ManualPaymentChange: {
+            /** Amount */
+            amount: string;
             /** Marked Paid */
             marked_paid: boolean;
             /** Method */
             method?: ("cash" | "cheque" | "bank_transfer") | null;
-            /** Amount */
-            amount: string;
             /** Note */
             note: string;
         };
@@ -6426,6 +6543,14 @@ export interface components {
          * @description The ledger row and resulting order-level amount paid.
          */
         ManualPaymentResult: {
+            /** Amount */
+            amount: string;
+            /** Amount Paid */
+            amount_paid: string;
+            /** Marked Paid */
+            marked_paid: boolean;
+            /** Method */
+            method: string | null;
             /**
              * Order Id
              * Format: uuid
@@ -6436,14 +6561,6 @@ export interface components {
              * Format: uuid
              */
             payment_id: string;
-            /** Marked Paid */
-            marked_paid: boolean;
-            /** Method */
-            method: string | null;
-            /** Amount */
-            amount: string;
-            /** Amount Paid */
-            amount_paid: string;
         };
         /**
          * Meta
@@ -6471,10 +6588,10 @@ export interface components {
          * @description A run count and its exact attributed order value.
          */
         MoneyTotal: {
-            /** Runs */
-            runs: number;
             /** Amount */
             amount: string;
+            /** Runs */
+            runs: number;
         };
         /**
          * OrderStatus
@@ -6487,37 +6604,37 @@ export interface components {
          * @description One business-local day in the seven-day outlook.
          */
         OutlookDay: {
+            /** Count */
+            count: number;
             /**
              * Date
              * Format: date
              */
             date: string;
-            /** Count */
-            count: number;
         };
         /**
          * PassengerContact
          * @description Customer identity shown on compact operational rows.
          */
         PassengerContact: {
+            /** Email */
+            email: string | null;
             /** Name */
             name: string;
             /** Phone */
             phone?: string | null;
-            /** Email */
-            email: string | null;
         };
         /**
          * PassengerPrices
          * @description Per-passenger-type prices on one departure.
          */
         PassengerPrices: {
-            /** Senior */
-            senior?: string | null;
             /** Adult */
             adult?: string | null;
             /** Child */
             child?: string | null;
+            /** Senior */
+            senior?: string | null;
         };
         /**
          * PassengerType
@@ -6554,26 +6671,26 @@ export interface components {
          * @description Latest collection state and reconciliation flags.
          */
         PaymentDetail: {
-            /** Method */
-            method: string | null;
-            /** Status */
-            status: string | null;
             /** Error Code */
             error_code: string | null;
             /** Error Message */
             error_message: string | null;
-            /** Provider Payment Id */
-            provider_payment_id: string | null;
+            /** Method */
+            method: string | null;
             /** Paid At */
             paid_at: string | null;
-            /** Refunded Amount */
-            refunded_amount: string;
+            /** Provider Payment Id */
+            provider_payment_id: string | null;
             /** Refund Outstanding */
             refund_outstanding: string;
-            /** Review Required */
-            review_required: boolean;
+            /** Refunded Amount */
+            refunded_amount: string;
             /** Review Reason */
             review_reason: string | null;
+            /** Review Required */
+            review_required: boolean;
+            /** Status */
+            status: string | null;
         };
         /**
          * PaymentDetails
@@ -6602,89 +6719,89 @@ export interface components {
          * @description A non-blocking notice that highest-only pricing applies.
          */
         PeakOverlapWarning: {
-            /** Overlapping Rule Ids */
-            overlapping_rule_ids: string[];
             /** Message */
             message: string;
+            /** Overlapping Rule Ids */
+            overlapping_rule_ids: string[];
         };
         /**
          * PeakRuleCreate
          * @description Create a local date/time pricing or availability rule.
          */
         PeakRuleCreate: {
-            rule_type: components["schemas"]["PeakRuleType"];
+            /**
+             * Applies To All Vehicles
+             * @default true
+             */
+            applies_to_all_vehicles: boolean;
+            /** Date End */
+            date_end?: string | null;
+            /** Date Start */
+            date_start?: string | null;
             /**
              * Increase Pct
              * @default 0
              */
             increase_pct: string;
             /**
-             * Applies To All Vehicles
-             * @default true
-             */
-            applies_to_all_vehicles: boolean;
-            /** Vehicle Type Ids */
-            vehicle_type_ids?: string[];
-            /** Recurrence */
-            recurrence?: string | null;
-            /** Date Start */
-            date_start?: string | null;
-            /** Date End */
-            date_end?: string | null;
-            /** Time Start */
-            time_start?: string | null;
-            /** Time End */
-            time_end?: string | null;
-            /**
              * Is Active
              * @default true
              */
             is_active: boolean;
+            /** Recurrence */
+            recurrence?: string | null;
+            rule_type: components["schemas"]["PeakRuleType"];
+            /** Time End */
+            time_end?: string | null;
+            /** Time Start */
+            time_start?: string | null;
+            /** Vehicle Type Ids */
+            vehicle_type_ids?: string[];
         };
         /**
          * PeakRuleMutationResult
          * @description A changed rule plus any active peak overlaps.
          */
         PeakRuleMutationResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
+            /** Applies To All Vehicles */
+            applies_to_all_vehicles: boolean;
             /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            rule_type: components["schemas"]["PeakRuleType"];
-            /** Increase Pct */
-            increase_pct: string;
-            /** Applies To All Vehicles */
-            applies_to_all_vehicles: boolean;
-            /** Vehicle Type Ids */
-            vehicle_type_ids: string[];
-            /** Recurrence */
-            recurrence: string | null;
-            /** Date Start */
-            date_start: string | null;
-            /** Date End */
-            date_end: string | null;
-            /** Time Start */
-            time_start: string | null;
-            /** Time End */
-            time_end: string | null;
-            /** Is Active */
-            is_active: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /** Date End */
+            date_end: string | null;
+            /** Date Start */
+            date_start: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Increase Pct */
+            increase_pct: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Recurrence */
+            recurrence: string | null;
+            rule_type: components["schemas"]["PeakRuleType"];
+            /** Time End */
+            time_end: string | null;
+            /** Time Start */
+            time_start: string | null;
             /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
+            /** Vehicle Type Ids */
+            vehicle_type_ids: string[];
             /** Warnings */
             warnings: components["schemas"]["PeakOverlapWarning"][];
         };
@@ -6709,59 +6826,59 @@ export interface components {
          * @description Every matching rule and the resulting highest peak or blackout.
          */
         PeakRulePreviewResult: {
-            /** Matching Rules */
-            matching_rules: components["schemas"]["PeakRuleResult"][];
             /** Increase Pct */
             increase_pct: string;
-            /** Winning Rule Id */
-            winning_rule_id: string | null;
             /** Is Blackout */
             is_blackout: boolean;
+            /** Matching Rules */
+            matching_rules: components["schemas"]["PeakRuleResult"][];
+            /** Winning Rule Id */
+            winning_rule_id: string | null;
         };
         /**
          * PeakRuleResult
          * @description One stored business-local rule and its vehicle restrictions.
          */
         PeakRuleResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
+            /** Applies To All Vehicles */
+            applies_to_all_vehicles: boolean;
             /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            rule_type: components["schemas"]["PeakRuleType"];
-            /** Increase Pct */
-            increase_pct: string;
-            /** Applies To All Vehicles */
-            applies_to_all_vehicles: boolean;
-            /** Vehicle Type Ids */
-            vehicle_type_ids: string[];
-            /** Recurrence */
-            recurrence: string | null;
-            /** Date Start */
-            date_start: string | null;
-            /** Date End */
-            date_end: string | null;
-            /** Time Start */
-            time_start: string | null;
-            /** Time End */
-            time_end: string | null;
-            /** Is Active */
-            is_active: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /** Date End */
+            date_end: string | null;
+            /** Date Start */
+            date_start: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Increase Pct */
+            increase_pct: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Recurrence */
+            recurrence: string | null;
+            rule_type: components["schemas"]["PeakRuleType"];
+            /** Time End */
+            time_end: string | null;
+            /** Time Start */
+            time_start: string | null;
             /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
+            /** Vehicle Type Ids */
+            vehicle_type_ids: string[];
         };
         /**
          * PeakRuleType
@@ -6774,31 +6891,36 @@ export interface components {
          * @description Partially edit a rule; the service validates the merged configuration.
          */
         PeakRuleUpdate: {
-            rule_type?: components["schemas"]["PeakRuleType"] | null;
-            /** Increase Pct */
-            increase_pct?: string | null;
             /** Applies To All Vehicles */
             applies_to_all_vehicles?: boolean | null;
-            /** Vehicle Type Ids */
-            vehicle_type_ids?: string[] | null;
-            /** Recurrence */
-            recurrence?: string | null;
-            /** Date Start */
-            date_start?: string | null;
             /** Date End */
             date_end?: string | null;
-            /** Time Start */
-            time_start?: string | null;
-            /** Time End */
-            time_end?: string | null;
+            /** Date Start */
+            date_start?: string | null;
+            /** Increase Pct */
+            increase_pct?: string | null;
             /** Is Active */
             is_active?: boolean | null;
+            /** Recurrence */
+            recurrence?: string | null;
+            rule_type?: components["schemas"]["PeakRuleType"] | null;
+            /** Time End */
+            time_end?: string | null;
+            /** Time Start */
+            time_start?: string | null;
+            /** Vehicle Type Ids */
+            vehicle_type_ids?: string[] | null;
         };
         /**
          * PendingReservationRow
          * @description One requested order awaiting a manual quote or review.
          */
         PendingReservationRow: {
+            /**
+             * Booking Id
+             * Format: uuid
+             */
+            booking_id: string;
             /**
              * Business Id
              * Format: uuid
@@ -6807,51 +6929,46 @@ export interface components {
             /** Business Name */
             business_name: string;
             business_type: components["schemas"]["BusinessType"];
+            driver: components["schemas"]["AssignmentSummary"];
+            /** Dropoff Address */
+            dropoff_address: string | null;
+            /**
+             * Due Bucket
+             * @enum {string}
+             */
+            due_bucket: "past_due" | "due_3_days" | "later";
+            /** Duration Minutes */
+            duration_minutes: number | null;
             /**
              * Order Id
              * Format: uuid
              */
             order_id: string;
-            /**
-             * Booking Id
-             * Format: uuid
-             */
-            booking_id: string;
             /** Order Number */
             order_number: string;
+            /** Out Of Service Area */
+            out_of_service_area: boolean;
+            passenger: components["schemas"]["PassengerContact"];
+            /** Pickup Address */
+            pickup_address: string | null;
+            /**
+             * Pickup Date
+             * Format: date
+             */
+            pickup_date: string;
             /**
              * Requested At
              * Format: date-time
              */
             requested_at: string;
             /**
-             * Due Bucket
-             * @enum {string}
-             */
-            due_bucket: "past_due" | "due_3_days" | "later";
-            /**
-             * Pickup Date
-             * Format: date
-             */
-            pickup_date: string;
-            passenger: components["schemas"]["PassengerContact"];
-            /** Pickup Address */
-            pickup_address: string | null;
-            /** Dropoff Address */
-            dropoff_address: string | null;
-            vehicle: components["schemas"]["AssignmentSummary"];
-            driver: components["schemas"]["AssignmentSummary"];
-            /** Total */
-            total: string;
-            /** Duration Minutes */
-            duration_minutes: number | null;
-            /** Out Of Service Area */
-            out_of_service_area: boolean;
-            /**
              * Status
              * @constant
              */
             status: "requested";
+            /** Total */
+            total: string;
+            vehicle: components["schemas"]["AssignmentSummary"];
         };
         /**
          * Permission
@@ -6860,31 +6977,47 @@ export interface components {
          */
         Permission: "booking:read" | "booking:write" | "booking:assign" | "booking:status" | "communication:send" | "customer:read" | "customer:write" | "customer:manage" | "pricing:read" | "pricing:write" | "vehicle_rate:write" | "vehicle_type_catalog:write" | "service_type_assignment:write" | "service_type_catalog:write" | "taxi_catalog:manage" | "payment:read" | "payment:write" | "email:read" | "audit:read" | "config:read" | "config:write" | "zone_price:import" | "company:read" | "company:write" | "company_identity:write" | "business_settings:read" | "business_settings:write" | "team:read" | "team:write" | "settings:read" | "settings:write" | "integration:read" | "api_keys:read" | "api_keys:write" | "report:read" | "own_runs:read";
         /**
+         * PreferencesSettingsUpdate
+         * @description Taxi booking choices controlled by the selected business.
+         */
+        PreferencesSettingsUpdate: {
+            /** Car Seat Price */
+            car_seat_price?: string | null;
+            /** Max Car Seats */
+            max_car_seats?: number | null;
+            /** Meet Greet Enabled */
+            meet_greet_enabled?: boolean | null;
+            /** Meet Greet Price */
+            meet_greet_price?: string | null;
+            /** Offer Car Seats */
+            offer_car_seats?: boolean | null;
+        };
+        /**
          * PriceOverride
          * @description A staff-entered total requiring a human explanation.
          */
         PriceOverride: {
-            /** Total */
-            total: string;
             /** Reason */
             reason: string;
+            /** Total */
+            total: string;
         };
         /**
          * PriceOverrideResult
          * @description The stored total after an explicit override.
          */
         PriceOverrideResult: {
+            /** Amount Paid */
+            amount_paid: string;
             /**
              * Order Id
              * Format: uuid
              */
             order_id: string;
-            /** Total */
-            total: string;
-            /** Amount Paid */
-            amount_paid: string;
             /** Price Overridden */
             price_overridden: boolean;
+            /** Total */
+            total: string;
         };
         /**
          * PriceTotals
@@ -6903,8 +7036,8 @@ export interface components {
          * @description A read-only comparison with an explicit unavailable outcome.
          */
         PricingCheck: {
-            current: components["schemas"]["PriceTotals"];
             calculated: components["schemas"]["PriceTotals"] | null;
+            current: components["schemas"]["PriceTotals"];
             /** Differs */
             differs: boolean;
             /** Unavailable Reason */
@@ -6915,18 +7048,18 @@ export interface components {
          * @description Store payment configuration without implying deposits are collected today.
          */
         PricingSettingsUpdate: {
+            deposit_type?: components["schemas"]["DepositType"] | null;
+            /** Deposit Value */
+            deposit_value?: string | null;
             /** Insurance Enabled */
             insurance_enabled?: boolean | null;
             /** Insurance Pct */
             insurance_pct?: string | null;
-            /** Round Trip Discount Pct */
-            round_trip_discount_pct?: string | null;
+            payment_capture_type?: components["schemas"]["PaymentCaptureType"] | null;
             /** Require Payment */
             require_payment?: boolean | null;
-            payment_capture_type?: components["schemas"]["PaymentCaptureType"] | null;
-            deposit_type?: components["schemas"]["DepositType"] | null;
-            /** Deposit Value */
-            deposit_value?: string | null;
+            /** Round Trip Discount Pct */
+            round_trip_discount_pct?: string | null;
         };
         /**
          * PricingType
@@ -6939,24 +7072,24 @@ export interface components {
          * @description Create a promo; redemption count is deliberately not client-editable.
          */
         PromoCreate: {
-            /** Name */
-            name: string;
             /** Code */
             code: string;
             discount_type: components["schemas"]["DiscountType"];
             /** Discount Value */
             discount_value: string;
-            /** Valid From */
-            valid_from?: string | null;
-            /** Valid Until */
-            valid_until?: string | null;
-            /** Max Uses */
-            max_uses?: number | null;
             /**
              * Is Active
              * @default true
              */
             is_active: boolean;
+            /** Max Uses */
+            max_uses?: number | null;
+            /** Name */
+            name: string;
+            /** Valid From */
+            valid_from?: string | null;
+            /** Valid Until */
+            valid_until?: string | null;
         };
         /**
          * PromoMutationResult
@@ -6964,42 +7097,42 @@ export interface components {
          */
         PromoMutationResult: {
             /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Name */
-            name: string;
             /** Code */
             code: string;
-            discount_type: components["schemas"]["DiscountType"];
-            /** Discount Value */
-            discount_value: string;
-            /** Valid From */
-            valid_from: string | null;
-            /** Valid Until */
-            valid_until: string | null;
-            /** Max Uses */
-            max_uses: number | null;
-            /** Used Count */
-            used_count: number;
-            /** Is Active */
-            is_active: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            discount_type: components["schemas"]["DiscountType"];
+            /** Discount Value */
+            discount_value: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Max Uses */
+            max_uses: number | null;
+            /** Name */
+            name: string;
             /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
+            /** Used Count */
+            used_count: number;
+            /** Valid From */
+            valid_from: string | null;
+            /** Valid Until */
+            valid_until: string | null;
             /** Warnings */
             warnings: components["schemas"]["PromoWarning"][];
         };
@@ -7009,80 +7142,80 @@ export interface components {
          */
         PromoResult: {
             /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Name */
-            name: string;
             /** Code */
             code: string;
-            discount_type: components["schemas"]["DiscountType"];
-            /** Discount Value */
-            discount_value: string;
-            /** Valid From */
-            valid_from: string | null;
-            /** Valid Until */
-            valid_until: string | null;
-            /** Max Uses */
-            max_uses: number | null;
-            /** Used Count */
-            used_count: number;
-            /** Is Active */
-            is_active: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            discount_type: components["schemas"]["DiscountType"];
+            /** Discount Value */
+            discount_value: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Max Uses */
+            max_uses: number | null;
+            /** Name */
+            name: string;
             /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
+            /** Used Count */
+            used_count: number;
+            /** Valid From */
+            valid_from: string | null;
+            /** Valid Until */
+            valid_until: string | null;
         };
         /**
          * PromoUpdate
          * @description Edit current terms; used_count is forbidden and remains checkout-owned.
          */
         PromoUpdate: {
-            /** Name */
-            name?: string | null;
             /** Code */
             code?: string | null;
             discount_type?: components["schemas"]["DiscountType"] | null;
             /** Discount Value */
             discount_value?: string | null;
+            /** Is Active */
+            is_active?: boolean | null;
+            /** Max Uses */
+            max_uses?: number | null;
+            /** Name */
+            name?: string | null;
             /** Valid From */
             valid_from?: string | null;
             /** Valid Until */
             valid_until?: string | null;
-            /** Max Uses */
-            max_uses?: number | null;
-            /** Is Active */
-            is_active?: boolean | null;
         };
         /**
          * PromoUsageResult
          * @description One immutable order snapshot that redeemed a promo.
          */
         PromoUsageResult: {
-            /** Order Number */
-            order_number: string;
+            /** Customer */
+            customer: string;
             /**
              * Date
              * Format: date-time
              */
             date: string;
-            /** Customer */
-            customer: string;
             /** Discount Amount */
             discount_amount: string;
+            /** Order Number */
+            order_number: string;
         };
         /**
          * PromoValidateRequest
@@ -7111,16 +7244,16 @@ export interface components {
          *     request as a failure.
          */
         PromoValidateResponse: {
-            /** Valid */
-            valid: boolean;
+            /** Discount Amount */
+            discount_amount?: string | null;
             /** Discount Type */
             discount_type?: string | null;
             /** Discount Value */
             discount_value?: string | null;
-            /** Discount Amount */
-            discount_amount?: string | null;
             /** Reason */
             reason?: string | null;
+            /** Valid */
+            valid: boolean;
         };
         /**
          * PromoWarning
@@ -7135,21 +7268,21 @@ export interface components {
          * @description The persisted queue row returned before Phase 11 delivery.
          */
         QueuedEmailResult: {
+            /** Email Type */
+            email_type: string;
             /**
              * Id
              * Format: uuid
              */
             id: string;
-            /** Email Type */
-            email_type: string;
-            /** To Email */
-            to_email: string;
-            /** Subject */
-            subject: string | null;
             /** Sent By */
             sent_by: string | null;
             /** Status */
             status: string;
+            /** Subject */
+            subject: string | null;
+            /** To Email */
+            to_email: string;
         };
         /**
          * QueuedSmsResult
@@ -7161,51 +7294,41 @@ export interface components {
              * Format: uuid
              */
             id: string;
-            /** To Phone */
-            to_phone: string;
             /** Status */
             status: string;
+            /** To Phone */
+            to_phone: string;
         };
         /**
          * QuoteLeg
          * @description One priced leg in the quote response.
          */
         QuoteLeg: {
+            /** Date */
+            date: string;
+            /** Duration Minutes */
+            duration_minutes: number;
+            /** From */
+            from: string;
+            /** Leg Price */
+            leg_price: string;
+            /** Pax Summary */
+            pax_summary: string;
             /**
              * Schedule Id
              * Format: uuid
              */
             schedule_id: string;
-            /** From */
-            from: string;
-            /** To */
-            to: string;
-            /** Date */
-            date: string;
             /** Time */
             time: string;
-            /** Duration Minutes */
-            duration_minutes: number;
-            /** Pax Summary */
-            pax_summary: string;
-            /** Leg Price */
-            leg_price: string;
+            /** To */
+            to: string;
         };
         /**
          * QuoteLegRequest
          * @description One leg of a cart being priced.
          */
         QuoteLegRequest: {
-            /**
-             * Schedule Id
-             * Format: uuid
-             */
-            schedule_id: string;
-            /**
-             * Pax Senior
-             * @default 0
-             */
-            pax_senior: number;
             /**
              * Pax Adult
              * @default 0
@@ -7216,6 +7339,16 @@ export interface components {
              * @default 0
              */
             pax_child: number;
+            /**
+             * Pax Senior
+             * @default 0
+             */
+            pax_senior: number;
+            /**
+             * Schedule Id
+             * Format: uuid
+             */
+            schedule_id: string;
         };
         /**
          * QuoteRequest
@@ -7225,13 +7358,13 @@ export interface components {
          *     clear rejection rather than the quiet impression that the server used it.
          */
         QuoteRequest: {
-            /** Legs */
-            legs: components["schemas"]["QuoteLegRequest"][];
             /**
              * Insurance Selected
              * @default false
              */
             insurance_selected: boolean;
+            /** Legs */
+            legs: components["schemas"]["QuoteLegRequest"][];
             /** Promo Code */
             promo_code?: string | null;
         };
@@ -7240,18 +7373,18 @@ export interface components {
          * @description The priced cart. Nothing was held and nothing was written.
          */
         QuoteResponse: {
-            /** Legs */
-            legs: components["schemas"]["QuoteLeg"][];
-            /** Subtotal */
-            subtotal: string;
+            /** Currency */
+            currency: string;
             /** Discount Amount */
             discount_amount: string;
             /** Insurance Amount */
             insurance_amount: string;
+            /** Legs */
+            legs: components["schemas"]["QuoteLeg"][];
+            /** Subtotal */
+            subtotal: string;
             /** Total */
             total: string;
-            /** Currency */
-            currency: string;
         };
         /**
          * QuoteStatus
@@ -7268,43 +7401,43 @@ export interface components {
          *     tells the customer more than a shorter list they cannot account for.
          */
         QuotedVehicle: {
+            /** Available */
+            available: boolean;
+            /** Base Price */
+            base_price?: string | null;
+            /** Luggage Capacity */
+            luggage_capacity: number;
+            /** Name */
+            name: string;
+            /** Passenger Capacity */
+            passenger_capacity: number;
+            /** Photo Url */
+            photo_url?: string | null;
+            /** Pricing Basis */
+            pricing_basis?: string | null;
+            quote_status: components["schemas"]["QuoteStatus"];
+            /** Unavailable Reason */
+            unavailable_reason?: string | null;
             /**
              * Vehicle Type Id
              * Format: uuid
              */
             vehicle_type_id: string;
-            /** Name */
-            name: string;
-            /** Passenger Capacity */
-            passenger_capacity: number;
-            /** Luggage Capacity */
-            luggage_capacity: number;
-            /** Photo Url */
-            photo_url?: string | null;
-            /** Base Price */
-            base_price?: string | null;
-            /** Pricing Basis */
-            pricing_basis?: string | null;
-            /** Available */
-            available: boolean;
-            quote_status: components["schemas"]["QuoteStatus"];
-            /** Unavailable Reason */
-            unavailable_reason?: string | null;
         };
         /**
          * ReadinessResponse
          * @description Readiness body, including a per-dependency breakdown.
          */
         ReadinessResponse: {
+            /** Checks */
+            checks: {
+                [key: string]: string;
+            };
             /**
              * Status
              * @enum {string}
              */
             status: "ok" | "degraded";
-            /** Checks */
-            checks: {
-                [key: string]: string;
-            };
         };
         /**
          * RecentEmail
@@ -7313,10 +7446,10 @@ export interface components {
         RecentEmail: {
             /** Client */
             client: string;
-            /** Subject */
-            subject: string | null;
             /** Sent At */
             sent_at: string | null;
+            /** Subject */
+            subject: string | null;
         };
         /**
          * RefreshRequest
@@ -7331,15 +7464,15 @@ export interface components {
          * @description Tab badge counts under the same scope and filters as the lists.
          */
         ReservationCounts: {
-            /** Runs */
-            runs: number;
-            /** Pending */
-            pending: number;
             /**
              * Last Changed At
              * @description Newest booking/order change across the resolved scope, ignoring list filters.
              */
             last_changed_at: string | null;
+            /** Pending */
+            pending: number;
+            /** Runs */
+            runs: number;
         };
         /**
          * ReservationDetail
@@ -7351,6 +7484,26 @@ export interface components {
              * Format: uuid
              */
             booking_id: string;
+            booking_type: components["schemas"]["BookingType"];
+            business: components["schemas"]["DetailBusiness"];
+            charges: components["schemas"]["ChargeDetail"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            created_by: components["schemas"]["CreatedBy"];
+            customer: components["schemas"]["DetailCustomer"];
+            dispatch: components["schemas"]["DetailDispatch"];
+            email_actions: components["schemas"]["EmailActions"];
+            /** Emails */
+            emails: components["schemas"]["EmailHistory"][];
+            /** External Reference */
+            external_reference: string | null;
+            /** Journey */
+            journey: components["schemas"]["TaxiJourneyDetail"] | components["schemas"]["ShuttleJourneyDetail"];
+            leg: components["schemas"]["BookingLeg"] | null;
+            notes: components["schemas"]["DetailNotes"];
             /**
              * Order Id
              * Format: uuid
@@ -7358,80 +7511,74 @@ export interface components {
             order_id: string;
             /** Order Number */
             order_number: string;
-            /** External Reference */
-            external_reference: string | null;
-            booking_type: components["schemas"]["BookingType"];
-            leg: components["schemas"]["BookingLeg"] | null;
+            order_status: components["schemas"]["OrderStatus"];
+            payment: components["schemas"]["PaymentDetail"];
+            route: components["schemas"]["RouteDetail"] | null;
             /** Sibling Booking Id */
             sibling_booking_id: string | null;
-            business: components["schemas"]["DetailBusiness"];
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            created_by: components["schemas"]["CreatedBy"];
             status: components["schemas"]["BookingStatus"];
-            order_status: components["schemas"]["OrderStatus"];
-            customer: components["schemas"]["DetailCustomer"];
-            /** Journey */
-            journey: components["schemas"]["TaxiJourneyDetail"] | components["schemas"]["ShuttleJourneyDetail"];
-            route: components["schemas"]["RouteDetail"] | null;
-            notes: components["schemas"]["DetailNotes"];
-            dispatch: components["schemas"]["DetailDispatch"];
-            charges: components["schemas"]["ChargeDetail"];
-            payment: components["schemas"]["PaymentDetail"];
-            /** Emails */
-            emails: components["schemas"]["EmailHistory"][];
-            email_actions: components["schemas"]["EmailActions"];
         };
         /**
          * ReservationEdit
          * @description Fields staff may correct without changing the historical price.
          */
         ReservationEdit: {
-            /** Pickup Date */
-            pickup_date?: string | null;
-            /** Pickup Time */
-            pickup_time?: string | null;
-            /** Pickup Address */
-            pickup_address?: string | null;
-            /** Dropoff Address */
-            dropoff_address?: string | null;
-            /** Airline */
-            airline?: string | null;
-            /** Flight Number */
-            flight_number?: string | null;
-            /** Passengers */
-            passengers?: number | null;
-            /** Luggage */
-            luggage?: number | null;
-            /** Stops */
-            stops?: {
-                [key: string]: unknown;
-            }[] | null;
-            /** Hours */
-            hours?: number | null;
-            /** Run Notes */
-            run_notes?: string | null;
-            /** Driver Notes */
-            driver_notes?: string | null;
             /** Additional Notes */
             additional_notes?: string | null;
+            /** Airline */
+            airline?: string | null;
+            /** Driver Notes */
+            driver_notes?: string | null;
+            /** Dropoff Address */
+            dropoff_address?: string | null;
             /** External Reference */
             external_reference?: string | null;
-            /** Pax Senior */
-            pax_senior?: number | null;
+            /** Flight Number */
+            flight_number?: string | null;
+            /** Hours */
+            hours?: number | null;
+            /** Lead Source Id */
+            lead_source_id?: string | null;
+            /** Luggage */
+            luggage?: number | null;
+            /** Meet And Greet */
+            meet_and_greet?: boolean | null;
+            /** Meet And Greet Amount */
+            meet_and_greet_amount?: string | null;
+            /** Passengers */
+            passengers?: number | null;
             /** Pax Adult */
             pax_adult?: number | null;
             /** Pax Child */
             pax_child?: number | null;
+            /** Pax Senior */
+            pax_senior?: number | null;
+            /** Pickup Address */
+            pickup_address?: string | null;
+            /** Pickup Date */
+            pickup_date?: string | null;
+            /** Pickup Time */
+            pickup_time?: string | null;
+            /** Run Notes */
+            run_notes?: string | null;
+            /** Stops */
+            stops?: {
+                [key: string]: unknown;
+            }[] | null;
         };
         /**
          * ReservationRow
          * @description One persisted booking row in the operational Runs list.
          */
         ReservationRow: {
+            /** Airline */
+            airline: string | null;
+            /**
+             * Booking Id
+             * Format: uuid
+             */
+            booking_id: string;
+            booking_type: components["schemas"]["BookingType"];
             /**
              * Business Id
              * Format: uuid
@@ -7440,11 +7587,17 @@ export interface components {
             /** Business Name */
             business_name: string;
             business_type: components["schemas"]["BusinessType"];
-            /**
-             * Booking Id
-             * Format: uuid
-             */
-            booking_id: string;
+            driver: components["schemas"]["AssignmentSummary"];
+            /** Dropoff Address */
+            dropoff_address: string | null;
+            /** Dropoff Time */
+            dropoff_time: string | null;
+            /** Duration Minutes */
+            duration_minutes: number | null;
+            /** Flight Number */
+            flight_number: string | null;
+            /** Leg */
+            leg: ("outbound" | "return") | null;
             /**
              * Order Id
              * Format: uuid
@@ -7452,9 +7605,10 @@ export interface components {
             order_id: string;
             /** Order Number */
             order_number: string;
-            booking_type: components["schemas"]["BookingType"];
-            /** Leg */
-            leg: ("outbound" | "return") | null;
+            order_status: components["schemas"]["OrderStatus"];
+            passenger: components["schemas"]["RunPassenger"];
+            /** Pickup Address */
+            pickup_address: string | null;
             /**
              * Pickup Date
              * Format: date
@@ -7462,71 +7616,62 @@ export interface components {
             pickup_date: string;
             /** Pickup Time */
             pickup_time: string | null;
-            /** Dropoff Time */
-            dropoff_time: string | null;
-            /** Duration Minutes */
-            duration_minutes: number | null;
-            passenger: components["schemas"]["RunPassenger"];
-            /** Pickup Address */
-            pickup_address: string | null;
-            /** Dropoff Address */
-            dropoff_address: string | null;
-            /** Airline */
-            airline: string | null;
-            /** Flight Number */
-            flight_number: string | null;
-            vehicle: components["schemas"]["AssignmentSummary"];
-            driver: components["schemas"]["AssignmentSummary"];
-            /** Total */
-            total: string;
-            status: components["schemas"]["BookingStatus"];
-            order_status: components["schemas"]["OrderStatus"];
             /** Run Notes */
             run_notes: string | null;
+            status: components["schemas"]["BookingStatus"];
+            /** Total */
+            total: string;
+            vehicle: components["schemas"]["AssignmentSummary"];
         };
         /**
          * RouteCreate
          * @description Create one directed shuttle service between scoped locations.
          */
         RouteCreate: {
+            /** Duration Minutes */
+            duration_minutes: number;
             /**
              * From Location Id
              * Format: uuid
              */
             from_location_id: string;
             /**
-             * To Location Id
-             * Format: uuid
+             * Is Active
+             * @default true
              */
-            to_location_id: string;
-            /** Duration Minutes */
-            duration_minutes: number;
+            is_active: boolean;
             /**
              * Service Label
              * @default Direct Service
              */
             service_label: string;
             /**
-             * Is Active
-             * @default true
+             * To Location Id
+             * Format: uuid
              */
-            is_active: boolean;
+            to_location_id: string;
         };
         /**
          * RouteDeactivationResult
          * @description A retired route plus its future schedule and booked-schedule impact.
          */
         RouteDeactivationResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
+            /** Affected Booked Schedule Count */
+            affected_booked_schedule_count: number;
+            /** Affected Future Schedule Count */
+            affected_future_schedule_count: number;
             /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Duration Minutes */
+            duration_minutes: number;
             /**
              * From Location Id
              * Format: uuid
@@ -7535,53 +7680,47 @@ export interface components {
             /** From Location Name */
             from_location_name: string;
             /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Prices */
+            prices: components["schemas"]["RoutePriceResult"][];
+            /** Service Label */
+            service_label: string;
+            /**
              * To Location Id
              * Format: uuid
              */
             to_location_id: string;
             /** To Location Name */
             to_location_name: string;
-            /** Duration Minutes */
-            duration_minutes: number;
-            /** Service Label */
-            service_label: string;
-            /** Is Active */
-            is_active: boolean;
-            /** Prices */
-            prices: components["schemas"]["RoutePriceResult"][];
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
             /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
-            /** Affected Future Schedule Count */
-            affected_future_schedule_count: number;
-            /** Affected Booked Schedule Count */
-            affected_booked_schedule_count: number;
         };
         /**
          * RouteDetail
          * @description Snapshot-compatible shuttle route presentation.
          */
         RouteDetail: {
+            /** Duration Minutes */
+            duration_minutes: number;
+            /** From */
+            from: string;
             /**
              * Id
              * Format: uuid
              */
             id: string;
-            /** From */
-            from: string;
-            /** To */
-            to: string;
             /** Service Label */
             service_label: string;
-            /** Duration Minutes */
-            duration_minutes: number;
+            /** To */
+            to: string;
         };
         /**
          * RoutePriceResult
@@ -7620,15 +7759,17 @@ export interface components {
          */
         RouteResult: {
             /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Duration Minutes */
+            duration_minutes: number;
             /**
              * From Location Id
              * Format: uuid
@@ -7637,25 +7778,23 @@ export interface components {
             /** From Location Name */
             from_location_name: string;
             /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Prices */
+            prices: components["schemas"]["RoutePriceResult"][];
+            /** Service Label */
+            service_label: string;
+            /**
              * To Location Id
              * Format: uuid
              */
             to_location_id: string;
             /** To Location Name */
             to_location_name: string;
-            /** Duration Minutes */
-            duration_minutes: number;
-            /** Service Label */
-            service_label: string;
-            /** Is Active */
-            is_active: boolean;
-            /** Prices */
-            prices: components["schemas"]["RoutePriceResult"][];
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
             /**
              * Updated At
              * Format: date-time
@@ -7678,62 +7817,57 @@ export interface components {
          * @description The route a search resolved to.
          */
         RouteSummary: {
+            /** Duration Minutes */
+            duration_minutes: number;
+            /** From */
+            from: string;
             /**
              * Id
              * Format: uuid
              */
             id: string;
-            /** From */
-            from: string;
-            /** To */
-            to: string;
-            /** Duration Minutes */
-            duration_minutes: number;
             /** Service Label */
             service_label: string;
+            /** To */
+            to: string;
         };
         /**
          * RouteUpdate
          * @description Edit a route; DELETE owns warning-bearing deactivation.
          */
         RouteUpdate: {
-            /** From Location Id */
-            from_location_id?: string | null;
-            /** To Location Id */
-            to_location_id?: string | null;
             /** Duration Minutes */
             duration_minutes?: number | null;
-            /** Service Label */
-            service_label?: string | null;
+            /** From Location Id */
+            from_location_id?: string | null;
             /** Is Active */
             is_active?: boolean | null;
+            /** Service Label */
+            service_label?: string | null;
+            /** To Location Id */
+            to_location_id?: string | null;
         };
         /**
          * RunPassenger
          * @description Customer identity plus the booked passenger and luggage counts.
          */
         RunPassenger: {
-            /** Name */
-            name: string;
-            /** Phone */
-            phone?: string | null;
             /** Email */
             email: string | null;
-            /** Passengers */
-            passengers: number;
             /** Luggage */
             luggage: number;
+            /** Name */
+            name: string;
+            /** Passengers */
+            passengers: number;
+            /** Phone */
+            phone?: string | null;
         };
         /**
          * ScheduleBulkCapacityRequest
          * @description Set capacity across one route and local-date range.
          */
         ScheduleBulkCapacityRequest: {
-            /**
-             * Route Id
-             * Format: uuid
-             */
-            route_id: string;
             /**
              * Date From
              * Format: date
@@ -7744,6 +7878,11 @@ export interface components {
              * Format: date
              */
             date_to: string;
+            /**
+             * Route Id
+             * Format: uuid
+             */
+            route_id: string;
             /** Seat Capacity */
             seat_capacity: number;
         };
@@ -7752,12 +7891,12 @@ export interface components {
          * @description Applied and skipped counts for a locked bulk capacity update.
          */
         ScheduleBulkCapacityResult: {
-            /** Updated Count */
-            updated_count: number;
-            /** Skipped Count */
-            skipped_count: number;
             /** Skipped */
             skipped: components["schemas"]["ScheduleCapacitySkip"][];
+            /** Skipped Count */
+            skipped_count: number;
+            /** Updated Count */
+            updated_count: number;
         };
         /**
          * ScheduleBulkPreviewResult
@@ -7766,10 +7905,8 @@ export interface components {
         ScheduleBulkPreviewResult: {
             /** Candidate Count */
             candidate_count: number;
-            /** Would Create Count */
-            would_create_count: number;
-            /** Skipped Count */
-            skipped_count: number;
+            /** Conflicts */
+            conflicts: components["schemas"]["ScheduleConflict"][];
             /**
              * Date From
              * Format: date
@@ -7784,19 +7921,16 @@ export interface components {
             first_entries: components["schemas"]["SchedulePreviewEntry"][];
             /** Last Entries */
             last_entries: components["schemas"]["SchedulePreviewEntry"][];
-            /** Conflicts */
-            conflicts: components["schemas"]["ScheduleConflict"][];
+            /** Skipped Count */
+            skipped_count: number;
+            /** Would Create Count */
+            would_create_count: number;
         };
         /**
          * ScheduleBulkRequest
          * @description Generate the cross product of matching local dates and time slots.
          */
         ScheduleBulkRequest: {
-            /**
-             * Route Id
-             * Format: uuid
-             */
-            route_id: string;
             /**
              * Date From
              * Format: date
@@ -7809,27 +7943,32 @@ export interface components {
             date_to: string;
             /** Days Of Week */
             days_of_week: components["schemas"]["Weekday"][];
-            /** Slots */
-            slots: components["schemas"]["ScheduleSlot"][];
+            /**
+             * Route Id
+             * Format: uuid
+             */
+            route_id: string;
             /**
              * Skip Existing
              * @default true
              */
             skip_existing: boolean;
+            /** Slots */
+            slots: components["schemas"]["ScheduleSlot"][];
         };
         /**
          * ScheduleBulkResult
          * @description Committed bulk-generation counts and created departures.
          */
         ScheduleBulkResult: {
+            /** Conflicts */
+            conflicts: components["schemas"]["ScheduleConflict"][];
+            /** Created */
+            created: components["schemas"]["ScheduleResult"][];
             /** Created Count */
             created_count: number;
             /** Skipped Count */
             skipped_count: number;
-            /** Created */
-            created: components["schemas"]["ScheduleResult"][];
-            /** Conflicts */
-            conflicts: components["schemas"]["ScheduleConflict"][];
         };
         /**
          * ScheduleCapacitySkip
@@ -7841,6 +7980,8 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /** Seats Booked */
+            seats_booked: number;
             /**
              * Service Date
              * Format: date
@@ -7851,8 +7992,6 @@ export interface components {
              * Format: time
              */
             start_time: string;
-            /** Seats Booked */
-            seats_booked: number;
         };
         /**
          * ScheduleConflict
@@ -7880,11 +8019,20 @@ export interface components {
          * @description Create one dated departure for a tenant-owned route.
          */
         ScheduleCreate: {
+            /** End Time */
+            end_time?: string | null;
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean;
             /**
              * Route Id
              * Format: uuid
              */
             route_id: string;
+            /** Seat Capacity */
+            seat_capacity: number;
             /**
              * Service Date
              * Format: date
@@ -7895,15 +8043,6 @@ export interface components {
              * Format: time
              */
             start_time: string;
-            /** End Time */
-            end_time?: string | null;
-            /** Seat Capacity */
-            seat_capacity: number;
-            /**
-             * Is Active
-             * @default true
-             */
-            is_active: boolean;
         };
         /**
          * ScheduleDeactivateRequest
@@ -7921,59 +8060,38 @@ export interface components {
          * @description A retired departure plus the non-cancelled bookings it affects.
          */
         ScheduleDeactivationResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
+            /** Affected Booking Count */
+            affected_booking_count: number;
             /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
             /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** End Time */
+            end_time: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /**
              * Route Id
              * Format: uuid
              */
             route_id: string;
-            /**
-             * Service Date
-             * Format: date
-             */
-            service_date: string;
-            /**
-             * Start Time
-             * Format: time
-             */
-            start_time: string;
-            /** End Time */
-            end_time: string | null;
             /** Seat Capacity */
             seat_capacity: number;
             /** Seats Booked */
             seats_booked: number;
             /** Seats Remaining */
             seats_remaining: number;
-            /** Is Active */
-            is_active: boolean;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /**
-             * Updated At
-             * Format: date-time
-             */
-            updated_at: string;
-            /** Affected Booking Count */
-            affected_booking_count: number;
-        };
-        /**
-         * SchedulePreviewEntry
-         * @description One compact generated departure shown before bulk creation.
-         */
-        SchedulePreviewEntry: {
             /**
              * Service Date
              * Format: date
@@ -7984,10 +8102,31 @@ export interface components {
              * Format: time
              */
             start_time: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /**
+         * SchedulePreviewEntry
+         * @description One compact generated departure shown before bulk creation.
+         */
+        SchedulePreviewEntry: {
             /** End Time */
             end_time: string | null;
             /** Seat Capacity */
             seat_capacity: number;
+            /**
+             * Service Date
+             * Format: date
+             */
+            service_date: string;
+            /**
+             * Start Time
+             * Format: time
+             */
+            start_time: string;
         };
         /**
          * ScheduleResult
@@ -7995,20 +8134,35 @@ export interface components {
          */
         ScheduleResult: {
             /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
             /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** End Time */
+            end_time: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /**
              * Route Id
              * Format: uuid
              */
             route_id: string;
+            /** Seat Capacity */
+            seat_capacity: number;
+            /** Seats Booked */
+            seats_booked: number;
+            /** Seats Remaining */
+            seats_remaining: number;
             /**
              * Service Date
              * Format: date
@@ -8019,21 +8173,6 @@ export interface components {
              * Format: time
              */
             start_time: string;
-            /** End Time */
-            end_time: string | null;
-            /** Seat Capacity */
-            seat_capacity: number;
-            /** Seats Booked */
-            seats_booked: number;
-            /** Seats Remaining */
-            seats_remaining: number;
-            /** Is Active */
-            is_active: boolean;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
             /**
              * Updated At
              * Format: date-time
@@ -8045,43 +8184,43 @@ export interface components {
          * @description One recurring local-time slot in a bulk schedule request.
          */
         ScheduleSlot: {
+            /** End Time */
+            end_time?: string | null;
+            /** Seat Capacity */
+            seat_capacity: number;
             /**
              * Start Time
              * Format: time
              */
             start_time: string;
-            /** End Time */
-            end_time?: string | null;
-            /** Seat Capacity */
-            seat_capacity: number;
         };
         /**
          * ScheduleUpdate
          * @description Edit live inventory; confirmation is required for booked disruptions.
          */
         ScheduleUpdate: {
-            /** Start Time */
-            start_time?: string | null;
-            /** End Time */
-            end_time?: string | null;
-            /** Seat Capacity */
-            seat_capacity?: number | null;
-            /** Is Active */
-            is_active?: boolean | null;
             /** Confirm Time Change */
             confirm_time_change?: boolean;
+            /** End Time */
+            end_time?: string | null;
+            /** Is Active */
+            is_active?: boolean | null;
+            /** Seat Capacity */
+            seat_capacity?: number | null;
+            /** Start Time */
+            start_time?: string | null;
         };
         /**
          * SearchResult
          * @description The whole search response: the route, the strip, and the departures.
          */
         SearchResult: {
-            route: components["schemas"]["RouteSummary"];
             /** Date Strip */
             date_strip: components["schemas"]["DateStripEntry"][];
             /** Departures */
             departures: components["schemas"]["Departure"][];
             filtered_summary?: components["schemas"]["FilteredSummary"] | null;
+            route: components["schemas"]["RouteSummary"];
         };
         /**
          * SelectedCharge
@@ -8112,26 +8251,26 @@ export interface components {
          * @description Created rows and duplicate count from one atomic bulk request.
          */
         ServiceAreaBulkResult: {
+            /** Created */
+            created: components["schemas"]["ServiceAreaResult"][];
             /** Created Count */
             created_count: number;
             /** Skipped Duplicate Count */
             skipped_duplicate_count: number;
-            /** Created */
-            created: components["schemas"]["ServiceAreaResult"][];
         };
         /**
          * ServiceAreaCreate
          * @description Create one city, ZIP, or state coverage rule.
          */
         ServiceAreaCreate: {
-            type: components["schemas"]["ServiceAreaType"];
-            /** Value */
-            value: string;
             /**
              * Is Active
              * @default true
              */
             is_active: boolean;
+            type: components["schemas"]["ServiceAreaType"];
+            /** Value */
+            value: string;
         };
         /**
          * ServiceAreaListEnvelope
@@ -8147,6 +8286,10 @@ export interface components {
          * @description Pagination plus the deliberate empty-boundary behavior.
          */
         ServiceAreaListMeta: {
+            /** Everything Is In Area */
+            everything_is_in_area: boolean;
+            /** Message */
+            message?: string | null;
             /**
              * Page
              * @description 1-based page number.
@@ -8162,10 +8305,6 @@ export interface components {
              * @description Total items matching the query, ignoring pagination.
              */
             total: number;
-            /** Everything Is In Area */
-            everything_is_in_area: boolean;
-            /** Message */
-            message?: string | null;
         };
         /**
          * ServiceAreaResult
@@ -8173,30 +8312,30 @@ export interface components {
          */
         ServiceAreaResult: {
             /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            type: components["schemas"]["ServiceAreaType"];
-            /** Value */
-            value: string;
-            /** Is Active */
-            is_active: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
             /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            type: components["schemas"]["ServiceAreaType"];
+            /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
+            /** Value */
+            value: string;
         };
         /**
          * ServiceAreaTestRequest
@@ -8213,11 +8352,11 @@ export interface components {
          * @description Coverage decision and the concrete rule that explained it.
          */
         ServiceAreaTestResult: {
+            /** Everything Is In Area */
+            everything_is_in_area: boolean;
             /** In Service Area */
             in_service_area: boolean;
             matched_rule: components["schemas"]["ServiceAreaResult"] | null;
-            /** Everything Is In Area */
-            everything_is_in_area: boolean;
             /** Message */
             message?: string | null;
         };
@@ -8232,17 +8371,19 @@ export interface components {
          * @description Edit one rule; DELETE owns soft deactivation.
          */
         ServiceAreaUpdate: {
+            /** Is Active */
+            is_active?: boolean | null;
             type?: components["schemas"]["ServiceAreaType"] | null;
             /** Value */
             value?: string | null;
-            /** Is Active */
-            is_active?: boolean | null;
         };
         /**
          * ServiceCatalogItem
          * @description Taxi service type with its stable code.
          */
         ServiceCatalogItem: {
+            /** Code */
+            code: string;
             /**
              * Id
              * Format: uuid
@@ -8250,8 +8391,6 @@ export interface components {
             id: string;
             /** Name */
             name: string;
-            /** Code */
-            code: string;
         };
         /**
          * ServiceTypeAssignment
@@ -8263,11 +8402,11 @@ export interface components {
              * Format: uuid
              */
             business_id: string;
-            /** Vehicle Type Id */
-            vehicle_type_id?: string | null;
             /** Is Enabled */
             is_enabled: boolean;
             pricing_type: components["schemas"]["PricingType"];
+            /** Vehicle Type Id */
+            vehicle_type_id?: string | null;
         };
         /**
          * ServiceTypeAssignmentResult
@@ -8275,40 +8414,40 @@ export interface components {
          */
         ServiceTypeAssignmentResult: {
             /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Vehicle Type Id */
-            vehicle_type_id: string | null;
-            /** Is Enabled */
-            is_enabled: boolean;
-            pricing_type: components["schemas"]["PricingType"];
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
             /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Enabled */
+            is_enabled: boolean;
+            pricing_type: components["schemas"]["PricingType"];
+            /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
+            /** Vehicle Type Id */
+            vehicle_type_id: string | null;
         };
         /**
          * ServiceTypeAssignmentsUpdate
          * @description Complete scoped configuration plus an optional owner-only global rename.
          */
         ServiceTypeAssignmentsUpdate: {
-            /** Display Name */
-            display_name?: string | null;
             /** Assignments */
             assignments: components["schemas"]["ServiceTypeAssignment"][];
+            /** Display Name */
+            display_name?: string | null;
         };
         /**
          * ServiceTypeCode
@@ -8321,16 +8460,16 @@ export interface components {
          * @description One service the business offers, for the step-one picker.
          */
         ServiceTypeOption: {
+            code: components["schemas"]["ServiceTypeCode"];
             /**
              * Id
              * Format: uuid
              */
             id: string;
-            code: components["schemas"]["ServiceTypeCode"];
-            /** Name */
-            name: string;
             /** Minimum Hours */
             minimum_hours?: number;
+            /** Name */
+            name: string;
         };
         /**
          * ServiceTypeReorder
@@ -8345,25 +8484,25 @@ export interface components {
          * @description One immutable engine code with editable presentation and assignments.
          */
         ServiceTypeResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Name */
-            name: string;
-            code: components["schemas"]["ServiceTypeCode"];
-            /** Sort Order */
-            sort_order: number;
-            /** Is Active */
-            is_active: boolean;
             /** Assignments */
             assignments: components["schemas"]["ServiceTypeAssignmentResult"][];
+            code: components["schemas"]["ServiceTypeCode"];
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Name */
+            name: string;
+            /** Sort Order */
+            sort_order: number;
             /**
              * Updated At
              * Format: date-time
@@ -8375,11 +8514,18 @@ export interface components {
          * @description Shuttle-only journey and seat fields.
          */
         ShuttleJourneyDetail: {
-            /**
-             * Schedule Id
-             * Format: uuid
-             */
-            schedule_id: string;
+            /** Address */
+            address: string | null;
+            /** Dropoff Time */
+            dropoff_time: string | null;
+            /** Insurance Selected */
+            insurance_selected: boolean;
+            /** Pax Adult */
+            pax_adult: number;
+            /** Pax Child */
+            pax_child: number;
+            /** Pax Senior */
+            pax_senior: number;
             /**
              * Pickup Date
              * Format: date
@@ -8387,20 +8533,13 @@ export interface components {
             pickup_date: string;
             /** Pickup Time */
             pickup_time: string | null;
-            /** Dropoff Time */
-            dropoff_time: string | null;
-            /** Pax Senior */
-            pax_senior: number;
-            /** Pax Adult */
-            pax_adult: number;
-            /** Pax Child */
-            pax_child: number;
+            /**
+             * Schedule Id
+             * Format: uuid
+             */
+            schedule_id: string;
             /** Seats */
             seats: number;
-            /** Insurance Selected */
-            insurance_selected: boolean;
-            /** Address */
-            address: string | null;
         };
         /**
          * StaffTripSheet
@@ -8412,34 +8551,34 @@ export interface components {
              * Format: uuid
              */
             booking_id: string;
-            /** Order Number */
-            order_number: string;
             business: components["schemas"]["TripSheetBusiness"];
-            pickup: components["schemas"]["TripSheetPickup"];
-            dropoff: components["schemas"]["TripSheetDropoff"];
-            passenger: components["schemas"]["TripSheetPassenger"];
-            vehicle: components["schemas"]["TripSheetVehicle"];
-            driver: components["schemas"]["TripSheetDriver"];
-            notes: components["schemas"]["TripSheetNotes"];
             charges_summary: components["schemas"]["TripSheetCharges"];
+            driver: components["schemas"]["TripSheetDriver"];
+            dropoff: components["schemas"]["TripSheetDropoff"];
             /**
              * Generated At
              * Format: date-time
              */
             generated_at: string;
+            notes: components["schemas"]["TripSheetNotes"];
+            /** Order Number */
+            order_number: string;
+            passenger: components["schemas"]["TripSheetPassenger"];
+            pickup: components["schemas"]["TripSheetPickup"];
+            vehicle: components["schemas"]["TripSheetVehicle"];
         };
         /**
          * StatusChange
          * @description A deliberate state transition; notifications are always opt-in.
          */
         StatusChange: {
+            /** Notify Customer */
+            notify_customer?: boolean;
             /**
              * Status
              * @enum {string}
              */
             status: "quoted" | "confirmed" | "assigned" | "completed" | "no_show" | "cancelled";
-            /** Notify Customer */
-            notify_customer?: boolean;
         };
         /**
          * StatusResult
@@ -8451,24 +8590,24 @@ export interface components {
              * Format: uuid
              */
             booking_id: string;
-            status: components["schemas"]["BookingStatus"];
             /** Order Status */
             order_status: string;
+            status: components["schemas"]["BookingStatus"];
         };
         /**
          * SurchargeCreate
          * @description Create a non-compounding percentage of the eligible fare base.
          */
         SurchargeCreate: {
-            /** Name */
-            name: string;
-            /** Percent */
-            percent: string;
             /**
              * Is Active
              * @default true
              */
             is_active: boolean;
+            /** Name */
+            name: string;
+            /** Percent */
+            percent: string;
         };
         /**
          * SurchargeResult
@@ -8476,26 +8615,26 @@ export interface components {
          */
         SurchargeResult: {
             /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Name */
-            name: string;
-            /** Percent */
-            percent: string;
-            /** Is Active */
-            is_active: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Name */
+            name: string;
+            /** Percent */
+            percent: string;
             /**
              * Updated At
              * Format: date-time
@@ -8507,20 +8646,60 @@ export interface components {
          * @description Edit a surcharge; historical booking snapshots remain unchanged.
          */
         SurchargeUpdate: {
+            /** Is Active */
+            is_active?: boolean | null;
             /** Name */
             name?: string | null;
             /** Percent */
             percent?: string | null;
-            /** Is Active */
-            is_active?: boolean | null;
         };
         /**
          * TaxiBookingRequest
          * @description A taxi journey being committed to.
          */
         TaxiBookingRequest: {
-            /** Service Type */
-            service_type: string;
+            /**
+             * Accepted Terms
+             * @default false
+             */
+            accepted_terms: boolean;
+            /** Airline */
+            airline?: string | null;
+            /**
+             * Car Seats
+             * @default 0
+             */
+            car_seats: number;
+            /** Charges */
+            charges?: components["schemas"]["SelectedCharge"][];
+            /** Comments */
+            comments?: string | null;
+            customer: components["schemas"]["CustomerDetails"];
+            /** Dropoff Address */
+            dropoff_address?: string | null;
+            /** Dropoff Airport Id */
+            dropoff_airport_id?: string | null;
+            /** Dropoff Zipcode */
+            dropoff_zipcode?: string | null;
+            /** Flight Number */
+            flight_number?: string | null;
+            /** Hours */
+            hours?: number | null;
+            /**
+             * Luggage
+             * @default 0
+             */
+            luggage: number;
+            /**
+             * Passengers
+             * @default 1
+             */
+            passengers: number;
+            payment: components["schemas"]["PaymentDetails"];
+            /** Pickup Address */
+            pickup_address?: string | null;
+            /** Pickup Airport Id */
+            pickup_airport_id?: string | null;
             /**
              * Pickup Date
              * Format: date
@@ -8531,63 +8710,23 @@ export interface components {
              * Format: time
              */
             pickup_time: string;
-            /** Pickup Address */
-            pickup_address?: string | null;
             /** Pickup Zipcode */
             pickup_zipcode?: string | null;
-            /** Dropoff Address */
-            dropoff_address?: string | null;
-            /** Dropoff Zipcode */
-            dropoff_zipcode?: string | null;
-            /** Pickup Airport Id */
-            pickup_airport_id?: string | null;
-            /** Dropoff Airport Id */
-            dropoff_airport_id?: string | null;
-            /** Airline */
-            airline?: string | null;
-            /** Flight Number */
-            flight_number?: string | null;
+            /** Promo Code */
+            promo_code?: string | null;
             /** Return Date */
             return_date?: string | null;
             /** Return Time */
             return_time?: string | null;
-            /** Hours */
-            hours?: number | null;
+            /** Service Type */
+            service_type: string;
             /** Stops */
             stops?: string[];
-            /**
-             * Passengers
-             * @default 1
-             */
-            passengers: number;
-            /**
-             * Luggage
-             * @default 0
-             */
-            luggage: number;
             /**
              * Vehicle Type Id
              * Format: uuid
              */
             vehicle_type_id: string;
-            /** Charges */
-            charges?: components["schemas"]["SelectedCharge"][];
-            /** Promo Code */
-            promo_code?: string | null;
-            /**
-             * Car Seats
-             * @default 0
-             */
-            car_seats: number;
-            customer: components["schemas"]["CustomerDetails"];
-            payment: components["schemas"]["PaymentDetails"];
-            /**
-             * Accepted Terms
-             * @default false
-             */
-            accepted_terms: boolean;
-            /** Comments */
-            comments?: string | null;
         };
         /**
          * TaxiBookingResponse
@@ -8599,6 +8738,10 @@ export interface components {
          *     booking.
          */
         TaxiBookingResponse: {
+            /** Amount Paid */
+            amount_paid: string;
+            /** Confirmation Email Sent */
+            confirmation_email_sent: boolean;
             /**
              * Order Id
              * Format: uuid
@@ -8606,24 +8749,40 @@ export interface components {
             order_id: string;
             /** Order Number */
             order_number: string;
+            /** Payment Method */
+            payment_method: string;
             /** Status */
             status: string;
             /** Total */
             total: string;
-            /** Amount Paid */
-            amount_paid: string;
-            /** Payment Method */
-            payment_method: string;
-            /** Confirmation Email Sent */
-            confirmation_email_sent: boolean;
         };
         /**
          * TaxiJourneyDetail
          * @description Taxi-only journey fields.
          */
         TaxiJourneyDetail: {
-            service_type: components["schemas"]["ServiceCatalogItem"];
-            vehicle_type: components["schemas"]["CatalogItem"];
+            /** Airline */
+            airline: string | null;
+            /** Distance Miles */
+            distance_miles: string | null;
+            /** Dropoff Address */
+            dropoff_address: string | null;
+            /** Dropoff Time */
+            dropoff_time: string | null;
+            /** Dropoff Zipcode */
+            dropoff_zipcode: string | null;
+            /** Duration Minutes */
+            duration_minutes: number | null;
+            /** Flight Number */
+            flight_number: string | null;
+            /** Hours */
+            hours: number | null;
+            /** Luggage */
+            luggage: number;
+            /** Passengers */
+            passengers: number;
+            /** Pickup Address */
+            pickup_address: string | null;
             /**
              * Pickup Date
              * Format: date
@@ -8631,44 +8790,56 @@ export interface components {
             pickup_date: string;
             /** Pickup Time */
             pickup_time: string | null;
-            /** Dropoff Time */
-            dropoff_time: string | null;
-            /** Duration Minutes */
-            duration_minutes: number | null;
-            /** Pickup Address */
-            pickup_address: string | null;
-            /** Dropoff Address */
-            dropoff_address: string | null;
             /** Pickup Zipcode */
             pickup_zipcode: string | null;
-            /** Dropoff Zipcode */
-            dropoff_zipcode: string | null;
+            /** Pricing Basis */
+            pricing_basis: string | null;
+            service_type: components["schemas"]["ServiceCatalogItem"];
             /** Stops */
             stops: {
                 [key: string]: unknown;
             }[];
-            /** Distance Miles */
-            distance_miles: string | null;
-            /** Airline */
-            airline: string | null;
-            /** Flight Number */
-            flight_number: string | null;
-            /** Passengers */
-            passengers: number;
-            /** Luggage */
-            luggage: number;
-            /** Hours */
-            hours: number | null;
-            /** Pricing Basis */
-            pricing_basis: string | null;
+            vehicle_type: components["schemas"]["CatalogItem"];
         };
         /**
          * TaxiPriceBreakdownRequest
          * @description Step two to step three: itemise the chosen vehicle after extras.
          */
         TaxiPriceBreakdownRequest: {
-            /** Service Type */
-            service_type: string;
+            /** Airline */
+            airline?: string | null;
+            /**
+             * Car Seats
+             * @default 0
+             */
+            car_seats: number;
+            /** Charges */
+            charges?: components["schemas"]["SelectedCharge"][];
+            /** Dropoff Address */
+            dropoff_address?: string | null;
+            /** Dropoff Airport Id */
+            dropoff_airport_id?: string | null;
+            /** Dropoff Zipcode */
+            dropoff_zipcode?: string | null;
+            /** Flight Number */
+            flight_number?: string | null;
+            /** Hours */
+            hours?: number | null;
+            /**
+             * Luggage
+             * @default 0
+             */
+            luggage: number;
+            /**
+             * Passengers
+             * @default 1
+             */
+            passengers: number;
+            payment_method?: components["schemas"]["PaymentMethod"] | null;
+            /** Pickup Address */
+            pickup_address?: string | null;
+            /** Pickup Airport Id */
+            pickup_airport_id?: string | null;
             /**
              * Pickup Date
              * Format: date
@@ -8679,55 +8850,23 @@ export interface components {
              * Format: time
              */
             pickup_time: string;
-            /** Pickup Address */
-            pickup_address?: string | null;
             /** Pickup Zipcode */
             pickup_zipcode?: string | null;
-            /** Dropoff Address */
-            dropoff_address?: string | null;
-            /** Dropoff Zipcode */
-            dropoff_zipcode?: string | null;
-            /** Pickup Airport Id */
-            pickup_airport_id?: string | null;
-            /** Dropoff Airport Id */
-            dropoff_airport_id?: string | null;
-            /** Airline */
-            airline?: string | null;
-            /** Flight Number */
-            flight_number?: string | null;
+            /** Promo Code */
+            promo_code?: string | null;
             /** Return Date */
             return_date?: string | null;
             /** Return Time */
             return_time?: string | null;
-            /** Hours */
-            hours?: number | null;
+            /** Service Type */
+            service_type: string;
             /** Stops */
             stops?: string[];
-            /**
-             * Passengers
-             * @default 1
-             */
-            passengers: number;
-            /**
-             * Luggage
-             * @default 0
-             */
-            luggage: number;
             /**
              * Vehicle Type Id
              * Format: uuid
              */
             vehicle_type_id: string;
-            /** Charges */
-            charges?: components["schemas"]["SelectedCharge"][];
-            /** Promo Code */
-            promo_code?: string | null;
-            payment_method?: components["schemas"]["PaymentMethod"] | null;
-            /**
-             * Car Seats
-             * @default 0
-             */
-            car_seats: number;
         };
         /**
          * TaxiPriceBreakdownResponse
@@ -8738,24 +8877,49 @@ export interface components {
          *     here so nobody reconciles the two by changing one.
          */
         TaxiPriceBreakdownResponse: {
+            /** Currency */
+            currency: string;
+            /** Discount Amount */
+            discount_amount: string;
             /** Line Items */
             line_items?: components["schemas"]["BreakdownLine"][];
             /** Subtotal */
             subtotal: string;
-            /** Discount Amount */
-            discount_amount: string;
             /** Total */
             total: string;
-            /** Currency */
-            currency: string;
         };
         /**
          * TaxiQuoteRequest
          * @description Step one to step two: price every vehicle the business offers.
          */
         TaxiQuoteRequest: {
-            /** Service Type */
-            service_type: string;
+            /** Airline */
+            airline?: string | null;
+            /** Dropoff Address */
+            dropoff_address?: string | null;
+            /** Dropoff Airport Id */
+            dropoff_airport_id?: string | null;
+            /** Dropoff Zipcode */
+            dropoff_zipcode?: string | null;
+            /** Flight Number */
+            flight_number?: string | null;
+            /** Hours */
+            hours?: number | null;
+            /**
+             * Luggage
+             * @default 0
+             */
+            luggage: number;
+            /**
+             * Passengers
+             * @default 1
+             */
+            passengers: number;
+            payment_method?: components["schemas"]["PaymentMethod"] | null;
+            /** Pickup Address */
+            pickup_address?: string | null;
+            /** Pickup Airport Id */
+            pickup_airport_id?: string | null;
             /**
              * Pickup Date
              * Format: date
@@ -8766,41 +8930,16 @@ export interface components {
              * Format: time
              */
             pickup_time: string;
-            /** Pickup Address */
-            pickup_address?: string | null;
             /** Pickup Zipcode */
             pickup_zipcode?: string | null;
-            /** Dropoff Address */
-            dropoff_address?: string | null;
-            /** Dropoff Zipcode */
-            dropoff_zipcode?: string | null;
-            /** Pickup Airport Id */
-            pickup_airport_id?: string | null;
-            /** Dropoff Airport Id */
-            dropoff_airport_id?: string | null;
-            /** Airline */
-            airline?: string | null;
-            /** Flight Number */
-            flight_number?: string | null;
             /** Return Date */
             return_date?: string | null;
             /** Return Time */
             return_time?: string | null;
-            /** Hours */
-            hours?: number | null;
+            /** Service Type */
+            service_type: string;
             /** Stops */
             stops?: string[];
-            /**
-             * Passengers
-             * @default 1
-             */
-            passengers: number;
-            /**
-             * Luggage
-             * @default 0
-             */
-            luggage: number;
-            payment_method?: components["schemas"]["PaymentMethod"] | null;
         };
         /**
          * TaxiQuoteResponse
@@ -8814,13 +8953,13 @@ export interface components {
             distance_miles?: string | null;
             /** Duration Minutes */
             duration_minutes?: number | null;
-            /** Route Polyline */
-            route_polyline?: string | null;
             /**
              * Out Of Service Area
              * @default false
              */
             out_of_service_area: boolean;
+            /** Route Polyline */
+            route_polyline?: string | null;
             /** Vehicles */
             vehicles?: components["schemas"]["QuotedVehicle"][];
         };
@@ -8837,78 +8976,78 @@ export interface components {
          * @description A staff account plus its complete initial business access.
          */
         TeamCreate: {
-            /** First Name */
-            first_name: string;
-            /** Last Name */
-            last_name: string;
-            /**
-             * Email
-             * Format: email
-             */
-            email: string;
-            /** Phone */
-            phone?: string | null;
-            /** Secondary Phone */
-            secondary_phone?: string | null;
-            /** Hire Date */
-            hire_date?: string | null;
-            /** Notes */
-            notes?: string | null;
-            role: components["schemas"]["AdminRole"];
+            /** Business Ids */
+            business_ids: string[];
             /**
              * Client Phone Visible
              * @default true
              */
             client_phone_visible: boolean;
-            /** Business Ids */
-            business_ids: string[];
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** First Name */
+            first_name: string;
+            /** Hire Date */
+            hire_date?: string | null;
+            /** Last Name */
+            last_name: string;
+            /** Notes */
+            notes?: string | null;
             password: components["schemas"]["TeamPassword"];
+            /** Phone */
+            phone?: string | null;
+            role: components["schemas"]["AdminRole"];
+            /** Secondary Phone */
+            secondary_phone?: string | null;
         };
         /**
          * TeamCreateResult
          * @description Creation response that reveals an auto-generated password once.
          */
         TeamCreateResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** First Name */
-            first_name: string;
-            /** Last Name */
-            last_name: string;
-            /** Email */
-            email: string;
-            /** Phone */
-            phone: string | null;
-            /** Secondary Phone */
-            secondary_phone: string | null;
-            /** Hire Date */
-            hire_date: string | null;
-            /** Notes */
-            notes: string | null;
-            role: components["schemas"]["AdminRole"];
-            /** Client Phone Visible */
-            client_phone_visible: boolean;
-            /** Is Active */
-            is_active: boolean;
             /** Business Ids */
             business_ids: string[];
+            /** Client Phone Visible */
+            client_phone_visible: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /** Email */
+            email: string;
+            /** First Name */
+            first_name: string;
+            /** Generated Password */
+            generated_password: string | null;
+            /** Hire Date */
+            hire_date: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Last Name */
+            last_name: string;
+            /** Notes */
+            notes: string | null;
+            /** Password Notice */
+            password_notice: string | null;
+            /** Phone */
+            phone: string | null;
+            role: components["schemas"]["AdminRole"];
+            /** Secondary Phone */
+            secondary_phone: string | null;
             /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
-            /** Generated Password */
-            generated_password: string | null;
-            /** Password Notice */
-            password_notice: string | null;
         };
         /**
          * TeamPassword
@@ -8928,37 +9067,37 @@ export interface components {
          * @description One tenant-visible staff account; password hashes never enter this model.
          */
         TeamResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** First Name */
-            first_name: string;
-            /** Last Name */
-            last_name: string;
-            /** Email */
-            email: string;
-            /** Phone */
-            phone: string | null;
-            /** Secondary Phone */
-            secondary_phone: string | null;
-            /** Hire Date */
-            hire_date: string | null;
-            /** Notes */
-            notes: string | null;
-            role: components["schemas"]["AdminRole"];
-            /** Client Phone Visible */
-            client_phone_visible: boolean;
-            /** Is Active */
-            is_active: boolean;
             /** Business Ids */
             business_ids: string[];
+            /** Client Phone Visible */
+            client_phone_visible: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /** Email */
+            email: string;
+            /** First Name */
+            first_name: string;
+            /** Hire Date */
+            hire_date: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Last Name */
+            last_name: string;
+            /** Notes */
+            notes: string | null;
+            /** Phone */
+            phone: string | null;
+            role: components["schemas"]["AdminRole"];
+            /** Secondary Phone */
+            secondary_phone: string | null;
             /**
              * Updated At
              * Format: date-time
@@ -8970,25 +9109,25 @@ export interface components {
          * @description Editable staff fields; business access has its own replacement endpoint.
          */
         TeamUpdate: {
-            /** First Name */
-            first_name?: string | null;
-            /** Last Name */
-            last_name?: string | null;
-            /** Email */
-            email?: string | null;
-            /** Phone */
-            phone?: string | null;
-            /** Secondary Phone */
-            secondary_phone?: string | null;
-            /** Hire Date */
-            hire_date?: string | null;
-            /** Notes */
-            notes?: string | null;
-            role?: components["schemas"]["AdminRole"] | null;
             /** Client Phone Visible */
             client_phone_visible?: boolean | null;
+            /** Email */
+            email?: string | null;
+            /** First Name */
+            first_name?: string | null;
+            /** Hire Date */
+            hire_date?: string | null;
             /** Is Active */
             is_active?: boolean | null;
+            /** Last Name */
+            last_name?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Phone */
+            phone?: string | null;
+            role?: components["schemas"]["AdminRole"] | null;
+            /** Secondary Phone */
+            secondary_phone?: string | null;
         };
         /**
          * TermsSettingsUpdate
@@ -9014,44 +9153,44 @@ export interface components {
          * @description Actual SMTP errors are credential-redacted before reaching this model.
          */
         TestEmailResult: {
-            /** Success */
-            success: boolean;
             /** Error */
             error?: string | null;
+            /** Success */
+            success: boolean;
         };
         /**
          * TokenResponse
          * @description A refreshed access token. No new refresh token is issued.
          */
         TokenResponse: {
-            /** Token */
-            token: string;
             /** Expires In */
             expires_in: number;
+            /** Token */
+            token: string;
         };
         /**
          * TripSheetBusiness
          * @description Business identity printed at the top of a trip sheet.
          */
         TripSheetBusiness: {
+            /** Logo Url */
+            logo_url: string | null;
             /** Name */
             name: string;
             /** Phone */
             phone: string | null;
-            /** Logo Url */
-            logo_url: string | null;
         };
         /**
          * TripSheetCharges
          * @description The balance the driver may need to collect.
          */
         TripSheetCharges: {
-            /** Total */
-            total: string;
-            /** Payment Method */
-            payment_method: string | null;
             /** Amount Due From Passenger */
             amount_due_from_passenger: string;
+            /** Payment Method */
+            payment_method: string | null;
+            /** Total */
+            total: string;
         };
         /**
          * TripSheetDriver
@@ -9066,76 +9205,76 @@ export interface components {
          * @description Expected destination and arrival time.
          */
         TripSheetDropoff: {
-            /** Time */
-            time: string | null;
             /** Address */
             address: string | null;
+            /** Time */
+            time: string | null;
         };
         /**
          * TripSheetNotes
          * @description Office sheet notes; additional_notes cannot be represented.
          */
         TripSheetNotes: {
-            /** Run Notes */
-            run_notes: string | null;
             /** Driver Notes */
             driver_notes: string | null;
+            /** Run Notes */
+            run_notes: string | null;
         };
         /**
          * TripSheetPassenger
          * @description Passenger details needed to operate the run.
          */
         TripSheetPassenger: {
-            /** Name */
-            name: string;
-            /** Phone */
-            phone?: string | null;
             /** Count */
             count: number;
             /** Luggage */
             luggage: number;
+            /** Name */
+            name: string;
+            /** Phone */
+            phone?: string | null;
         };
         /**
          * TripSheetPickup
          * @description Pickup facts needed to begin the run.
          */
         TripSheetPickup: {
+            /** Address */
+            address: string | null;
+            /** Airline */
+            airline: string | null;
             /**
              * Date
              * Format: date
              */
             date: string;
-            /** Time */
-            time: string | null;
-            /** Address */
-            address: string | null;
-            /** Airline */
-            airline: string | null;
             /** Flight Number */
             flight_number: string | null;
+            /** Time */
+            time: string | null;
         };
         /**
          * TripSheetVehicle
          * @description Optional vehicle assignment.
          */
         TripSheetVehicle: {
-            /** Name */
-            name: string | null;
             /** License Plate */
             license_plate: string | null;
+            /** Name */
+            name: string | null;
         };
         /** ValidationError */
         ValidationError: {
+            /** Context */
+            ctx?: Record<string, never>;
+            /** Input */
+            input?: unknown;
             /** Location */
             loc: (string | number)[];
             /** Message */
             msg: string;
             /** Error Type */
             type: string;
-            /** Input */
-            input?: unknown;
-            /** Context */
-            ctx?: Record<string, never>;
         };
         /**
          * VehicleBookingWarning
@@ -9167,22 +9306,8 @@ export interface components {
          * @description A physical vehicle belonging to the selected business.
          */
         VehicleCreate: {
-            /** Name */
-            name: string;
-            /** Make */
-            make?: string | null;
-            /** Model */
-            model?: string | null;
-            /** Year */
-            year?: number | null;
-            /** License Plate */
-            license_plate?: string | null;
             /** Color */
             color?: string | null;
-            /** Vin */
-            vin?: string | null;
-            /** Tabs Expiry */
-            tabs_expiry?: string | null;
             /** Inspection Expiry */
             inspection_expiry?: string | null;
             /**
@@ -9190,121 +9315,135 @@ export interface components {
              * @default true
              */
             is_active: boolean;
+            /** License Plate */
+            license_plate?: string | null;
+            /** Make */
+            make?: string | null;
+            /** Model */
+            model?: string | null;
+            /** Name */
+            name: string;
+            /** Tabs Expiry */
+            tabs_expiry?: string | null;
+            /** Vin */
+            vin?: string | null;
+            /** Year */
+            year?: number | null;
         };
         /**
          * VehicleDeactivationResult
          * @description Deactivated asset plus non-blocking affected-run warnings.
          */
         VehicleDeactivationResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
+            /** Affected Upcoming Bookings */
+            affected_upcoming_bookings: components["schemas"]["VehicleBookingWarning"][];
             /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Name */
-            name: string;
-            /** Make */
-            make: string | null;
-            /** Model */
-            model: string | null;
-            /** Year */
-            year: number | null;
-            /** License Plate */
-            license_plate: string | null;
             /** Color */
             color: string | null;
-            /** Vin */
-            vin: string | null;
-            /** Tabs Expiry */
-            tabs_expiry: string | null;
-            /** Inspection Expiry */
-            inspection_expiry: string | null;
-            /** Is Active */
-            is_active: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
             /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Inspection Expiry */
+            inspection_expiry: string | null;
+            /** Is Active */
+            is_active: boolean;
+            /** License Plate */
+            license_plate: string | null;
+            /** Make */
+            make: string | null;
+            /** Model */
+            model: string | null;
+            /** Name */
+            name: string;
+            /** Tabs Expiry */
+            tabs_expiry: string | null;
+            /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
-            /** Affected Upcoming Bookings */
-            affected_upcoming_bookings: components["schemas"]["VehicleBookingWarning"][];
+            /** Vin */
+            vin: string | null;
+            /** Year */
+            year: number | null;
         };
         /**
          * VehicleRateAssignment
          * @description One business's availability, rates, and refund policy.
          */
         VehicleRateAssignment: {
+            /** Airport Fee */
+            airport_fee: string;
+            /** Base Fare */
+            base_fare: string;
             /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Is Available */
-            is_available: boolean;
-            /** Base Fare */
-            base_fare: string;
-            /** Per Mile Rate */
-            per_mile_rate: string;
-            /** Minimum Fare */
-            minimum_fare: string;
             /** Hourly Rate */
             hourly_rate: string;
-            /** Minimum Hours */
-            minimum_hours: number;
-            /** Airport Fee */
-            airport_fee: string;
+            /** Is Available */
+            is_available: boolean;
             /**
              * Is Non Refundable
              * @default false
              */
             is_non_refundable: boolean;
+            /** Minimum Fare */
+            minimum_fare: string;
+            /** Minimum Hours */
+            minimum_hours: number;
+            /** Per Mile Rate */
+            per_mile_rate: string;
         };
         /**
          * VehicleRateResult
          * @description A persisted tenant-specific vehicle offering.
          */
         VehicleRateResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
+            /** Airport Fee */
+            airport_fee: string;
+            /** Base Fare */
+            base_fare: string;
             /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Is Available */
-            is_available: boolean;
-            /** Base Fare */
-            base_fare: string;
-            /** Per Mile Rate */
-            per_mile_rate: string;
-            /** Minimum Fare */
-            minimum_fare: string;
-            /** Hourly Rate */
-            hourly_rate: string;
-            /** Minimum Hours */
-            minimum_hours: number;
-            /** Airport Fee */
-            airport_fee: string;
-            /** Is Non Refundable */
-            is_non_refundable: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /** Hourly Rate */
+            hourly_rate: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Available */
+            is_available: boolean;
+            /** Is Non Refundable */
+            is_non_refundable: boolean;
+            /** Minimum Fare */
+            minimum_fare: string;
+            /** Minimum Hours */
+            minimum_hours: number;
+            /** Per Mile Rate */
+            per_mile_rate: string;
             /**
              * Updated At
              * Format: date-time
@@ -9317,45 +9456,45 @@ export interface components {
          */
         VehicleResult: {
             /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
-            /** Name */
-            name: string;
-            /** Make */
-            make: string | null;
-            /** Model */
-            model: string | null;
-            /** Year */
-            year: number | null;
-            /** License Plate */
-            license_plate: string | null;
             /** Color */
             color: string | null;
-            /** Vin */
-            vin: string | null;
-            /** Tabs Expiry */
-            tabs_expiry: string | null;
-            /** Inspection Expiry */
-            inspection_expiry: string | null;
-            /** Is Active */
-            is_active: boolean;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
             /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Inspection Expiry */
+            inspection_expiry: string | null;
+            /** Is Active */
+            is_active: boolean;
+            /** License Plate */
+            license_plate: string | null;
+            /** Make */
+            make: string | null;
+            /** Model */
+            model: string | null;
+            /** Name */
+            name: string;
+            /** Tabs Expiry */
+            tabs_expiry: string | null;
+            /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
+            /** Vin */
+            vin: string | null;
+            /** Year */
+            year: number | null;
         };
         /**
          * VehicleTypeAssignmentsUpdate
@@ -9370,53 +9509,38 @@ export interface components {
          * @description Presentation shared by every business using this vehicle type.
          */
         VehicleTypeCreate: {
-            /** Name */
-            name: string;
-            /** Photo Url */
-            photo_url?: string | null;
-            /**
-             * Passenger Capacity
-             * @default 0
-             */
-            passenger_capacity: number;
-            /**
-             * Luggage Capacity
-             * @default 0
-             */
-            luggage_capacity: number;
-            /**
-             * Sort Order
-             * @default 0
-             */
-            sort_order: number;
             /**
              * Is Active
              * @default true
              */
             is_active: boolean;
+            /**
+             * Luggage Capacity
+             * @default 0
+             */
+            luggage_capacity: number;
+            /** Name */
+            name: string;
+            /**
+             * Passenger Capacity
+             * @default 0
+             */
+            passenger_capacity: number;
+            /** Photo Url */
+            photo_url?: string | null;
+            /**
+             * Sort Order
+             * @default 0
+             */
+            sort_order: number;
         };
         /**
          * VehicleTypeDeactivationResult
          * @description Deactivated type plus businesses whose public offering was removed.
          */
         VehicleTypeDeactivationResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Name */
-            name: string;
-            /** Photo Url */
-            photo_url: string | null;
-            /** Passenger Capacity */
-            passenger_capacity: number;
-            /** Luggage Capacity */
-            luggage_capacity: number;
-            /** Sort Order */
-            sort_order: number;
-            /** Is Active */
-            is_active: boolean;
+            /** Affected Available Business Ids */
+            affected_available_business_ids: string[];
             /** Assignments */
             assignments: components["schemas"]["VehicleRateResult"][];
             /**
@@ -9425,27 +9549,42 @@ export interface components {
              */
             created_at: string;
             /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Luggage Capacity */
+            luggage_capacity: number;
+            /** Name */
+            name: string;
+            /** Passenger Capacity */
+            passenger_capacity: number;
+            /** Photo Url */
+            photo_url: string | null;
+            /** Sort Order */
+            sort_order: number;
+            /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
-            /** Affected Available Business Ids */
-            affected_available_business_ids: string[];
         };
         /**
          * VehicleTypeDuplicate
          * @description Copy global presentation and optionally one selected business's rates.
          */
         VehicleTypeDuplicate: {
-            /** New Name */
-            new_name: string;
+            /** Business Id */
+            business_id?: string | null;
             /**
              * Copy Rates
              * @default false
              */
             copy_rates: boolean;
-            /** Business Id */
-            business_id?: string | null;
+            /** New Name */
+            new_name: string;
         };
         /**
          * VehicleTypeReorder
@@ -9460,23 +9599,6 @@ export interface components {
          * @description Global presentation plus only the caller's scoped assignments.
          */
         VehicleTypeResult: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Name */
-            name: string;
-            /** Photo Url */
-            photo_url: string | null;
-            /** Passenger Capacity */
-            passenger_capacity: number;
-            /** Luggage Capacity */
-            luggage_capacity: number;
-            /** Sort Order */
-            sort_order: number;
-            /** Is Active */
-            is_active: boolean;
             /** Assignments */
             assignments: components["schemas"]["VehicleRateResult"][];
             /**
@@ -9484,6 +9606,23 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Luggage Capacity */
+            luggage_capacity: number;
+            /** Name */
+            name: string;
+            /** Passenger Capacity */
+            passenger_capacity: number;
+            /** Photo Url */
+            photo_url: string | null;
+            /** Sort Order */
+            sort_order: number;
             /**
              * Updated At
              * Format: date-time
@@ -9495,44 +9634,44 @@ export interface components {
          * @description Partial owner-only changes to global presentation.
          */
         VehicleTypeUpdate: {
-            /** Name */
-            name?: string | null;
-            /** Photo Url */
-            photo_url?: string | null;
-            /** Passenger Capacity */
-            passenger_capacity?: number | null;
-            /** Luggage Capacity */
-            luggage_capacity?: number | null;
-            /** Sort Order */
-            sort_order?: number | null;
             /** Is Active */
             is_active?: boolean | null;
+            /** Luggage Capacity */
+            luggage_capacity?: number | null;
+            /** Name */
+            name?: string | null;
+            /** Passenger Capacity */
+            passenger_capacity?: number | null;
+            /** Photo Url */
+            photo_url?: string | null;
+            /** Sort Order */
+            sort_order?: number | null;
         };
         /**
          * VehicleUpdate
          * @description Partial edits to one physical vehicle.
          */
         VehicleUpdate: {
-            /** Name */
-            name?: string | null;
-            /** Make */
-            make?: string | null;
-            /** Model */
-            model?: string | null;
-            /** Year */
-            year?: number | null;
-            /** License Plate */
-            license_plate?: string | null;
             /** Color */
             color?: string | null;
-            /** Vin */
-            vin?: string | null;
-            /** Tabs Expiry */
-            tabs_expiry?: string | null;
             /** Inspection Expiry */
             inspection_expiry?: string | null;
             /** Is Active */
             is_active?: boolean | null;
+            /** License Plate */
+            license_plate?: string | null;
+            /** Make */
+            make?: string | null;
+            /** Model */
+            model?: string | null;
+            /** Name */
+            name?: string | null;
+            /** Tabs Expiry */
+            tabs_expiry?: string | null;
+            /** Vin */
+            vin?: string | null;
+            /** Year */
+            year?: number | null;
         };
         /**
          * WebhookReceipt
@@ -9557,40 +9696,40 @@ export interface components {
          * @description Every bad physical line is included in one staff-facing validation report.
          */
         ZoneImportReport: {
-            /** Valid */
-            valid: boolean;
             /**
              * Applied
              * @default false
              */
             applied: boolean;
-            mode: components["schemas"]["ImportMode"];
-            /** Dry Run */
-            dry_run: boolean;
-            /** Row Count */
-            row_count: number;
             /**
              * Created Count
              * @default 0
              */
             created_count: number;
             /**
-             * Updated Count
+             * Deactivated Count
              * @default 0
              */
-            updated_count: number;
+            deactivated_count: number;
+            /** Dry Run */
+            dry_run: boolean;
+            /** Errors */
+            errors?: string[];
+            mode: components["schemas"]["ImportMode"];
+            /** Row Count */
+            row_count: number;
             /**
              * Unchanged Count
              * @default 0
              */
             unchanged_count: number;
             /**
-             * Deactivated Count
+             * Updated Count
              * @default 0
              */
-            deactivated_count: number;
-            /** Errors */
-            errors?: string[];
+            updated_count: number;
+            /** Valid */
+            valid: boolean;
         };
         /**
          * ZoneImportRequest
@@ -9599,13 +9738,13 @@ export interface components {
         ZoneImportRequest: {
             /** Csv Content */
             csv_content: string;
-            /** @default merge */
-            mode: components["schemas"]["ImportMode"];
             /**
              * Dry Run
              * @default false
              */
             dry_run: boolean;
+            /** @default merge */
+            mode: components["schemas"]["ImportMode"];
         };
         /**
          * ZonePriceCreate
@@ -9620,17 +9759,17 @@ export interface components {
             /** Destination Zipcode */
             destination_zipcode: string;
             /**
-             * Vehicle Type Id
-             * Format: uuid
-             */
-            vehicle_type_id: string;
-            /** Price */
-            price: string;
-            /**
              * Is Active
              * @default true
              */
             is_active: boolean;
+            /** Price */
+            price: string;
+            /**
+             * Vehicle Type Id
+             * Format: uuid
+             */
+            vehicle_type_id: string;
         };
         /**
          * ZonePriceResult
@@ -9638,41 +9777,41 @@ export interface components {
          */
         ZonePriceResult: {
             /**
-             * Id
+             * Anchor Id
              * Format: uuid
              */
-            id: string;
+            anchor_id: string;
             /**
              * Business Id
              * Format: uuid
              */
             business_id: string;
             /**
-             * Anchor Id
-             * Format: uuid
-             */
-            anchor_id: string;
-            /** Destination Zipcode */
-            destination_zipcode: string;
-            /**
-             * Vehicle Type Id
-             * Format: uuid
-             */
-            vehicle_type_id: string;
-            /** Price */
-            price: string;
-            /** Is Active */
-            is_active: boolean;
-            /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /** Destination Zipcode */
+            destination_zipcode: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Price */
+            price: string;
             /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
+            /**
+             * Vehicle Type Id
+             * Format: uuid
+             */
+            vehicle_type_id: string;
         };
         /**
          * ZonePriceUpdate
@@ -9683,12 +9822,12 @@ export interface components {
             anchor_id?: string | null;
             /** Destination Zipcode */
             destination_zipcode?: string | null;
-            /** Vehicle Type Id */
-            vehicle_type_id?: string | null;
-            /** Price */
-            price?: string | null;
             /** Is Active */
             is_active?: boolean | null;
+            /** Price */
+            price?: string | null;
+            /** Vehicle Type Id */
+            vehicle_type_id?: string | null;
         };
     };
     responses: never;
@@ -9735,488 +9874,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReadinessResponse"];
-                };
-            };
-        };
-    };
-    get_business_v1_public_business_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Business-Key"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_BusinessPublic_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_locations_v1_public_shuttle_locations_get: {
-        parameters: {
-            query?: {
-                /** @description Return only destinations reachable from this origin. */
-                exclude_location_id?: string | null;
-            };
-            header?: {
-                "X-Business-Key"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_list_LocationGroup__"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    search_v1_public_shuttle_search_get: {
-        parameters: {
-            query: {
-                from_location_id: string;
-                to_location_id: string;
-                date: string;
-                pax_senior?: number;
-                pax_adult?: number;
-                pax_child?: number;
-            };
-            header?: {
-                "X-Business-Key"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_SearchResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    search_return_v1_public_shuttle_search_return_get: {
-        parameters: {
-            query: {
-                /** @description Required selected outbound departure. */
-                outbound_schedule_id: string;
-                from_location_id: string;
-                to_location_id: string;
-                date: string;
-                pax_senior?: number;
-                pax_adult?: number;
-                pax_child?: number;
-            };
-            header?: {
-                "X-Business-Key"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_SearchResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    quote_v1_public_shuttle_quote_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Business-Key"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["QuoteRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_QuoteResponse_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    create_booking_v1_public_shuttle_booking_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                "Idempotency-Key"?: string | null;
-                "X-Business-Key"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BookingRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_BookingResponse_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_service_types_v1_public_taxi_service_types_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Business-Key"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_list_ServiceTypeOption__"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_airports_v1_public_taxi_airports_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Business-Key"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_list_AirportOption__"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_airlines_v1_public_taxi_airlines_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Business-Key"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_list_AirlineOption__"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_charges_v1_public_taxi_charges_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Business-Key"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_list_ChargeOption__"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    quote_v1_public_taxi_quote_post: {
-        parameters: {
-            query?: {
-                /** @description Omit vehicles that cannot carry the party, rather than listing them. */
-                hide_incapable?: boolean;
-            };
-            header?: {
-                "X-Business-Key"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TaxiQuoteRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_TaxiQuoteResponse_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    price_breakdown_v1_public_taxi_price_breakdown_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Business-Key"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TaxiPriceBreakdownRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_TaxiPriceBreakdownResponse_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    create_booking_v1_public_taxi_booking_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                "Idempotency-Key"?: string | null;
-                "X-Business-Key"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TaxiBookingRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_TaxiBookingResponse_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    validate_v1_public_promo_validate_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Business-Key"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PromoValidateRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_PromoValidateResponse_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -10278,193 +9935,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_AccountHolderResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_airports_v1_admin_airports_get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-                /** @description 1-based page number. */
-                page?: number;
-                /** @description Items per page. */
-                per_page?: number;
-                /** @description Sort column, prefix with - for descending. */
-                sort?: string | null;
-                /** @description Free-text search term. */
-                search?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ListEnvelope_AirportResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    create_airport_v1_admin_airports_post: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AirportCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_AirportResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_airport_v1_admin_airports__airport_id__get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                airport_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_AirportResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    deactivate_airport_v1_admin_airports__airport_id__delete: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                airport_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_AirportDeactivationResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_airport_v1_admin_airports__airport_id__patch: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                airport_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AirportUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_AirportResult_"];
                 };
             };
             /** @description Validation Error */
@@ -10665,6 +10135,232 @@ export interface operations {
             };
         };
     };
+    list_airports_v1_admin_airports_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+                /** @description 1-based page number. */
+                page?: number;
+                /** @description Items per page. */
+                per_page?: number;
+                /** @description Sort column, prefix with - for descending. */
+                sort?: string | null;
+                /** @description Free-text search term. */
+                search?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListEnvelope_AirportResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_airport_v1_admin_airports_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AirportCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AirportResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_airport_v1_admin_airports__airport_id__get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                airport_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AirportResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_airport_v1_admin_airports__airport_id__delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                airport_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AirportDeactivationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_airport_v1_admin_airports__airport_id__patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                airport_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AirportUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AirportResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_api_key_v1_admin_api_keys__key_id__delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                key_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApiKeyRevoke"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ApiKeyResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     login_v1_admin_auth_login_post: {
         parameters: {
             query?: never;
@@ -10685,39 +10381,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_LoginResponse_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    refresh_v1_admin_auth_refresh_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RefreshRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_TokenResponse_"];
                 };
             };
             /** @description Validation Error */
@@ -10784,6 +10447,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_CurrentUser_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refresh_v1_admin_auth_refresh_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefreshRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_TokenResponse_"];
                 };
             };
             /** @description Validation Error */
@@ -10906,7 +10602,50 @@ export interface operations {
             };
         };
     };
-    assign_reservation_v1_admin_reservations__booking_id__assign_post: {
+    list_api_keys_v1_admin_businesses__business_uuid__api_keys_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+                /** @description 1-based page number. */
+                page?: number;
+                /** @description Items per page. */
+                per_page?: number;
+                /** @description Sort column, prefix with - for descending. */
+                sort?: string | null;
+                /** @description Free-text search term. */
+                search?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListEnvelope_ApiKeyResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_api_key_v1_admin_businesses__business_uuid__api_keys_post: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -10915,23 +10654,23 @@ export interface operations {
                 authorization?: string | null;
             };
             path: {
-                booking_id: string;
+                business_uuid: string;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["AssignmentRequest"];
+                "application/json": components["schemas"]["ApiKeyCreate"];
             };
         };
         responses: {
             /** @description Successful Response */
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_AssignmentResult_"];
+                    "application/json": components["schemas"]["Envelope_ApiKeyCreatedResult_"];
                 };
             };
             /** @description Validation Error */
@@ -10945,7 +10684,7 @@ export interface operations {
             };
         };
     };
-    assignable_drivers_v1_admin_drivers_get: {
+    reveal_embed_key_v1_admin_businesses__business_uuid__embed_key_get: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -10953,7 +10692,9 @@ export interface operations {
             header?: {
                 authorization?: string | null;
             };
-            path?: never;
+            path: {
+                business_uuid: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -10964,7 +10705,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ListEnvelope_AssignableDriver_"];
+                    "application/json": components["schemas"]["Envelope_EmbedKeyRevealResult_"];
                 };
             };
             /** @description Validation Error */
@@ -10978,7 +10719,7 @@ export interface operations {
             };
         };
     };
-    assignable_vehicles_v1_admin_vehicles_assignable_get: {
+    regenerate_embed_key_v1_admin_businesses__business_uuid__embed_key_regenerate_post: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -10986,7 +10727,9 @@ export interface operations {
             header?: {
                 authorization?: string | null;
             };
-            path?: never;
+            path: {
+                business_uuid: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -10997,7 +10740,350 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ListEnvelope_AssignableVehicle_"];
+                    "application/json": components["schemas"]["Envelope_EmbedKeyRegeneratedResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_integration_v1_admin_businesses__business_uuid__integration_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_IntegrationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_settings_v1_admin_businesses__business_uuid__settings_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_BusinessSettingsResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_booking_settings_v1_admin_businesses__business_uuid__settings_booking_patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BookingSettingsUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_BusinessSettingsMutationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_cancellation_settings_v1_admin_businesses__business_uuid__settings_cancellation_patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CancellationSettingsUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_BusinessSettingsMutationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_email_settings_v1_admin_businesses__business_uuid__settings_email_patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmailSettingsUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_BusinessSettingsMutationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_preferences_settings_v1_admin_businesses__business_uuid__settings_preferences_patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PreferencesSettingsUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_BusinessSettingsMutationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_pricing_settings_v1_admin_businesses__business_uuid__settings_pricing_patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PricingSettingsUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_BusinessSettingsMutationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_terms_settings_v1_admin_businesses__business_uuid__settings_terms_patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TermsSettingsUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_BusinessSettingsMutationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    test_email_settings_v1_admin_businesses__business_uuid__settings_test_email_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TestEmailRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_TestEmailResult_"];
                 };
             };
             /** @description Validation Error */
@@ -11122,81 +11208,7 @@ export interface operations {
             };
         };
     };
-    queue_reservation_email_v1_admin_reservations__booking_id__emails_post: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                booking_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["EmailActionRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_QueuedEmailResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    queue_dispatch_sms_v1_admin_reservations__booking_id__dispatch_sms_post: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                booking_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_QueuedSmsResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_emails_v1_admin_emails_get: {
+    list_categories_v1_admin_categories_get: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -11206,10 +11218,8 @@ export interface operations {
                 per_page?: number;
                 /** @description Sort column, prefix with - for descending. */
                 sort?: string | null;
+                /** @description Free-text search term. */
                 search?: string | null;
-                date_from?: string | null;
-                date_to?: string | null;
-                email_type?: ("quote" | "confirmation" | "deposit_receipt" | "total_receipt" | "dispatch") | null;
             };
             header?: {
                 authorization?: string | null;
@@ -11225,7 +11235,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ListEnvelope_EmailLogItem_"];
+                    "application/json": components["schemas"]["ListEnvelope_CategoryResult_"];
                 };
             };
             /** @description Validation Error */
@@ -11239,7 +11249,81 @@ export interface operations {
             };
         };
     };
-    email_detail_v1_admin_emails__email_id__get: {
+    create_category_v1_admin_categories_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CategoryCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_CategoryResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reorder_categories_v1_admin_categories_order_put: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CategoryReorder"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_list_CategoryResult__"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_category_v1_admin_categories__category_id__get: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -11248,7 +11332,7 @@ export interface operations {
                 authorization?: string | null;
             };
             path: {
-                email_id: string;
+                category_id: string;
             };
             cookie?: never;
         };
@@ -11260,7 +11344,268 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_EmailLogDetail_"];
+                    "application/json": components["schemas"]["Envelope_CategoryResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_category_v1_admin_categories__category_id__delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                category_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_CategoryDeactivationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_category_v1_admin_categories__category_id__patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                category_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CategoryUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_CategoryResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_charges_v1_admin_charges_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+                /** @description 1-based page number. */
+                page?: number;
+                /** @description Items per page. */
+                per_page?: number;
+                /** @description Sort column, prefix with - for descending. */
+                sort?: string | null;
+                /** @description Free-text search term. */
+                search?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListEnvelope_ChargeResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_charge_v1_admin_charges_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChargeCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ChargeResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_charge_v1_admin_charges__charge_id__get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                charge_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ChargeResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_charge_v1_admin_charges__charge_id__delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                charge_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ChargeResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_charge_v1_admin_charges__charge_id__patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                charge_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChargeUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ChargeResult_"];
                 };
             };
             /** @description Validation Error */
@@ -11516,6 +11861,151 @@ export interface operations {
             };
         };
     };
+    dashboard_v1_admin_dashboard_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_DashboardPayload_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assignable_drivers_v1_admin_drivers_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListEnvelope_AssignableDriver_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_emails_v1_admin_emails_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+                /** @description 1-based page number. */
+                page?: number;
+                /** @description Items per page. */
+                per_page?: number;
+                /** @description Sort column, prefix with - for descending. */
+                sort?: string | null;
+                search?: string | null;
+                date_from?: string | null;
+                date_to?: string | null;
+                email_type?: ("request" | "quote" | "confirmation" | "receipt" | "invoice" | "reminder" | "cancellation" | "deposit_receipt" | "total_receipt" | "dispatch" | "company_alert" | "request_submitted" | "customer_reminder" | "driver_reminder") | null;
+                status?: ("queued" | "sending" | "sent" | "failed" | "bounced" | "skipped") | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListEnvelope_EmailLogItem_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    email_detail_v1_admin_emails__email_id__get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                email_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EmailLogDetail_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_lead_sources_v1_admin_lead_sources_get: {
         parameters: {
             query?: {
@@ -11668,40 +12158,7 @@ export interface operations {
             };
         };
     };
-    dashboard_v1_admin_dashboard_get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_DashboardPayload_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_vehicles_v1_admin_vehicles_get: {
+    list_locations_v1_admin_locations_get: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -11713,8 +12170,8 @@ export interface operations {
                 sort?: string | null;
                 /** @description Free-text search term. */
                 search?: string | null;
-                is_active?: boolean | null;
-                expiring_within_days?: number | null;
+                category_id?: string | null;
+                include_route_count?: boolean;
             };
             header?: {
                 authorization?: string | null;
@@ -11730,7 +12187,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ListEnvelope_VehicleResult_"];
+                    "application/json": components["schemas"]["ListEnvelope_LocationResult_"];
                 };
             };
             /** @description Validation Error */
@@ -11744,7 +12201,7 @@ export interface operations {
             };
         };
     };
-    create_vehicle_v1_admin_vehicles_post: {
+    create_location_v1_admin_locations_post: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -11757,7 +12214,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["VehicleCreate"];
+                "application/json": components["schemas"]["LocationCreate"];
             };
         };
         responses: {
@@ -11767,7 +12224,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_VehicleResult_"];
+                    "application/json": components["schemas"]["Envelope_LocationResult_"];
                 };
             };
             /** @description Validation Error */
@@ -11781,149 +12238,7 @@ export interface operations {
             };
         };
     };
-    get_vehicle_v1_admin_vehicles__vehicle_id__get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                vehicle_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_VehicleResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    deactivate_vehicle_v1_admin_vehicles__vehicle_id__delete: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                vehicle_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_VehicleDeactivationResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_vehicle_v1_admin_vehicles__vehicle_id__patch: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                vehicle_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["VehicleUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_VehicleResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_global_settings_v1_admin_settings_global_get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_GlobalSettingsResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_global_settings_v1_admin_settings_global_patch: {
+    reorder_locations_v1_admin_locations_order_put: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -11936,7 +12251,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GlobalSettingsUpdate"];
+                "application/json": components["schemas"]["LocationReorder"];
             };
         };
         responses: {
@@ -11946,7 +12261,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_GlobalSettingsResult_"];
+                    "application/json": components["schemas"]["Envelope_list_LocationResult__"];
                 };
             };
             /** @description Validation Error */
@@ -11960,7 +12275,7 @@ export interface operations {
             };
         };
     };
-    get_integration_v1_admin_businesses__business_uuid__integration_get: {
+    get_location_v1_admin_locations__location_id__get: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -11969,7 +12284,7 @@ export interface operations {
                 authorization?: string | null;
             };
             path: {
-                business_uuid: string;
+                location_id: string;
             };
             cookie?: never;
         };
@@ -11981,7 +12296,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_IntegrationResult_"];
+                    "application/json": components["schemas"]["Envelope_LocationResult_"];
                 };
             };
             /** @description Validation Error */
@@ -11995,7 +12310,81 @@ export interface operations {
             };
         };
     };
-    list_api_keys_v1_admin_businesses__business_uuid__api_keys_get: {
+    deactivate_location_v1_admin_locations__location_id__delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_LocationDeactivationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_location_v1_admin_locations__location_id__patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LocationUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_LocationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_reservation_history_v1_admin_my_history_get: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -12011,9 +12400,7 @@ export interface operations {
             header?: {
                 authorization?: string | null;
             };
-            path: {
-                business_uuid: string;
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -12024,155 +12411,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ListEnvelope_ApiKeyResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    create_api_key_v1_admin_businesses__business_uuid__api_keys_post: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                business_uuid: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ApiKeyCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_ApiKeyCreatedResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    reveal_embed_key_v1_admin_businesses__business_uuid__embed_key_get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                business_uuid: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_EmbedKeyRevealResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    regenerate_embed_key_v1_admin_businesses__business_uuid__embed_key_regenerate_post: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                business_uuid: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_EmbedKeyRegeneratedResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    revoke_api_key_v1_admin_api_keys__key_id__delete: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                key_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ApiKeyRevoke"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_ApiKeyResult_"];
+                    "application/json": components["schemas"]["ListEnvelope_DriverRunRow_"];
                 };
             };
             /** @description Validation Error */
@@ -12251,421 +12490,6 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Envelope_DriverTripSheet_"];
                     "text/plain": string;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    my_reservation_history_v1_admin_my_history_get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-                /** @description 1-based page number. */
-                page?: number;
-                /** @description Items per page. */
-                per_page?: number;
-                /** @description Sort column, prefix with - for descending. */
-                sort?: string | null;
-                /** @description Free-text search term. */
-                search?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ListEnvelope_DriverRunRow_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_charges_v1_admin_charges_get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-                /** @description 1-based page number. */
-                page?: number;
-                /** @description Items per page. */
-                per_page?: number;
-                /** @description Sort column, prefix with - for descending. */
-                sort?: string | null;
-                /** @description Free-text search term. */
-                search?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ListEnvelope_ChargeResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    create_charge_v1_admin_charges_post: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ChargeCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_ChargeResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_charge_v1_admin_charges__charge_id__get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                charge_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_ChargeResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    deactivate_charge_v1_admin_charges__charge_id__delete: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                charge_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_ChargeResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_charge_v1_admin_charges__charge_id__patch: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                charge_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ChargeUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_ChargeResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_surcharges_v1_admin_surcharges_get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-                /** @description 1-based page number. */
-                page?: number;
-                /** @description Items per page. */
-                per_page?: number;
-                /** @description Sort column, prefix with - for descending. */
-                sort?: string | null;
-                /** @description Free-text search term. */
-                search?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ListEnvelope_SurchargeResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    create_surcharge_v1_admin_surcharges_post: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SurchargeCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_SurchargeResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_surcharge_v1_admin_surcharges__surcharge_id__get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                surcharge_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_SurchargeResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    deactivate_surcharge_v1_admin_surcharges__surcharge_id__delete: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                surcharge_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_SurchargeResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_surcharge_v1_admin_surcharges__surcharge_id__patch: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                surcharge_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SurchargeUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_SurchargeResult_"];
                 };
             };
             /** @description Validation Error */
@@ -12903,6 +12727,193 @@ export interface operations {
             };
         };
     };
+    list_anchors_v1_admin_pricing_anchors_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+                /** @description 1-based page number. */
+                page?: number;
+                /** @description Items per page. */
+                per_page?: number;
+                /** @description Sort column, prefix with - for descending. */
+                sort?: string | null;
+                /** @description Free-text search term. */
+                search?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListEnvelope_AnchorResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_anchor_v1_admin_pricing_anchors_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnchorCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AnchorResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_anchor_v1_admin_pricing_anchors__anchor_id__get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                anchor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AnchorResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_anchor_v1_admin_pricing_anchors__anchor_id__delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                anchor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AnchorDeactivationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_anchor_v1_admin_pricing_anchors__anchor_id__patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                anchor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnchorUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AnchorResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_promo_codes_v1_admin_promo_codes_get: {
         parameters: {
             query?: {
@@ -12968,49 +12979,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_PromoMutationResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    promo_code_usage_v1_admin_promo_codes__promo_id__usage_get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-                /** @description 1-based page number. */
-                page?: number;
-                /** @description Items per page. */
-                per_page?: number;
-                /** @description Sort column, prefix with - for descending. */
-                sort?: string | null;
-                /** @description Free-text search term. */
-                search?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                promo_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ListEnvelope_PromoUsageResult_"];
                 };
             };
             /** @description Validation Error */
@@ -13120,6 +13088,1406 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_PromoMutationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    promo_code_usage_v1_admin_promo_codes__promo_id__usage_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+                /** @description 1-based page number. */
+                page?: number;
+                /** @description Items per page. */
+                per_page?: number;
+                /** @description Sort column, prefix with - for descending. */
+                sort?: string | null;
+                /** @description Free-text search term. */
+                search?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                promo_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListEnvelope_PromoUsageResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_reservations_v1_admin_reservations_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+                date_from?: string | null;
+                date_to?: string | null;
+                status?: components["schemas"]["BookingStatus"][] | null;
+                type?: components["schemas"]["BookingType"] | null;
+                driver_id?: string | null;
+                vehicle_id?: string | null;
+                /** @description Free-text search term. */
+                search?: string | null;
+                /** @description 1-based page number. */
+                page?: number;
+                /** @description Items per page. */
+                per_page?: number;
+                /** @description Sort column, prefix with - for descending. */
+                sort?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListEnvelope_ReservationRow_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_manual_reservation_v1_admin_reservations_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManualBookingCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ManualBookingResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    calendar_v1_admin_reservations_calendar_get: {
+        parameters: {
+            query: {
+                date: string;
+                view?: "month" | "week" | "day" | "list";
+                business_id?: string | null;
+                date_from?: string | null;
+                date_to?: string | null;
+                status?: components["schemas"]["BookingStatus"][] | null;
+                type?: components["schemas"]["BookingType"] | null;
+                driver_id?: string | null;
+                vehicle_id?: string | null;
+                search?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_CalendarPayload_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    calendar_popover_v1_admin_reservations_calendar__booking_id__get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_CalendarPopover_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reservation_counts_v1_admin_reservations_counts_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+                date_from?: string | null;
+                date_to?: string | null;
+                status?: components["schemas"]["BookingStatus"][] | null;
+                type?: components["schemas"]["BookingType"] | null;
+                driver_id?: string | null;
+                vehicle_id?: string | null;
+                search?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ReservationCounts_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pending_reservations_v1_admin_reservations_pending_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+                date_from?: string | null;
+                date_to?: string | null;
+                status?: components["schemas"]["BookingStatus"][] | null;
+                type?: components["schemas"]["BookingType"] | null;
+                driver_id?: string | null;
+                vehicle_id?: string | null;
+                /** @description Free-text search term. */
+                search?: string | null;
+                /** @description 1-based page number. */
+                page?: number;
+                /** @description Items per page. */
+                per_page?: number;
+                /** @description Sort column, prefix with - for descending. */
+                sort?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListEnvelope_PendingReservationRow_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reservation_detail_v1_admin_reservations__booking_id__get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ReservationDetail_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_reservation_v1_admin_reservations__booking_id__delete: {
+        parameters: {
+            query?: {
+                cancel_order?: boolean;
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CancellationRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_CancellationResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_reservation_v1_admin_reservations__booking_id__patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReservationEdit"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_StatusResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assign_reservation_v1_admin_reservations__booking_id__assign_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignmentRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AssignmentResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reservation_audit_v1_admin_reservations__booking_id__audit_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+                /** @description 1-based page number. */
+                page?: number;
+                /** @description Items per page. */
+                per_page?: number;
+                /** @description Sort column, prefix with - for descending. */
+                sort?: string | null;
+                /** @description Free-text search term. */
+                search?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListEnvelope_AuditTrailItem_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_reservation_charge_v1_admin_reservations__booking_id__charges_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminChargeCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AdminChargeResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_reservation_charge_v1_admin_reservations__booking_id__charges__booking_charge_id__delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+                booking_charge_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AdminChargeResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    check_reservation_pricing_v1_admin_reservations__booking_id__check_pricing_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_PricingCheck_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    copy_reservation_v1_admin_reservations__booking_id__copy_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CopyTripRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_CopyTripResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    queue_dispatch_sms_v1_admin_reservations__booking_id__dispatch_sms_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_QueuedSmsResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    queue_reservation_email_v1_admin_reservations__booking_id__emails_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmailActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_QueuedEmailResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    change_manual_payment_v1_admin_reservations__booking_id__payment_patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManualPaymentChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ManualPaymentResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    override_reservation_price_v1_admin_reservations__booking_id__price_patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PriceOverride"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_PriceOverrideResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    change_reservation_status_v1_admin_reservations__booking_id__status_patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StatusChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_StatusResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reservation_trip_sheet_v1_admin_reservations__booking_id__trip_sheet_get: {
+        parameters: {
+            query?: {
+                format?: "json" | "text";
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_StaffTripSheet_"];
+                    "text/plain": string;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_routes_v1_admin_routes_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+                /** @description 1-based page number. */
+                page?: number;
+                /** @description Items per page. */
+                per_page?: number;
+                /** @description Sort column, prefix with - for descending. */
+                sort?: string | null;
+                /** @description Free-text search term. */
+                search?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListEnvelope_RouteResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_route_v1_admin_routes_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RouteCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_RouteResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_route_v1_admin_routes__route_id__get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                route_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_RouteResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_route_v1_admin_routes__route_id__delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                route_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_RouteDeactivationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_route_v1_admin_routes__route_id__patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                route_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RouteUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_RouteResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_route_prices_v1_admin_routes__route_id__prices_put: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                route_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RoutePricesUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_RouteResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reverse_route_v1_admin_routes__route_id__reverse_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                route_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RouteReverseRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_RouteResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_schedules_v1_admin_schedules_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+                /** @description 1-based page number. */
+                page?: number;
+                /** @description Items per page. */
+                per_page?: number;
+                /** @description Sort column, prefix with - for descending. */
+                sort?: string | null;
+                /** @description Free-text search term. */
+                search?: string | null;
+                route_id?: string | null;
+                date_from?: string | null;
+                date_to?: string | null;
+                is_active?: boolean | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListEnvelope_ScheduleResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_schedule_v1_admin_schedules_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScheduleCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ScheduleResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    bulk_create_schedules_v1_admin_schedules_bulk_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScheduleBulkRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ScheduleBulkResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    bulk_update_schedule_capacity_v1_admin_schedules_bulk_capacity_patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScheduleBulkCapacityRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ScheduleBulkCapacityResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_schedules_v1_admin_schedules_bulk_preview_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScheduleBulkRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ScheduleBulkPreviewResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_schedule_v1_admin_schedules__schedule_id__delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                schedule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ScheduleDeactivateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ScheduleDeactivationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_schedule_v1_admin_schedules__schedule_id__patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                schedule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScheduleUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ScheduleResult_"];
                 };
             };
             /** @description Validation Error */
@@ -13420,985 +14788,6 @@ export interface operations {
             };
         };
     };
-    list_reservations_v1_admin_reservations_get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-                date_from?: string | null;
-                date_to?: string | null;
-                status?: components["schemas"]["BookingStatus"][] | null;
-                type?: components["schemas"]["BookingType"] | null;
-                driver_id?: string | null;
-                vehicle_id?: string | null;
-                /** @description Free-text search term. */
-                search?: string | null;
-                /** @description 1-based page number. */
-                page?: number;
-                /** @description Items per page. */
-                per_page?: number;
-                /** @description Sort column, prefix with - for descending. */
-                sort?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ListEnvelope_ReservationRow_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    create_manual_reservation_v1_admin_reservations_post: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ManualBookingCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_ManualBookingResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    copy_reservation_v1_admin_reservations__booking_id__copy_post: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                booking_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CopyTripRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_CopyTripResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    calendar_v1_admin_reservations_calendar_get: {
-        parameters: {
-            query: {
-                date: string;
-                view?: "month" | "week" | "day" | "list";
-                business_id?: string | null;
-                date_from?: string | null;
-                date_to?: string | null;
-                status?: components["schemas"]["BookingStatus"][] | null;
-                type?: components["schemas"]["BookingType"] | null;
-                driver_id?: string | null;
-                vehicle_id?: string | null;
-                search?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_CalendarPayload_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    pending_reservations_v1_admin_reservations_pending_get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-                date_from?: string | null;
-                date_to?: string | null;
-                status?: components["schemas"]["BookingStatus"][] | null;
-                type?: components["schemas"]["BookingType"] | null;
-                driver_id?: string | null;
-                vehicle_id?: string | null;
-                /** @description Free-text search term. */
-                search?: string | null;
-                /** @description 1-based page number. */
-                page?: number;
-                /** @description Items per page. */
-                per_page?: number;
-                /** @description Sort column, prefix with - for descending. */
-                sort?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ListEnvelope_PendingReservationRow_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    reservation_counts_v1_admin_reservations_counts_get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-                date_from?: string | null;
-                date_to?: string | null;
-                status?: components["schemas"]["BookingStatus"][] | null;
-                type?: components["schemas"]["BookingType"] | null;
-                driver_id?: string | null;
-                vehicle_id?: string | null;
-                search?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_ReservationCounts_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    calendar_popover_v1_admin_reservations_calendar__booking_id__get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                booking_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_CalendarPopover_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    reservation_audit_v1_admin_reservations__booking_id__audit_get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-                /** @description 1-based page number. */
-                page?: number;
-                /** @description Items per page. */
-                per_page?: number;
-                /** @description Sort column, prefix with - for descending. */
-                sort?: string | null;
-                /** @description Free-text search term. */
-                search?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                booking_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ListEnvelope_AuditTrailItem_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    reservation_trip_sheet_v1_admin_reservations__booking_id__trip_sheet_get: {
-        parameters: {
-            query?: {
-                format?: "json" | "text";
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                booking_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_StaffTripSheet_"];
-                    "text/plain": string;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    reservation_detail_v1_admin_reservations__booking_id__get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                booking_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_ReservationDetail_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    cancel_reservation_v1_admin_reservations__booking_id__delete: {
-        parameters: {
-            query?: {
-                cancel_order?: boolean;
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                booking_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CancellationRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_CancellationResponse_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    edit_reservation_v1_admin_reservations__booking_id__patch: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                booking_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ReservationEdit"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_StatusResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    change_reservation_status_v1_admin_reservations__booking_id__status_patch: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                booking_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["StatusChange"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_StatusResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    check_reservation_pricing_v1_admin_reservations__booking_id__check_pricing_post: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                booking_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_PricingCheck_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    override_reservation_price_v1_admin_reservations__booking_id__price_patch: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                booking_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PriceOverride"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_PriceOverrideResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    change_manual_payment_v1_admin_reservations__booking_id__payment_patch: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                booking_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ManualPaymentChange"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_ManualPaymentResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    add_reservation_charge_v1_admin_reservations__booking_id__charges_post: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                booking_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AdminChargeCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_AdminChargeResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    delete_reservation_charge_v1_admin_reservations__booking_id__charges__booking_charge_id__delete: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                booking_id: string;
-                booking_charge_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_AdminChargeResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_schedules_v1_admin_schedules_get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-                /** @description 1-based page number. */
-                page?: number;
-                /** @description Items per page. */
-                per_page?: number;
-                /** @description Sort column, prefix with - for descending. */
-                sort?: string | null;
-                /** @description Free-text search term. */
-                search?: string | null;
-                route_id?: string | null;
-                date_from?: string | null;
-                date_to?: string | null;
-                is_active?: boolean | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ListEnvelope_ScheduleResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    create_schedule_v1_admin_schedules_post: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ScheduleCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_ScheduleResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    preview_schedules_v1_admin_schedules_bulk_preview_post: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ScheduleBulkRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_ScheduleBulkPreviewResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    bulk_create_schedules_v1_admin_schedules_bulk_post: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ScheduleBulkRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_ScheduleBulkResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    bulk_update_schedule_capacity_v1_admin_schedules_bulk_capacity_patch: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ScheduleBulkCapacityRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_ScheduleBulkCapacityResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    deactivate_schedule_v1_admin_schedules__schedule_id__delete: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                schedule_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["ScheduleDeactivateRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_ScheduleDeactivationResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_schedule_v1_admin_schedules__schedule_id__patch: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                schedule_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ScheduleUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_ScheduleResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
     list_service_types_v1_admin_service_types_get: {
         parameters: {
             query?: {
@@ -14508,7 +14897,7 @@ export interface operations {
             };
         };
     };
-    get_settings_v1_admin_businesses__business_uuid__settings_get: {
+    get_global_settings_v1_admin_settings_global_get: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -14516,9 +14905,7 @@ export interface operations {
             header?: {
                 authorization?: string | null;
             };
-            path: {
-                business_uuid: string;
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -14529,7 +14916,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_BusinessSettingsResult_"];
+                    "application/json": components["schemas"]["Envelope_GlobalSettingsResult_"];
                 };
             };
             /** @description Validation Error */
@@ -14543,7 +14930,7 @@ export interface operations {
             };
         };
     };
-    update_booking_settings_v1_admin_businesses__business_uuid__settings_booking_patch: {
+    update_global_settings_v1_admin_settings_global_patch: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -14551,14 +14938,12 @@ export interface operations {
             header?: {
                 authorization?: string | null;
             };
-            path: {
-                business_uuid: string;
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["BookingSettingsUpdate"];
+                "application/json": components["schemas"]["GlobalSettingsUpdate"];
             };
         };
         responses: {
@@ -14568,7 +14953,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_BusinessSettingsMutationResult_"];
+                    "application/json": components["schemas"]["Envelope_GlobalSettingsResult_"];
                 };
             };
             /** @description Validation Error */
@@ -14582,202 +14967,7 @@ export interface operations {
             };
         };
     };
-    update_pricing_settings_v1_admin_businesses__business_uuid__settings_pricing_patch: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                business_uuid: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PricingSettingsUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_BusinessSettingsMutationResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_cancellation_settings_v1_admin_businesses__business_uuid__settings_cancellation_patch: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                business_uuid: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CancellationSettingsUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_BusinessSettingsMutationResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_email_settings_v1_admin_businesses__business_uuid__settings_email_patch: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                business_uuid: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["EmailSettingsUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_BusinessSettingsMutationResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_terms_settings_v1_admin_businesses__business_uuid__settings_terms_patch: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                business_uuid: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TermsSettingsUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_BusinessSettingsMutationResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    test_email_settings_v1_admin_businesses__business_uuid__settings_test_email_post: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                business_uuid: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TestEmailRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_TestEmailResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_categories_v1_admin_categories_get: {
+    list_surcharges_v1_admin_surcharges_get: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -14804,7 +14994,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ListEnvelope_CategoryResult_"];
+                    "application/json": components["schemas"]["ListEnvelope_SurchargeResult_"];
                 };
             };
             /** @description Validation Error */
@@ -14818,7 +15008,7 @@ export interface operations {
             };
         };
     };
-    create_category_v1_admin_categories_post: {
+    create_surcharge_v1_admin_surcharges_post: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -14831,7 +15021,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CategoryCreate"];
+                "application/json": components["schemas"]["SurchargeCreate"];
             };
         };
         responses: {
@@ -14841,7 +15031,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_CategoryResult_"];
+                    "application/json": components["schemas"]["Envelope_SurchargeResult_"];
                 };
             };
             /** @description Validation Error */
@@ -14855,44 +15045,7 @@ export interface operations {
             };
         };
     };
-    reorder_categories_v1_admin_categories_order_put: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CategoryReorder"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_list_CategoryResult__"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_category_v1_admin_categories__category_id__get: {
+    get_surcharge_v1_admin_surcharges__surcharge_id__get: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -14901,7 +15054,7 @@ export interface operations {
                 authorization?: string | null;
             };
             path: {
-                category_id: string;
+                surcharge_id: string;
             };
             cookie?: never;
         };
@@ -14913,7 +15066,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_CategoryResult_"];
+                    "application/json": components["schemas"]["Envelope_SurchargeResult_"];
                 };
             };
             /** @description Validation Error */
@@ -14927,7 +15080,7 @@ export interface operations {
             };
         };
     };
-    deactivate_category_v1_admin_categories__category_id__delete: {
+    deactivate_surcharge_v1_admin_surcharges__surcharge_id__delete: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -14936,7 +15089,7 @@ export interface operations {
                 authorization?: string | null;
             };
             path: {
-                category_id: string;
+                surcharge_id: string;
             };
             cookie?: never;
         };
@@ -14948,7 +15101,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_CategoryDeactivationResult_"];
+                    "application/json": components["schemas"]["Envelope_SurchargeResult_"];
                 };
             };
             /** @description Validation Error */
@@ -14962,7 +15115,7 @@ export interface operations {
             };
         };
     };
-    update_category_v1_admin_categories__category_id__patch: {
+    update_surcharge_v1_admin_surcharges__surcharge_id__patch: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -14971,13 +15124,13 @@ export interface operations {
                 authorization?: string | null;
             };
             path: {
-                category_id: string;
+                surcharge_id: string;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CategoryUpdate"];
+                "application/json": components["schemas"]["SurchargeUpdate"];
             };
         };
         responses: {
@@ -14987,498 +15140,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_CategoryResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_locations_v1_admin_locations_get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-                /** @description 1-based page number. */
-                page?: number;
-                /** @description Items per page. */
-                per_page?: number;
-                /** @description Sort column, prefix with - for descending. */
-                sort?: string | null;
-                /** @description Free-text search term. */
-                search?: string | null;
-                category_id?: string | null;
-                include_route_count?: boolean;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ListEnvelope_LocationResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    create_location_v1_admin_locations_post: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LocationCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_LocationResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    reorder_locations_v1_admin_locations_order_put: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LocationReorder"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_list_LocationResult__"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_location_v1_admin_locations__location_id__get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                location_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_LocationResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    deactivate_location_v1_admin_locations__location_id__delete: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                location_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_LocationDeactivationResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_location_v1_admin_locations__location_id__patch: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                location_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LocationUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_LocationResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_routes_v1_admin_routes_get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-                /** @description 1-based page number. */
-                page?: number;
-                /** @description Items per page. */
-                per_page?: number;
-                /** @description Sort column, prefix with - for descending. */
-                sort?: string | null;
-                /** @description Free-text search term. */
-                search?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ListEnvelope_RouteResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    create_route_v1_admin_routes_post: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RouteCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_RouteResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_route_v1_admin_routes__route_id__get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                route_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_RouteResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    deactivate_route_v1_admin_routes__route_id__delete: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                route_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_RouteDeactivationResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_route_v1_admin_routes__route_id__patch: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                route_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RouteUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_RouteResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    set_route_prices_v1_admin_routes__route_id__prices_put: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                route_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RoutePricesUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_RouteResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    reverse_route_v1_admin_routes__route_id__reverse_post: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                route_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RouteReverseRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_RouteResult_"];
+                    "application/json": components["schemas"]["Envelope_SurchargeResult_"];
                 };
             };
             /** @description Validation Error */
@@ -16057,7 +15719,7 @@ export interface operations {
             };
         };
     };
-    list_anchors_v1_admin_pricing_anchors_get: {
+    list_vehicles_v1_admin_vehicles_get: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -16069,6 +15731,8 @@ export interface operations {
                 sort?: string | null;
                 /** @description Free-text search term. */
                 search?: string | null;
+                is_active?: boolean | null;
+                expiring_within_days?: number | null;
             };
             header?: {
                 authorization?: string | null;
@@ -16084,7 +15748,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ListEnvelope_AnchorResult_"];
+                    "application/json": components["schemas"]["ListEnvelope_VehicleResult_"];
                 };
             };
             /** @description Validation Error */
@@ -16098,7 +15762,7 @@ export interface operations {
             };
         };
     };
-    create_anchor_v1_admin_pricing_anchors_post: {
+    create_vehicle_v1_admin_vehicles_post: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -16111,7 +15775,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["AnchorCreate"];
+                "application/json": components["schemas"]["VehicleCreate"];
             };
         };
         responses: {
@@ -16121,7 +15785,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_AnchorResult_"];
+                    "application/json": components["schemas"]["Envelope_VehicleResult_"];
                 };
             };
             /** @description Validation Error */
@@ -16135,7 +15799,40 @@ export interface operations {
             };
         };
     };
-    get_anchor_v1_admin_pricing_anchors__anchor_id__get: {
+    assignable_vehicles_v1_admin_vehicles_assignable_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListEnvelope_AssignableVehicle_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_vehicle_v1_admin_vehicles__vehicle_id__get: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -16144,7 +15841,7 @@ export interface operations {
                 authorization?: string | null;
             };
             path: {
-                anchor_id: string;
+                vehicle_id: string;
             };
             cookie?: never;
         };
@@ -16156,7 +15853,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_AnchorResult_"];
+                    "application/json": components["schemas"]["Envelope_VehicleResult_"];
                 };
             };
             /** @description Validation Error */
@@ -16170,7 +15867,7 @@ export interface operations {
             };
         };
     };
-    deactivate_anchor_v1_admin_pricing_anchors__anchor_id__delete: {
+    deactivate_vehicle_v1_admin_vehicles__vehicle_id__delete: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -16179,7 +15876,7 @@ export interface operations {
                 authorization?: string | null;
             };
             path: {
-                anchor_id: string;
+                vehicle_id: string;
             };
             cookie?: never;
         };
@@ -16191,7 +15888,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_AnchorDeactivationResult_"];
+                    "application/json": components["schemas"]["Envelope_VehicleDeactivationResult_"];
                 };
             };
             /** @description Validation Error */
@@ -16205,7 +15902,7 @@ export interface operations {
             };
         };
     };
-    update_anchor_v1_admin_pricing_anchors__anchor_id__patch: {
+    update_vehicle_v1_admin_vehicles__vehicle_id__patch: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -16214,13 +15911,13 @@ export interface operations {
                 authorization?: string | null;
             };
             path: {
-                anchor_id: string;
+                vehicle_id: string;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["AnchorUpdate"];
+                "application/json": components["schemas"]["VehicleUpdate"];
             };
         };
         responses: {
@@ -16230,7 +15927,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_AnchorResult_"];
+                    "application/json": components["schemas"]["Envelope_VehicleResult_"];
                 };
             };
             /** @description Validation Error */
@@ -16322,6 +16019,39 @@ export interface operations {
             };
         };
     };
+    export_zone_prices_v1_admin_zone_prices_export_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_CsvDocument_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     import_zone_prices_v1_admin_zone_prices_import_post: {
         parameters: {
             query?: {
@@ -16346,39 +16076,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_ZoneImportReport_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    export_zone_prices_v1_admin_zone_prices_export_get: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_CsvDocument_"];
                 };
             };
             /** @description Validation Error */
@@ -16521,6 +16218,488 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_ZonePriceResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_business_v1_public_business_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Business-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_BusinessPublic_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    validate_v1_public_promo_validate_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Business-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PromoValidateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_PromoValidateResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_booking_v1_public_shuttle_booking_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Business-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BookingRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_BookingResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_locations_v1_public_shuttle_locations_get: {
+        parameters: {
+            query?: {
+                /** @description Return only destinations reachable from this origin. */
+                exclude_location_id?: string | null;
+            };
+            header?: {
+                "X-Business-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_list_LocationGroup__"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quote_v1_public_shuttle_quote_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Business-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuoteRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_QuoteResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_v1_public_shuttle_search_get: {
+        parameters: {
+            query: {
+                from_location_id: string;
+                to_location_id: string;
+                date: string;
+                pax_senior?: number;
+                pax_adult?: number;
+                pax_child?: number;
+            };
+            header?: {
+                "X-Business-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_SearchResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_return_v1_public_shuttle_search_return_get: {
+        parameters: {
+            query: {
+                /** @description Required selected outbound departure. */
+                outbound_schedule_id: string;
+                from_location_id: string;
+                to_location_id: string;
+                date: string;
+                pax_senior?: number;
+                pax_adult?: number;
+                pax_child?: number;
+            };
+            header?: {
+                "X-Business-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_SearchResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_airlines_v1_public_taxi_airlines_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Business-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_list_AirlineOption__"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_airports_v1_public_taxi_airports_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Business-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_list_AirportOption__"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_booking_v1_public_taxi_booking_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Business-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaxiBookingRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_TaxiBookingResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_charges_v1_public_taxi_charges_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Business-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_list_ChargeOption__"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    price_breakdown_v1_public_taxi_price_breakdown_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Business-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaxiPriceBreakdownRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_TaxiPriceBreakdownResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quote_v1_public_taxi_quote_post: {
+        parameters: {
+            query?: {
+                /** @description Omit vehicles that cannot carry the party, rather than listing them. */
+                hide_incapable?: boolean;
+            };
+            header?: {
+                "X-Business-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaxiQuoteRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_TaxiQuoteResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_service_types_v1_public_taxi_service_types_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Business-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_list_ServiceTypeOption__"];
                 };
             };
             /** @description Validation Error */

@@ -24,6 +24,12 @@ Read this section first if you have already built against v1.1.
   remains a `400` with field `value`. `DELETE /v1/admin/service-areas/{id}`
   returns `422 LAST_SERVICE_AREA` rather than deactivating the business's final
   active coverage rule. New rows still return `201`.
+- **B-29 preferences and inbound leads:** public business settings now publish
+  the taxi tenant's car-seat availability, maximum and unit price. Meet &
+  Greet is staff-only and does not appear in any public schema. Admin settings,
+  manual reservations and reservation edits expose the corresponding staff
+  controls; lead-source attribution is snapshotted on each admin-created or
+  edited order rather than rewriting the shared customer.
 
 ### Airport locations are server-resolved
 
@@ -259,6 +265,9 @@ Called by both plugins on load. Supplies branding and the settings that shape th
     "advance_booking_hours": 6,
     "insurance_enabled": true,
     "insurance_pct": "15.00",
+    "offer_car_seats": true,
+    "max_car_seats": 5,
+    "car_seat_price": "15.00",
     "payment_methods": ["online", "cash"],
     "terms_and_conditions": "<p>...</p>"
   },
@@ -274,6 +283,10 @@ Called by both plugins on load. Supplies branding and the settings that shape th
 `terms_and_conditions` is HTML and may be **null** if the business has not written any. Hide the link rather than opening an empty modal.
 
 `payment_methods` drives which options the form offers. Do not hardcode them.
+
+`offer_car_seats`, `max_car_seats` and `car_seat_price` drive the taxi widget's
+top-level `car_seats` control. Meet & Greet is deliberately absent: it is a
+staff-only admin booking option.
 
 `payments` contains Square's publishable application and location identifiers
 for Web Payments SDK tokenisation. It is `null` if either identifier is not
@@ -500,6 +513,11 @@ Generate the key when the customer reaches the payment step and **reuse it acros
 }}
 ```
 
+`confirmation_email_sent` means the confirmation was accepted into the
+asynchronous delivery queue while email delivery was enabled. It does not mean
+the SMTP server has already accepted it. When delivery is disabled, the row is
+retained for history but is permanently ineligible and this field is `false`.
+
 `address` is required when any selected location has `requires_address: true`.
 
 `accepted_terms` must be `true`.
@@ -621,8 +639,7 @@ Customer-selectable extras only. Admin-applied charges never appear here.
 
 ```json
 { "data": [
-  { "id": "uuid", "name": "Car Seat", "amount": "15.00", "is_per_unit": true, "max_quantity": 4 },
-  { "id": "uuid", "name": "Meet & Greet", "amount": "25.00", "is_per_unit": false }
+  { "id": "uuid", "name": "Car Seat", "amount": "15.00", "is_per_unit": true, "max_quantity": 4 }
 ]}
 ```
 
@@ -635,7 +652,7 @@ These are the only request fields added by pricing-rework Parts 1–2.
 | Field | Endpoints | Required | Type and allowed values | Implemented effect |
 |---|---|---|---|---|
 | `payment_method` | `/taxi/quote`, `/taxi/price-breakdown` | No; default `null` | string enum: `"online"`, `"cash"`, `"cheque"`, `"bank_transfer"`, or `null` | `"online"` applies the row's CC surcharge; every other value and `null` produces a zero CC amount |
-| `car_seats` | `/taxi/price-breakdown`, `/taxi/booking` | No; default `0` | integer `0`–`5` inclusive | On replacement Distance/Flat Rate rows, adds `15.00 × car_seats`; the amount is not read from `/taxi/charges` |
+| `car_seats` | `/taxi/price-breakdown`, `/taxi/booking` | No; default `0` | integer `0`–`5` inclusive | On replacement Distance/Flat Rate rows, validates against public business settings and adds `car_seat_price × car_seats`; the amount is not read from `/taxi/charges` |
 
 `/taxi/booking` does **not** accept top-level `payment_method`. It retains the
 required `payment` object with optional `payment.method` (default `"online"`)
@@ -797,7 +814,7 @@ exact order. Zero-amount rows are retained.
 | 10 | `Fuel Surcharge` | `surcharge` | percentage of charged base plus additions |
 | 11 | `Sales Tax` | `surcharge` | percentage of charged base plus additions |
 | 12 | `Discount` | `discount` | negative percentage amount |
-| 13 | `Car Seats` | `charge` | `car_seats` × `"15.00"` |
+| 13 | `Car Seats` | `charge` | `car_seats` × the snapshotted business preference price |
 | 14 | `Meet & Greet` | `charge` | currently zero from public requests |
 | 15 | `CC Surcharge` | `surcharge` | percentage of pipeline subtotal |
 
@@ -904,6 +921,9 @@ Replaying a completed `Idempotency-Key` still counts toward both limits.
 }}
 ```
 
+`confirmation_email_sent` reports queue eligibility, not completed SMTP
+delivery. It is `false` when `EMAIL_DELIVERY_ENABLED` is off.
+
 #### Resulting status
 
 | Condition | `status` |
@@ -949,7 +969,8 @@ Distance/Flat Rate paths. `/taxi/quote` and `/taxi/booking` do not return a
 ### I-3 — Car seats and generic charges
 
 `GET /taxi/charges` can expose a customer-applied `"Car Seat"` charge while the
-new top-level `car_seats` field independently prices at `"15.00"` each. A request
+new top-level `car_seats` field independently prices at the business preference
+price. A request
 can send both. They do not currently both apply:
 
 - Distance/Flat Rate row paths use top-level `car_seats`; selected generic
@@ -957,7 +978,10 @@ can send both. They do not currently both apply:
 - Legacy anchor-zone/hourly paths use selected generic `charges`; top-level
   `car_seats` is not passed into the legacy calculator or snapshot.
 
-The intended single public representation still needs a product decision.
+The repository contract documents top-level `car_seats`, but the live widget
+source is not present here, so exclusive use could not be confirmed. The
+generic catalog row remains visible for compatibility. Replacement round trips
+charge `price × count` once per order, pending a client decision for round trips.
 
 ### I-4 — Flat Rate manual-quote booking
 
@@ -974,11 +998,12 @@ applies a non-zero amount only for `payment_method: "online"`, but always emits
 the `"CC Surcharge"` row and uses `"0.00"` for every other method or null.
 Confirm whether the API should omit that line or the embed should hide it.
 
-### I-6 — Discounts and Meet & Greet on replacement rows
+### I-6 — Discounts on replacement rows
 
-The rework spec describes booking-level `discount_pct` and `meet_and_greet`
-inputs. Neither is present in the public quote, breakdown or booking schemas.
-The row pipeline therefore emits zero `"Discount"` and `"Meet & Greet"` lines.
+The rework spec describes booking-level `discount_pct`. It is not present in
+the public quote, breakdown or booking schemas. Meet & Greet is now an explicit
+staff-only admin feature and remains absent from those public schemas; the row
+pipeline therefore emits a zero `"Meet & Greet"` line for public requests.
 In addition, a public `promo_code` is not converted into the row pipeline's
 `discount_pct`: breakdown rejects it as `PROMO_INVALID`, while booking does not
 apply or persist it on a replacement row. Decide how these inputs reach the row
