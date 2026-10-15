@@ -9,6 +9,7 @@ import { businessDateTimeParts } from "../src/time";
 const BUSINESS = {
   id: "business-1", name: "Island Transit", type: "taxi", currency: "USD",
   timezone: "America/Chicago", distance_unit: "miles",
+  max_passengers: 8, max_luggage: 8,
   settings: { advance_booking_hours: 6, insurance_enabled: false,
     insurance_pct: "0.00", payment_methods: ["cash"] },
 } satisfies Business;

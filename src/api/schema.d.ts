@@ -1039,9 +1039,49 @@ export interface paths {
         put?: never;
         /**
          * Create Api Key
-         * @description Save raw_key now; cannot_be_retrieved_again is always true.
+         * @description Create a hashed and encrypted credential without permitting intermediary caches.
          */
         post: operations["create_api_key_v1_admin_businesses__business_uuid__api_keys_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/businesses/{business_uuid}/embed-key": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reveal Embed Key
+         * @description Reveal the newest active key named embed, or require regeneration.
+         */
+        get: operations["reveal_embed_key_v1_admin_businesses__business_uuid__embed_key_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/businesses/{business_uuid}/embed-key/regenerate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Regenerate Embed Key
+         * @description Replace every active embed key and warn that old sites stop working.
+         */
+        post: operations["regenerate_embed_key_v1_admin_businesses__business_uuid__embed_key_regenerate_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1391,7 +1431,7 @@ export interface paths {
         put?: never;
         /**
          * Create Service Area
-         * @description Create one normalized coverage rule.
+         * @description Create one normalized coverage rule or reactivate its inactive predecessor.
          */
         post: operations["create_service_area_v1_admin_service_areas_post"];
         delete?: never;
@@ -2945,6 +2985,10 @@ export interface components {
             name: string;
             /** Code */
             code?: string | null;
+            /** Address */
+            address?: string | null;
+            /** Zipcode */
+            zipcode?: string | null;
             /**
              * Is Active
              * @default true
@@ -2970,6 +3014,10 @@ export interface components {
             name: string;
             /** Code */
             code: string | null;
+            /** Address */
+            address: string | null;
+            /** Zipcode */
+            zipcode: string | null;
             /** Is Active */
             is_active: boolean;
             /**
@@ -3019,6 +3067,10 @@ export interface components {
             name: string;
             /** Code */
             code: string | null;
+            /** Address */
+            address: string | null;
+            /** Zipcode */
+            zipcode: string | null;
             /** Is Active */
             is_active: boolean;
             /**
@@ -3041,6 +3093,10 @@ export interface components {
             name?: string | null;
             /** Code */
             code?: string | null;
+            /** Address */
+            address?: string | null;
+            /** Zipcode */
+            zipcode?: string | null;
             /** Is Active */
             is_active?: boolean | null;
         };
@@ -3149,7 +3205,7 @@ export interface components {
         };
         /**
          * ApiKeyCreatedResult
-         * @description Save this creation-only value now: no endpoint can retrieve it later.
+         * @description New credentials can later be revealed if their encrypted copy remains readable.
          */
         ApiKeyCreatedResult: {
             /**
@@ -3175,11 +3231,11 @@ export interface components {
             /** Raw Key */
             raw_key: string;
             /**
-             * Cannot Be Retrieved Again
+             * Can Be Revealed Again
              * @default true
              * @constant
              */
-            cannot_be_retrieved_again: true;
+            can_be_revealed_again: true;
         };
         /**
          * ApiKeyResult
@@ -3524,6 +3580,10 @@ export interface components {
              */
             settings: components["schemas"]["BusinessSettingsPublic"];
             payments?: components["schemas"]["BusinessPaymentsPublic"] | null;
+            /** Max Passengers */
+            max_passengers?: number | null;
+            /** Max Luggage */
+            max_luggage?: number | null;
         };
         /**
          * BusinessResult
@@ -5168,6 +5228,26 @@ export interface components {
             /** Footer Invoice */
             footer_invoice?: string | null;
         };
+        /**
+         * EmbedKeyRegeneratedResult
+         * @description The replacement and the operational consequence the UI must display.
+         */
+        EmbedKeyRegeneratedResult: {
+            /** Key */
+            key: string;
+            /** Warning */
+            warning: string;
+        };
+        /**
+         * EmbedKeyRevealResult
+         * @description Legacy hash-only keys require regeneration rather than attempted recovery.
+         */
+        EmbedKeyRevealResult: {
+            /** Key */
+            key: string | null;
+            /** Reason */
+            reason: "regenerate_required" | null;
+        };
         /** Envelope[AccountHolderResult] */
         Envelope_AccountHolderResult_: {
             data: components["schemas"]["AccountHolderResult"];
@@ -5291,6 +5371,14 @@ export interface components {
         /** Envelope[EmailLogDetail] */
         Envelope_EmailLogDetail_: {
             data: components["schemas"]["EmailLogDetail"];
+        };
+        /** Envelope[EmbedKeyRegeneratedResult] */
+        Envelope_EmbedKeyRegeneratedResult_: {
+            data: components["schemas"]["EmbedKeyRegeneratedResult"];
+        };
+        /** Envelope[EmbedKeyRevealResult] */
+        Envelope_EmbedKeyRevealResult_: {
+            data: components["schemas"]["EmbedKeyRevealResult"];
         };
         /** Envelope[GlobalSettingsResult] */
         Envelope_GlobalSettingsResult_: {
@@ -5544,6 +5632,25 @@ export interface components {
         Envelope_list_VehicleTypeResult__: {
             /** Data */
             data: components["schemas"]["VehicleTypeResult"][];
+        };
+        /**
+         * ErrorDetail
+         * @description The body of an error envelope. ``field`` is omitted when not applicable.
+         */
+        ErrorDetail: {
+            /** Code */
+            code: string;
+            /** Message */
+            message: string;
+            /** Field */
+            field?: string | null;
+        };
+        /**
+         * ErrorEnvelope
+         * @description Error envelope. Produced only by the handlers registered in app.main.
+         */
+        ErrorEnvelope: {
+            error: components["schemas"]["ErrorDetail"];
         };
         /**
          * FilteredSummary
@@ -6751,7 +6858,7 @@ export interface components {
          * @description A capability an endpoint can require.
          * @enum {string}
          */
-        Permission: "booking:read" | "booking:write" | "booking:assign" | "booking:status" | "communication:send" | "customer:read" | "customer:write" | "customer:manage" | "pricing:read" | "pricing:write" | "vehicle_rate:write" | "vehicle_type_catalog:write" | "service_type_assignment:write" | "service_type_catalog:write" | "taxi_catalog:manage" | "payment:read" | "payment:write" | "email:read" | "audit:read" | "config:read" | "config:write" | "zone_price:import" | "company:read" | "company:write" | "company_identity:write" | "business_settings:read" | "business_settings:write" | "team:read" | "team:write" | "settings:read" | "settings:write" | "api_keys:read" | "api_keys:write" | "report:read" | "own_runs:read";
+        Permission: "booking:read" | "booking:write" | "booking:assign" | "booking:status" | "communication:send" | "customer:read" | "customer:write" | "customer:manage" | "pricing:read" | "pricing:write" | "vehicle_rate:write" | "vehicle_type_catalog:write" | "service_type_assignment:write" | "service_type_catalog:write" | "taxi_catalog:manage" | "payment:read" | "payment:write" | "email:read" | "audit:read" | "config:read" | "config:write" | "zone_price:import" | "company:read" | "company:write" | "company_identity:write" | "business_settings:read" | "business_settings:write" | "team:read" | "team:write" | "settings:read" | "settings:write" | "integration:read" | "api_keys:read" | "api_keys:write" | "report:read" | "own_runs:read";
         /**
          * PriceOverride
          * @description A staff-entered total requiring a human explanation.
@@ -8209,8 +8316,21 @@ export interface components {
          * @enum {string}
          */
         ServiceTypeCode: "one_way" | "round_trip" | "hourly" | "airport_pickup" | "airport_dropoff";
+        /**
+         * ServiceTypeOption
+         * @description One service the business offers, for the step-one picker.
+         */
         ServiceTypeOption: {
-            [key: string]: unknown;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            code: components["schemas"]["ServiceTypeCode"];
+            /** Name */
+            name: string;
+            /** Minimum Hours */
+            minimum_hours?: number;
         };
         /**
          * ServiceTypeReorder
@@ -11957,6 +12077,76 @@ export interface operations {
             };
         };
     };
+    reveal_embed_key_v1_admin_businesses__business_uuid__embed_key_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EmbedKeyRevealResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    regenerate_embed_key_v1_admin_businesses__business_uuid__embed_key_regenerate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EmbedKeyRegeneratedResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     revoke_api_key_v1_admin_api_keys__key_id__delete: {
         parameters: {
             query?: {
@@ -13001,6 +13191,15 @@ export interface operations {
             };
         };
         responses: {
+            /** @description An inactive canonical duplicate was reactivated. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ServiceAreaResult_"];
+                };
+            };
             /** @description Successful Response */
             201: {
                 headers: {
@@ -13008,6 +13207,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_ServiceAreaResult_"];
+                };
+            };
+            /** @description An active canonical duplicate already exists. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
             /** @description Validation Error */
@@ -13154,13 +13362,21 @@ export interface operations {
                     "application/json": components["schemas"]["Envelope_ServiceAreaResult_"];
                 };
             };
-            /** @description Validation Error */
+            /** @description The rule is the business's final active service area. */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "LAST_SERVICE_AREA",
+                     *         "message": "At least one service area is required. Without any, every address is treated as in your service area."
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
         };

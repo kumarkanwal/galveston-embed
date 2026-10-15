@@ -1,5 +1,4 @@
-import type { Airline, Airport } from "../../api/client";
-import type { ServiceTypeOption } from "../../api/service-types";
+import type { Airline, Airport, ServiceTypeOption } from "../../api/client";
 
 export const CORE_SERVICE_CODES = [
   "one_way",

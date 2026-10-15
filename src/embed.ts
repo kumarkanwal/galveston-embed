@@ -32,8 +32,8 @@ export function captureScriptConfig(
   };
 }
 
-function reportMountError(error: unknown): void {
-  console.error("Galveston booking widget could not mount.", error);
+function reportMountError(): void {
+  console.error("Galveston booking widget could not mount.");
 }
 
 export function mountBookingWidget(
@@ -44,7 +44,7 @@ export function mountBookingWidget(
   try {
     const mountElement = documentRoot.getElementById(MOUNT_ID);
     if (mountElement === null) {
-      reportMountError(new Error(`#${MOUNT_ID} was not found.`));
+      reportMountError();
       return;
     }
     if (mountElement.shadowRoot !== null) return;
@@ -58,8 +58,8 @@ export function mountBookingWidget(
       client: createClient(config),
       mapsKey: import.meta.env.VITE_MAPS_BROWSER_KEY ?? "",
     }), appRoot);
-  } catch (error: unknown) {
-    reportMountError(error);
+  } catch {
+    reportMountError();
   }
 }
 

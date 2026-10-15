@@ -57,7 +57,8 @@ function renderTrip(
   const root = document.createElement("div");
   document.body.append(root);
   render(<TripDetails client={client} errors={errors} form={formFor(service)} formError={null}
-    isSubmitting={isSubmitting} mapsKey="" onSubmit={() => undefined} routePolyline={null}
+    isSubmitting={isSubmitting} limits={{ passengers: 8, luggage: 8 }} mapsKey=""
+    onSubmit={() => undefined} routePolyline={null}
     services={[...SERVICES]} timeZone="America/Chicago" update={() => undefined} />, root);
   return root;
 }

@@ -9,6 +9,7 @@ import type {
 } from "../../api/client";
 import { businessDateTimeParts } from "../../time";
 import { buildQuoteRequest } from "../trip/build-quote-request";
+import type { PartyLimits } from "../trip/limits";
 import { quoteFailure } from "../trip/quote-error";
 import type { CoreServiceCode, TripErrors, TripFormState } from "../trip/types";
 import { validateTrip } from "../trip/validation";
@@ -72,10 +73,10 @@ function initialState(business: Business, service: CoreServiceCode): BookingFlow
   };
 }
 
-export function useBookingFlow(client: ApiClient, business: Business, service: CoreServiceCode) {
-  const [state, setState] = useState(() => initialState(business, service));
-  const requestInFlight = useRef(false);
-  const update = <Key extends keyof TripFormState>(key: Key, value: TripFormState[Key]) => {
+type FlowSetter = (update: (current: BookingFlowState) => BookingFlowState) => void;
+
+function createUpdate(setState: FlowSetter) {
+  return <Key extends keyof TripFormState>(key: Key, value: TripFormState[Key]) => {
     setState((current) => ({ ...current,
       confirmation: null,
       errors: { ...current.errors, [key]: undefined },
@@ -85,11 +86,18 @@ export function useBookingFlow(client: ApiClient, business: Business, service: C
       selectedVehicle: null,
     }));
   };
+}
+
+export function useBookingFlow(client: ApiClient, business: Business,
+  service: CoreServiceCode, limits: PartyLimits) {
+  const [state, setState] = useState(() => initialState(business, service));
+  const requestInFlight = useRef(false);
+  const update = createUpdate(setState);
   const submit = async (event: SubmitEvent) => {
     event.preventDefault();
     if (requestInFlight.current) return;
     const errors = validateTrip(state.form, { now: new Date(), timeZone: business.timezone,
-      advanceBookingHours: business.settings.advance_booking_hours });
+      advanceBookingHours: business.settings.advance_booking_hours, limits });
     if (Object.keys(errors).length > 0) {
       setState((current) => ({ ...current, errors })); return;
     }

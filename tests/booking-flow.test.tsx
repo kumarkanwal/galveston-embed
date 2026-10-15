@@ -14,6 +14,7 @@ import { quoteFailure } from "../src/app/trip/quote-error";
 const BUSINESS = {
   id: "business-1", name: "Island Transit", type: "taxi", currency: "USD",
   timezone: "America/Chicago", distance_unit: "miles",
+  max_passengers: 8, max_luggage: 8,
   settings: { advance_booking_hours: 0, insurance_enabled: false,
     insurance_pct: "0.00", payment_methods: ["cash"] },
 } satisfies Business;
@@ -48,7 +49,7 @@ type Flow = ReturnType<typeof useBookingFlow>;
 let latestFlow: Flow | undefined;
 
 function Harness({ client }: { client: ApiClient }) {
-  const flow = useBookingFlow(client, BUSINESS, "one_way");
+  const flow = useBookingFlow(client, BUSINESS, "one_way", { passengers: 8, luggage: 8 });
   latestFlow = flow;
   return <div data-step={flow.state.step}>{flow.state.formError}</div>;
 }

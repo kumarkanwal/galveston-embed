@@ -1,18 +1,19 @@
 import { compareWithBusinessNow, meetsAdvanceBookingRequirement } from "../../time";
-import { MAX_LUGGAGE, MAX_PASSENGERS } from "./limits";
+import type { PartyLimits } from "./limits";
 import type { TripErrors, TripFormState } from "./types";
 
 export interface ValidationContext {
   advanceBookingHours: number;
+  limits: PartyLimits;
   now: Date;
   timeZone: string;
 }
 
-function validateParty(form: TripFormState, errors: TripErrors): void {
-  if (form.passengers < 1 || form.passengers > MAX_PASSENGERS) {
+function validateParty(form: TripFormState, errors: TripErrors, limits: PartyLimits): void {
+  if (form.passengers < 1 || form.passengers > limits.passengers) {
     errors.passengers = "Select a valid passenger count.";
   }
-  if (form.luggage < 0 || form.luggage > MAX_LUGGAGE) {
+  if (form.luggage < 0 || form.luggage > limits.luggage) {
     errors.luggage = "Select a valid luggage count.";
   }
 }
@@ -69,7 +70,7 @@ export function validateTrip(
 ): TripErrors {
   const errors: TripErrors = {};
   validateDateTime(form, errors, context);
-  validateParty(form, errors);
+  validateParty(form, errors, context.limits);
   validateAddresses(form, errors);
   validateAirport(form, errors);
   return errors;

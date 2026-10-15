@@ -1,3 +1,5 @@
+import type { RoutePreviewLibrary } from "./preview-route";
+
 const MAPS_SCRIPT_PREFIX = "https://maps.googleapis.com/maps/api/js";
 const CALLBACK_NAME = "__galvestonMapsReady";
 
@@ -71,6 +73,13 @@ export async function loadPlacesLibrary(
 ): Promise<google.maps.PlacesLibrary> {
   const api = await loadGoogleMaps(key);
   return api.maps.importLibrary("places") as Promise<google.maps.PlacesLibrary>;
+}
+
+export async function loadRouteLibrary(
+  key: string,
+): Promise<RoutePreviewLibrary> {
+  const api = await loadGoogleMaps(key);
+  return api.maps.importLibrary("routes") as unknown as Promise<RoutePreviewLibrary>;
 }
 
 export async function loadMapLibraries(key: string): Promise<{

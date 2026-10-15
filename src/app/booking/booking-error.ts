@@ -3,6 +3,7 @@ import {
   NetworkError,
   RateLimitedError,
   RequestInFlightError,
+  UnauthorizedError,
 } from "../../api/errors";
 import type { ConfirmField } from "../confirm/types";
 
@@ -35,6 +36,9 @@ function apiFailure(error: ApiError): BookingFailure {
 }
 
 export function bookingFailure(error: unknown): BookingFailure {
+  if (error instanceof UnauthorizedError) {
+    return { field: null, message: "This booking form is not configured." };
+  }
   if (error instanceof RequestInFlightError) {
     return { field: null, message: "Your booking is still being processed. Please wait a moment and try again." };
   }
