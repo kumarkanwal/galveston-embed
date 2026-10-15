@@ -23,9 +23,14 @@ describe("Google Maps failure", () => {
 
   it("keeps a usable widget notice when the map cannot load", async () => {
     const root = document.createElement("div");
-    render(<MapPanel mapsKey="" pickup={null} dropoff={null} routePolyline={null} />, root);
+    render(<MapPanel mapsKey="" pickup={null} dropoff={null} routePolyline={null}
+      pickupLabel="Port of Galveston" dropoffLabel="IAH Airport" />, root);
     await vi.waitFor(() => expect(root.textContent).toContain("address lookup are unavailable"));
     expect(root.querySelector(".map-canvas")).toBeNull();
+    expect(root.querySelector("#trip-map-description")?.textContent)
+      .toBe("Pickup: Port of Galveston. Dropoff: IAH Airport.");
+    expect(root.querySelector(".map-panel")?.getAttribute("aria-describedby"))
+      .toBe("trip-map-description");
   });
 });
 

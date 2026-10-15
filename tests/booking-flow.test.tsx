@@ -79,6 +79,13 @@ beforeEach(() => {
 });
 
 describe("quote submission", () => {
+  it("requests focus for the first validation error on failed submit", async () => {
+    render(<Harness client={clientWith(vi.fn(async () => QUOTE))} />, document.body);
+    await flow().submit(submitEvent());
+    expect(flow().state.errorFocusField).toBe("pickupTime");
+    expect(flow().state.errorFocusVersion).toBe(1);
+  });
+
   it("sends exactly once while a request is in flight", async () => {
     let resolveQuote: ((quote: TaxiQuoteResponse) => void) | undefined;
     const quote = vi.fn(() => new Promise<TaxiQuoteResponse>((resolve) => { resolveQuote = resolve; }));
@@ -150,6 +157,17 @@ describe("booking navigation", () => {
 });
 
 describe("quote errors", () => {
+  it("requests focus for a named API field error", async () => {
+    const quote = vi.fn(async () => Promise.reject(new ApiError(400, {
+      code: "VALIDATION_ERROR", message: "Choose another date.", field: "pickup_date",
+    })));
+    render(<Harness client={clientWith(quote)} />, document.body);
+    await makeValid();
+    await flow().submit(submitEvent());
+    expect(flow().state.errorFocusField).toBe("pickupDate");
+    expect(flow().state.errorFocusVersion).toBeGreaterThan(0);
+  });
+
   it.each([
     [new ApiError(400, { code: "VALIDATION_ERROR", message: "Bad date", field: "pickup_date" }),
       { field: "pickupDate", message: "Bad date" }],

@@ -11,12 +11,14 @@ import { businessDateTimeParts } from "../../time";
 import { buildQuoteRequest } from "../trip/build-quote-request";
 import type { PartyLimits } from "../trip/limits";
 import { quoteFailure } from "../trip/quote-error";
-import type { CoreServiceCode, TripErrors, TripFormState } from "../trip/types";
-import { validateTrip } from "../trip/validation";
+import type { CoreServiceCode, TripErrors, TripField, TripFormState } from "../trip/types";
+import { firstTripError, validateTrip } from "../trip/validation";
 
 export interface BookingFlowState {
   confirmation: { requestQuote: boolean; response: TaxiBookingResponse } | null;
   errors: TripErrors;
+  errorFocusField: TripField | null;
+  errorFocusVersion: number;
   form: TripFormState;
   formError: string | null;
   isSubmitting: boolean;
@@ -64,6 +66,8 @@ function initialState(business: Business, service: CoreServiceCode): BookingFlow
   return {
     confirmation: null,
     errors: {},
+    errorFocusField: null,
+    errorFocusVersion: 0,
     form: initialForm(business, service),
     formError: null,
     isSubmitting: false,
@@ -88,18 +92,34 @@ function createUpdate(setState: FlowSetter) {
   };
 }
 
+function createBlur(setState: FlowSetter, business: Business, limits: PartyLimits) {
+  return (key: TripField) => setState((current) => {
+    const nextErrors = validateTrip(current.form, {
+      now: new Date(),
+      timeZone: business.timezone,
+      advanceBookingHours: business.settings.advance_booking_hours,
+      limits,
+    });
+    return { ...current, errors: { ...current.errors, [key]: nextErrors[key] } };
+  });
+}
+
 export function useBookingFlow(client: ApiClient, business: Business,
   service: CoreServiceCode, limits: PartyLimits) {
   const [state, setState] = useState(() => initialState(business, service));
   const requestInFlight = useRef(false);
   const update = createUpdate(setState);
+  const blur = createBlur(setState, business, limits);
   const submit = async (event: SubmitEvent) => {
     event.preventDefault();
     if (requestInFlight.current) return;
     const errors = validateTrip(state.form, { now: new Date(), timeZone: business.timezone,
       advanceBookingHours: business.settings.advance_booking_hours, limits });
     if (Object.keys(errors).length > 0) {
-      setState((current) => ({ ...current, errors })); return;
+      setState((current) => ({ ...current, errors,
+        errorFocusField: firstTripError(errors),
+        errorFocusVersion: current.errorFocusVersion + 1,
+      })); return;
     }
     requestInFlight.current = true;
     const submittedForm = state.form;
@@ -113,6 +133,10 @@ export function useBookingFlow(client: ApiClient, business: Business,
       const failure = quoteFailure(error, submittedForm.service);
       setState((current) => ({ ...current,
         errors: failure.field === null ? current.errors : { [failure.field]: failure.message },
+        errorFocusField: failure.field,
+        errorFocusVersion: failure.field === null
+          ? current.errorFocusVersion
+          : current.errorFocusVersion + 1,
         formError: failure.field === null ? failure.message : null,
         isSubmitting: false,
       }));
@@ -128,5 +152,5 @@ export function useBookingFlow(client: ApiClient, business: Business,
   const complete = (response: TaxiBookingResponse, requestQuote: boolean) =>
     setState((current) => ({ ...current, confirmation: { requestQuote, response }, quote: null,
       selectedVehicle: null }));
-  return { state, update, submit, back, choose, complete };
+  return { state, update, blur, submit, back, choose, complete };
 }

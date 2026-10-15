@@ -2,15 +2,17 @@ const STEPS = ["Trip Details", "Choose Vehicle", "Confirm"];
 
 interface ProgressStepsProps {
   activeStep?: 1 | 2 | 3;
+  complete?: boolean;
 }
 
-export function ProgressSteps({ activeStep = 1 }: ProgressStepsProps) {
+export function ProgressSteps({ activeStep = 1, complete = false }: ProgressStepsProps) {
   return (
-    <ol class="progress" aria-label="Booking progress">
+    <ol class="progress" aria-label={complete ? "Booking progress, completed" : "Booking progress"}>
       {STEPS.map((step, index) => (
-        <li class={index + 1 <= activeStep ? "active" : ""}
-          aria-current={index + 1 === activeStep ? "step" : undefined}>
-          <span>{index + 1}</span>
+        <li class={complete || index + 1 <= activeStep ? "active" : ""}
+          aria-label={complete ? `${step}, completed` : undefined}
+          aria-current={!complete && index + 1 === activeStep ? "step" : undefined}>
+          <span class="step-number" aria-hidden="true">{index + 1}</span>
           {step}
         </li>
       ))}

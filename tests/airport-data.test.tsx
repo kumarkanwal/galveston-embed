@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ApiClient, Airline, Airport } from "../src/api/client";
 import { createApiClient } from "../src/api/client";
 import { TripDetails } from "../src/app/trip/TripDetails";
+import { comboboxOptionId } from "../src/app/trip/combobox-a11y";
 import type { CoreServiceCode, TripErrors, TripFormState } from "../src/app/trip/types";
 
 const AIRPORTS: Airport[] = [{ id: "airport-1", name: "George Bush", code: "IAH" }];
@@ -53,12 +54,14 @@ function renderTrip(
   client: ApiClient,
   isSubmitting = false,
   errors: TripErrors = {},
+  autoFocusHeading = false,
 ): HTMLElement {
   const root = document.createElement("div");
   document.body.append(root);
-  render(<TripDetails client={client} errors={errors} form={formFor(service)} formError={null}
+  render(<TripDetails autoFocusHeading={autoFocusHeading}
+    client={client} errors={errors} form={formFor(service)} formError={null}
     isSubmitting={isSubmitting} limits={{ passengers: 8, luggage: 8 }} mapsKey=""
-    onSubmit={() => undefined} routePolyline={null}
+    onFieldBlur={() => undefined} onSubmit={() => undefined} routePolyline={null}
     services={[...SERVICES]} timeZone="America/Chicago" update={() => undefined} />, root);
   return root;
 }
@@ -75,6 +78,14 @@ function expectOrder(actual: string[], expected: string[]) {
 
 beforeEach(() => {
   document.body.replaceChildren();
+});
+
+describe("trip step accessibility", () => {
+  it("moves focus to the heading without making the whole step live", async () => {
+    const root = renderTrip("airport_pickup", mockClient(), false, {}, true);
+    await vi.waitFor(() => expect(root.querySelector("h1")).toBe(document.activeElement));
+    expect(root.querySelector("section.widget")?.hasAttribute("aria-live")).toBe(false);
+  });
 });
 
 describe("airport data states", () => {
@@ -132,7 +143,42 @@ describe("airport API field errors", () => {
     });
     await vi.waitFor(() => expect(root.querySelector("#airport")).not.toBeNull());
     expect(root.querySelector("#airport")?.getAttribute("aria-invalid")).toBe("true");
+    expect(root.querySelector("#airport")?.getAttribute("aria-describedby")).toBe("airport-error");
     expect(root.textContent).toContain(message);
+    expect(root.querySelector("#airport-error")?.parentElement?.querySelector("#airport"))
+      .not.toBeNull();
+  });
+
+  it("exposes the active airline option to assistive technology", async () => {
+    const root = renderTrip("airport_pickup", mockClient());
+    await vi.waitFor(() => expect(root.querySelector("#airline")).not.toBeNull());
+    root.querySelector<HTMLInputElement>("#airline")?.focus();
+    await vi.waitFor(() => expect(root.querySelector("#airline-options")).not.toBeNull());
+    expect(root.querySelector("#airline")?.getAttribute("aria-activedescendant"))
+      .toBe("airline-options-0");
+    expect(root.querySelector("#airline-options-0")?.getAttribute("role")).toBe("option");
+    expect(comboboxOptionId("pickup-address-options", 0)).toBe("pickup-address-options-0");
+  });
+});
+
+describe("trip field error placement", () => {
+  it("renders every one-way error inside its own field", () => {
+    const errors: TripErrors = {
+      pickupDate: "Bad date", pickupTime: "Bad time", passengers: "Bad passengers",
+      luggage: "Bad luggage", pickupAddress: "Bad pickup", dropoffAddress: "Bad dropoff",
+    };
+    const root = renderTrip("one_way", mockClient(), false, errors);
+    for (const [inputId, errorId] of [
+      ["pickup-date", "pickup-date-error"], ["pickup-time", "pickup-time-error"],
+      ["passengers", "passengers-error"], ["luggage", "luggage-error"],
+      ["pickup-address", "pickup-address-error"], ["dropoff-address", "dropoff-address-error"],
+    ]) {
+      expect(root.querySelector(`#${errorId}`)?.parentElement?.querySelector(`#${inputId}`))
+        .not.toBeNull();
+    }
+    expect(root.querySelector("#pickup-address")?.getAttribute("aria-autocomplete")).toBe("list");
+    expect(root.querySelector("#pickup-address")?.getAttribute("aria-controls"))
+      .toBe("pickup-address-options");
   });
 });
 

@@ -48,11 +48,11 @@
 }
 
 .pickup-pin {
-  color: #5cb85c;
+  color: var(--green);
 }
 
 .dropoff-pin {
-  color: #d9534f;
+  color: #b52b27;
 }
 
 .charges {
@@ -145,15 +145,23 @@
 }
 
 .terms-label input[type="checkbox"] {
-  height: auto;
-  margin: 2px 0 0;
-  width: auto;
+  height: 18px;
+  margin: 0;
+  width: 18px;
+}
+
+.checkbox-target {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  margin: 0;
 }
 
 .terms-link {
   background: none;
   border: 0;
-  color: #d9534f;
+  color: #b52b27;
   cursor: pointer;
   font: inherit;
   font-style: italic;
@@ -161,12 +169,24 @@
   text-decoration: underline;
 }
 
+.terms-overlay {
+  align-items: center;
+  background: rgb(0 0 0 / 45%);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 16px;
+  position: fixed;
+  z-index: 1000;
+}
+
 .terms-panel {
   background: #ffffff;
   border: 1px solid #cccccc;
   box-shadow: 0 5px 15px rgb(0 0 0 / 20%);
-  margin-top: 10px;
+  max-width: 640px;
   padding: 16px;
+  width: 100%;
 }
 
 .terms-panel h3 {
@@ -261,6 +281,33 @@
     float: none;
     margin-top: 24px;
     width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .checkbox-target,
+  .terms-copy label,
+  .terms-link {
+    min-height: 44px;
+  }
+
+  .checkbox-target {
+    min-width: 44px;
+  }
+
+  .terms-copy label,
+  .terms-link {
+    align-items: center;
+    display: inline-flex;
+  }
+
+  .terms-label input[type="checkbox"] {
+    height: 20px;
+    width: 20px;
+  }
+
+  .create-trip {
+    min-height: 44px;
   }
 }
 

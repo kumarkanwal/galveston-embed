@@ -189,6 +189,8 @@ describe("booking field errors", () => {
     root.querySelector<HTMLButtonElement>(".create-trip")?.click();
     await vi.waitFor(() => expect(root.querySelector("#email-error")?.textContent)
       .toContain("That email cannot be used."));
+    expect(root.querySelector("#email")).toBe(document.activeElement);
+    expect(root.querySelector("#email")?.getAttribute("aria-describedby")).toBe("email-error");
     expect(root.querySelector<HTMLInputElement>("#firstName")?.value).toBe("Ada");
     expect(root.querySelector<HTMLInputElement>("#comments")?.value).toBe("Call on arrival");
     expect(book).toHaveBeenCalledOnce();
@@ -289,6 +291,19 @@ describe("confirmation", () => {
     expect(root.textContent).toContain("$92.70 USD");
     expect(root.textContent).not.toContain("receive an email");
     expect(root.querySelector(".back-button")).toBeNull();
+    expect(root.querySelector(".progress")?.getAttribute("aria-label"))
+      .toBe("Booking progress, completed");
+    expect(root.querySelector("[aria-current]")).toBeNull();
+    expect([...root.querySelectorAll(".progress li")].every((item) =>
+      item.getAttribute("aria-label")?.endsWith("completed"))).toBe(true);
+  });
+
+  it("moves focus to the confirmation heading", async () => {
+    const root = document.createElement("div");
+    document.body.append(root);
+    render(<Confirmation autoFocusHeading currency="USD" requestQuote={false}
+      response={BOOKED} />, root);
+    await vi.waitFor(() => expect(root.querySelector("h1")).toBe(document.activeElement));
   });
 
   it("uses quote wording and conditionally shows the email promise", () => {

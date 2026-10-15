@@ -25,7 +25,7 @@ function tripAddress(form: TripFormState, kind: "pickup" | "dropoff"): string {
 export function TripSummary(props: TripSummaryProps) {
   const distance = props.quote.distance_miles;
   return <section class="trip-summary">
-    <h2>Trip Summary</h2>
+    <h2 tabIndex={-1}>Trip Summary</h2>
     <div class="summary-content">
       <VehiclePhoto vehicle={props.vehicle} />
       <div>

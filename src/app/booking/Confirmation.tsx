@@ -1,13 +1,14 @@
 import type { TaxiBookingResponse } from "../../api/client";
 import { formatMoney } from "../../money";
 import { ProgressSteps } from "../trip/ProgressSteps";
+import { useEffect, useRef } from "preact/hooks";
 
 interface ConfirmationProps {
+  autoFocusHeading?: boolean;
   currency: string;
   requestQuote: boolean;
   response: TaxiBookingResponse;
 }
-
 function confirmationLead(requestQuote: boolean): string {
   return requestQuote
     ? "Thank you! Your quote request was successfully submitted. Your pending reservation number is"
@@ -15,9 +16,15 @@ function confirmationLead(requestQuote: boolean): string {
 }
 
 export function Confirmation(props: ConfirmationProps) {
-  return <section class="widget confirmation" aria-live="polite">
-    <ProgressSteps activeStep={3} />
-    <h1><span class="confirmation-check" aria-hidden="true">✓</span> Confirmation</h1>
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (props.autoFocusHeading) headingRef.current?.focus();
+  }, [props.autoFocusHeading]);
+  return <section class="widget confirmation">
+    <ProgressSteps activeStep={3} complete />
+    <h1 ref={headingRef} tabIndex={-1}>
+      <span class="confirmation-check" aria-hidden="true">✓</span> Confirmation
+    </h1>
     <div class="confirmation-notice" role="status">
       <p>{confirmationLead(props.requestQuote)} <strong>{props.response.order_number}</strong>.</p>
       {props.response.confirmation_email_sent && <p>

@@ -1,6 +1,11 @@
 import { compareWithBusinessNow, meetsAdvanceBookingRequirement } from "../../time";
 import type { PartyLimits } from "./limits";
-import type { TripErrors, TripFormState } from "./types";
+import type { TripErrors, TripField, TripFormState } from "./types";
+
+const TRIP_FIELD_ORDER: TripField[] = [
+  "pickupDate", "pickupTime", "passengers", "luggage", "pickupAddress",
+  "dropoffAddress", "pickupAirportId", "dropoffAirportId", "airline", "flightNumber",
+];
 
 export interface ValidationContext {
   advanceBookingHours: number;
@@ -74,4 +79,8 @@ export function validateTrip(
   validateAddresses(form, errors);
   validateAirport(form, errors);
   return errors;
+}
+
+export function firstTripError(errors: TripErrors): TripField | null {
+  return TRIP_FIELD_ORDER.find((field) => errors[field] !== undefined) ?? null;
 }
