@@ -85,3 +85,46 @@ describe("Choose Vehicle", () => {
     expect(root.querySelector(".back-button")).not.toBeNull();
   });
 });
+
+describe("Vehicle photos", () => {
+  it("renders only HTTPS photos with lazy loading and the exact vehicle-name alt", () => {
+    const vehicle = {
+      ...VEHICLES[0]!, photo_url: "https://images.example/sedan.png",
+    } satisfies QuotedVehicle;
+    const { root } = mountQuote({ out_of_service_area: false, vehicles: [vehicle] });
+    const image = root.querySelector<HTMLImageElement>(".vehicle-photo");
+    expect(image?.getAttribute("src")).toBe(vehicle.photo_url);
+    expect(image?.getAttribute("alt")).toBe(vehicle.name);
+    expect(image?.getAttribute("loading")).toBe("lazy");
+    expect(image?.getAttribute("width")).toBe("110");
+    expect(image?.getAttribute("height")).toBe("70");
+  });
+
+  it("shows the SVG placeholder for null, missing, HTTP, and malformed photo URLs", () => {
+    const vehicles: QuotedVehicle[] = [
+      { ...VEHICLES[0]!, vehicle_type_id: "null", name: "Null", photo_url: null },
+      { ...VEHICLES[0]!, vehicle_type_id: "missing", name: "Missing" },
+      { ...VEHICLES[0]!, vehicle_type_id: "http", name: "HTTP",
+        photo_url: "http://images.example/van.png" },
+      { ...VEHICLES[0]!, vehicle_type_id: "malformed", name: "Malformed", photo_url: "not a URL" },
+    ];
+    const { root } = mountQuote({ out_of_service_area: false, vehicles });
+    expect(root.querySelectorAll(".vehicle-photo")).toHaveLength(0);
+    expect(root.querySelectorAll(".vehicle-photo-placeholder")).toHaveLength(4);
+    expect(root.querySelectorAll(".vehicle-placeholder-icon")).toHaveLength(4);
+  });
+
+  it("replaces a failed HTTPS image with the same-size placeholder", () => {
+    const vehicle = {
+      ...VEHICLES[0]!, photo_url: "https://images.example/missing.png",
+    } satisfies QuotedVehicle;
+    const { root } = mountQuote({ out_of_service_area: false, vehicles: [vehicle] });
+    const image = root.querySelector<HTMLImageElement>(".vehicle-photo");
+    expect(image).not.toBeNull();
+    act(() => { image?.dispatchEvent(new Event("error")); });
+    const placeholder = root.querySelector(".vehicle-photo-placeholder");
+    expect(root.querySelector(".vehicle-photo")).toBeNull();
+    expect(placeholder?.classList.contains("vehicle-photo-frame")).toBe(true);
+    expect(placeholder?.getAttribute("aria-label")).toBe("Sedan image unavailable");
+  });
+});
