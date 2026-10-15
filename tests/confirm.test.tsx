@@ -9,7 +9,7 @@ import type {
   TaxiQuoteResponse,
 } from "../src/api/client";
 import { ApiError, NetworkError, RateLimitedError } from "../src/api/errors";
-import { breakdownErrorMessage } from "../src/app/confirm/breakdown-error";
+import { breakdownFailure } from "../src/app/confirm/breakdown-error";
 import { buildBookingRequest, buildBreakdownRequest } from "../src/app/confirm/build-requests";
 import { Confirm } from "../src/app/confirm/Confirm";
 import type { ConfirmFormState } from "../src/app/confirm/types";
@@ -20,7 +20,8 @@ const BUSINESS = {
   timezone: "America/Chicago", distance_unit: "miles",
   max_passengers: 8, max_luggage: 8,
   settings: { advance_booking_hours: 0, insurance_enabled: false,
-    insurance_pct: "0.00", payment_methods: ["cash"],
+    insurance_pct: "0.00", offer_car_seats: true, max_car_seats: 5,
+    car_seat_price: "15.00", payment_methods: ["cash"],
     terms_and_conditions: "Use <b>care</b> & arrive early." },
 } satisfies Business;
 
@@ -122,6 +123,55 @@ describe("Confirm price breakdown", () => {
     await Promise.resolve();
     expect(root.textContent).toContain("$107.70 USD");
     expect(root.textContent).not.toContain("$92.70 USD");
+  });
+});
+
+describe("Car seat preferences", () => {
+  it.each([
+    ["disabled", { offer_car_seats: false, max_car_seats: 5 }],
+    ["zero maximum", { offer_car_seats: true, max_car_seats: 0 }],
+  ])("hides Car Seats and requests pricing with zero when %s", async (_label, settings) => {
+    const priceBreakdown = vi.fn<ApiClient["priceBreakdown"]>(async () => BREAKDOWN);
+    const business = { ...BUSINESS, settings: { ...BUSINESS.settings, ...settings } };
+    const { root } = mount(priceBreakdown, business);
+    await vi.waitFor(() => expect(priceBreakdown).toHaveBeenCalledOnce());
+    expect(root.querySelector("#carSeats")).toBeNull();
+    expect(priceBreakdown.mock.calls[0]?.[0].car_seats).toBe(0);
+  });
+
+  it("uses the configured options and per-seat label without calculating money", async () => {
+    const business = { ...BUSINESS, settings: { ...BUSINESS.settings,
+      max_car_seats: 2, car_seat_price: "12.50" } };
+    const { root } = mount(vi.fn(async () => BREAKDOWN), business);
+    await vi.waitFor(() => expect(root.textContent).toContain("$92.70 USD"));
+    expect([...root.querySelectorAll<HTMLOptionElement>("#carSeats option")]
+      .map((option) => option.value)).toEqual(["0", "1", "2"]);
+    expect(root.textContent).toContain("$12.50 each");
+  });
+
+  it("shows and focuses a car-seat pricing error without changing any fields", async () => {
+    const priceBreakdown = vi.fn<ApiClient["priceBreakdown"]>()
+      .mockResolvedValueOnce(BREAKDOWN)
+      .mockRejectedValueOnce(new ApiError(400, {
+        code: "VALIDATION_ERROR", message: "This business allows at most 1 car seat.",
+        field: "car_seats",
+      }));
+    const { root } = mount(priceBreakdown);
+    await vi.waitFor(() => expect(root.textContent).toContain("$92.70 USD"));
+    input(root, "firstName", "Ada");
+    input(root, "comments", "Keep this note");
+    const select = root.querySelector<HTMLSelectElement>("#carSeats");
+    if (select === null) throw new Error("Missing Car Seats select");
+    select.value = "2";
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+    await vi.waitFor(() => expect(root.querySelector("#carSeats-error")?.textContent)
+      .toContain("at most 1"));
+    await vi.waitFor(() => expect(select).toBe(document.activeElement));
+    expect(select.value).toBe("2");
+    expect(select.getAttribute("aria-invalid")).toBe("true");
+    expect(root.querySelector<HTMLInputElement>("#firstName")?.value).toBe("Ada");
+    expect(root.querySelector<HTMLInputElement>("#comments")?.value).toBe("Keep this note");
+    expect(priceBreakdown).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -273,7 +323,13 @@ describe("breakdown errors", () => {
     [new NetworkError(new Error("offline")),
       "Pricing could not be loaded. Please go back and try again."],
   ])("maps breakdown failures without retrying", (error, message) => {
-    expect(breakdownErrorMessage(error)).toBe(message);
+    expect(breakdownFailure(error).message).toBe(message);
+  });
+
+  it("maps a named car-seat failure to the Car Seats control", () => {
+    expect(breakdownFailure(new ApiError(400, {
+      code: "VALIDATION_ERROR", message: "Car seats are disabled.", field: "car_seats",
+    }))).toEqual({ field: "carSeats", message: "Car seats are disabled." });
   });
 
   it("shows a failed breakdown with Back and does not retry", async () => {

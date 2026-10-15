@@ -27,7 +27,8 @@ const BUSINESS = {
   timezone: "America/Chicago", distance_unit: "miles",
   max_passengers: 8, max_luggage: 8,
   settings: { advance_booking_hours: 0, insurance_enabled: false,
-    insurance_pct: "0.00", payment_methods: ["cash"], terms_and_conditions: "Be ready." },
+    insurance_pct: "0.00", offer_car_seats: true, max_car_seats: 5,
+    car_seat_price: "15.00", payment_methods: ["cash"], terms_and_conditions: "Be ready." },
 } satisfies Business;
 
 const TRIP: TripFormState = {
@@ -70,13 +71,18 @@ function clientWith(book: ApiClient["book"]) {
   } satisfies ApiClient;
 }
 
-function mount(book: ApiClient["book"], vehicle: QuotedVehicle = PRICED, outOfServiceArea = false) {
+function mount(
+  book: ApiClient["book"],
+  vehicle: QuotedVehicle = PRICED,
+  outOfServiceArea = false,
+  business: Business = BUSINESS,
+) {
   const root = document.createElement("div");
   document.body.append(root);
   const client = clientWith(book);
   const onBooked = vi.fn();
   const quote = { out_of_service_area: outOfServiceArea, vehicles: [vehicle] } satisfies TaxiQuoteResponse;
-  render(<Confirm business={BUSINESS} client={client} form={TRIP} onBack={() => undefined}
+  render(<Confirm business={business} client={client} form={TRIP} onBack={() => undefined}
     onBooked={onBooked} quote={quote} serviceName="One Way Transfer" vehicle={vehicle} />, root);
   return { client, onBooked, root };
 }
@@ -197,11 +203,62 @@ describe("booking field errors", () => {
   });
 });
 
+describe("booking car-seat preferences", () => {
+  it.each([
+    ["priced", PRICED, true],
+    ["Request a Quote", MANUAL, false],
+  ])("shows and focuses a %s car-seat error without changing the choice", async (
+    _label, vehicle, waitForBreakdown,
+  ) => {
+    const book = vi.fn<ApiClient["book"]>(async () => Promise.reject(new ApiError(400, {
+      code: "VALIDATION_ERROR", message: "Car seats are not offered by this business.",
+      field: "car_seats",
+    })));
+    const { client, root } = mount(book, vehicle);
+    await fillValid(root, waitForBreakdown);
+    enter(root, "comments", "Keep this note");
+    const carSeats = root.querySelector<HTMLSelectElement>("#carSeats");
+    if (carSeats === null) throw new Error("Missing Car Seats select");
+    carSeats.value = "2";
+    carSeats.dispatchEvent(new Event("change", { bubbles: true }));
+    if (waitForBreakdown) {
+      await vi.waitFor(() => expect(client.priceBreakdown).toHaveBeenCalledTimes(2));
+      await vi.waitFor(() => expect(root.textContent).toContain("$90.00 USD"));
+    }
+    root.querySelector<HTMLButtonElement>(".create-trip")?.click();
+    await vi.waitFor(() => expect(root.querySelector("#carSeats-error")?.textContent)
+      .toContain("not offered"));
+    await vi.waitFor(() => expect(carSeats).toBe(document.activeElement));
+    expect(carSeats.value).toBe("2");
+    expect(root.querySelector<HTMLInputElement>("#firstName")?.value).toBe("Ada");
+    expect(root.querySelector<HTMLInputElement>("#comments")?.value).toBe("Keep this note");
+    enter(root, "firstName", "Grace");
+    expect(root.querySelector("#carSeats-error")).not.toBeNull();
+    expect(book).toHaveBeenCalledOnce();
+  });
+
+  it.each([
+    ["disabled", { offer_car_seats: false, max_car_seats: 5 }],
+    ["zero maximum", { offer_car_seats: true, max_car_seats: 0 }],
+  ])("submits zero car seats when the control is %s", async (_label, settings) => {
+    const book = vi.fn<ApiClient["book"]>(async () => BOOKED);
+    const business = { ...BUSINESS, settings: { ...BUSINESS.settings, ...settings } };
+    const { root } = mount(book, PRICED, false, business);
+    await fillValid(root);
+    expect(root.querySelector("#carSeats")).toBeNull();
+    root.querySelector<HTMLButtonElement>(".create-trip")?.click();
+    await vi.waitFor(() => expect(book).toHaveBeenCalledOnce());
+    expect(book.mock.calls[0]?.[0].car_seats).toBe(0);
+  });
+});
+
 describe("request quote booking", () => {
   it("skips pricing, keeps car seats, and submits with quote wording", async () => {
     const book = vi.fn<ApiClient["book"]>(async () =>
       ({ ...BOOKED, status: "requested", total: "0.00" }));
-    const { client, onBooked, root } = mount(book, MANUAL, true);
+    const business = { ...BUSINESS, settings: { ...BUSINESS.settings,
+      max_car_seats: 2, car_seat_price: "27.00" } };
+    const { client, onBooked, root } = mount(book, MANUAL, true, business);
     expect(client.priceBreakdown).not.toHaveBeenCalled();
     expect(root.textContent).toContain("outside our standard service area");
     expect(root.textContent).toContain("Request a Quote");
@@ -210,6 +267,8 @@ describe("request quote booking", () => {
       .toContain("Request Quote");
     const carSeats = root.querySelector<HTMLSelectElement>(".car-seats select");
     if (carSeats === null) throw new Error("Missing Car Seats select");
+    expect(carSeats.options).toHaveLength(3);
+    expect(root.textContent).not.toContain("$27.00 each");
     carSeats.value = "2";
     carSeats.dispatchEvent(new Event("change", { bubbles: true }));
     await fillValid(root, false);
@@ -288,6 +347,7 @@ describe("confirmation", () => {
     const root = document.createElement("div");
     render(<Confirmation currency="USD" requestQuote={false} response={BOOKED} />, root);
     expect(root.textContent).toContain("HVT-2026-003211");
+    expect(root.textContent).toContain("reservation was successfully submitted");
     expect(root.textContent).toContain("$92.70 USD");
     expect(root.textContent).not.toContain("receive an email");
     expect(root.querySelector(".back-button")).toBeNull();
@@ -306,14 +366,24 @@ describe("confirmation", () => {
     await vi.waitFor(() => expect(root.querySelector("h1")).toBe(document.activeElement));
   });
 
-  it("uses quote wording and conditionally shows the email promise", () => {
+  it.each(["requested", "pending"])("uses priced booking-request wording for %s", (status) => {
+    const root = document.createElement("div");
+    render(<Confirmation currency="USD" requestQuote={false}
+      response={{ ...BOOKED, status, confirmation_email_sent: true }} />, root);
+    expect(root.textContent).toContain("booking request was submitted");
+    expect(root.textContent).toContain("The company will confirm your trip.");
+    expect(root.textContent).toContain("HVT-2026-003211");
+    expect(root.textContent).not.toContain("receive an email");
+  });
+
+  it("uses quote wording and never promises an email", () => {
     const root = document.createElement("div");
     render(<Confirmation currency="USD" requestQuote
       response={{ ...BOOKED, status: "requested", total: "0.00", confirmation_email_sent: true }} />,
     root);
     expect(root.textContent).toContain("quote request was successfully submitted");
     expect(root.textContent).toContain("pending reservation number");
-    expect(root.textContent).toContain("You will receive an email confirming your details.");
+    expect(root.textContent).not.toContain("receive an email");
     expect(root.textContent).not.toContain("$0.00 USD");
   });
 });

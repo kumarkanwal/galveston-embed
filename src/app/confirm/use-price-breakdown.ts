@@ -2,14 +2,14 @@ import { useEffect, useRef, useState } from "preact/hooks";
 
 import type { ApiClient, TaxiPriceBreakdownResponse } from "../../api/client";
 import type { TripFormState } from "../trip/types";
-import { breakdownErrorMessage } from "./breakdown-error";
+import { breakdownFailure } from "./breakdown-error";
 import { buildBreakdownRequest } from "./build-requests";
 
 export type BreakdownState =
   | { status: "skipped" }
   | { status: "loading" }
   | { status: "ready"; data: TaxiPriceBreakdownResponse }
-  | { status: "error"; message: string };
+  | { status: "error"; field: "carSeats" | null; message: string };
 
 export function usePriceBreakdown(
   client: ApiClient,
@@ -36,7 +36,7 @@ export function usePriceBreakdown(
       })
       .catch((error: unknown) => {
         if (latestRequest.current === requestId) {
-          setState({ status: "error", message: breakdownErrorMessage(error) });
+          setState({ status: "error", ...breakdownFailure(error) });
         }
       });
   }, [carSeats, client, enabled, form, vehicleTypeId]);

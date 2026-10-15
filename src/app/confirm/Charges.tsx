@@ -1,24 +1,41 @@
-import { formatMoney } from "../../money";
-import { FormError } from "../trip/FieldError";
+import { formatMoney, formatMoneyAmount } from "../../money";
+import { FieldError, FormError } from "../trip/FieldError";
 import type { BreakdownState } from "./use-price-breakdown";
 
 interface ChargesProps {
+  carSeatError: string | undefined;
+  carSeatMax: number;
+  carSeatPrice: string;
   carSeats: number;
   currency: string;
   onCarSeatsChange: (count: number) => void;
   state: BreakdownState;
 }
 
-const CAR_SEAT_OPTIONS = [0, 1, 2, 3, 4, 5];
+export interface CarSeatsFieldProps {
+  carSeatError: string | undefined;
+  carSeatMax: number;
+  carSeatPrice: string | undefined;
+  carSeats: number;
+  currency: string;
+  onCarSeatsChange: (count: number) => void;
+}
 
-export function CarSeatsField(props: Pick<ChargesProps, "carSeats" | "onCarSeatsChange">) {
-  return <label class="car-seats">
-    <span>Car Seats</span>
-    <select value={props.carSeats}
+export function CarSeatsField(props: CarSeatsFieldProps) {
+  if (props.carSeatMax <= 0) return null;
+  const options = Array.from({ length: props.carSeatMax + 1 }, (_, count) => count);
+  return <div class="car-seats">
+    <label for="carSeats">Car Seats {props.carSeatPrice !== undefined && <small>
+      {formatMoneyAmount(props.carSeatPrice, props.currency)} each
+    </small>}</label>
+    <select aria-describedby={props.carSeatError === undefined ? undefined : "carSeats-error"}
+      aria-invalid={props.carSeatError !== undefined} data-confirm-field="carSeats"
+      id="carSeats" value={props.carSeats}
       onChange={(event) => props.onCarSeatsChange(Number(event.currentTarget.value))}>
-      {CAR_SEAT_OPTIONS.map((count) => <option value={count}>{count} Car Seats</option>)}
+      {options.map((count) => <option value={count}>{count} Car Seats</option>)}
     </select>
-  </label>;
+    <FieldError id="carSeats-error" message={props.carSeatError} />
+  </div>;
 }
 
 export function Charges(props: ChargesProps) {
@@ -29,11 +46,14 @@ export function Charges(props: ChargesProps) {
     {props.state.status === "loading" && <p class="charges-status" role="status">
       Loading charges…
     </p>}
-    {props.state.status === "error" && <FormError>{props.state.message}</FormError>}
+    {props.state.status === "error" && props.state.field === null &&
+      <FormError>{props.state.message}</FormError>}
     {lines.map((line, index) => <div class="charge-row" key={index}>
       <span>{line.label}</span><span>{formatMoney(line.amount, response?.currency ?? props.currency)}</span>
     </div>)}
-    <CarSeatsField carSeats={props.carSeats} onCarSeatsChange={props.onCarSeatsChange} />
+    <CarSeatsField carSeatError={props.carSeatError} carSeatMax={props.carSeatMax}
+      carSeatPrice={props.carSeatPrice} carSeats={props.carSeats} currency={props.currency}
+      onCarSeatsChange={props.onCarSeatsChange} />
     {response !== null && <div class="charges-total">
       <strong>Total</strong><strong>{formatMoney(response.total, response.currency)}</strong>
     </div>}

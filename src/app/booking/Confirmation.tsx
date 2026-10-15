@@ -9,10 +9,8 @@ interface ConfirmationProps {
   requestQuote: boolean;
   response: TaxiBookingResponse;
 }
-function confirmationLead(requestQuote: boolean): string {
-  return requestQuote
-    ? "Thank you! Your quote request was successfully submitted. Your pending reservation number is"
-    : "Thank you! Your reservation was successfully submitted. Your reservation number is";
+function isPendingPricedStatus(status: string): boolean {
+  return status === "requested" || status === "pending";
 }
 
 export function Confirmation(props: ConfirmationProps) {
@@ -26,9 +24,17 @@ export function Confirmation(props: ConfirmationProps) {
       <span class="confirmation-check" aria-hidden="true">✓</span> Confirmation
     </h1>
     <div class="confirmation-notice" role="status">
-      <p>{confirmationLead(props.requestQuote)} <strong>{props.response.order_number}</strong>.</p>
-      {props.response.confirmation_email_sent && <p>
-        You will receive an email confirming your details.
+      {props.requestQuote && <p>
+        Thank you! Your quote request was successfully submitted. Your pending reservation number is{" "}
+        <strong>{props.response.order_number}</strong>.
+      </p>}
+      {!props.requestQuote && isPendingPricedStatus(props.response.status) && <p>
+        Thank you! Your booking request was submitted. Your reservation number is{" "}
+        <strong>{props.response.order_number}</strong>. The company will confirm your trip.
+      </p>}
+      {!props.requestQuote && !isPendingPricedStatus(props.response.status) && <p>
+        Thank you! Your reservation was successfully submitted. Your reservation number is{" "}
+        <strong>{props.response.order_number}</strong>.
       </p>}
       {!props.requestQuote && <p class="confirmation-total">
         Total: <strong>{formatMoney(props.response.total, props.currency)}</strong>

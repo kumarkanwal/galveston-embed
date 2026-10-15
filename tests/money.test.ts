@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { formatMoney } from "../src/money";
+import { formatMoney, formatMoneyAmount } from "../src/money";
 
 describe("formatMoney", () => {
   afterEach(() => vi.unstubAllEnvs());
@@ -24,6 +24,11 @@ describe("formatMoney", () => {
   it("renders a dash for malformed production input", () => {
     vi.stubEnv("PROD", true);
     expect(formatMoney("4.2", "USD")).toBe("—");
+  });
+
+  it("formats a compact per-seat amount without changing the money string", () => {
+    expect(formatMoneyAmount("15.00", "USD")).toBe("$15.00");
+    expect(formatMoneyAmount("1415.00", "USD")).toBe("$1,415.00");
   });
 
   it("contains none of the banned numeric-money functions", () => {
