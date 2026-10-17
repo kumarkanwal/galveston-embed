@@ -6,7 +6,7 @@ Base URL: `https://api.<domain>.com/v1`
 Consumers: Booking-form embed (taxi)
 
 **Version 1.2** — generated from the implemented schemas, routers, services and
-`openapi.json` after pricing-rework Parts 1–2. This document covers the public
+`openapi.json` through B-30. This document covers the public
 surface; the admin surface (`/admin/*`) is not documented here.
 
 ---
@@ -41,7 +41,17 @@ Read this section first if you have already built against v1.1.
   Greet is staff-only and does not appear in any public schema. Admin settings,
   manual reservations and reservation edits expose the corresponding staff
   controls; lead-source attribution is snapshotted on each admin-created or
-  edited order rather than rewriting the shared customer.
+  edited order rather than rewriting the shared customer. B-29a reservation
+  detail responses now include `meet_and_greet`, `meet_and_greet_amount` and
+  the order-level `lead_source` object while preserving
+  `customer.lead_source`; email detail responses expose stored `text_body` and
+  `html_body` values.
+- **B-30 promo codes:** promo validation and taxi Distance/Flat Rate breakdowns
+  now apply percent and fixed-amount codes using the business-local date.
+  Tracking-only codes use `discount_type: "none"` with value `"0.00"`; they
+  are accepted, snapshotted on the order and counted once on confirmation but
+  do not change any price. Codes are unique per business without regard to
+  letter case. Optional `max_uses` behavior is unchanged.
 
 ### Airport locations are server-resolved
 
