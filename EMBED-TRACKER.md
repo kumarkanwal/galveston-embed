@@ -38,7 +38,7 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 
 ## Progress
 
-**Overall: 66%** ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░ · **"Built" means 100%, add-ons included.**
+**Overall: 70%** ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░ · **"Built" means 100%, add-ons included.**
 
 | # | Phase | Side | Weight | Status | Done |
 |---|---|---|---|---|---|
@@ -52,11 +52,11 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 7 | E-5 Create Trip, confirmation, errors | Widget + Admin | 9% | ✅ Complete — merged and verified live | 9% |
 | 8 | E-6 Mobile, side-by-side with BRO, hosting | Both | 12% | 🔄 E-6e exact airport pin complete; BRO/hosting pending | 4% |
 | 9 | E-7 Card payment (Square) | Both | 9% | ⛔ B-16 | 0% |
-| 10 | E-8 Promo codes | Both | 4% | ⛔ Backend promo wiring | 0% |
+| 10 | E-7a Promo codes | Both | 4% | ✅ Complete — ready for review | 4% |
 | 11 | E-9 Round trip | Both | 5% | ⛔ I-1 | 0% |
 | 12 | E-10 Peak / blackout | Both | 3% | ⛔ B-7 | 0% |
 | 13 | E-11 Hourly (hours + Add Stops) | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
-| | **Total** | | **100%** | | **66%** |
+| | **Total** | | **100%** | | **70%** |
 
 Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
@@ -67,7 +67,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 | S-1 | New repo `galveston-embed` | ✅ | Separate from `galveston-widgets` (old cancelled plugin; leave untouched) |
 | S-2 | **VPS runs the latest backend**, including the pricing migration `f1a2b3c4d5e6` | ✅ | Pricing migration and B-20 are deployed on the preview VPS |
 | S-3 | D-1 (contract v1.2) and B-20 pushed to `origin` | ✅ | B-20 is included in backend commit `7e15a04` |
-| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ | Refreshed from backend commit `983c21d63b5353dfbfb61b1d86a2b658323a46fc` (including B-28 shared airports and exact airport pins) |
+| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ | Refreshed from backend commit `3943c62c00d572a251366d568117711e43f9eb07` (including B-30 taxi promo pricing) |
 | S-5 | Demo company API key, named `embed` | ✅ Ready when needed | Runbook: `docs/runbooks/embed-keys.md` (backend) |
 | S-6 | Developer's local address (e.g. `http://localhost:5173`) added to `CORS_ORIGINS` on the VPS | ⛔ Not yet | Otherwise the browser cannot read API responses |
 | S-7 | **Google Maps browser key**, HTTP-referrer restricted to dev address now, client sites later | 🔍 Key available; enable Routes API and restrict it | Must be separate from the server key. Maps JavaScript API, Places API (New), and Routes API are required; never use the server key in the browser |
@@ -120,6 +120,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 | 3.9 | Create Trip (cash) | ✅ | Sends once with a request-bound UUID idempotency key. A fingerprint/key pair (no customer data) survives reloads; retries reuse it until trip, vehicle, car seats, or customer details change (ED-026) |
 | 3.10 | Request a Quote vehicle chosen | ✅ | Shows Step 3 without charges, never calls price-breakdown, and submits a zero-total manual quote request |
 | 3.11 | Back button | ✅ | Returns to step 2 |
+| 3.12 | Promo code | ✅ | Priced vehicles only. Apply re-runs price-breakdown with the exact entered code; discount lines and totals remain server-owned. Tracking-only codes show `Code applied` without a discount line. Invalid codes retain the normal total and booking path; Remove re-prices without the code. The same applied code is sent with booking for the server to re-check. |
 
 ## After booking
 
@@ -134,7 +135,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 | # | Item | Status | Why later / what blocks it |
 |---|---|---|---|
 | A-1 | **Card payment** (new; BRO has none) | ⛔ | C-15 answered: one Square account, one location per company (ED-015). Still needs B-20 pushed, each company's Square location id, and B-16 sandbox test |
-| A-2 | Promo code | ⛔ | Not wired into the new pricing path (D-1 report) |
+| A-2 | Promo code | ✅ | E-7a uses B-30 price-breakdown and booking support on Distance and Flat Rate rows. Request-a-Quote vehicles keep ED-009 and do not show the control. |
 | A-3 | Round trip | ⛔ | Pricing unverified (I-1). Currently disabled for all businesses in the client's real setup |
 | A-4 | Peak / blackout display | ⏸ | Peak increases not on the new pricing path yet (B-7) |
 | A-5 | Per-pricing-row airport filter | ⏸ | `pricing_row_airports` exists but nothing uses it |
@@ -164,6 +165,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 | `403`, `404`, `503` | The API message, or a friendly fallback; never retry automatically |
 | `409 REQUEST_IN_FLIGHT` | "Your booking is still being processed. Please wait a moment and try again."; a customer retry reuses the same key |
 | `422 ADVANCE_BOOKING_VIOLATION`, `OUT_OF_SERVICE_AREA`, `VEHICLE_UNAVAILABLE`, `BELOW_MINIMUM_HOURS`, `PAYMENT_METHOD_NOT_OFFERED`, `AIRPORT_ADDRESS_MISSING` | The API's `message` |
+| `422 PROMO_INVALID` | The API's `message` under Promo code; Remove restores pricing and booking without the code |
 | `429 RATE_LIMITED` | "Too many requests, please wait a moment and try again." |
 | Other `5xx`, network failure | "We couldn't confirm your booking. Please try again — you will not be booked twice."; a customer retry reuses the same key |
 
@@ -200,8 +202,8 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 ## Sources of truth
 
-- `galveston-backend/docs/API_CONTRACT.md` (commit `983c21d63b5353dfbfb61b1d86a2b658323a46fc`)
-- `galveston-backend/openapi.json` (commit `983c21d63b5353dfbfb61b1d86a2b658323a46fc`)
+- `galveston-backend/docs/API_CONTRACT.md` (commit `3943c62c00d572a251366d568117711e43f9eb07`; section I-6 is stale for B-30)
+- `galveston-backend/openapi.json` (commit `3943c62c00d572a251366d568117711e43f9eb07`)
 - `galveston-backend/docs/PROJECT-TRACKER.md`
 - BRO screenshots in this repo
 
@@ -209,6 +211,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 17 Oct 2026 | E-7a complete for review: refreshed and byte-verified the B-30 API sources, added the BRO-style Step 3 promo control for priced vehicles, kept discount lines and totals server-owned, supported tracking-only and invalid/expired codes, removed codes through a fresh normal breakdown, and sent only the successfully applied code with booking. |
 | 17 Oct 2026 | E-6e complete for review: refreshed the pushed B-28 contract, geocoded each selected airport's server-owned address and zipcode for the Step 1 pin and route, retained a silent airport-name fallback with at most one developer warning, and kept quote, breakdown, booking, and money behavior unchanged. |
 | 15 Oct 2026 | E-6d complete for review: Step 2 now loads only HTTPS vehicle photos, reserves fixed responsive image space, lazy-loads with the vehicle name as alt text, and replaces absent, invalid, non-HTTPS, or failed images with a neutral inline car placeholder. |
 | 15 Oct 2026 | E-6c complete for review: refreshed the approved B-29 contract, replaced the fixed Car Seats list with company Preferences, kept pricing server-owned, placed stale-preference errors under the preserved selection, and made priced confirmation wording follow `requested`/`pending` versus `confirmed`. Request a Quote shows no car-seat price, Meet & Greet remains staff-only, and no confirmation promises email. |

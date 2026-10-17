@@ -87,9 +87,9 @@ Copy BRO's 3-step flow. Screenshots in `docs/reference/bro/` are the reference f
 | Load | `GET /business`, `GET /taxi/service-types` (and airports, airlines when needed) |
 | 1. Trip Details → Check Pricing | `POST /taxi/quote` (built in E-3; E-2 only builds and validates the request) |
 | 2. Choose Vehicle | none (uses the quote) |
-| 3. Confirm | `POST /taxi/price-breakdown` (priced vehicles only), then `POST /taxi/booking` |
+| 3. Confirm | `POST /taxi/price-breakdown` (priced vehicles only, including an applied promo code), then `POST /taxi/booking` with the same code |
 
-**Dropped from BRO:** the site header (Menu, Login), customer accounts, round trip, promo code (for now).
+**Dropped from BRO:** the site header (Menu, Login), customer accounts, round trip.
 **Added beyond BRO (later):** card payment.
 
 ## 7. Environments

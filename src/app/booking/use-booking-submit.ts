@@ -12,6 +12,7 @@ interface BookingSubmitOptions {
   carSeats: number;
   client: ApiClient;
   onSuccess: (response: TaxiBookingResponse) => void;
+  promoCode: string | null;
   trip: TripFormState;
   vehicleTypeId: string;
 }
@@ -27,7 +28,7 @@ export function useBookingSubmit(options: BookingSubmitOptions) {
     if (inFlight.current) return;
     inFlight.current = true;
     const body = buildBookingRequest(
-      options.trip, options.vehicleTypeId, options.carSeats, form,
+      options.trip, options.vehicleTypeId, options.carSeats, form, options.promoCode,
     );
     setFailure(null);
     setIsSubmitting(true);

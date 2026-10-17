@@ -1,6 +1,7 @@
 import { formatMoney, formatMoneyAmount } from "../../money";
 import { FieldError, FormError } from "../trip/FieldError";
-import type { BreakdownState } from "./use-price-breakdown";
+import { PromoCodeField } from "./PromoCodeField";
+import type { BreakdownState, PromoCodeState } from "./use-price-breakdown";
 
 interface ChargesProps {
   carSeatError: string | undefined;
@@ -9,6 +10,11 @@ interface ChargesProps {
   carSeats: number;
   currency: string;
   onCarSeatsChange: (count: number) => void;
+  onPromoApply: () => void;
+  onPromoInput: (value: string) => void;
+  onPromoRemove: () => void;
+  promo: PromoCodeState;
+  promoError: string | undefined;
   state: BreakdownState;
 }
 
@@ -54,6 +60,8 @@ export function Charges(props: ChargesProps) {
     <CarSeatsField carSeatError={props.carSeatError} carSeatMax={props.carSeatMax}
       carSeatPrice={props.carSeatPrice} carSeats={props.carSeats} currency={props.currency}
       onCarSeatsChange={props.onCarSeatsChange} />
+    <PromoCodeField error={props.promoError} onApply={props.onPromoApply}
+      onInput={props.onPromoInput} onRemove={props.onPromoRemove} promo={props.promo} />
     {response !== null && <div class="charges-total">
       <strong>Total</strong><strong>{formatMoney(response.total, response.currency)}</strong>
     </div>}
