@@ -25,7 +25,9 @@ export function useAirportLocation(
       onLocation(location);
       setStatus(location === null ? "error" : "ready");
     }).catch(() => {
-      if (active) setStatus("error");
+      if (!active) return;
+      onLocation(null);
+      setStatus("error");
     });
     return () => { active = false; };
   }, [airport?.id, mapsKey]);

@@ -75,6 +75,13 @@ export async function loadPlacesLibrary(
   return api.maps.importLibrary("places") as Promise<google.maps.PlacesLibrary>;
 }
 
+export async function loadGeocodingLibrary(
+  key: string,
+): Promise<google.maps.GeocodingLibrary> {
+  const api = await loadGoogleMaps(key);
+  return api.maps.importLibrary("geocoding") as Promise<google.maps.GeocodingLibrary>;
+}
+
 export async function loadRouteLibrary(
   key: string,
 ): Promise<RoutePreviewLibrary> {

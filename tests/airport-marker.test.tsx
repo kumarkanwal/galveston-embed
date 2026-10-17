@@ -20,8 +20,10 @@ vi.mock("../src/app/trip/MapPanel", () => ({
 }));
 
 const AIRPORTS: Airport[] = [
-  { id: "iah", name: "George Bush Intercontinental", code: "IAH" },
-  { id: "hou", name: "William P. Hobby", code: "HOU" },
+  { id: "iah", name: "George Bush Intercontinental", code: "IAH",
+    address: "2800 N Terminal Rd, Houston, TX", zipcode: "77032" },
+  { id: "hou", name: "William P. Hobby", code: "HOU",
+    address: "7800 Airport Blvd, Houston, TX", zipcode: "77061" },
 ];
 const BUSINESS = {
   id: "business-1", name: "Island Transit", type: "taxi", currency: "USD",
@@ -106,16 +108,16 @@ describe("airport markers", () => {
 });
 
 describe("airport lookup failure", () => {
-  it("keeps pricing usable when Places lookup fails", async () => {
+  it("keeps pricing usable without showing an error when every lookup fails", async () => {
     mocks.resolveAirportLocation.mockRejectedValue(new Error("Places unavailable"));
     const root = document.createElement("div");
     document.body.append(root);
     render(<Harness service="airport_pickup" />, root);
     await chooseAirport(root, "iah");
-    await vi.waitFor(() => expect(root.textContent).toContain("still check pricing"));
+    await vi.waitFor(() => expect(flow().state.form.pickupAirportId).toBe("iah"));
     expect(marker(root, "pickup")).toBeNull();
+    expect(root.textContent).not.toContain("Airport map location is unavailable");
     expect(root.querySelector<HTMLButtonElement>(".check-pricing")?.disabled).toBe(false);
-    expect(flow().state.form.pickupAirportId).toBe("iah");
   });
 });
 

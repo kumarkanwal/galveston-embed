@@ -20,11 +20,6 @@ function AirportLocationStatus({ status }: {
   if (status === "loading") {
     return <small class="field-note" role="status">Locating airport on map…</small>;
   }
-  if (status === "error") {
-    return <small class="field-note" role="status">
-      Airport map location is unavailable. You can still check pricing.
-    </small>;
-  }
   return null;
 }
 

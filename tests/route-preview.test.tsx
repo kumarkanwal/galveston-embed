@@ -53,6 +53,7 @@ describe("step-one route preview", () => {
   it.each([
     ["address to address", PICKUP, DROPOFF],
     ["airport to address", CHANGED_DROPOFF, DROPOFF],
+    ["address to airport", PICKUP, CHANGED_DROPOFF],
   ])("requests and draws a driving route for %s", async (_label, pickup, dropoff) => {
     const line = polyline();
     const computeRoutes = vi.fn(async () => ({ routes: [route([pickup, dropoff], line)] }));
