@@ -15,6 +15,18 @@ surface; the admin surface (`/admin/*`) is not documented here.
 
 Read this section first if you have already built against v1.1.
 
+- **B-28 shared air-travel catalogs:** every company now receives the same
+  active airport and airline lists. Public airport rows include the exact
+  server-owned `address` and `zipcode` pin used for quote and booking
+  resolution. Existing endpoint paths and airport-id request fields are
+  unchanged.
+- **B-1 booking email behavior:** every successful shuttle or taxi submission
+  queues a direct company alert plus the customer message matching its final
+  status. Taxi cash bookings now return `requested`; shuttle cash bookings keep
+  their existing confirmed status and seat/hold behavior. Priced taxi card
+  bookings use `auto_confirm_card_payments`: confirmed when enabled, requested
+  when disabled. Customer-facing request, confirmation and reminder messages
+  are BCCed to `alerts_email`; company and driver messages are not.
 - **B-24 admin integration:** authorized owners and managers can reveal the
   newest active API key named `embed`; owners can regenerate it, immediately
   revoking every previous active `embed` key. Public authentication and the
@@ -517,6 +529,9 @@ Generate the key when the customer reaches the payment step and **reuse it acros
 asynchronous delivery queue while email delivery was enabled. It does not mean
 the SMTP server has already accepted it. When delivery is disabled, the row is
 retained for history but is permanently ineligible and this field is `false`.
+The shuttle flow also queues a direct company alert. Cash shuttle bookings keep
+the same confirmed status, hold consumption and seat mutation as online shuttle
+bookings; B-1 does not move them into Pending Requests.
 
 `address` is required when any selected location has `requires_address: true`.
 
@@ -622,12 +637,28 @@ Local addresses that Maps cannot resolve are expected. They produce `out_of_serv
 ### `GET /v1/public/taxi/airports`
 
 ```json
-{ "data": [ { "id": "uuid", "name": "George Bush Intercontinental Airport", "code": "IAH" } ] }
+{
+  "data": [
+    {
+      "id": "uuid",
+      "name": "George Bush Intercontinental Airport",
+      "code": "IAH",
+      "address": "2800 N Terminal Rd, Houston, TX",
+      "zipcode": "77032"
+    }
+  ]
+}
 ```
+
+This active list is shared by all companies. `address` and `zipcode` are the
+exact server-owned location used when the customer selects the airport; the
+plugin should use them for display and must not substitute a different pin.
 
 ### `GET /v1/public/taxi/airlines`
 
 Feeds the flight-details dropdown on airport services.
+
+The active airline list is shared by all companies.
 
 ```json
 { "data": [ { "id": "uuid", "name": "British Airways" } ] }
@@ -913,7 +944,7 @@ Replaying a completed `Idempotency-Key` still counts toward both limits.
 { "data": {
   "order_id": "uuid",
   "order_number": "HVT-2026-003211",
-  "status": "confirmed",
+  "status": "requested",
   "total": "76.30",
   "amount_paid": "0.00",
   "payment_method": "cash",
@@ -921,23 +952,28 @@ Replaying a completed `Idempotency-Key` still counts toward both limits.
 }}
 ```
 
-`confirmation_email_sent` reports queue eligibility, not completed SMTP
-delivery. It is `false` when `EMAIL_DELIVERY_ENABLED` is off.
+`confirmation_email_sent` is the legacy field name for the customer outcome
+email: confirmation for a confirmed order, or request acknowledgement for a
+requested order. It reports queue eligibility, not completed SMTP delivery, and
+is `false` when `EMAIL_DELIVERY_ENABLED` is off. A direct company alert is also
+queued for every successful submission.
 
 #### Resulting status
 
 | Condition | `status` |
 |---|---|
 | No price was produced, including a missing/zero Flat Rate | `"requested"` — staff quote it manually |
-| Business has auto-confirm on | `"confirmed"` |
-| Business has auto-confirm off | `"requested"` — staff review it |
+| Cash payment | `"requested"` — staff confirm it |
+| Priced card payment and `auto_confirm_card_payments` is on | `"confirmed"` |
+| Priced card payment and `auto_confirm_card_payments` is off | `"requested"` — staff review it |
 
 An unpriced booking creates a **zero-total `requested` order and does not fail**.
 That includes an out-of-area journey, an unresolved Distance journey, and a
 Flat Rate row whose matched dropoff area has no rate or a `"0.00"` rate. No
 payment-provider call is made.
 
-Cash bookings confirm with `amount_paid: "0.00"` and pay the driver on the day.
+Cash bookings return `requested` with `amount_paid: "0.00"`; staff confirmation
+later queues the confirmation email.
 
 ---
 
@@ -1053,6 +1089,21 @@ narrowed remains open.
 The unknown-outcome case is the one to get right. An automatic retry there can double-charge a customer.
 
 ---
+
+## Admin shared lead sources (B-32)
+
+The existing admin paths remain stable:
+
+- `GET /v1/admin/lead-sources`
+- `POST /v1/admin/lead-sources`
+- `PATCH /v1/admin/lead-sources/{source_id}`
+- `DELETE /v1/admin/lead-sources/{source_id}`
+
+All six businesses read the same list. Owners, managers, and dispatchers may
+list and select active sources on customers and bookings. Catalog mutations
+require the platform-super-admin flag and return `403 FORBIDDEN_BUSINESS_SCOPE`
+for every other admin. `LeadSourceResult.business_id` remains present for client
+compatibility and is always `null` for the shared catalog.
 
 ## Notes for plugin developers
 

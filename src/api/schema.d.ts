@@ -77,13 +77,13 @@ export interface paths {
         };
         /**
          * List Airlines
-         * @description List scoped airline configuration.
+         * @description List the shared airline catalog, active by default.
          */
         get: operations["list_airlines_v1_admin_airlines_get"];
         put?: never;
         /**
          * Create Airline
-         * @description Create one selected-business airline.
+         * @description Create one shared airline as a platform catalog administrator.
          */
         post: operations["create_airline_v1_admin_airlines_post"];
         delete?: never;
@@ -101,7 +101,7 @@ export interface paths {
         };
         /**
          * Get Airline
-         * @description Return one scoped airline.
+         * @description Return one shared airline.
          */
         get: operations["get_airline_v1_admin_airlines__airline_id__get"];
         put?: never;
@@ -115,7 +115,7 @@ export interface paths {
         head?: never;
         /**
          * Update Airline
-         * @description Edit one scoped airline.
+         * @description Edit one shared airline as a platform catalog administrator.
          */
         patch: operations["update_airline_v1_admin_airlines__airline_id__patch"];
         trace?: never;
@@ -129,13 +129,13 @@ export interface paths {
         };
         /**
          * List Airports
-         * @description List scoped airport configuration.
+         * @description List the shared airport catalog.
          */
         get: operations["list_airports_v1_admin_airports_get"];
         put?: never;
         /**
          * Create Airport
-         * @description Create one selected-business airport.
+         * @description Create one shared airport as a platform catalog administrator.
          */
         post: operations["create_airport_v1_admin_airports_post"];
         delete?: never;
@@ -153,7 +153,7 @@ export interface paths {
         };
         /**
          * Get Airport
-         * @description Return one scoped airport.
+         * @description Return one shared airport.
          */
         get: operations["get_airport_v1_admin_airports__airport_id__get"];
         put?: never;
@@ -167,7 +167,7 @@ export interface paths {
         head?: never;
         /**
          * Update Airport
-         * @description Edit one scoped airport.
+         * @description Edit one shared airport as a platform catalog administrator.
          */
         patch: operations["update_airport_v1_admin_airports__airport_id__patch"];
         trace?: never;
@@ -889,13 +889,13 @@ export interface paths {
         };
         /**
          * List Lead Sources
-         * @description List acquisition sources in the active business scope.
+         * @description List the acquisition sources shared by every business.
          */
         get: operations["list_lead_sources_v1_admin_lead_sources_get"];
         put?: never;
         /**
          * Create Lead Source
-         * @description Create one source for the selected business.
+         * @description Create one platform-wide source.
          */
         post: operations["create_lead_source_v1_admin_lead_sources_post"];
         delete?: never;
@@ -916,14 +916,14 @@ export interface paths {
         post?: never;
         /**
          * Delete Lead Source
-         * @description Remove or deactivate one scoped acquisition source.
+         * @description Remove or deactivate one platform-wide acquisition source.
          */
         delete: operations["delete_lead_source_v1_admin_lead_sources__source_id__delete"];
         options?: never;
         head?: never;
         /**
          * Update Lead Source
-         * @description Edit one scoped acquisition source.
+         * @description Edit one platform-wide acquisition source.
          */
         patch: operations["update_lead_source_v1_admin_lead_sources__source_id__patch"];
         trace?: never;
@@ -1546,6 +1546,26 @@ export interface paths {
          * @description Queue one reservation-panel email action.
          */
         post: operations["queue_reservation_email_v1_admin_reservations__booking_id__emails_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reservations/{booking_id}/emails/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Preview Reservation Email
+         * @description Render one B-1 email without queueing or sending it.
+         */
+        get: operations["preview_reservation_email_v1_admin_reservations__booking_id__emails_preview_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2907,7 +2927,7 @@ export interface components {
         };
         /**
          * AirlineCreate
-         * @description One airline offered in the selected business's dropdown.
+         * @description One airline offered in every business's dropdown.
          */
         AirlineCreate: {
             /**
@@ -2933,14 +2953,11 @@ export interface components {
         };
         /**
          * AirlineResult
-         * @description One tenant-owned airline dropdown row.
+         * @description One shared airline; business_id stays null for client compatibility.
          */
         AirlineResult: {
-            /**
-             * Business Id
-             * Format: uuid
-             */
-            business_id: string;
+            /** Business Id */
+            business_id?: string | null;
             /**
              * Created At
              * Format: date-time
@@ -2998,13 +3015,13 @@ export interface components {
         };
         /**
          * AirportCreate
-         * @description One airport offered by the selected taxi business.
+         * @description One airport offered by every business.
          */
         AirportCreate: {
             /** Address */
-            address?: string | null;
+            address: string;
             /** Code */
-            code?: string | null;
+            code: string;
             /**
              * Is Active
              * @default true
@@ -3013,7 +3030,7 @@ export interface components {
             /** Name */
             name: string;
             /** Zipcode */
-            zipcode?: string | null;
+            zipcode: string;
         };
         /**
          * AirportDeactivationResult
@@ -3021,16 +3038,13 @@ export interface components {
          */
         AirportDeactivationResult: {
             /** Address */
-            address: string | null;
+            address: string;
             /** Affected Upcoming Bookings */
             affected_upcoming_bookings: components["schemas"]["AirportBookingWarning"][];
-            /**
-             * Business Id
-             * Format: uuid
-             */
-            business_id: string;
+            /** Business Id */
+            business_id?: string | null;
             /** Code */
-            code: string | null;
+            code: string;
             /**
              * Created At
              * Format: date-time
@@ -3051,15 +3065,17 @@ export interface components {
              */
             updated_at: string;
             /** Zipcode */
-            zipcode: string | null;
+            zipcode: string;
         };
         /**
          * AirportOption
-         * @description One airport the business serves.
+         * @description One shared airport with the exact pickup/dropoff pin.
          */
         AirportOption: {
+            /** Address */
+            address: string;
             /** Code */
-            code?: string | null;
+            code: string;
             /**
              * Id
              * Format: uuid
@@ -3067,21 +3083,20 @@ export interface components {
             id: string;
             /** Name */
             name: string;
+            /** Zipcode */
+            zipcode: string;
         };
         /**
          * AirportResult
-         * @description One tenant-owned airport dropdown row.
+         * @description One shared airport; business_id stays null for client compatibility.
          */
         AirportResult: {
             /** Address */
-            address: string | null;
-            /**
-             * Business Id
-             * Format: uuid
-             */
-            business_id: string;
+            address: string;
+            /** Business Id */
+            business_id?: string | null;
             /** Code */
-            code: string | null;
+            code: string;
             /**
              * Created At
              * Format: date-time
@@ -3102,7 +3117,7 @@ export interface components {
              */
             updated_at: string;
             /** Zipcode */
-            zipcode: string | null;
+            zipcode: string;
         };
         /**
          * AirportUpdate
@@ -5299,6 +5314,25 @@ export interface components {
             to_email: string;
         };
         /**
+         * EmailPreview
+         * @description A read-only rendering of one B-1 template for a real scoped booking.
+         */
+        EmailPreview: {
+            /**
+             * Email Type
+             * @enum {string}
+             */
+            email_type: "company_alert" | "request_submitted" | "confirmation" | "customer_reminder" | "driver_reminder";
+            /** Html Body */
+            html_body: string;
+            /** Subject */
+            subject: string;
+            /** Text Body */
+            text_body: string;
+            /** To Email */
+            to_email: string;
+        };
+        /**
          * EmailSettingsUpdate
          * @description Nullable text fields clear overrides; the SMTP password is always write-only.
          */
@@ -5481,6 +5515,10 @@ export interface components {
         /** Envelope[EmailLogDetail] */
         Envelope_EmailLogDetail_: {
             data: components["schemas"]["EmailLogDetail"];
+        };
+        /** Envelope[EmailPreview] */
+        Envelope_EmailPreview_: {
+            data: components["schemas"]["EmailPreview"];
         };
         /** Envelope[EmbedKeyRegeneratedResult] */
         Envelope_EmbedKeyRegeneratedResult_: {
@@ -5922,7 +5960,7 @@ export interface components {
         };
         /**
          * LeadSourceCreate
-         * @description A business-owned acquisition source.
+         * @description An acquisition source offered by every business.
          */
         LeadSourceCreate: {
             /** Name */
@@ -5930,14 +5968,11 @@ export interface components {
         };
         /**
          * LeadSourceResult
-         * @description One scoped lead source.
+         * @description One shared lead source; business_id stays null for compatibility.
          */
         LeadSourceResult: {
-            /**
-             * Business Id
-             * Format: uuid
-             */
-            business_id: string;
+            /** Business Id */
+            business_id?: string | null;
             /**
              * Created At
              * Format: date-time
@@ -6975,7 +7010,7 @@ export interface components {
          * @description A capability an endpoint can require.
          * @enum {string}
          */
-        Permission: "booking:read" | "booking:write" | "booking:assign" | "booking:status" | "communication:send" | "customer:read" | "customer:write" | "customer:manage" | "pricing:read" | "pricing:write" | "vehicle_rate:write" | "vehicle_type_catalog:write" | "service_type_assignment:write" | "service_type_catalog:write" | "taxi_catalog:manage" | "payment:read" | "payment:write" | "email:read" | "audit:read" | "config:read" | "config:write" | "zone_price:import" | "company:read" | "company:write" | "company_identity:write" | "business_settings:read" | "business_settings:write" | "team:read" | "team:write" | "settings:read" | "settings:write" | "integration:read" | "api_keys:read" | "api_keys:write" | "report:read" | "own_runs:read";
+        Permission: "booking:read" | "booking:write" | "booking:assign" | "booking:status" | "communication:send" | "customer:read" | "customer:write" | "customer:manage" | "pricing:read" | "pricing:write" | "vehicle_rate:write" | "vehicle_type_catalog:write" | "service_type_assignment:write" | "service_type_catalog:write" | "taxi_catalog:manage" | "platform_catalog:manage" | "payment:read" | "payment:write" | "email:read" | "audit:read" | "config:read" | "config:write" | "zone_price:import" | "company:read" | "company:write" | "company_identity:write" | "business_settings:read" | "business_settings:write" | "team:read" | "team:write" | "settings:read" | "settings:write" | "integration:read" | "api_keys:read" | "api_keys:write" | "report:read" | "own_runs:read";
         /**
          * PreferencesSettingsUpdate
          * @description Taxi booking choices controlled by the selected business.
@@ -8569,11 +8604,11 @@ export interface components {
         };
         /**
          * StatusChange
-         * @description A deliberate state transition; notifications are always opt-in.
+         * @description A state transition; confirmation notifies by default and permits opt-out.
          */
         StatusChange: {
             /** Notify Customer */
-            notify_customer?: boolean;
+            notify_customer?: boolean | null;
             /**
              * Status
              * @enum {string}
@@ -9951,6 +9986,7 @@ export interface operations {
     list_airlines_v1_admin_airlines_get: {
         parameters: {
             query?: {
+                active_only?: boolean;
                 business_id?: string | null;
                 /** @description 1-based page number. */
                 page?: number;
@@ -13798,6 +13834,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_QueuedEmailResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_reservation_email_v1_admin_reservations__booking_id__emails_preview_get: {
+        parameters: {
+            query: {
+                email_type: "company_alert" | "request_submitted" | "confirmation" | "customer_reminder" | "driver_reminder";
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EmailPreview_"];
                 };
             };
             /** @description Validation Error */
