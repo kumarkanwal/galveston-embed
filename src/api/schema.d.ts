@@ -5075,6 +5075,21 @@ export interface components {
             vehicle: components["schemas"]["AssignmentSummary"];
         };
         /**
+         * DetailLeadSource
+         * @description The order-level acquisition source selected for this reservation.
+         */
+        DetailLeadSource: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Name */
+            name: string;
+        };
+        /**
          * DetailNotes
          * @description The three note audiences kept separate on a run.
          */
@@ -5091,7 +5106,7 @@ export interface components {
          * @description How a promo code reduces the total.
          * @enum {string}
          */
-        DiscountType: "percent" | "amount";
+        DiscountType: "percent" | "amount" | "none";
         /**
          * DriverRunRow
          * @description Driver-safe run details; internal additional notes are intentionally absent.
@@ -5246,6 +5261,8 @@ export interface components {
             error: string | null;
             /** Fallback Used */
             fallback_used: boolean;
+            /** Html Body */
+            html_body: string | null;
             /**
              * Id
              * Format: uuid
@@ -5267,6 +5284,8 @@ export interface components {
             status: string;
             /** Subject */
             subject: string | null;
+            /** Text Body */
+            text_body: string | null;
             /** To Email */
             to_email: string;
         };
@@ -7281,8 +7300,7 @@ export interface components {
         PromoValidateResponse: {
             /** Discount Amount */
             discount_amount?: string | null;
-            /** Discount Type */
-            discount_type?: string | null;
+            discount_type?: components["schemas"]["DiscountType"] | null;
             /** Discount Value */
             discount_value?: string | null;
             /** Reason */
@@ -7537,7 +7555,12 @@ export interface components {
             external_reference: string | null;
             /** Journey */
             journey: components["schemas"]["TaxiJourneyDetail"] | components["schemas"]["ShuttleJourneyDetail"];
+            lead_source: components["schemas"]["DetailLeadSource"] | null;
             leg: components["schemas"]["BookingLeg"] | null;
+            /** Meet And Greet */
+            meet_and_greet: boolean;
+            /** Meet And Greet Amount */
+            meet_and_greet_amount: string | null;
             notes: components["schemas"]["DetailNotes"];
             /**
              * Order Id

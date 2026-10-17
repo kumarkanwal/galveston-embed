@@ -26,13 +26,16 @@ const FIELD_MAP: Record<string, ConfirmField> = {
   first_name: "firstName",
   last_name: "lastName",
   phone: "phone",
+  promo_code: "promoCode",
 };
 
 function apiFailure(error: ApiError): BookingFailure {
   if (error.status >= 500 && error.status !== 503) {
     return { field: null, message: UNKNOWN_OUTCOME };
   }
-  const field = error.field === undefined ? null : (FIELD_MAP[error.field] ?? null);
+  const field = error.code === "PROMO_INVALID"
+    ? "promoCode"
+    : error.field === undefined ? null : (FIELD_MAP[error.field] ?? null);
   return { field, message: error.message || "Your booking could not be submitted." };
 }
 

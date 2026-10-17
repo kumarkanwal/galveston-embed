@@ -7,5 +7,10 @@ export interface ConfirmFormState {
   phone: string;
 }
 
-export type ConfirmField = keyof ConfirmFormState | "breakdown" | "carSeats" | "comments";
+export type ConfirmField =
+  | keyof ConfirmFormState
+  | "breakdown"
+  | "carSeats"
+  | "comments"
+  | "promoCode";
 export type ConfirmErrors = Partial<Record<ConfirmField, string>>;

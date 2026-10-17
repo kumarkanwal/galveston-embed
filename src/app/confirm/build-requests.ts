@@ -10,12 +10,14 @@ export function buildBreakdownRequest(
   form: TripFormState,
   vehicleTypeId: string,
   carSeats: number,
+  promoCode: string | null = null,
 ): TaxiPriceBreakdownRequest {
   return {
     ...buildQuoteRequest(form),
     vehicle_type_id: vehicleTypeId,
     payment_method: "cash",
     car_seats: carSeats,
+    ...(promoCode === null ? {} : { promo_code: promoCode }),
   };
 }
 
@@ -24,6 +26,7 @@ export function buildBookingRequest(
   vehicleTypeId: string,
   carSeats: number,
   form: ConfirmFormState,
+  promoCode: string | null = null,
 ): TaxiBookingRequest {
   const { payment_method: _paymentMethod, ...journey } = buildQuoteRequest(trip);
   return {
@@ -39,5 +42,6 @@ export function buildBookingRequest(
     comments: form.comments.trim() || null,
     payment: { method: "cash" },
     accepted_terms: form.acceptedTerms,
+    ...(promoCode === null ? {} : { promo_code: promoCode }),
   };
 }

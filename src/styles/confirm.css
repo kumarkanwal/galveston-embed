@@ -122,6 +122,44 @@
   grid-column: 2;
 }
 
+.promo-code {
+  border-bottom: 1px solid #cccccc;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  padding: 16px 0;
+}
+
+.promo-code button {
+  background: var(--green);
+  border: 1px solid #4cae4c;
+  border-radius: 3px 0 0 3px;
+  color: #ffffff;
+  cursor: pointer;
+  min-width: 72px;
+  padding: 6px 12px;
+}
+
+.promo-code button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.promo-code input {
+  border-radius: 0 3px 3px 0;
+  min-width: 0;
+}
+
+.promo-code .field-error,
+.promo-code p {
+  grid-column: 2;
+  margin: 5px 0 0;
+}
+
+.promo-code p {
+  color: #3c763d;
+  font-size: 12px;
+}
+
 .charges-total {
   background: var(--green);
   color: #ffffff;
@@ -323,6 +361,11 @@
   }
 
   .create-trip {
+    min-height: 44px;
+  }
+
+  .promo-code button,
+  .promo-code input {
     min-height: 44px;
   }
 }
