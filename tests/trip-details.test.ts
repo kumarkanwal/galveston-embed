@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { buildBookingRequest, buildBreakdownRequest } from "../src/app/confirm/build-requests";
 import { buildQuoteRequest } from "../src/app/trip/build-quote-request";
 import { tripMapPoints } from "../src/app/trip/TripDetails";
 import type { CoreServiceCode, TripFormState } from "../src/app/trip/types";
@@ -66,7 +67,7 @@ describe("quote request builder", () => {
     });
   });
 
-  it("sets only the applicable airport side", () => {
+  it("airport id still sent", () => {
     expect(buildQuoteRequest(formFor("airport_pickup"))).toMatchObject({
       pickup_address: null,
       pickup_zipcode: null,
@@ -80,6 +81,36 @@ describe("quote request builder", () => {
       pickup_airport_id: null,
       dropoff_airport_id: "airport-dropoff",
       airline: "Example Air",
+    });
+  });
+
+});
+
+describe("airport pricing request invariants", () => {
+  it("no pricing change", () => {
+    const trip = formFor("airport_pickup");
+    const breakdown = buildBreakdownRequest(trip, "vehicle-1", 2);
+    const booking = buildBookingRequest(trip, "vehicle-1", 2, {
+      acceptedTerms: true,
+      comments: "",
+      email: "rider@example.com",
+      firstName: "Test",
+      lastName: "Rider",
+      phone: "",
+    });
+    expect(breakdown).toMatchObject({
+      pickup_airport_id: "airport-pickup",
+      pickup_address: null,
+      pickup_zipcode: null,
+      payment_method: "cash",
+      vehicle_type_id: "vehicle-1",
+    });
+    expect(booking).toMatchObject({
+      pickup_airport_id: "airport-pickup",
+      pickup_address: null,
+      pickup_zipcode: null,
+      payment: { method: "cash" },
+      vehicle_type_id: "vehicle-1",
     });
   });
 });

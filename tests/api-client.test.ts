@@ -128,6 +128,20 @@ describe("API request setup", () => {
 
 });
 
+describe("airport API data", () => {
+  it("returns the server-owned airport address and zipcode", async () => {
+    const airport = {
+      id: "airport-1",
+      name: "George Bush Intercontinental Airport",
+      code: "IAH",
+      address: "2800 N Terminal Rd, Houston, TX",
+      zipcode: "77032",
+    };
+    const fetch = vi.fn(async (_input: Request) => jsonResponse({ data: [airport] }));
+    await expect(clientWith(fetch).getAirports()).resolves.toEqual([airport]);
+  });
+});
+
 describe("price breakdown API", () => {
   it("posts once without retrying", async () => {
     const fetch = vi.fn(async (_input: Request) => jsonResponse({ data: {
@@ -183,6 +197,15 @@ describe("API response validation", () => {
       } response.`);
     },
   );
+
+  it.each(["address", "zipcode"])("rejects a non-string airport %s", async (field) => {
+    const airport = {
+      id: "airport-1", name: "IAH", code: "IAH",
+      address: "2800 N Terminal Rd", zipcode: "77032", [field]: 123,
+    };
+    const fetch = vi.fn(async (_input: Request) => jsonResponse({ data: [airport] }));
+    await expect(clientWith(fetch).getAirports()).rejects.toThrow("Invalid airports response.");
+  });
 });
 
 describe("API errors", () => {

@@ -1,6 +1,6 @@
 # Booking Widget (Embed) — Tracker
 
-**Repo:** `galveston-embed` (new, separate) · **Last updated:** 15 October 2026
+**Repo:** `galveston-embed` (new, separate) · **Last updated:** 17 October 2026
 **Talks to:** the hosted `galveston-backend` API on the VPS.
 **Replaces:** the client's live Book Rides Online (BRO) booking form.
 
@@ -50,7 +50,7 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 5 | E-3 Step 2 — Choose Vehicle | Widget + VPS | 11% | ✅ Complete — address filter fixed | 11% |
 | 6 | E-4 Step 3 — Confirm & breakdown | Widget | 9% | ✅ Complete — ready for review | 9% |
 | 7 | E-5 Create Trip, confirmation, errors | Widget + Admin | 9% | ✅ Complete — merged and verified live | 9% |
-| 8 | E-6 Mobile, side-by-side with BRO, hosting | Both | 12% | 🔄 E-6c company Car Seats complete; BRO/hosting pending | 4% |
+| 8 | E-6 Mobile, side-by-side with BRO, hosting | Both | 12% | 🔄 E-6e exact airport pin complete; BRO/hosting pending | 4% |
 | 9 | E-7 Card payment (Square) | Both | 9% | ⛔ B-16 | 0% |
 | 10 | E-8 Promo codes | Both | 4% | ⛔ Backend promo wiring | 0% |
 | 11 | E-9 Round trip | Both | 5% | ⛔ I-1 | 0% |
@@ -67,7 +67,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 | S-1 | New repo `galveston-embed` | ✅ | Separate from `galveston-widgets` (old cancelled plugin; leave untouched) |
 | S-2 | **VPS runs the latest backend**, including the pricing migration `f1a2b3c4d5e6` | ✅ | Pricing migration and B-20 are deployed on the preview VPS |
 | S-3 | D-1 (contract v1.2) and B-20 pushed to `origin` | ✅ | B-20 is included in backend commit `7e15a04` |
-| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ | Refreshed from backend commit `867f27b2191ca1965775d3e87536ac76c584e794` (B-21, B-24, B-25, B-27a) |
+| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ | Refreshed from backend commit `983c21d63b5353dfbfb61b1d86a2b658323a46fc` (including B-28 shared airports and exact airport pins) |
 | S-5 | Demo company API key, named `embed` | ✅ Ready when needed | Runbook: `docs/runbooks/embed-keys.md` (backend) |
 | S-6 | Developer's local address (e.g. `http://localhost:5173`) added to `CORS_ORIGINS` on the VPS | ⛔ Not yet | Otherwise the browser cannot read API responses |
 | S-7 | **Google Maps browser key**, HTTP-referrer restricted to dev address now, client sites later | 🔍 Key available; enable Routes API and restrict it | Must be separate from the server key. Maps JavaScript API, Places API (New), and Routes API are required; never use the server key in the browser |
@@ -87,7 +87,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 | 1.4 | Luggage dropdown | ✅ | `GET /business` → `max_luggage` | Uses the business limit capped at the request-schema maximum. Null means no vehicles are available (ED-020, ED-024) |
 | 1.5 | Pickup / dropoff address autocomplete | ✅ | Google Places (browser key, S-7) | US-only suggestions allow cities, street addresses and places such as hotels, terminals and airports; country, state, region and postal-code-only suggestions are excluded. Send **both** the address text and the zipcode. **Take the zipcode from Places `address_components` (`postal_code`), never by parsing the typed text.** Why: zipcodes decide zone prices; a wrong guess is a wrong price |
 | 1.6 | Pin icon beside each address | ✅ | — | Decorative icon only, no action (ED-014) |
-| 1.7 | Map | ✅ | Google Maps JavaScript API + Routes API | Draws and updates a browser route as soon as both Step 1 endpoints are known; the decoded backend quote route takes over after pricing (ED-025) |
+| 1.7 | Map | ✅ | Google Maps JavaScript API + Routes API | Draws and updates a browser route as soon as both Step 1 endpoints are known; airport endpoints use the API's exact address and zipcode with a silent name-search fallback; the decoded backend quote route takes over after pricing (ED-025) |
 | 1.8 | Airport Pickup / Dropoff fields: airport, airline, flight number | ✅ | `GET /taxi/airports`, `GET /taxi/airlines` | Airport is a plain select; airline is searchable. The BRO airport screenshots are present |
 | 1.9 | Hourly: hours field, stops | ⏸ E-11 | — | Removed from the core by ED-016; ignore `hourly` until its add-on phase |
 | 1.10 | Check Pricing | ✅ | `POST /taxi/quote?hide_incapable=true` | Sends once per click, disables while in flight, and handles quote errors without losing fields |
@@ -200,8 +200,8 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 ## Sources of truth
 
-- `galveston-backend/docs/API_CONTRACT.md` (commit `9438c3d4f4f334e0a8ffd277bee15b988272ea17`)
-- `galveston-backend/openapi.json` (commit `9438c3d4f4f334e0a8ffd277bee15b988272ea17`)
+- `galveston-backend/docs/API_CONTRACT.md` (commit `983c21d63b5353dfbfb61b1d86a2b658323a46fc`)
+- `galveston-backend/openapi.json` (commit `983c21d63b5353dfbfb61b1d86a2b658323a46fc`)
 - `galveston-backend/docs/PROJECT-TRACKER.md`
 - BRO screenshots in this repo
 
@@ -209,6 +209,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 17 Oct 2026 | E-6e complete for review: refreshed the pushed B-28 contract, geocoded each selected airport's server-owned address and zipcode for the Step 1 pin and route, retained a silent airport-name fallback with at most one developer warning, and kept quote, breakdown, booking, and money behavior unchanged. |
 | 15 Oct 2026 | E-6d complete for review: Step 2 now loads only HTTPS vehicle photos, reserves fixed responsive image space, lazy-loads with the vehicle name as alt text, and replaces absent, invalid, non-HTTPS, or failed images with a neutral inline car placeholder. |
 | 15 Oct 2026 | E-6c complete for review: refreshed the approved B-29 contract, replaced the fixed Car Seats list with company Preferences, kept pricing server-owned, placed stale-preference errors under the preserved selection, and made priced confirmation wording follow `requested`/`pending` versus `confirmed`. Request a Quote shows no car-seat price, Meet & Greet remains staff-only, and no confirmation promises email. |
 | 15 Oct 2026 | E-6b complete for review: field errors stay with their controls and appear only after blur or submit; mobile controls use 44px targets and 16px text through tablet widths; keyboard focus, Terms trapping, form semantics, concise announcements, map alternatives, completed progress, and same-brand WCAG AA colours are covered by regression tests and an exact-width browser pass. |

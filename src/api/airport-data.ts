@@ -8,7 +8,12 @@ function isAirport(value: unknown): value is Airport {
   if (!isRecord(value)) return false;
   const validCode = value.code === undefined || value.code === null
     || typeof value.code === "string";
-  return typeof value.id === "string" && typeof value.name === "string" && validCode;
+  const validAddress = value.address === undefined || value.address === null
+    || typeof value.address === "string";
+  const validZipcode = value.zipcode === undefined || value.zipcode === null
+    || typeof value.zipcode === "string";
+  return typeof value.id === "string" && typeof value.name === "string"
+    && validCode && validAddress && validZipcode;
 }
 
 function isAirline(value: unknown): value is Airline {

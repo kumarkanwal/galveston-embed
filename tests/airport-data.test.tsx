@@ -7,7 +7,10 @@ import { TripDetails } from "../src/app/trip/TripDetails";
 import { comboboxOptionId } from "../src/app/trip/combobox-a11y";
 import type { CoreServiceCode, TripErrors, TripFormState } from "../src/app/trip/types";
 
-const AIRPORTS: Airport[] = [{ id: "airport-1", name: "George Bush", code: "IAH" }];
+const AIRPORTS: Airport[] = [{
+  id: "airport-1", name: "George Bush", code: "IAH",
+  address: "2800 N Terminal Rd, Houston, TX", zipcode: "77032",
+}];
 const AIRLINES: Airline[] = [{ id: "airline-1", name: "Example Air" }];
 const SERVICES = [
   { id: "pickup", code: "airport_pickup", name: "Airport Pickup" },
