@@ -1,6 +1,6 @@
 # Booking Widget (Embed) — Tracker
 
-**Repo:** `galveston-embed` (new, separate) · **Last updated:** 17 October 2026
+**Repo:** `galveston-embed` (new, separate) · **Last updated:** 20 October 2026
 **Talks to:** the hosted `galveston-backend` API on the VPS.
 **Replaces:** the client's live Book Rides Online (BRO) booking form.
 
@@ -38,7 +38,7 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 
 ## Progress
 
-**Overall: 70%** ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░ · **"Built" means 100%, add-ons included.**
+**Overall: 73%** ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░ · **"Built" means 100%, add-ons included.**
 
 | # | Phase | Side | Weight | Status | Done |
 |---|---|---|---|---|---|
@@ -54,9 +54,9 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 9 | E-7 Card payment (Square) | Both | 9% | ⛔ B-16 | 0% |
 | 10 | E-7a Promo codes | Both | 4% | ✅ Complete — ready for review | 4% |
 | 11 | E-9 Round trip | Both | 5% | ⛔ I-1 | 0% |
-| 12 | E-10 Peak / blackout | Both | 3% | ⛔ B-7 | 0% |
+| 12 | E-7b Taxi peak / blackout display | Both | 3% | ✅ Complete — ready for review | 3% |
 | 13 | E-11 Hourly (hours + Add Stops) | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
-| | **Total** | | **100%** | | **70%** |
+| | **Total** | | **100%** | | **73%** |
 
 Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
@@ -67,7 +67,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 | S-1 | New repo `galveston-embed` | ✅ | Separate from `galveston-widgets` (old cancelled plugin; leave untouched) |
 | S-2 | **VPS runs the latest backend**, including the pricing migration `f1a2b3c4d5e6` | ✅ | Pricing migration and B-20 are deployed on the preview VPS |
 | S-3 | D-1 (contract v1.2) and B-20 pushed to `origin` | ✅ | B-20 is included in backend commit `7e15a04` |
-| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ | Refreshed from backend commit `3943c62c00d572a251366d568117711e43f9eb07` (including B-30 taxi promo pricing) |
+| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ | Refreshed from backend commit `bb25f45570ee83b4e88f609fed446981d4916a1a` (including B-35 taxi peak / blackout behavior) |
 | S-5 | Demo company API key, named `embed` | ✅ Ready when needed | Runbook: `docs/runbooks/embed-keys.md` (backend) |
 | S-6 | Developer's local address (e.g. `http://localhost:5173`) added to `CORS_ORIGINS` on the VPS | ⛔ Not yet | Otherwise the browser cannot read API responses |
 | S-7 | **Google Maps browser key**, HTTP-referrer restricted to dev address now, client sites later | 🔍 Key available; enable Routes API and restrict it | Must be separate from the server key. Maps JavaScript API, Places API (New), and Routes API are required; never use the server key in the browser |
@@ -137,7 +137,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 | A-1 | **Card payment** (new; BRO has none) | ⛔ | C-15 answered: one Square account, one location per company (ED-015). Still needs B-20 pushed, each company's Square location id, and B-16 sandbox test |
 | A-2 | Promo code | ✅ | E-7a uses B-30 price-breakdown and booking support on Distance and Flat Rate rows. Request-a-Quote vehicles keep ED-009 and do not show the control. |
 | A-3 | Round trip | ⛔ | Pricing unverified (I-1). Currently disabled for all businesses in the client's real setup |
-| A-4 | Peak / blackout display | ⏸ | Peak increases not on the new pricing path yet (B-7) |
+| A-4 | Taxi peak / blackout display | ✅ | E-7b displays server peak lines, quote blackouts and booking-time unavailability. Shuttle remains out of scope under ED-003. |
 | A-5 | Per-pricing-row airport filter | ⏸ | `pricing_row_airports` exists but nothing uses it |
 | A-6 | Production hosting of `embed.js` on the VPS | ⏸ | Behind Caddy. Config only, no host-specific code |
 
@@ -202,8 +202,8 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 ## Sources of truth
 
-- `galveston-backend/docs/API_CONTRACT.md` (commit `3943c62c00d572a251366d568117711e43f9eb07`; section I-6 is stale for B-30)
-- `galveston-backend/openapi.json` (commit `3943c62c00d572a251366d568117711e43f9eb07`)
+- `galveston-backend/docs/API_CONTRACT.md` (commit `bb25f45570ee83b4e88f609fed446981d4916a1a`)
+- `galveston-backend/openapi.json` (commit `bb25f45570ee83b4e88f609fed446981d4916a1a`)
 - `galveston-backend/docs/PROJECT-TRACKER.md`
 - BRO screenshots in this repo
 
@@ -211,6 +211,7 @@ Weights are estimates. Phase details and dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 20 Oct 2026 | E-7b complete for review: refreshed and byte-verified the B-35 API sources, kept peak surcharge display entirely server-owned, labelled and disabled every unavailable vehicle consistently, and returned booking-time `VEHICLE_UNAVAILABLE` outcomes to Step 2 with the failed vehicle disabled and clear next-step guidance. Taxi only; ED-003 remains in force. |
 | 17 Oct 2026 | E-7a complete for review: refreshed and byte-verified the B-30 API sources, added the BRO-style Step 3 promo control for priced vehicles, kept discount lines and totals server-owned, supported tracking-only and invalid/expired codes, removed codes through a fresh normal breakdown, and sent only the successfully applied code with booking. |
 | 17 Oct 2026 | E-6e complete for review: refreshed the pushed B-28 contract, geocoded each selected airport's server-owned address and zipcode for the Step 1 pin and route, retained a silent airport-name fallback with at most one developer warning, and kept quote, breakdown, booking, and money behavior unchanged. |
 | 15 Oct 2026 | E-6d complete for review: Step 2 now loads only HTTPS vehicle photos, reserves fixed responsive image space, lazy-loads with the vehicle name as alt text, and replaces absent, invalid, non-HTTPS, or failed images with a neutral inline car placeholder. |

@@ -96,6 +96,7 @@ function mount(client: ApiClient, vehicle: QuotedVehicle = VEHICLE) {
   document.body.append(root);
   render(<Confirm business={BUSINESS} client={client} form={TRIP}
     onBack={() => undefined} onBooked={() => undefined} quote={{ ...QUOTE, vehicles: [vehicle] }}
+    onVehicleUnavailable={() => undefined}
     serviceName="One Way Transfer" vehicle={vehicle} />, root);
   return root;
 }

@@ -51,7 +51,7 @@ function BookingFlowReady(props: Omit<BookingFlowProps, "services"> & {
   if (flow.state.step === 2 && flow.state.quote !== null) {
     return <ChooseVehicle autoFocusHeading={autoFocusHeading}
       business={props.business} quote={flow.state.quote}
-      onBack={flow.back} onChoose={flow.choose} />;
+      notice={flow.state.vehicleNotice} onBack={flow.back} onChoose={flow.choose} />;
   }
   if (flow.state.step === 3 && flow.state.selectedVehicle !== null) {
     const vehicle = flow.state.selectedVehicle;
@@ -60,6 +60,7 @@ function BookingFlowReady(props: Omit<BookingFlowProps, "services"> & {
     return <Confirm autoFocusHeading={autoFocusHeading}
       business={props.business} client={props.client} form={flow.state.form}
       onBack={flow.back} onBooked={flow.complete} quote={flow.state.quote}
+      onVehicleUnavailable={flow.vehicleUnavailable}
       serviceName={service.name} vehicle={vehicle} />;
   }
   return <TripDetails client={props.client} errors={flow.state.errors} form={flow.state.form}

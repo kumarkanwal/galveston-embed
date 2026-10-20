@@ -75,7 +75,8 @@ function mount(
   const client = mockClient(priceBreakdown);
   render(<Confirm autoFocusHeading={autoFocusHeading}
     business={business} client={client} form={TRIP} onBack={() => undefined}
-    onBooked={() => undefined} quote={QUOTE} serviceName="One Way Transfer" vehicle={VEHICLE} />, root);
+    onBooked={() => undefined} onVehicleUnavailable={() => undefined}
+    quote={QUOTE} serviceName="One Way Transfer" vehicle={VEHICLE} />, root);
   return { client, root };
 }
 
@@ -95,7 +96,6 @@ describe("Confirm price breakdown", () => {
     await vi.waitFor(() => expect(priceBreakdown).toHaveBeenCalledOnce());
     expect(priceBreakdown).toHaveBeenCalledWith(buildBreakdownRequest(TRIP, VEHICLE.vehicle_type_id, 0));
   });
-
   it("keeps API order, hides every exact zero line, and formats the server total", async () => {
     const { root } = mount();
     await vi.waitFor(() => expect(root.textContent).toContain("$92.70 USD"));
@@ -103,6 +103,20 @@ describe("Confirm price breakdown", () => {
       .toEqual(["Base Price$90.00 USD", "Fuel Surcharge$2.70 USD"]);
     expect(root.textContent).not.toContain("Unrelated Zero");
     expect(root.textContent).toContain("One Way Transfer on Monday, October 12, 2026 at 12:44 AM");
+  });
+
+  it("shows the server peak surcharge line unchanged without client math", async () => {
+    const peakBreakdown: TaxiPriceBreakdownResponse = {
+      ...BREAKDOWN,
+      line_items: [{ label: "Base Price", amount: "90.00", kind: "base", quantity: 1 },
+        { label: "Peak Hours Increase", amount: "18.00", kind: "surcharge", quantity: 1 },
+      ],
+      subtotal: "108.00", total: "108.00",
+    };
+    const { root } = mount(vi.fn(async () => peakBreakdown));
+    await vi.waitFor(() => expect(root.textContent).toContain("$108.00 USD"));
+    expect([...root.querySelectorAll(".charge-row")].map((row) => row.textContent))
+      .toEqual(["Base Price$90.00 USD", "Peak Hours Increase$18.00 USD"]);
   });
 
   it("ignores an older response after car seats trigger a newer request", async () => {
@@ -183,11 +197,13 @@ describe("Confirm breakdown lifetime", () => {
     const changedTrip = { ...TRIP, passengers: 2 };
     render(<Confirm business={BUSINESS} client={client} form={changedTrip}
       onBack={() => undefined} onBooked={() => undefined} quote={QUOTE}
+      onVehicleUnavailable={() => undefined}
       serviceName="One Way Transfer" vehicle={VEHICLE} />, root);
     await vi.waitFor(() => expect(priceBreakdown).toHaveBeenCalledTimes(2));
     render(null, root);
     render(<Confirm business={BUSINESS} client={client} form={changedTrip}
       onBack={() => undefined} onBooked={() => undefined} quote={QUOTE}
+      onVehicleUnavailable={() => undefined}
       serviceName="One Way Transfer" vehicle={VEHICLE} />, root);
     await vi.waitFor(() => expect(priceBreakdown).toHaveBeenCalledTimes(3));
   });

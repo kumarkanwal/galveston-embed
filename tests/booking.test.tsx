@@ -76,6 +76,7 @@ function mount(
   vehicle: QuotedVehicle = PRICED,
   outOfServiceArea = false,
   business: Business = BUSINESS,
+  onVehicleUnavailable = vi.fn(),
 ) {
   const root = document.createElement("div");
   document.body.append(root);
@@ -83,8 +84,9 @@ function mount(
   const onBooked = vi.fn();
   const quote = { out_of_service_area: outOfServiceArea, vehicles: [vehicle] } satisfies TaxiQuoteResponse;
   render(<Confirm business={business} client={client} form={TRIP} onBack={() => undefined}
-    onBooked={onBooked} quote={quote} serviceName="One Way Transfer" vehicle={vehicle} />, root);
-  return { client, onBooked, root };
+    onBooked={onBooked} onVehicleUnavailable={onVehicleUnavailable}
+    quote={quote} serviceName="One Way Transfer" vehicle={vehicle} />, root);
+  return { client, onBooked, onVehicleUnavailable, root };
 }
 
 function enter(root: HTMLElement, id: string, value: string) {
@@ -315,8 +317,6 @@ describe("booking error submission", () => {
     [new UnauthorizedError({ code: "UNAUTHENTICATED", message: "Server" }), "not configured"],
     [new ApiError(422, { code: "ADVANCE_BOOKING_VIOLATION", message: "Choose a later time." }),
       "Choose a later time."],
-    [new ApiError(422, { code: "VEHICLE_UNAVAILABLE", message: "Choose another vehicle." }),
-      "Choose another vehicle."],
     [new ApiError(422, { code: "PAYMENT_METHOD_NOT_OFFERED", message: "Cash is unavailable." }),
       "Cash is unavailable."],
     [new ApiError(422, { code: "AIRPORT_ADDRESS_MISSING", message: "Select an airport." }),
@@ -339,6 +339,17 @@ describe("booking error submission", () => {
       expect(JSON.stringify(consoleError.mock.calls)).not.toContain("bk_");
     }
     consoleError.mockRestore();
+  });
+
+  it("sends VEHICLE_UNAVAILABLE back to vehicle selection without retrying", async () => {
+    const error = new ApiError(422, { code: "VEHICLE_UNAVAILABLE",
+      message: "No vehicle is available for the requested time." });
+    const book = vi.fn<ApiClient["book"]>(async () => Promise.reject(error));
+    const onVehicleUnavailable = vi.fn();
+    const { root } = mount(book, PRICED, false, BUSINESS, onVehicleUnavailable);
+    await fillValid(root); root.querySelector<HTMLButtonElement>(".create-trip")?.click();
+    await vi.waitFor(() => expect(onVehicleUnavailable).toHaveBeenCalledWith(error.message));
+    expect(book).toHaveBeenCalledOnce(); expect(root.textContent).not.toContain(error.message);
   });
 });
 
