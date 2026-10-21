@@ -1,7 +1,7 @@
 import { useRef, useState } from "preact/hooks";
 
 import type { ApiClient, TaxiBookingResponse } from "../../api/client";
-import { UnauthorizedError } from "../../api/errors";
+import { ApiError, UnauthorizedError } from "../../api/errors";
 import { IdempotencyKeyManager } from "../../api/idempotency";
 import type { TripFormState } from "../trip/types";
 import { buildBookingRequest } from "../confirm/build-requests";
@@ -12,6 +12,7 @@ interface BookingSubmitOptions {
   carSeats: number;
   client: ApiClient;
   onSuccess: (response: TaxiBookingResponse) => void;
+  onVehicleUnavailable: (message: string) => void;
   promoCode: string | null;
   trip: TripFormState;
   vehicleTypeId: string;
@@ -40,7 +41,12 @@ export function useBookingSubmit(options: BookingSubmitOptions) {
         unauthorizedLogged.current = true;
         console.error("Galveston booking widget configuration was rejected.");
       }
-      setFailure(bookingFailure(error));
+      const nextFailure = bookingFailure(error);
+      if (error instanceof ApiError && error.code === "VEHICLE_UNAVAILABLE") {
+        options.onVehicleUnavailable(nextFailure.message);
+      } else {
+        setFailure(nextFailure);
+      }
     } finally {
       inFlight.current = false;
       setIsSubmitting(false);

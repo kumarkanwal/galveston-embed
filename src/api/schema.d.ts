@@ -2284,6 +2284,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/vehicle-types/{vehicle_type_id}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload Vehicle Type Image
+         * @description Normalize and replace a global image as a platform administrator.
+         */
+        post: operations["upload_vehicle_type_image_v1_admin_vehicle_types__vehicle_type_id__image_post"];
+        /**
+         * Remove Vehicle Type Image
+         * @description Remove a global image as a platform administrator.
+         */
+        delete: operations["remove_vehicle_type_image_v1_admin_vehicle_types__vehicle_type_id__image_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/vehicles": {
         parameters: {
             query?: never;
@@ -2871,6 +2895,7 @@ export interface components {
             /** Zip */
             zip?: string | null;
         };
+        AdditionalAmount: string;
         /**
          * AdminChargeCreate
          * @description One configured staff-only charge snapshotted onto a booking.
@@ -3428,6 +3453,14 @@ export interface components {
             ip_address: string | null;
             /** Request Id */
             request_id: string | null;
+        };
+        /** Body_upload_vehicle_type_image_v1_admin_vehicle_types__vehicle_type_id__image_post */
+        Body_upload_vehicle_type_image_v1_admin_vehicle_types__vehicle_type_id__image_post: {
+            /**
+             * File
+             * @description JPEG, PNG, or WebP; maximum 5 MB
+             */
+            file: string;
         };
         /**
          * BookedLeg
@@ -6402,8 +6435,18 @@ export interface components {
          * @description One unpaid admin booking, with type-specific fields validated by the service.
          */
         ManualBookingCreate: {
+            /** @default 0.00 */
+            additional_charge: components["schemas"]["AdditionalAmount"];
+            /** @default 0.00 */
+            additional_luggage: components["schemas"]["AdditionalAmount"];
+            /** @default 0.00 */
+            additional_passengers: components["schemas"]["AdditionalAmount"];
+            /** @default 0.00 */
+            additional_stops: components["schemas"]["AdditionalAmount"];
             /** Airline */
             airline?: string | null;
+            /** @default 0.00 */
+            airport_fee: components["schemas"]["AdditionalAmount"];
             /**
              * Booking Type
              * @enum {string}
@@ -6490,8 +6533,12 @@ export interface components {
             stops?: {
                 [key: string]: unknown;
             }[] | null;
+            /** @default 0.00 */
+            tolls: components["schemas"]["AdditionalAmount"];
             /** Vehicle Type Id */
             vehicle_type_id?: string | null;
+            /** @default 0.00 */
+            waiting_time: components["schemas"]["AdditionalAmount"];
         };
         /**
          * ManualBookingNotes
@@ -6770,7 +6817,7 @@ export interface components {
         PaymentMethod: "online" | "cash" | "cheque" | "bank_transfer";
         /**
          * PeakOverlapWarning
-         * @description A non-blocking notice that highest-only pricing applies.
+         * @description A non-blocking notice that matching increases will be summed.
          */
         PeakOverlapWarning: {
             /** Message */
@@ -6804,6 +6851,8 @@ export interface components {
             is_active: boolean;
             /** Recurrence */
             recurrence?: string | null;
+            /** Route Ids */
+            route_ids?: string[];
             rule_type: components["schemas"]["PeakRuleType"];
             /** Time End */
             time_end?: string | null;
@@ -6844,6 +6893,8 @@ export interface components {
             is_active: boolean;
             /** Recurrence */
             recurrence: string | null;
+            /** Route Ids */
+            route_ids: string[];
             rule_type: components["schemas"]["PeakRuleType"];
             /** Time End */
             time_end: string | null;
@@ -6869,17 +6920,18 @@ export interface components {
              * Format: date-time
              */
             at: string;
-            /**
-             * Vehicle Type Id
-             * Format: uuid
-             */
-            vehicle_type_id: string;
+            /** Route Id */
+            route_id?: string | null;
+            /** Vehicle Type Id */
+            vehicle_type_id?: string | null;
         };
         /**
          * PeakRulePreviewResult
-         * @description Every matching rule and the resulting highest peak or blackout.
+         * @description Every matching rule and the resulting summed increase or blackout.
          */
         PeakRulePreviewResult: {
+            /** Applied Rule Ids */
+            applied_rule_ids: string[];
             /** Increase Pct */
             increase_pct: string;
             /** Is Blackout */
@@ -6921,6 +6973,8 @@ export interface components {
             is_active: boolean;
             /** Recurrence */
             recurrence: string | null;
+            /** Route Ids */
+            route_ids: string[];
             rule_type: components["schemas"]["PeakRuleType"];
             /** Time End */
             time_end: string | null;
@@ -6957,6 +7011,8 @@ export interface components {
             is_active?: boolean | null;
             /** Recurrence */
             recurrence?: string | null;
+            /** Route Ids */
+            route_ids?: string[] | null;
             rule_type?: components["schemas"]["PeakRuleType"] | null;
             /** Time End */
             time_end?: string | null;
@@ -7434,6 +7490,8 @@ export interface components {
             insurance_amount: string;
             /** Legs */
             legs: components["schemas"]["QuoteLeg"][];
+            /** Line Items */
+            line_items?: components["schemas"]["BreakdownLine"][] | null;
             /** Subtotal */
             subtotal: string;
             /** Total */
@@ -7532,6 +7590,16 @@ export interface components {
          * @description One fully hydrated, type-adaptive admin reservation.
          */
         ReservationDetail: {
+            /** Additional Charge */
+            additional_charge: string;
+            /** Additional Luggage */
+            additional_luggage: string;
+            /** Additional Passengers */
+            additional_passengers: string;
+            /** Additional Stops */
+            additional_stops: string;
+            /** Airport Fee */
+            airport_fee: string;
             /**
              * Booking Id
              * Format: uuid
@@ -7561,6 +7629,8 @@ export interface components {
             meet_and_greet: boolean;
             /** Meet And Greet Amount */
             meet_and_greet_amount: string | null;
+            /** Meet And Greet Default Price */
+            meet_and_greet_default_price: string;
             notes: components["schemas"]["DetailNotes"];
             /**
              * Order Id
@@ -7575,16 +7645,25 @@ export interface components {
             /** Sibling Booking Id */
             sibling_booking_id: string | null;
             status: components["schemas"]["BookingStatus"];
+            /** Tolls */
+            tolls: string;
+            /** Waiting Time */
+            waiting_time: string;
         };
         /**
          * ReservationEdit
          * @description Fields staff may correct without changing the historical price.
          */
         ReservationEdit: {
+            additional_charge?: components["schemas"]["AdditionalAmount"] | null;
+            additional_luggage?: components["schemas"]["AdditionalAmount"] | null;
             /** Additional Notes */
             additional_notes?: string | null;
+            additional_passengers?: components["schemas"]["AdditionalAmount"] | null;
+            additional_stops?: components["schemas"]["AdditionalAmount"] | null;
             /** Airline */
             airline?: string | null;
+            airport_fee?: components["schemas"]["AdditionalAmount"] | null;
             /** Driver Notes */
             driver_notes?: string | null;
             /** Dropoff Address */
@@ -7623,6 +7702,8 @@ export interface components {
             stops?: {
                 [key: string]: unknown;
             }[] | null;
+            tolls?: components["schemas"]["AdditionalAmount"] | null;
+            waiting_time?: components["schemas"]["AdditionalAmount"] | null;
         };
         /**
          * ReservationRow
@@ -9584,7 +9665,11 @@ export interface components {
              * @default 0
              */
             passenger_capacity: number;
-            /** Photo Url */
+            /**
+             * Photo Url
+             * @deprecated
+             * @description Accepted for backward compatibility but ignored. Use the vehicle-type image upload endpoint.
+             */
             photo_url?: string | null;
             /**
              * Sort Order
@@ -9700,7 +9785,11 @@ export interface components {
             name?: string | null;
             /** Passenger Capacity */
             passenger_capacity?: number | null;
-            /** Photo Url */
+            /**
+             * Photo Url
+             * @deprecated
+             * @description Accepted for backward compatibility but ignored. Use the vehicle-type image upload endpoint.
+             */
             photo_url?: string | null;
             /** Sort Order */
             sort_order?: number | null;
@@ -15796,6 +15885,80 @@ export interface operations {
         responses: {
             /** @description Successful Response */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_VehicleTypeResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_vehicle_type_image_v1_admin_vehicle_types__vehicle_type_id__image_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                vehicle_type_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_vehicle_type_image_v1_admin_vehicle_types__vehicle_type_id__image_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_VehicleTypeResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_vehicle_type_image_v1_admin_vehicle_types__vehicle_type_id__image_delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                vehicle_type_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

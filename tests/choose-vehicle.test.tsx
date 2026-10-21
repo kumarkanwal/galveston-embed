@@ -39,7 +39,7 @@ function mountQuote(quote: TaxiQuoteResponse, onChoose = vi.fn()) {
   const root = document.createElement("div");
   document.body.append(root);
   render(<ChooseVehicle business={BUSINESS} quote={quote}
-    onBack={() => undefined} onChoose={onChoose} />, root);
+    notice={null} onBack={() => undefined} onChoose={onChoose} />, root);
   return { onChoose, root };
 }
 
@@ -53,9 +53,10 @@ describe("Choose Vehicle", () => {
     expect(root.textContent).toContain("$1,413.75 USD");
     expect(root.textContent).toContain("Request a Quote");
     const buttons = [...root.querySelectorAll<HTMLButtonElement>(".vehicle-choose")];
-    expect(buttons.map((button) => button.textContent)).toEqual(["Choose", "Choose", "Unavailable"]);
+    expect(buttons.map((button) => button.textContent))
+      .toEqual(["Choose", "Choose", "Not available at this time"]);
     expect(buttons.map((button) => button.getAttribute("aria-label")))
-      .toEqual(["Choose Sedan", "Choose Van", "Bus unavailable"]);
+      .toEqual(["Choose Sedan", "Choose Van", "Bus: Not available at this time"]);
     expect(buttons[2]?.disabled).toBe(true);
     buttons[0]?.click();
     expect(onChoose).toHaveBeenCalledWith(VEHICLES[0]);
@@ -67,7 +68,7 @@ describe("Choose Vehicle", () => {
     document.body.append(root);
     act(() => render(<ChooseVehicle autoFocusHeading business={BUSINESS}
       quote={{ out_of_service_area: false, vehicles: VEHICLES }}
-      onBack={() => undefined} onChoose={() => undefined} />, root));
+      notice={null} onBack={() => undefined} onChoose={() => undefined} />, root));
     const heading = root.querySelector(".step-title");
     await vi.waitFor(() => expect(focus).toHaveBeenCalled());
     expect(focus.mock.instances).toContain(heading);
@@ -83,6 +84,15 @@ describe("Choose Vehicle", () => {
     const { root } = mountQuote({ out_of_service_area: false, vehicles: [] });
     expect(root.textContent).toContain("No vehicles are available for this trip");
     expect(root.querySelector(".back-button")).not.toBeNull();
+  });
+
+  it("shows a booking-time availability notice with next-step guidance", () => {
+    const { root } = mountQuote({ out_of_service_area: false, vehicles: VEHICLES });
+    render(<ChooseVehicle business={BUSINESS} quote={{ out_of_service_area: false, vehicles: VEHICLES }}
+      notice="No vehicle is available for the requested time."
+      onBack={() => undefined} onChoose={() => undefined} />, root);
+    expect(root.querySelector('[role="alert"]')?.textContent)
+      .toContain("Choose another vehicle, or go back to select another time.");
   });
 });
 

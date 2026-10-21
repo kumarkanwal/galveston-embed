@@ -6,6 +6,7 @@ import { VehicleRow } from "./VehicleRow";
 interface ChooseVehicleProps {
   autoFocusHeading?: boolean;
   business: Business;
+  notice: string | null;
   onBack: () => void;
   onChoose: (vehicle: QuotedVehicle) => void;
   quote: TaxiQuoteResponse;
@@ -23,6 +24,9 @@ export function ChooseVehicle(props: ChooseVehicleProps) {
     </header>
     <ProgressSteps activeStep={2} />
     <h2 class="step-title" ref={headingRef} tabIndex={-1}>Choose Your Vehicle Type</h2>
+    {props.notice !== null && <div class="service-area-note" role="alert">
+      {props.notice} Choose another vehicle, or go back to select another time.
+    </div>}
     {props.quote.out_of_service_area && <div class="service-area-note" role="status">
       This trip is outside our standard service area. Choose a vehicle and we'll send you a quote.
     </div>}

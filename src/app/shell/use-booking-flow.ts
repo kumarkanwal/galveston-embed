@@ -25,6 +25,7 @@ export interface BookingFlowState {
   quote: TaxiQuoteResponse | null;
   selectedVehicle: QuotedVehicle | null;
   step: 1 | 2 | 3;
+  vehicleNotice: string | null;
 }
 
 function initialForm(business: Business, service: CoreServiceCode): TripFormState {
@@ -74,6 +75,7 @@ function initialState(business: Business, service: CoreServiceCode): BookingFlow
     quote: null,
     selectedVehicle: null,
     step: 1,
+    vehicleNotice: null,
   };
 }
 
@@ -88,6 +90,7 @@ function createUpdate(setState: FlowSetter) {
       formError: null,
       quote: null,
       selectedVehicle: null,
+      vehicleNotice: null,
     }));
   };
 }
@@ -104,12 +107,40 @@ function createBlur(setState: FlowSetter, business: Business, limits: PartyLimit
   });
 }
 
+function markVehicleUnavailable(
+  quote: TaxiQuoteResponse | null,
+  vehicleTypeId: string | undefined,
+): TaxiQuoteResponse | null {
+  if (quote?.vehicles === undefined) return quote;
+  const vehicles = quote.vehicles.map((vehicle) => vehicle.vehicle_type_id === vehicleTypeId
+    ? { ...vehicle, available: false, quote_status: "unavailable" as const }
+    : vehicle);
+  return { ...quote, vehicles };
+}
+
+function createVehicleUnavailable(setState: FlowSetter) {
+  return (message: string) => setState((current) => ({
+    ...current,
+    quote: markVehicleUnavailable(current.quote, current.selectedVehicle?.vehicle_type_id),
+    selectedVehicle: null,
+    step: 2,
+    vehicleNotice: message,
+  }));
+}
+
+function createComplete(setState: FlowSetter) {
+  return (response: TaxiBookingResponse, requestQuote: boolean) => setState((current) => ({
+    ...current, confirmation: { requestQuote, response }, quote: null, selectedVehicle: null,
+  }));
+}
+
 export function useBookingFlow(client: ApiClient, business: Business,
   service: CoreServiceCode, limits: PartyLimits) {
   const [state, setState] = useState(() => initialState(business, service));
   const requestInFlight = useRef(false);
-  const update = createUpdate(setState);
-  const blur = createBlur(setState, business, limits);
+  const update = createUpdate(setState); const blur = createBlur(setState, business, limits);
+  const vehicleUnavailable = createVehicleUnavailable(setState);
+  const complete = createComplete(setState);
   const submit = async (event: SubmitEvent) => {
     event.preventDefault();
     if (requestInFlight.current) return;
@@ -127,7 +158,7 @@ export function useBookingFlow(client: ApiClient, business: Business,
     try {
       const quote = await client.quote(buildQuoteRequest(submittedForm));
       setState((current) => current.form === submittedForm
-        ? { ...current, isSubmitting: false, quote, step: 2 }
+        ? { ...current, isSubmitting: false, quote, step: 2, vehicleNotice: null }
         : { ...current, isSubmitting: false });
     } catch (error: unknown) {
       const failure = quoteFailure(error, submittedForm.service);
@@ -144,13 +175,11 @@ export function useBookingFlow(client: ApiClient, business: Business,
       requestInFlight.current = false;
     }
   };
-  const back = () => setState((current) => ({ ...current, step: current.step === 3 ? 2 : 1 }));
+  const back = () => setState((current) => ({ ...current,
+    step: current.step === 3 ? 2 : 1, vehicleNotice: null }));
   const choose = (vehicle: QuotedVehicle) => {
     if (vehicle.quote_status !== "unavailable") setState((current) => (
-      { ...current, selectedVehicle: vehicle, step: 3 }));
+      { ...current, selectedVehicle: vehicle, step: 3, vehicleNotice: null }));
   };
-  const complete = (response: TaxiBookingResponse, requestQuote: boolean) =>
-    setState((current) => ({ ...current, confirmation: { requestQuote, response }, quote: null,
-      selectedVehicle: null }));
-  return { state, update, blur, submit, back, choose, complete };
+  return { state, update, blur, submit, back, choose, complete, vehicleUnavailable };
 }

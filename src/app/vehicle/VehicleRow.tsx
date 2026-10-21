@@ -8,9 +8,11 @@ interface VehicleRowProps {
   vehicle: QuotedVehicle;
 }
 
+const UNAVAILABLE_TEXT = "Not available at this time";
+
 function fare(vehicle: QuotedVehicle, currency: string): string {
   if (vehicle.quote_status === "request_quote") return "Request a Quote";
-  if (vehicle.quote_status === "unavailable") return "Unavailable";
+  if (vehicle.quote_status === "unavailable") return UNAVAILABLE_TEXT;
   if (vehicle.base_price === null || vehicle.base_price === undefined) return "Price unavailable";
   return formatMoney(vehicle.base_price, currency);
 }
@@ -62,7 +64,7 @@ export function VehicleRow({ currency, onChoose, vehicle }: VehicleRowProps) {
     </div>
     <div class="vehicle-fare">{fare(vehicle, currency)}</div>
     <button class="vehicle-choose" type="button" disabled={unavailable}
-      aria-label={unavailable ? `${vehicle.name} unavailable` : `Choose ${vehicle.name}`}
-      onClick={() => onChoose(vehicle)}>{unavailable ? "Unavailable" : "Choose"}</button>
+      aria-label={unavailable ? `${vehicle.name}: ${UNAVAILABLE_TEXT}` : `Choose ${vehicle.name}`}
+      onClick={() => onChoose(vehicle)}>{unavailable ? UNAVAILABLE_TEXT : "Choose"}</button>
   </article>;
 }

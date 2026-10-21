@@ -6,7 +6,7 @@ Base URL: `https://api.<domain>.com/v1`
 Consumers: Booking-form embed (taxi)
 
 **Version 1.2** — generated from the implemented schemas, routers, services and
-`openapi.json` through B-30. This document covers the public
+`openapi.json` through B-35. This document covers the public
 surface; the admin surface (`/admin/*`) is not documented here.
 
 ---
@@ -14,6 +14,29 @@ surface; the admin surface (`/admin/*`) is not documented here.
 ## Changes from v1.1
 
 Read this section first if you have already built against v1.1.
+
+- **B-35 peak hours and blackout rules:** active rules are evaluated at each
+  leg's pickup in the business timezone. Overlapping increases now sum instead
+  of selecting the highest rule, including for rules stored before B-35; the
+  sum applies to fare only before promo and appears as `Peak Hours Increase`.
+  Time windows are start-inclusive and end-exclusive, except an end of `23:59`
+  includes the final minute. Taxi blackouts mark matching vehicle types
+  unavailable. Shuttle blackouts hide matching route departures from search
+  and are rechecked by quote and booking. Requests with no matching rule keep
+  their previous response and price behavior.
+- **B-33 staff-entered additional amounts:** reservation storage and the admin
+  create, edit and detail contracts now expose seven fixed money fields. These
+  fields are staff-only; the public widget and all public request schemas are
+  unchanged. On replacement Distance/Flat Rate pricing, a promo discounts only
+  the fare, while the card surcharge applies to the complete pre-card amount.
+- **B-31 vehicle-type images:** the platform super admin can now upload,
+  replace, and remove global vehicle-type images. JPEG, PNG, and WebP inputs
+  up to 5 MB are normalized to metadata-free WebP images no larger than 800
+  pixels on the longest edge. Public taxi vehicle `photo_url` values may now
+  point below `https://galveston-api.kanwalkumar.com/media/vehicle-types/`.
+  Admin vehicle-type create/update still accept `photo_url` for compatibility
+  but ignore it; image changes use the multipart `/admin/vehicle-types/{id}/image`
+  endpoint.
 
 - **B-28 shared air-travel catalogs:** every company now receives the same
   active airport and airline lists. Public airport rows include the exact
@@ -1044,16 +1067,16 @@ applies a non-zero amount only for `payment_method: "online"`, but always emits
 the `"CC Surcharge"` row and uses `"0.00"` for every other method or null.
 Confirm whether the API should omit that line or the embed should hide it.
 
-### I-6 — Discounts on replacement rows
+### I-6 — Discounts on replacement rows (RESOLVED)
 
-The rework spec describes booking-level `discount_pct`. It is not present in
-the public quote, breakdown or booking schemas. Meet & Greet is now an explicit
-staff-only admin feature and remains absent from those public schemas; the row
-pipeline therefore emits a zero `"Meet & Greet"` line for public requests.
-In addition, a public `promo_code` is not converted into the row pipeline's
-`discount_pct`: breakdown rejects it as `PROMO_INVALID`, while booking does not
-apply or persist it on a replacement row. Decide how these inputs reach the row
-pipeline before the embed offers them for Distance or Flat Rate.
+The rework spec's booking-level `discount_pct` remains an internal snapshot and
+is not a public request field. Public `promo_code` **is wired** for replacement
+Distance and Flat Rate rows: validation and booking apply it to the fare only,
+snapshot the promo id and exact discount amount, and consume it once when the
+booking reaches confirmation. Pricing-row additions, car seats, Meet & Greet
+and the seven staff-entered amounts are not part of the promo base. Gratuity,
+fuel surcharge and sales tax retain their existing base and ordering; the card
+surcharge is calculated last on the full pre-card amount.
 
 ### I-7 — Preview payment-method enum
 

@@ -25,6 +25,7 @@ interface ConfirmProps {
   form: TripFormState;
   onBack: () => void;
   onBooked: (response: TaxiBookingResponse, requestQuote: boolean) => void;
+  onVehicleUnavailable: (message: string) => void;
   quote: TaxiQuoteResponse;
   serviceName: string;
   vehicle: QuotedVehicle;
@@ -84,6 +85,7 @@ function useConfirmController(props: ConfirmProps) {
     carSeats,
     client: props.client,
     onSuccess: (response) => props.onBooked(response, requestQuote),
+    onVehicleUnavailable: props.onVehicleUnavailable,
     promoCode: pricing.promo.appliedCode,
     trip: props.form,
     vehicleTypeId: props.vehicle.vehicle_type_id,

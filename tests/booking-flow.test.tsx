@@ -141,7 +141,29 @@ describe("booking navigation", () => {
     flow().back();
     await vi.waitFor(() => expect(flow().state.step).toBe(2));
   });
+});
 
+describe("booking-time availability navigation", () => {
+  it("returns a booking-time unavailable vehicle to step 2 and disables it", async () => {
+    render(<Harness client={clientWith(vi.fn(async () => QUOTE))} />, document.body);
+    await makeValid();
+    await flow().submit(submitEvent());
+    const vehicle = QUOTE.vehicles?.[0];
+    if (vehicle === undefined) throw new Error("Fixture vehicle missing.");
+    flow().choose(vehicle);
+    await vi.waitFor(() => expect(flow().state.step).toBe(3));
+    flow().vehicleUnavailable("No vehicle is available for the requested time.");
+    await vi.waitFor(() => expect(flow().state.step).toBe(2));
+    expect(flow().state.selectedVehicle).toBeNull();
+    expect(flow().state.vehicleNotice).toContain("No vehicle is available");
+    expect(flow().state.quote?.vehicles?.[0]).toMatchObject({
+      available: false,
+      quote_status: "unavailable",
+    });
+  });
+});
+
+describe("booking success navigation", () => {
   it("clears booking selections after success", async () => {
     render(<Harness client={clientWith(vi.fn(async () => QUOTE))} />, document.body);
     await makeValid();
