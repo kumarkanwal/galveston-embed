@@ -1704,6 +1704,54 @@ export interface paths {
         patch: operations["update_route_v1_admin_routes__route_id__patch"];
         trace?: never;
     };
+    "/v1/admin/routes/{route_id}/businesses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Route Businesses
+         * @description Return company checkboxes for a platform-managed shared route.
+         */
+        get: operations["get_route_businesses_v1_admin_routes__route_id__businesses_get"];
+        /**
+         * Replace Route Businesses
+         * @description Replace route visibility; only a platform super admin may do this.
+         */
+        put: operations["replace_route_businesses_v1_admin_routes__route_id__businesses_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/routes/{route_id}/departure-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Route Departure Templates
+         * @description Return weekly local departure templates and their generated horizon.
+         */
+        get: operations["get_route_departure_templates_v1_admin_routes__route_id__departure_templates_get"];
+        /**
+         * Replace Route Departure Templates
+         * @description Replace weekly templates and materialize a rolling 180-day horizon.
+         */
+        put: operations["replace_route_departure_templates_v1_admin_routes__route_id__departure_templates_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/routes/{route_id}/prices": {
         parameters: {
             query?: never;
@@ -1738,6 +1786,30 @@ export interface paths {
          * @description Create the mirror direction and optionally copy fares as a starting point.
          */
         post: operations["reverse_route_v1_admin_routes__route_id__reverse_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/routes/{route_id}/vehicle-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Route Vehicle Types
+         * @description Return capacity-bearing vehicle types configured for one route.
+         */
+        get: operations["get_route_vehicle_types_v1_admin_routes__route_id__vehicle_types_get"];
+        /**
+         * Replace Route Vehicle Types
+         * @description Replace route cars and their optional capacity overrides.
+         */
+        put: operations["replace_route_vehicle_types_v1_admin_routes__route_id__vehicle_types_put"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3742,6 +3814,8 @@ export interface components {
             cancellation_notice_hours: number;
             /** Car Seat Price */
             car_seat_price: string;
+            /** Card Surcharge Pct */
+            card_surcharge_pct: string;
             /**
              * Created At
              * Format: date-time
@@ -3910,6 +3984,8 @@ export interface components {
             cancellation_notice_hours: number;
             /** Car Seat Price */
             car_seat_price: string;
+            /** Card Surcharge Pct */
+            card_surcharge_pct: string;
             /**
              * Created At
              * Format: date-time
@@ -5075,6 +5151,103 @@ export interface components {
             unselectable_reason: string | null;
         };
         /**
+         * DepartureTemplateMutationResult
+         * @description Template replacement plus idempotent schedule materialization counts.
+         */
+        DepartureTemplateMutationResult: {
+            /** Created Count */
+            created_count: number;
+            /** Existing Count */
+            existing_count: number;
+            /** Generated Through */
+            generated_through: string | null;
+            /**
+             * Route Id
+             * Format: uuid
+             */
+            route_id: string;
+            /** Templates */
+            templates: components["schemas"]["DepartureTemplateResult"][];
+        };
+        /**
+         * DepartureTemplateResult
+         * @description Stored weekly template with its effective capacity.
+         */
+        DepartureTemplateResult: {
+            /** Days Of Week */
+            days_of_week: components["schemas"]["Weekday"][];
+            /** Effective Seat Capacity */
+            effective_seat_capacity: number;
+            /** End Time */
+            end_time: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Seat Capacity Override */
+            seat_capacity_override: number | null;
+            /**
+             * Start Time
+             * Format: time
+             */
+            start_time: string;
+            /**
+             * Vehicle Type Id
+             * Format: uuid
+             */
+            vehicle_type_id: string;
+            /** Vehicle Type Name */
+            vehicle_type_name: string;
+        };
+        /**
+         * DepartureTemplateWrite
+         * @description One local departure time for a route car on selected weekdays.
+         */
+        DepartureTemplateWrite: {
+            /** Days Of Week */
+            days_of_week: components["schemas"]["Weekday"][];
+            /** End Time */
+            end_time?: string | null;
+            /** Seat Capacity Override */
+            seat_capacity_override?: number | null;
+            /**
+             * Start Time
+             * Format: time
+             */
+            start_time: string;
+            /**
+             * Vehicle Type Id
+             * Format: uuid
+             */
+            vehicle_type_id: string;
+        };
+        /**
+         * DepartureTemplatesResult
+         * @description Weekly templates and the latest generated service date.
+         */
+        DepartureTemplatesResult: {
+            /** Generated Through */
+            generated_through: string | null;
+            /**
+             * Route Id
+             * Format: uuid
+             */
+            route_id: string;
+            /** Templates */
+            templates: components["schemas"]["DepartureTemplateResult"][];
+        };
+        /**
+         * DepartureTemplatesUpdate
+         * @description Complete fixed-time matrix; one route cannot have two cars at one minute.
+         */
+        DepartureTemplatesUpdate: {
+            /** Templates */
+            templates: components["schemas"]["DepartureTemplateWrite"][];
+        };
+        /**
          * DepositType
          * @description How a business takes a deposit instead of the full amount up front.
          * @enum {string}
@@ -5580,6 +5753,14 @@ export interface components {
         Envelope_DashboardPayload_: {
             data: components["schemas"]["DashboardPayload"];
         };
+        /** Envelope[DepartureTemplateMutationResult] */
+        Envelope_DepartureTemplateMutationResult_: {
+            data: components["schemas"]["DepartureTemplateMutationResult"];
+        };
+        /** Envelope[DepartureTemplatesResult] */
+        Envelope_DepartureTemplatesResult_: {
+            data: components["schemas"]["DepartureTemplatesResult"];
+        };
         /** Envelope[DriverTripSheet] */
         Envelope_DriverTripSheet_: {
             data: components["schemas"]["DriverTripSheet"];
@@ -5692,6 +5873,10 @@ export interface components {
         Envelope_ReservationDetail_: {
             data: components["schemas"]["ReservationDetail"];
         };
+        /** Envelope[RouteBusinessesResult] */
+        Envelope_RouteBusinessesResult_: {
+            data: components["schemas"]["RouteBusinessesResult"];
+        };
         /** Envelope[RouteDeactivationResult] */
         Envelope_RouteDeactivationResult_: {
             data: components["schemas"]["RouteDeactivationResult"];
@@ -5699,6 +5884,10 @@ export interface components {
         /** Envelope[RouteResult] */
         Envelope_RouteResult_: {
             data: components["schemas"]["RouteResult"];
+        };
+        /** Envelope[RouteVehicleTypesResult] */
+        Envelope_RouteVehicleTypesResult_: {
+            data: components["schemas"]["RouteVehicleTypesResult"];
         };
         /** Envelope[ScheduleBulkCapacityResult] */
         Envelope_ScheduleBulkCapacityResult_: {
@@ -6725,6 +6914,36 @@ export interface components {
             runs: number;
         };
         /**
+         * OnRequestAvailability
+         * @description Custom-time option returned without inventing a dated schedule id.
+         */
+        OnRequestAvailability: {
+            /**
+             * Departure Type
+             * @default on_request
+             * @constant
+             */
+            departure_type: "on_request";
+            /** Earliest Pickup Date */
+            earliest_pickup_date?: string | null;
+            /** Earliest Pickup Time */
+            earliest_pickup_time?: string | null;
+            /**
+             * Route Id
+             * Format: uuid
+             */
+            route_id: string;
+            /** Seat Capacity */
+            seat_capacity: number;
+            /**
+             * Vehicle Type Id
+             * Format: uuid
+             */
+            vehicle_type_id: string;
+            /** Vehicle Type Name */
+            vehicle_type_name: string;
+        };
+        /**
          * OrderStatus
          * @description Lifecycle of a checkout. Taxi quotes enter at requested; shuttle at pending.
          * @enum {string}
@@ -7192,6 +7411,8 @@ export interface components {
          * @description Store payment configuration without implying deposits are collected today.
          */
         PricingSettingsUpdate: {
+            /** Card Surcharge Pct */
+            card_surcharge_pct?: string | null;
             deposit_type?: components["schemas"]["DepositType"] | null;
             /** Deposit Value */
             deposit_value?: string | null;
@@ -7449,6 +7670,8 @@ export interface components {
         QuoteLeg: {
             /** Date */
             date: string;
+            /** Departure Type */
+            departure_type?: "on_request" | null;
             /** Duration Minutes */
             duration_minutes: number;
             /** From */
@@ -7457,21 +7680,32 @@ export interface components {
             leg_price: string;
             /** Pax Summary */
             pax_summary: string;
-            /**
-             * Schedule Id
-             * Format: uuid
-             */
-            schedule_id: string;
+            /** Pickup Date */
+            pickup_date?: string | null;
+            /** Pickup Time */
+            pickup_time?: string | null;
+            /** Route Id */
+            route_id?: string | null;
+            /** Schedule Id */
+            schedule_id?: string | null;
             /** Time */
             time: string;
             /** To */
             to: string;
+            /** Vehicle Type Id */
+            vehicle_type_id?: string | null;
         };
         /**
          * QuoteLegRequest
-         * @description One leg of a cart being priced.
+         * @description One fixed departure or exact customer-selected on-request time.
          */
         QuoteLegRequest: {
+            /**
+             * Departure Type
+             * @default scheduled
+             * @enum {string}
+             */
+            departure_type: "scheduled" | "on_request";
             /**
              * Pax Adult
              * @default 0
@@ -7487,11 +7721,16 @@ export interface components {
              * @default 0
              */
             pax_senior: number;
-            /**
-             * Schedule Id
-             * Format: uuid
-             */
-            schedule_id: string;
+            /** Pickup Date */
+            pickup_date?: string | null;
+            /** Pickup Time */
+            pickup_time?: string | null;
+            /** Route Id */
+            route_id?: string | null;
+            /** Schedule Id */
+            schedule_id?: string | null;
+            /** Vehicle Type Id */
+            vehicle_type_id?: string | null;
         };
         /**
          * QuoteRequest
@@ -7508,6 +7747,8 @@ export interface components {
             insurance_selected: boolean;
             /** Legs */
             legs: components["schemas"]["QuoteLegRequest"][];
+            /** @default online */
+            payment_method: components["schemas"]["PaymentMethod"];
             /** Promo Code */
             promo_code?: string | null;
         };
@@ -7801,10 +8042,52 @@ export interface components {
             vehicle: components["schemas"]["AssignmentSummary"];
         };
         /**
+         * RouteBusinessResult
+         * @description One company assignment, including the route owner's immutable row.
+         */
+        RouteBusinessResult: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Business Name */
+            business_name: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Is Owner */
+            is_owner: boolean;
+            /** Timezone */
+            timezone: string;
+        };
+        /**
+         * RouteBusinessesResult
+         * @description All visible company assignments for one route.
+         */
+        RouteBusinessesResult: {
+            /** Businesses */
+            businesses: components["schemas"]["RouteBusinessResult"][];
+            /**
+             * Route Id
+             * Format: uuid
+             */
+            route_id: string;
+        };
+        /**
+         * RouteBusinessesUpdate
+         * @description Complete set of companies whose websites may sell the route.
+         */
+        RouteBusinessesUpdate: {
+            /** Business Ids */
+            business_ids: string[];
+        };
+        /**
          * RouteCreate
          * @description Create one directed shuttle service between scoped locations.
          */
         RouteCreate: {
+            /** @default fixed */
+            departure_mode: components["schemas"]["ShuttleDepartureMode"];
             /** Duration Minutes */
             duration_minutes: number;
             /**
@@ -7847,6 +8130,7 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            departure_mode: components["schemas"]["ShuttleDepartureMode"];
             /** Duration Minutes */
             duration_minutes: number;
             /**
@@ -7912,6 +8196,8 @@ export interface components {
             passenger_type: components["schemas"]["PassengerType"];
             /** Price */
             price: string;
+            /** Round Trip Price */
+            round_trip_price: string | null;
         };
         /**
          * RoutePriceWrite
@@ -7921,6 +8207,8 @@ export interface components {
             passenger_type: components["schemas"]["PassengerType"];
             /** Price */
             price: string;
+            /** Round Trip Price */
+            round_trip_price?: string | null;
         };
         /**
          * RoutePricesUpdate
@@ -7945,6 +8233,7 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            departure_mode: components["schemas"]["ShuttleDepartureMode"];
             /** Duration Minutes */
             duration_minutes: number;
             /**
@@ -8013,6 +8302,7 @@ export interface components {
          * @description Edit a route; DELETE owns warning-bearing deactivation.
          */
         RouteUpdate: {
+            departure_mode?: components["schemas"]["ShuttleDepartureMode"] | null;
             /** Duration Minutes */
             duration_minutes?: number | null;
             /** From Location Id */
@@ -8023,6 +8313,71 @@ export interface components {
             service_label?: string | null;
             /** To Location Id */
             to_location_id?: string | null;
+        };
+        /**
+         * RouteVehicleTypeResult
+         * @description A route car with its catalog and effective seat capacities.
+         */
+        RouteVehicleTypeResult: {
+            /** Effective Seat Capacity */
+            effective_seat_capacity: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Passenger Capacity */
+            passenger_capacity: number;
+            /** Seat Capacity Override */
+            seat_capacity_override: number | null;
+            /**
+             * Vehicle Type Id
+             * Format: uuid
+             */
+            vehicle_type_id: string;
+            /** Vehicle Type Name */
+            vehicle_type_name: string;
+        };
+        /**
+         * RouteVehicleTypeWrite
+         * @description One capacity-bearing vehicle type configured for a route.
+         */
+        RouteVehicleTypeWrite: {
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean;
+            /** Seat Capacity Override */
+            seat_capacity_override?: number | null;
+            /**
+             * Vehicle Type Id
+             * Format: uuid
+             */
+            vehicle_type_id: string;
+        };
+        /**
+         * RouteVehicleTypesResult
+         * @description All configured vehicle types for one route.
+         */
+        RouteVehicleTypesResult: {
+            /**
+             * Route Id
+             * Format: uuid
+             */
+            route_id: string;
+            /** Vehicle Types */
+            vehicle_types: components["schemas"]["RouteVehicleTypeResult"][];
+        };
+        /**
+         * RouteVehicleTypesUpdate
+         * @description Complete route vehicle-type configuration.
+         */
+        RouteVehicleTypesUpdate: {
+            /** Vehicle Types */
+            vehicle_types: components["schemas"]["RouteVehicleTypeWrite"][];
         };
         /**
          * RunPassenger
@@ -8397,6 +8752,7 @@ export interface components {
             /** Departures */
             departures: components["schemas"]["Departure"][];
             filtered_summary?: components["schemas"]["FilteredSummary"] | null;
+            on_request?: components["schemas"]["OnRequestAvailability"] | null;
             route: components["schemas"]["RouteSummary"];
         };
         /**
@@ -8686,6 +9042,12 @@ export interface components {
              */
             updated_at: string;
         };
+        /**
+         * ShuttleDepartureMode
+         * @description Whether a route sells generated departures or customer-selected times.
+         * @enum {string}
+         */
+        ShuttleDepartureMode: "fixed" | "on_request";
         /**
          * ShuttleJourneyDetail
          * @description Shuttle-only journey and seat fields.
@@ -14408,6 +14770,154 @@ export interface operations {
             };
         };
     };
+    get_route_businesses_v1_admin_routes__route_id__businesses_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                route_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_RouteBusinessesResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    replace_route_businesses_v1_admin_routes__route_id__businesses_put: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                route_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RouteBusinessesUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_RouteBusinessesResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_route_departure_templates_v1_admin_routes__route_id__departure_templates_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                route_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_DepartureTemplatesResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    replace_route_departure_templates_v1_admin_routes__route_id__departure_templates_put: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                route_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DepartureTemplatesUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_DepartureTemplateMutationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     set_route_prices_v1_admin_routes__route_id__prices_put: {
         parameters: {
             query?: {
@@ -14473,6 +14983,80 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_RouteResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_route_vehicle_types_v1_admin_routes__route_id__vehicle_types_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                route_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_RouteVehicleTypesResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    replace_route_vehicle_types_v1_admin_routes__route_id__vehicle_types_put: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                route_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RouteVehicleTypesUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_RouteVehicleTypesResult_"];
                 };
             };
             /** @description Validation Error */
@@ -16773,11 +17357,15 @@ export interface operations {
     search_return_v1_public_shuttle_search_return_get: {
         parameters: {
             query: {
-                /** @description Required selected outbound departure. */
-                outbound_schedule_id: string;
                 from_location_id: string;
                 to_location_id: string;
                 date: string;
+                /** @description Selected fixed outbound departure. */
+                outbound_schedule_id?: string | null;
+                outbound_route_id?: string | null;
+                outbound_vehicle_type_id?: string | null;
+                outbound_pickup_date?: string | null;
+                outbound_pickup_time?: string | null;
                 pax_senior?: number;
                 pax_adult?: number;
                 pax_child?: number;

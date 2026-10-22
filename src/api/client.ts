@@ -1,6 +1,6 @@
-import createClient from "openapi-fetch";
+import createClient, { type Client } from "openapi-fetch";
 
-import type { components, paths } from "./schema";
+import type { components, operations, paths } from "./schema";
 import { validateAirlines, validateAirports } from "./airport-data";
 import { ApiError, NetworkError, parseApiError, RequestTimeoutError } from "./errors";
 
@@ -16,6 +16,19 @@ export type TaxiPriceBreakdownResponse = components["schemas"]["TaxiPriceBreakdo
 export type TaxiBookingRequest = components["schemas"]["TaxiBookingRequest"];
 export type TaxiBookingResponse = components["schemas"]["TaxiBookingResponse"];
 export type BreakdownLine = components["schemas"]["BreakdownLine"];
+export type LocationGroup = components["schemas"]["LocationGroup"];
+export type LocationOption = components["schemas"]["LocationOption"];
+export type ShuttleDeparture = components["schemas"]["Departure"];
+export type ShuttleSearchResult = components["schemas"]["SearchResult"];
+export type ShuttleQuoteRequest = components["schemas"]["QuoteRequest"];
+export type ShuttleQuoteResponse = components["schemas"]["QuoteResponse"];
+export type ShuttleQuoteLeg = components["schemas"]["QuoteLegRequest"];
+export type ShuttleBookingRequest = components["schemas"]["BookingRequest"];
+export type ShuttleBookingResponse = components["schemas"]["BookingResponse"];
+export type ShuttleSearchQuery =
+  operations["search_v1_public_shuttle_search_get"]["parameters"]["query"];
+export type ShuttleReturnQuery =
+  operations["search_return_v1_public_shuttle_search_return_get"]["parameters"]["query"];
 
 interface ApiResult<T> {
   data?: T;
@@ -31,6 +44,14 @@ export interface ApiClient {
   quote(body: TaxiQuoteRequest): Promise<TaxiQuoteResponse>;
   priceBreakdown(body: TaxiPriceBreakdownRequest): Promise<TaxiPriceBreakdownResponse>;
   book(body: TaxiBookingRequest, idempotencyKey: string): Promise<TaxiBookingResponse>;
+}
+
+export interface ShuttleApiClient extends ApiClient {
+  getShuttleLocations(excludeLocationId?: string): Promise<LocationGroup[]>;
+  searchShuttle(query: ShuttleSearchQuery): Promise<ShuttleSearchResult>;
+  searchShuttleReturn(query: ShuttleReturnQuery): Promise<ShuttleSearchResult>;
+  quoteShuttle(body: ShuttleQuoteRequest): Promise<ShuttleQuoteResponse>;
+  bookShuttle(body: ShuttleBookingRequest, idempotencyKey: string): Promise<ShuttleBookingResponse>;
 }
 
 export interface ApiClientOptions {
@@ -81,17 +102,7 @@ function timeoutFetch(
   };
 }
 
-export function createApiClient(options: ApiClientOptions): ApiClient {
-  const fetchRequest = options.fetch ?? ((request: Request) => globalThis.fetch(request));
-  const client = createClient<paths>({
-    baseUrl: trimTrailingSlash(options.apiBase),
-    headers: {
-      "Content-Type": "application/json",
-      "X-Business-Key": options.businessKey,
-    },
-    fetch: timeoutFetch(fetchRequest, options.timeoutMs ?? DEFAULT_TIMEOUT_MS),
-  });
-
+function createTaxiMethods(client: Client<paths>): ApiClient {
   return {
     async getBusiness() {
       const envelope = await execute(() => client.GET("/v1/public/business"));
@@ -130,5 +141,56 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
       return envelope.data;
     },
   };
+}
+
+function createShuttleMethods(client: Client<paths>): Omit<ShuttleApiClient, keyof ApiClient> {
+  return {
+    async getShuttleLocations(excludeLocationId) {
+      const query = excludeLocationId === undefined ? {} : { exclude_location_id: excludeLocationId };
+      const envelope = await execute(() => client.GET("/v1/public/shuttle/locations", {
+        params: { query },
+      }));
+      return envelope.data;
+    },
+    async searchShuttle(query) {
+      const envelope = await execute(() => client.GET("/v1/public/shuttle/search", {
+        params: { query },
+      }));
+      return envelope.data;
+    },
+    async searchShuttleReturn(query) {
+      const envelope = await execute(() => client.GET("/v1/public/shuttle/search/return", {
+        params: { query },
+      }));
+      return envelope.data;
+    },
+    async quoteShuttle(body) {
+      const envelope = await execute(() => client.POST("/v1/public/shuttle/quote", { body }));
+      return envelope.data;
+    },
+    async bookShuttle(body, idempotencyKey) {
+      const envelope = await execute(() => client.POST("/v1/public/shuttle/booking", {
+        body, headers: { "Idempotency-Key": idempotencyKey },
+      }));
+      return envelope.data;
+    },
+  };
+}
+
+export function createApiClient(options: ApiClientOptions): ShuttleApiClient {
+  const fetchRequest = options.fetch ?? ((request: Request) => globalThis.fetch(request));
+  const client = createClient<paths>({
+    baseUrl: trimTrailingSlash(options.apiBase),
+    headers: {
+      "Content-Type": "application/json",
+      "X-Business-Key": options.businessKey,
+    },
+    fetch: timeoutFetch(fetchRequest, options.timeoutMs ?? DEFAULT_TIMEOUT_MS),
+  });
+  return { ...createTaxiMethods(client), ...createShuttleMethods(client) };
+}
+
+export function isShuttleApiClient(client: ApiClient): client is ShuttleApiClient {
+  return "getShuttleLocations" in client;
 }
 

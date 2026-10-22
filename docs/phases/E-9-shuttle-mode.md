@@ -26,7 +26,6 @@ rather than inventing, renaming or deriving a field, if B-38C lacks any of:
 - grouped shuttle locations and reachable-destination filtering;
 - an explicit way to decide whether senior and child prices are separate;
 - scheduled and on-request outbound and return leg inputs;
-- the displayed vehicle/car name for each departure choice;
 - remaining-seat data;
 - server-owned quote line items and totals;
 - shuttle promo and cash-payment fields; or
@@ -35,9 +34,10 @@ rather than inventing, renaming or deriving a field, if B-38C lacks any of:
 The B-38C refresh at backend commit
 `2fdc7b1753dcce119b887313ebf16304341b2a0f` exposes
 `OnRequestAvailability.vehicle_type_name`, but scheduled `Departure` exposes no
-vehicle/car-name field. Its `service_label` is a service description (the
-contract example is `Direct Service`), not a vehicle name. E-9 implementation
-is blocked until the backend publishes a scheduled-departure vehicle name.
+vehicle/car-name field. E-9 proceeds without that label: scheduled cards show
+time, seats, price and the documented `service_label`; on-request shows
+`vehicle_type_name`. **TODO E-9b / backend B-38D:** add `vehicle_type` to the
+public scheduled `Departure`, then display its name in a small follow-up.
 
 ## Mode boundary
 
@@ -67,13 +67,14 @@ is blocked until the backend publishes a scheduled-departure vehicle name.
 
 - Search with `GET /v1/public/shuttle/search` and show only bookable results
   returned by the server.
-- Each scheduled result displays its time, server-provided vehicle/car name,
-  seats remaining and price. Preserve server strings; never calculate money or
-  availability.
+- Each scheduled result displays its time, seats remaining, price and
+  `service_label` exactly as documented. Do not present `service_label` as a car
+  name. Preserve server strings; never calculate money or availability.
 - When no departures are returned, show the existing no-departures message.
   `filtered_summary` may refine the explanation without exposing hidden rows.
 - For an `on_request` result, show a business-local time picker instead of a
-  departure list and construct only the generated on-request leg shape.
+  departure list, display its `vehicle_type_name`, and construct only the
+  generated on-request leg shape.
 
 ### 3. Return
 
@@ -137,10 +138,10 @@ Focused coverage must include:
   an automatic retry; and
 - regression coverage for the complete E-8 taxi flow.
 
-After the backend gate passes, run focused Vitest files, `pnpm typecheck`,
+Run focused Vitest files, `pnpm typecheck`,
 `pnpm lint`, one `pnpm build`, then `pnpm test:dist`. Do not run `pnpm check`,
 because it would build a second time; report it as **UNVERIFIED**. Report raw
 and gzipped bundle size, backend gaps, decisions, BRO differences and anything
 unverified. Commit the approved work, do not push, and finish with
-`git log -4 --oneline`, `git status --short`, and the push command.
+`git log -5 --oneline`, `git status --short`, and the push command.
 

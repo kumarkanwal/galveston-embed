@@ -1,4 +1,5 @@
 import { useEffect } from "preact/hooks";
+import type { ComponentChildren } from "preact";
 
 import type { BookingFailure } from "../booking/booking-error";
 import { FieldError, FormError } from "../trip/FieldError";
@@ -14,6 +15,7 @@ interface ConfirmFormProps {
   onChange: () => void;
   onValid: Parameters<typeof useConfirmForm>[2];
   terms: string | null | undefined;
+  extraFields?: ComponentChildren;
 }
 
 export function ConfirmForm(props: ConfirmFormProps) {
@@ -40,6 +42,7 @@ export function ConfirmForm(props: ConfirmFormProps) {
     </div>
     <h2>Personal Info</h2>
     <CustomerFields blur={state.blur} errors={errors} form={state.form} update={state.update} />
+    {props.extraFields}
     <TermsAgreement accepted={state.form.acceptedTerms} error={errors.acceptedTerms}
       terms={props.terms} onBlur={() => state.blur("acceptedTerms")}
       onChange={(value) => state.update("acceptedTerms", value)} />

@@ -73,7 +73,8 @@ One phase at a time: **spec → build → report → review → merge**. Do not 
 | **E-7a** | Promo codes | Backend promos wired into the new pricing path |
 | **E-7b** | Peak/blackout display | Backend B-35 |
 | **E-8** | Taxi round trip, split luggage counts, form toggles | Backend B-37 |
-| **E-9** | Shuttle mode in the same widget | Backend B-38C; scheduled-departure vehicle name |
+| **E-9** | Shuttle mode in the same widget | Backend B-38C |
+| **E-9b** | Scheduled-departure car name | Backend B-38D public `Departure.vehicle_type` |
 | **E-11** | Hourly: hours field and Add Stops | Backend hourly pricing (Part 3, client question C-6) |
 
 ---
