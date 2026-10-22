@@ -167,3 +167,15 @@ Date: 2026-10-15 · Status: accepted (extends ED-023)
 Decision: keep the SHA-256 request fingerprint and its UUID idempotency key in `sessionStorage`, with no request body or customer fields.
 Why: a reload during an uncertain booking POST must retain the same attempt key, but browser storage must not duplicate customer data.
 Consequences: an unchanged request reuses its key across reloads and navigation; changing trip, vehicle, car seats, or customer details creates a new fingerprint and key. Storage failures fall back safely to the in-memory behavior.
+
+## ED-027 — Taxi round trip joins the supported service types
+Date: 2026-10-22 · Status: accepted (supersedes ED-004 and ED-016 for `round_trip` only)
+Decision: support taxi `round_trip` alongside one-way and airport services; continue to exclude `hourly` and every shuttle endpoint.
+Why: backend B-37 now prices replacement round trips per leg and validates return chronology consistently across quote, breakdown and booking. The public API has no configured default service.
+Consequences: a visible service dropdown includes round trip in API order. A hidden dropdown uses the first permitted non-round-trip service in API order and, when round trip is also offered, exposes a One way / Round trip switch. Hidden mode fails closed when no non-round-trip service exists. ED-003 remains unchanged.
+
+## ED-028 — Split luggage counts remain one server-owned capacity
+Date: 2026-10-22 · Status: accepted (supersedes the luggage-field part of ED-020)
+Decision: collect `large_bags` and `small_bags` separately and never send the deprecated `luggage` alias.
+Why: B-37 publishes separate check-in/trunk and carry-on request fields while retaining one combined vehicle `luggage_capacity` and one business `max_luggage`.
+Consequences: each counter follows its generated schema maximum; their sum follows the business maximum capped by both schema fields together. The widget never calculates per-vehicle availability and displays the server's unavailable results.

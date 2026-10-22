@@ -10,7 +10,7 @@ type AirportDataState =
 
 export function useAirportData(client: ApiClient, service: CoreServiceCode) {
   const [state, setState] = useState<AirportDataState>({ status: "idle" });
-  const needsAirportData = service !== "one_way";
+  const needsAirportData = service === "airport_pickup" || service === "airport_dropoff";
   useEffect(() => {
     if (!needsAirportData) {
       setState({ status: "idle" });

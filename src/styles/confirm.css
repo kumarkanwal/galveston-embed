@@ -32,6 +32,11 @@
   margin: 3px 0 4px;
 }
 
+.summary-return {
+  font-size: 12px;
+  margin: 0 0 3px;
+}
+
 .summary-counts {
   display: flex;
   font-size: 12px;

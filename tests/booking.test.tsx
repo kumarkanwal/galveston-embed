@@ -28,12 +28,14 @@ const BUSINESS = {
   max_passengers: 8, max_luggage: 8,
   settings: { advance_booking_hours: 0, insurance_enabled: false,
     insurance_pct: "0.00", offer_car_seats: true, max_car_seats: 5,
-    car_seat_price: "15.00", payment_methods: ["cash"], terms_and_conditions: "Be ready." },
+    car_seat_price: "15.00", payment_methods: ["cash"], show_map: true,
+    show_service_dropdown: true, terms_and_conditions: "Be ready." },
 } satisfies Business;
 
 const TRIP: TripFormState = {
   service: "one_way", pickupDate: "2026-10-12", pickupTime: "10:00",
-  passengers: 2, luggage: 1,
+  returnDate: "2026-10-13", returnTime: "10:00",
+  passengers: 2, largeBags: 1, smallBags: 0,
   pickupAddress: { address: "Galveston, TX", zipcode: "77550", location: { lat: 1, lng: 2 } },
   dropoffAddress: { address: "Houston, TX", zipcode: "77002", location: { lat: 3, lng: 4 } },
   pickupAirportId: "", pickupAirportName: "", dropoffAirportId: "",
@@ -120,16 +122,16 @@ describe("booking submission", () => {
     button?.click();
     button?.click();
     await vi.waitFor(() => expect(book).toHaveBeenCalledOnce());
-    expect(book.mock.calls[0]?.[0]).toMatchObject({
-      accepted_terms: true, car_seats: 0,
+    expect(book.mock.calls[0]?.[0]).toMatchObject({ accepted_terms: true, car_seats: 0,
+      large_bags: 1, small_bags: 0,
       customer: { first_name: "Ada", last_name: "Lovelace", email: "ada@example.com" },
       payment: { method: "cash" },
     });
+    expect(book.mock.calls[0]?.[0]).not.toHaveProperty("luggage");
     expect(book.mock.calls[0]?.[1]).toMatch(/^[0-9a-f-]{36}$/u);
     resolve?.(BOOKED);
     await vi.waitFor(() => expect(onBooked).toHaveBeenCalledWith(BOOKED, false));
   });
-
   it("sends once when Enter submission and click happen together", async () => {
     let resolve: ((value: TaxiBookingResponse) => void) | undefined;
     const book = vi.fn<ApiClient["book"]>(() =>
@@ -143,7 +145,6 @@ describe("booking submission", () => {
     await vi.waitFor(() => expect(book).toHaveBeenCalledOnce());
     resolve?.(BOOKED);
   });
-
 });
 
 describe("booking idempotency", () => {
@@ -169,7 +170,6 @@ describe("booking idempotency", () => {
     expect(book.mock.calls[2]?.[1]).not.toBe(book.mock.calls[1]?.[1]);
     expect(root.querySelector<HTMLInputElement>("#email")?.value).toBe("ada@example.com");
   });
-
   it("reuses the successful attempt key after the confirmation page is left", async () => {
     const book = vi.fn<ApiClient["book"]>(async () => BOOKED);
     const first = mount(book);

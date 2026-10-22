@@ -22,6 +22,8 @@ const BUSINESS = {
     max_car_seats: 5,
     offer_car_seats: true,
     payment_methods: ["cash"],
+    show_map: true,
+    show_service_dropdown: true,
   },
 } satisfies Business;
 
@@ -93,6 +95,17 @@ describe("Choose Vehicle", () => {
       onBack={() => undefined} onChoose={() => undefined} />, root);
     expect(root.querySelector('[role="alert"]')?.textContent)
       .toContain("Choose another vehicle, or go back to select another time.");
+  });
+});
+
+describe("Server-owned vehicle availability", () => {
+  it("shows a server-owned luggage-capacity unavailable row", () => {
+    const vehicle = { ...VEHICLES[0]!, available: false, quote_status: "unavailable",
+      unavailable_reason: "capacity" } satisfies QuotedVehicle;
+    const { root } = mountQuote({ out_of_service_area: false, vehicles: [vehicle] });
+    const button = root.querySelector<HTMLButtonElement>(".vehicle-choose");
+    expect(button?.disabled).toBe(true);
+    expect(button?.textContent).toBe("Not available at this time");
   });
 });
 

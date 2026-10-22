@@ -31,7 +31,8 @@ const BUSINESS = {
   max_passengers: 8, max_luggage: 8,
   settings: { advance_booking_hours: 0, insurance_enabled: false,
     insurance_pct: "0.00", offer_car_seats: true, max_car_seats: 5,
-    car_seat_price: "15.00", payment_methods: ["cash"] },
+    car_seat_price: "15.00", payment_methods: ["cash"],
+    show_map: true, show_service_dropdown: true },
 } satisfies Business;
 const SERVICES = [
   { id: "pickup", code: "airport_pickup", name: "Airport Pickup" },
@@ -57,13 +58,13 @@ let latestFlow: Flow | undefined;
 
 function Harness({ service }: { service: CoreServiceCode }) {
   const [apiClient] = useState(client);
-  const flow = useBookingFlow(apiClient, BUSINESS, service, { passengers: 8, luggage: 8 });
+  const flow = useBookingFlow(apiClient, BUSINESS, service, { passengers: 8, bags: 8 });
   latestFlow = flow;
   return <TripDetails client={apiClient} errors={flow.state.errors} form={flow.state.form}
     formError={flow.state.formError} isSubmitting={false} mapsKey="maps-key"
-    limits={{ passengers: 8, luggage: 8 }} onFieldBlur={flow.blur} onSubmit={flow.submit}
-    routePolyline={null} services={[...SERVICES]}
-    timeZone="America/Chicago" update={flow.update} />;
+    limits={{ passengers: 8, bags: 8 }} onFieldBlur={flow.blur} onSubmit={flow.submit}
+    routePolyline={null} roundTripAlternative={null} services={[...SERVICES]} showMap
+    showServiceDropdown timeZone="America/Chicago" update={flow.update} />;
 }
 
 function flow(): Flow {

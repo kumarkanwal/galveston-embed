@@ -112,7 +112,7 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
       const envelope = await execute(() =>
         client.POST("/v1/public/taxi/quote", {
           body,
-          params: { query: { hide_incapable: true } },
+          params: { query: { hide_incapable: false } },
         }),
       );
       return envelope.data;

@@ -1,14 +1,23 @@
 import { businessDateTimeParts } from "../../time";
 import { FieldError } from "./FieldError";
+import { LuggageCounters } from "./LuggageCounters";
 import type { PartyLimits } from "./limits";
-import type { CoreService, TripErrors, TripField, TripFormState } from "./types";
+import type {
+  CoreService,
+  CoreServiceCode,
+  TripErrors,
+  TripField,
+  TripFormState,
+} from "./types";
 
 interface TripCoreFieldsProps {
   errors: TripErrors;
   form: TripFormState;
   limits: PartyLimits;
   onFieldBlur: (field: TripField) => void;
+  roundTripAlternative: CoreServiceCode | null;
   services: CoreService[];
+  showServiceDropdown: boolean;
   timeZone: string;
   update: <Key extends keyof TripFormState>(key: Key, value: TripFormState[Key]) => void;
 }
@@ -23,8 +32,7 @@ function DateTimeFields(props: Pick<
 >) {
   const minimum = businessDateTimeParts(new Date(), props.timeZone);
   return <>
-    <div class="field-row">
-      <div class="field">
+    <div class="field passenger-field">
         <label for="pickup-date">Pickup Date</label>
         <input id="pickup-date" type="date" value={props.form.pickupDate}
           min={minimum.date} required aria-invalid={props.errors.pickupDate !== undefined}
@@ -42,24 +50,77 @@ function DateTimeFields(props: Pick<
           onBlur={() => props.onFieldBlur("pickupTime")}
           onInput={(event) => props.update("pickupTime", event.currentTarget.value)} />
         <FieldError id="pickup-time-error" message={props.errors.pickupTime} />
-      </div>
     </div>
   </>;
 }
 
+function ReturnDateTimeFields(props: Pick<
+  TripCoreFieldsProps,
+  "errors" | "form" | "onFieldBlur" | "update"
+>) {
+  if (props.form.service !== "round_trip") return null;
+  return <div class="field-row return-fields">
+    <div class="field" data-trip-field="returnDate">
+      <label for="return-date">Return Date</label>
+      <input id="return-date" type="date" value={props.form.returnDate}
+        min={props.form.pickupDate || undefined} required
+        aria-invalid={props.errors.returnDate !== undefined}
+        aria-describedby={props.errors.returnDate === undefined ? undefined : "return-date-error"}
+        onBlur={() => props.onFieldBlur("returnDate")}
+        onInput={(event) => props.update("returnDate", event.currentTarget.value)} />
+      <FieldError id="return-date-error" message={props.errors.returnDate} />
+    </div>
+    <div class="field" data-trip-field="returnTime">
+      <label for="return-time">Return Time</label>
+      <input id="return-time" type="time" value={props.form.returnTime} required
+        min={props.form.returnDate === props.form.pickupDate ? props.form.pickupTime : undefined}
+        aria-invalid={props.errors.returnTime !== undefined}
+        aria-describedby={props.errors.returnTime === undefined ? undefined : "return-time-error"}
+        onBlur={() => props.onFieldBlur("returnTime")}
+        onInput={(event) => props.update("returnTime", event.currentTarget.value)} />
+      <FieldError id="return-time-error" message={props.errors.returnTime} />
+    </div>
+  </div>;
+}
+
+function ServiceControl(props: Pick<
+  TripCoreFieldsProps,
+  "form" | "roundTripAlternative" | "services" | "showServiceDropdown" | "update"
+>) {
+  if (props.showServiceDropdown) {
+    return <div class="field full-field">
+      <label for="service">Service Details</label>
+      <select id="service" value={props.form.service}
+        onChange={(event) => props.update(
+          "service", event.currentTarget.value as TripFormState["service"],
+        )}>
+        {props.services.map((service) => <option value={service.code}>{service.name}</option>)}
+      </select>
+    </div>;
+  }
+  const alternative = props.roundTripAlternative;
+  if (alternative === null) return null;
+  const roundTrip = props.form.service === "round_trip";
+  return <div class="trip-kind-toggle" role="group" aria-label="Trip type">
+    <button type="button" aria-pressed={!roundTrip}
+      onClick={() => props.update("service", alternative)}>
+      One way
+    </button>
+    <button type="button" aria-pressed={roundTrip}
+      onClick={() => props.update("service", "round_trip")}>Round trip</button>
+  </div>;
+}
+
 export function TripCoreFields({
-  errors, form, limits, onFieldBlur, services, timeZone, update,
+  errors, form, limits, onFieldBlur, roundTripAlternative, services,
+  showServiceDropdown, timeZone, update,
 }: TripCoreFieldsProps) {
   return <>
-    <div class="field full-field">
-      <label for="service">Service Details</label>
-      <select id="service" value={form.service}
-        onChange={(event) => update("service", event.currentTarget.value as TripFormState["service"])}>
-        {services.map((service) => <option value={service.code}>{service.name}</option>)}
-      </select>
-    </div>
+    <ServiceControl form={form} roundTripAlternative={roundTripAlternative} services={services}
+      showServiceDropdown={showServiceDropdown} update={update} />
     <DateTimeFields errors={errors} form={form} onFieldBlur={onFieldBlur}
       timeZone={timeZone} update={update} />
+    <ReturnDateTimeFields errors={errors} form={form} onFieldBlur={onFieldBlur} update={update} />
     <div class="field-row">
       <div class="field">
         <label for="passengers">Passengers</label>
@@ -74,19 +135,8 @@ export function TripCoreFields({
         </select>
         <FieldError id="passengers-error" message={errors.passengers} />
       </div>
-      <div class="field">
-        <label for="luggage">Luggage</label>
-        <select id="luggage" value={form.luggage}
-          aria-invalid={errors.luggage !== undefined}
-          aria-describedby={errors.luggage === undefined ? undefined : "luggage-error"}
-          onBlur={() => onFieldBlur("luggage")}
-          onChange={(event) => update("luggage", Number(event.currentTarget.value))}>
-          {numericOptions(limits.luggage, 0).map((count) => <option value={count}>
-            {count} luggage
-          </option>)}
-        </select>
-        <FieldError id="luggage-error" message={errors.luggage} />
-      </div>
     </div>
+    <LuggageCounters errors={errors} form={form} maximum={limits.bags}
+      onFieldBlur={onFieldBlur} update={update} />
   </>;
 }

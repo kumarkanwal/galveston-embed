@@ -20,8 +20,11 @@ function formFor(service: CoreServiceCode): TripFormState {
     service,
     pickupDate: "2026-10-20",
     pickupTime: "10:00",
+    returnDate: "2026-10-21",
+    returnTime: "10:00",
     passengers: 2,
-    luggage: 3,
+    largeBags: 2,
+    smallBags: 1,
     pickupAddress: ADDRESS,
     dropoffAddress: ADDRESS,
     pickupAirportId: "airport-pickup",
@@ -44,10 +47,12 @@ function quoteSchemaKeys(): string[] {
 }
 
 describe("quote request builder", () => {
-  it.each(["one_way", "airport_pickup", "airport_dropoff"] as const)(
-    "uses only schema keys for %s",
+  it.each(["one_way", "round_trip", "airport_pickup", "airport_dropoff"] as const)(
+    "uses only supported schema keys for %s",
     (service) => {
-      expect(Object.keys(buildQuoteRequest(formFor(service))).sort()).toEqual(quoteSchemaKeys());
+      const keys = Object.keys(buildQuoteRequest(formFor(service)));
+      expect(keys.every((key) => quoteSchemaKeys().includes(key))).toBe(true);
+      expect(keys).not.toContain("luggage");
     },
   );
 
@@ -62,6 +67,10 @@ describe("quote request builder", () => {
       dropoff_airport_id: null,
       airline: null,
       flight_number: null,
+      large_bags: 2,
+      small_bags: 1,
+      return_date: null,
+      return_time: null,
       hours: null,
       stops: [],
     });
@@ -84,6 +93,17 @@ describe("quote request builder", () => {
     });
   });
 
+});
+
+describe("round-trip quote request", () => {
+  it("builds return and split-bag fields", () => {
+    const request = buildQuoteRequest(formFor("round_trip"));
+    expect(request).toMatchObject({
+      service_type: "round_trip", return_date: "2026-10-21", return_time: "10:00",
+      large_bags: 2, small_bags: 1,
+    });
+    expect(request).not.toHaveProperty("luggage");
+  });
 });
 
 describe("airport pricing request invariants", () => {
@@ -135,7 +155,7 @@ describe("step-one map endpoints", () => {
 
 const VALIDATION_CONTEXT = {
   advanceBookingHours: 12,
-  limits: { passengers: 8, luggage: 8 },
+  limits: { passengers: 8, bags: 8 },
   now: new Date("2026-10-19T15:00:00.000Z"),
   timeZone: "America/Chicago",
 };
@@ -157,6 +177,25 @@ describe("trip field validation", () => {
     Object.assign(form, { [field]: field.endsWith("Address") || field === "airline" ? null : "" });
     expect(validateTrip(form, VALIDATION_CONTEXT)).toHaveProperty(field);
   });
+
+  it("requires both round-trip return fields and rejects a return not after pickup", () => {
+    const form = formFor("round_trip");
+    form.returnDate = ""; form.returnTime = "";
+    expect(validateTrip(form, VALIDATION_CONTEXT)).toMatchObject({
+      returnDate: "Select a return date.", returnTime: "Select a return time.",
+    });
+    form.returnDate = form.pickupDate; form.returnTime = form.pickupTime;
+    expect(validateTrip(form, VALIDATION_CONTEXT).returnTime).toBe("Return must be after pickup.");
+    form.returnTime = "10:01";
+    expect(validateTrip(form, VALIDATION_CONTEXT).returnTime).toBeUndefined();
+  });
+
+  it("validates the combined split-bag total", () => {
+    const form = formFor("one_way");
+    form.largeBags = 5; form.smallBags = 4;
+    expect(validateTrip(form, VALIDATION_CONTEXT).largeBags)
+      .toBe("Select no more than 8 bags in total.");
+  });
 });
 
 describe("trip date and time validation", () => {
@@ -173,7 +212,7 @@ describe("trip date and time validation", () => {
     const form = formFor("one_way");
     const chicagoContext = {
       advanceBookingHours: 0,
-      limits: { passengers: 8, luggage: 8 },
+      limits: { passengers: 8, bags: 8 },
       now: new Date("2026-07-01T03:30:00.000Z"),
       timeZone: "America/Chicago",
     };

@@ -2,6 +2,7 @@ import type { Airline, Airport, ServiceTypeOption } from "../../api/client";
 
 export const CORE_SERVICE_CODES = [
   "one_way",
+  "round_trip",
   "airport_pickup",
   "airport_dropoff",
 ] as const;
@@ -24,8 +25,11 @@ export interface TripFormState {
   service: CoreServiceCode;
   pickupDate: string;
   pickupTime: string;
+  returnDate: string;
+  returnTime: string;
   passengers: number;
-  luggage: number;
+  largeBags: number;
+  smallBags: number;
   pickupAddress: SelectedAddress | null;
   dropoffAddress: SelectedAddress | null;
   pickupAirportId: string;
@@ -41,8 +45,11 @@ export interface TripFormState {
 export type TripField =
   | "pickupDate"
   | "pickupTime"
+  | "returnDate"
+  | "returnTime"
   | "passengers"
-  | "luggage"
+  | "largeBags"
+  | "smallBags"
   | "pickupAddress"
   | "dropoffAddress"
   | "pickupAirportId"

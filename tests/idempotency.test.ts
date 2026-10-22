@@ -39,6 +39,18 @@ describe("IdempotencyKeyManager", () => {
     expect(changed).not.toBe(first);
   });
 
+  it.each([
+    ["return departure", { return_date: "2026-10-24", large_bags: 1, small_bags: 1 }],
+    ["large bags", { return_date: "2026-10-23", large_bags: 2, small_bags: 1 }],
+    ["small bags", { return_date: "2026-10-23", large_bags: 1, small_bags: 2 }],
+  ])("returns a new key when %s changes", async (_label, changed) => {
+    const manager = new IdempotencyKeyManager(sequentialUuids(), null, fingerprints());
+    const first = await manager.getKey({
+      return_date: "2026-10-23", large_bags: 1, small_bags: 1,
+    });
+    await expect(manager.getKey(changed)).resolves.not.toBe(first);
+  });
+
   it("ignores object key order, including nested objects", async () => {
     const manager = new IdempotencyKeyManager(sequentialUuids(), null, fingerprints());
     const first = await manager.getKey({ customer: { first: "A", last: "B" }, passengers: 2 });

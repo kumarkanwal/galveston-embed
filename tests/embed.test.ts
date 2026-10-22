@@ -21,6 +21,8 @@ const BUSINESS: Business = {
     max_car_seats: 5,
     offer_car_seats: true,
     payment_methods: ["cash"],
+    show_map: true,
+    show_service_dropdown: true,
   },
 };
 

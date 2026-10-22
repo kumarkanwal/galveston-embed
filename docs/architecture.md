@@ -89,7 +89,11 @@ Copy BRO's 3-step flow. Screenshots in `docs/reference/bro/` are the reference f
 | 2. Choose Vehicle | none (uses the quote) |
 | 3. Confirm | `POST /taxi/price-breakdown` (priced vehicles only, including an applied promo code), then `POST /taxi/booking` with the same code |
 
-**Dropped from BRO:** the site header (Menu, Login), customer accounts, round trip.
+**Dropped from BRO:** the site header (Menu, Login) and customer accounts.
+Taxi round trip is an allowed `service_type`; hourly remains deferred. Businesses
+may hide the service dropdown or map through public settings. Hidden service
+selection uses the first permitted non-round-trip service in API order, with a
+One way / Round trip switch when both paths are offered (ED-027).
 **Added beyond BRO (later):** card payment.
 
 ## 7. Environments
