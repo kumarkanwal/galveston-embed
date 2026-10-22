@@ -4,10 +4,10 @@
 | Field | Value |
 |---|---|
 | Copied from | `galveston-backend/docs/API_CONTRACT.md` |
-| Backend commit | `bb25f45570ee83b4e88f609fed446981d4916a1a` |
-| Copied on | `2026-10-20` |
+| Backend commit | `8bc75f3b0c4f37b656d9459917b6105ddad74419` |
+| Copied on | `2026-10-22` |
 
 Refresh only after a complete backend change is committed and pushed.
 
-This source includes backend B-35 peak and blackout behavior, including taxi
-quote availability and booking-time blackout enforcement.
+This source includes backend B-37 taxi round-trip pricing, split luggage counts
+and public form-presentation settings. Backend commit `f678b66` is included.

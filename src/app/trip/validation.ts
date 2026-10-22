@@ -1,9 +1,10 @@
 import { compareWithBusinessNow, meetsAdvanceBookingRequirement } from "../../time";
-import type { PartyLimits } from "./limits";
+import { BAG_COUNT_SCHEMA_LIMIT, type PartyLimits } from "./limits";
 import type { TripErrors, TripField, TripFormState } from "./types";
 
 const TRIP_FIELD_ORDER: TripField[] = [
-  "pickupDate", "pickupTime", "passengers", "luggage", "pickupAddress",
+  "pickupDate", "pickupTime", "returnDate", "returnTime", "passengers",
+  "largeBags", "smallBags", "pickupAddress",
   "dropoffAddress", "pickupAirportId", "dropoffAirportId", "airline", "flightNumber",
 ];
 
@@ -18,8 +19,14 @@ function validateParty(form: TripFormState, errors: TripErrors, limits: PartyLim
   if (form.passengers < 1 || form.passengers > limits.passengers) {
     errors.passengers = "Select a valid passenger count.";
   }
-  if (form.luggage < 0 || form.luggage > limits.luggage) {
-    errors.luggage = "Select a valid luggage count.";
+  if (form.largeBags < 0 || form.largeBags > BAG_COUNT_SCHEMA_LIMIT) {
+    errors.largeBags = "Select a valid check-in bag count.";
+  }
+  if (form.smallBags < 0 || form.smallBags > BAG_COUNT_SCHEMA_LIMIT) {
+    errors.smallBags = "Select a valid carry-on bag count.";
+  }
+  if (form.largeBags + form.smallBags > limits.bags) {
+    errors.largeBags = `Select no more than ${limits.bags} bags in total.`;
   }
 }
 
@@ -33,7 +40,7 @@ function validateAddresses(form: TripFormState, errors: TripErrors): void {
 }
 
 function validateAirport(form: TripFormState, errors: TripErrors): void {
-  if (form.service === "one_way") return;
+  if (form.service === "one_way" || form.service === "round_trip") return;
   if (form.service === "airport_pickup" && form.pickupAirportId === "") {
     errors.pickupAirportId = "Select a pickup airport.";
   }
@@ -42,6 +49,17 @@ function validateAirport(form: TripFormState, errors: TripErrors): void {
   }
   if (form.airline === null) errors.airline = "Select an airline.";
   if (form.flightNumber.trim() === "") errors.flightNumber = "Enter a flight number.";
+}
+
+function validateReturnDateTime(form: TripFormState, errors: TripErrors): void {
+  if (form.service !== "round_trip") return;
+  if (form.returnDate === "") errors.returnDate = "Select a return date.";
+  if (form.returnTime === "") errors.returnTime = "Select a return time.";
+  if (form.returnDate === "" || form.returnTime === ""
+    || form.pickupDate === "" || form.pickupTime === "") return;
+  const pickup = `${form.pickupDate}T${form.pickupTime}`;
+  const returning = `${form.returnDate}T${form.returnTime}`;
+  if (returning <= pickup) errors.returnTime = "Return must be after pickup.";
 }
 
 function validateDateTime(
@@ -75,6 +93,7 @@ export function validateTrip(
 ): TripErrors {
   const errors: TripErrors = {};
   validateDateTime(form, errors, context);
+  validateReturnDateTime(form, errors);
   validateParty(form, errors, context.limits);
   validateAddresses(form, errors);
   validateAirport(form, errors);

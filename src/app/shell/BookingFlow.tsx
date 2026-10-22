@@ -2,7 +2,7 @@ import type { ApiClient, Business, ServiceTypeOption } from "../../api/client";
 import { useEffect, useRef } from "preact/hooks";
 import { Confirmation } from "../booking/Confirmation";
 import { Confirm } from "../confirm/Confirm";
-import { filterCoreServices } from "../trip/service-types";
+import { filterCoreServices, firstNonRoundTripService } from "../trip/service-types";
 import { TripDetails } from "../trip/TripDetails";
 import { ChooseVehicle } from "../vehicle/ChooseVehicle";
 import { partyLimits, type PartyLimits } from "../trip/limits";
@@ -17,26 +17,32 @@ interface BookingFlowProps {
 export function BookingFlow(props: BookingFlowProps) {
   const services = filterCoreServices(props.services);
   const limits = partyLimits(props.business);
+  const showServiceDropdown = props.business.settings.show_service_dropdown !== false;
   if (limits === null) {
     return <section class="widget status" aria-live="polite">
       No vehicles are available. Please contact us.
     </section>;
   }
-  if (services.length === 0) {
+  const hiddenDefault = firstNonRoundTripService(services);
+  if (services.length === 0 || (!showServiceDropdown && hiddenDefault === undefined)) {
     return <section class="widget status" aria-live="polite">
       Online booking is not available. Please contact us.
     </section>;
   }
-  const firstService = services[0];
+  const firstService = showServiceDropdown ? services[0] : hiddenDefault;
   if (firstService === undefined) return null;
   return <BookingFlowReady {...props} initialService={firstService.code}
-    limits={limits} services={services} />;
+    limits={limits} roundTripAlternative={!showServiceDropdown
+      && services.some((service) => service.code === "round_trip") ? firstService.code : null}
+    services={services} showServiceDropdown={showServiceDropdown} />;
 }
 
 function BookingFlowReady(props: Omit<BookingFlowProps, "services"> & {
   initialService: ReturnType<typeof filterCoreServices>[number]["code"];
   limits: PartyLimits;
+  roundTripAlternative: ReturnType<typeof filterCoreServices>[number]["code"] | null;
   services: ReturnType<typeof filterCoreServices>;
+  showServiceDropdown: boolean;
 }) {
   const flow = useBookingFlow(props.client, props.business, props.initialService, props.limits);
   const view = flow.state.confirmation !== null ? "confirmation" : `step-${flow.state.step}`;
@@ -70,6 +76,9 @@ function BookingFlowReady(props: Omit<BookingFlowProps, "services"> & {
     mapsKey={props.mapsKey} onSubmit={flow.submit}
     limits={props.limits}
     routePolyline={flow.state.quote?.route_polyline ?? null}
+    roundTripAlternative={props.roundTripAlternative}
     services={props.services} timeZone={props.business.timezone}
+    showMap={props.business.settings.show_map !== false}
+    showServiceDropdown={props.showServiceDropdown}
     onFieldBlur={flow.blur} update={flow.update} />;
 }

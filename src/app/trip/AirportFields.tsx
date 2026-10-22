@@ -24,7 +24,7 @@ function AirportLocationStatus({ status }: {
 }
 
 export function AirportFields(props: AirportFieldsProps) {
-  if (props.form.service === "one_way") return null;
+  if (props.form.service !== "airport_pickup" && props.form.service !== "airport_dropoff") return null;
   const pickup = props.form.service === "airport_pickup";
   const airportKey = pickup ? "pickupAirportId" : "dropoffAirportId";
   const airportNameKey = pickup ? "pickupAirportName" : "dropoffAirportName";

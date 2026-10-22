@@ -33,6 +33,8 @@ const BUSINESS = {
     max_car_seats: 5,
     offer_car_seats: true,
     payment_methods: ["cash"],
+    show_map: true,
+    show_service_dropdown: true,
     terms_and_conditions: "Arrive ten minutes early.",
   },
 };
@@ -42,7 +44,8 @@ const QUOTE: TaxiQuoteRequest = {
   pickup_date: "2026-10-20",
   pickup_time: "10:00:00",
   passengers: 1,
-  luggage: 0,
+  large_bags: 0,
+  small_bags: 0,
 };
 
 const BREAKDOWN: TaxiPriceBreakdownRequest = {
@@ -120,7 +123,7 @@ describe("API request setup", () => {
     expect(fetch).toHaveBeenCalledOnce();
     const request = fetch.mock.calls[0]?.[0];
     expect(request?.method).toBe("POST");
-    expect(request?.url).toBe("https://api.test/v1/public/taxi/quote?hide_incapable=true");
+    expect(request?.url).toBe("https://api.test/v1/public/taxi/quote?hide_incapable=false");
     expect(request?.headers.get("X-Business-Key")).toBe("bk_test");
     expect(request?.headers.get("Content-Type")).toBe("application/json");
     await expect(request?.clone().json()).resolves.toEqual(QUOTE);

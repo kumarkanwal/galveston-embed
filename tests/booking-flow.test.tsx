@@ -17,7 +17,8 @@ const BUSINESS = {
   max_passengers: 8, max_luggage: 8,
   settings: { advance_booking_hours: 0, insurance_enabled: false,
     insurance_pct: "0.00", offer_car_seats: true, max_car_seats: 5,
-    car_seat_price: "15.00", payment_methods: ["cash"] },
+    car_seat_price: "15.00", payment_methods: ["cash"],
+    show_map: true, show_service_dropdown: true },
 } satisfies Business;
 const QUOTE: TaxiQuoteResponse = {
   distance_miles: "50.00",
@@ -49,8 +50,11 @@ function clientWith(quote: ApiClient["quote"]): ApiClient {
 type Flow = ReturnType<typeof useBookingFlow>;
 let latestFlow: Flow | undefined;
 
-function Harness({ client }: { client: ApiClient }) {
-  const flow = useBookingFlow(client, BUSINESS, "one_way", { passengers: 8, luggage: 8 });
+function Harness({ client, service = "one_way" }: {
+  client: ApiClient;
+  service?: "one_way" | "round_trip";
+}) {
+  const flow = useBookingFlow(client, BUSINESS, service, { passengers: 8, bags: 8 });
   latestFlow = flow;
   return <div data-step={flow.state.step}>{flow.state.formError}</div>;
 }
@@ -60,13 +64,17 @@ function flow(): Flow {
   return latestFlow;
 }
 
-async function makeValid() {
+async function makeValid(roundTrip = false) {
   const address = { address: "Galveston, TX 77550", zipcode: "77550",
     location: { lat: 29.3, lng: -94.8 } };
   flow().update("pickupDate", "2026-12-01");
   flow().update("pickupTime", "10:00");
   flow().update("pickupAddress", address);
   flow().update("dropoffAddress", address);
+  if (roundTrip) {
+    flow().update("returnDate", "2026-12-02");
+    flow().update("returnTime", "10:00");
+  }
   await vi.waitFor(() => expect(flow().state.form.dropoffAddress).toEqual(address));
 }
 
@@ -108,6 +116,17 @@ describe("quote submission", () => {
     await flow().submit(submitEvent());
     expect(quote).toHaveBeenCalledOnce();
     expect(flow().state.formError).toContain("could not be loaded");
+  });
+
+  it("shows the server minimum-gap message on Return Date without retrying", async () => {
+    const error = new ApiError(400, { code: "VALIDATION_ERROR",
+      message: "Return must leave at least 30 minutes after arrival.", field: "return_date" });
+    const quote = vi.fn(async () => Promise.reject(error));
+    render(<Harness client={clientWith(quote)} service="round_trip" />, document.body);
+    await makeValid(true); await flow().submit(submitEvent());
+    expect(quote).toHaveBeenCalledOnce();
+    expect(flow().state.errors.returnDate).toBe(error.message);
+    expect(flow().state.form.returnDate).toBe("2026-12-02");
   });
 
 });

@@ -84,6 +84,10 @@
   grid-template-columns: minmax(0, 1fr) minmax(360px, 1fr);
 }
 
+.trip-layout.no-map {
+  grid-template-columns: minmax(0, 720px);
+}
+
 .trip-form {
   min-width: 0;
 }
@@ -99,6 +103,98 @@
   display: grid;
   gap: 22px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.passenger-field {
+  max-width: calc(50% - 11px);
+}
+
+.trip-kind-toggle {
+  display: grid;
+  gap: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
+.trip-kind-toggle button {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  color: #333333;
+  cursor: pointer;
+  min-height: 36px;
+}
+
+.trip-kind-toggle button:first-child {
+  border-radius: 3px 0 0 3px;
+}
+
+.trip-kind-toggle button:last-child {
+  border-left: 0;
+  border-radius: 0 3px 3px 0;
+}
+
+.trip-kind-toggle button[aria-pressed="true"] {
+  background: var(--blue);
+  color: #ffffff;
+}
+
+.bag-fields {
+  border: 0;
+  margin: 2px 0 9px;
+  padding: 0;
+}
+
+.bag-fields legend {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.bag-label {
+  align-items: center;
+  display: flex;
+  font-size: 12px;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.bag-icon {
+  fill: #526078;
+  height: 22px;
+  width: 22px;
+}
+
+.counter-controls {
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  display: grid;
+  grid-template-columns: 38px minmax(38px, 1fr) 38px;
+  min-height: 34px;
+}
+
+.counter-controls[aria-invalid="true"] {
+  border-color: var(--error);
+}
+
+.counter-controls button {
+  background: #f5f5f5;
+  border: 0;
+  color: #333333;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.counter-controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.counter-controls output {
+  align-items: center;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  display: flex;
+  justify-content: center;
 }
 
 label {
@@ -362,6 +458,10 @@ select[aria-invalid="true"] {
   .field-row {
     gap: 0;
     grid-template-columns: 1fr;
+  }
+
+  .passenger-field {
+    max-width: none;
   }
 
   .widget-heading h1 {

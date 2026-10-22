@@ -32,9 +32,15 @@ export function TripSummary(props: TripSummaryProps) {
         <h3>{props.serviceName} on {formatBusinessLocalDateTime(
           props.form.pickupDate, props.form.pickupTime,
         )} - Vehicle: {props.vehicle.name}{distance == null ? "" : ` (${distance} mi)`}</h3>
+        {props.form.service === "round_trip" && <p class="summary-return">
+          Return: {formatBusinessLocalDateTime(props.form.returnDate, props.form.returnTime)}
+        </p>}
         <div class="summary-counts">
           <span aria-label={`${props.form.passengers} passengers`}>♟ {props.form.passengers}</span>
-          <span aria-label={`${props.form.luggage} luggage`}>▣ {props.form.luggage}</span>
+          <span aria-label={`${props.form.largeBags} check-in or trunk bags`}>
+            ▣ {props.form.largeBags}
+          </span>
+          <span aria-label={`${props.form.smallBags} carry-on bags`}>▫ {props.form.smallBags}</span>
         </div>
         <div class="summary-address"><span class="pickup-pin">●</span>{tripAddress(props.form, "pickup")}</div>
         <div class="summary-address"><span class="dropoff-pin">●</span>{tripAddress(props.form, "dropoff")}</div>

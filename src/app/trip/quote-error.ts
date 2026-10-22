@@ -4,8 +4,11 @@ import type { CoreServiceCode, TripField } from "./types";
 const FIELD_NAMES: Partial<Record<string, TripField>> = {
   pickup_date: "pickupDate",
   pickup_time: "pickupTime",
+  return_date: "returnDate",
+  return_time: "returnTime",
   passengers: "passengers",
-  luggage: "luggage",
+  large_bags: "largeBags",
+  small_bags: "smallBags",
   pickup_address: "pickupAddress",
   pickup_zipcode: "pickupAddress",
   dropoff_address: "dropoffAddress",

@@ -22,12 +22,14 @@ const BUSINESS = {
   settings: { advance_booking_hours: 0, insurance_enabled: false,
     insurance_pct: "0.00", offer_car_seats: true, max_car_seats: 5,
     car_seat_price: "15.00", payment_methods: ["cash"],
+    show_map: true, show_service_dropdown: true,
     terms_and_conditions: "Use <b>care</b> & arrive early." },
 } satisfies Business;
 
 const TRIP: TripFormState = {
   service: "one_way", pickupDate: "2026-10-12", pickupTime: "00:44",
-  passengers: 1, luggage: 0,
+  returnDate: "2026-10-13", returnTime: "00:44",
+  passengers: 1, largeBags: 0, smallBags: 0,
   pickupAddress: { address: "Houston, TX", zipcode: "77002", location: { lat: 1, lng: 2 } },
   dropoffAddress: { address: "Houston Premium Outlets", zipcode: "77433",
     location: { lat: 3, lng: 4 } },
@@ -90,12 +92,6 @@ function input(root: HTMLElement, id: string, value: string) {
 beforeEach(() => document.body.replaceChildren());
 
 describe("Confirm price breakdown", () => {
-  it("requests once with the stored trip, vehicle, cash, and zero car seats", async () => {
-    const priceBreakdown = vi.fn(async () => BREAKDOWN);
-    mount(priceBreakdown);
-    await vi.waitFor(() => expect(priceBreakdown).toHaveBeenCalledOnce());
-    expect(priceBreakdown).toHaveBeenCalledWith(buildBreakdownRequest(TRIP, VEHICLE.vehicle_type_id, 0));
-  });
   it("keeps API order, hides every exact zero line, and formats the server total", async () => {
     const { root } = mount();
     await vi.waitFor(() => expect(root.textContent).toContain("$92.70 USD"));
@@ -137,6 +133,36 @@ describe("Confirm price breakdown", () => {
     await Promise.resolve();
     expect(root.textContent).toContain("$107.70 USD");
     expect(root.textContent).not.toContain("$92.70 USD");
+  });
+});
+
+describe("Confirm pricing request", () => {
+  it("sends the stored trip, vehicle, cash, and split bags once", async () => {
+    const priceBreakdown = vi.fn<ApiClient["priceBreakdown"]>(async () => BREAKDOWN);
+    mount(priceBreakdown);
+    await vi.waitFor(() => expect(priceBreakdown).toHaveBeenCalledOnce());
+    expect(priceBreakdown).toHaveBeenCalledWith(buildBreakdownRequest(TRIP, VEHICLE.vehicle_type_id, 0));
+    const request = priceBreakdown.mock.calls[0]?.[0];
+    expect(request).toMatchObject({ large_bags: 0, small_bags: 0 });
+    expect(request).not.toHaveProperty("luggage");
+  });
+});
+
+describe("Server-owned round-trip lines", () => {
+  it("shows both-leg, one-promo, and one-fee lines once in server order", async () => {
+    const response: TaxiPriceBreakdownResponse = { ...BREAKDOWN,
+      line_items: [
+        { label: "Outbound Fare", amount: "90.00", kind: "base", quantity: 1 },
+        { label: "Return Fare", amount: "90.00", kind: "base", quantity: 1 },
+        { label: "Promo SAVE10", amount: "-18.00", kind: "discount", quantity: 1 },
+        { label: "Card Fee", amount: "5.00", kind: "surcharge", quantity: 1 },
+      ], subtotal: "167.00", discount_amount: "18.00", total: "167.00" };
+    const { root } = mount(vi.fn(async () => response));
+    await vi.waitFor(() => expect(root.textContent).toContain("$167.00 USD"));
+    expect([...root.querySelectorAll(".charge-row")].map((row) => row.textContent)).toEqual([
+      "Outbound Fare$90.00 USD", "Return Fare$90.00 USD",
+      "Promo SAVE10-$18.00 USD", "Card Fee$5.00 USD",
+    ]);
   });
 });
 
@@ -324,6 +350,8 @@ describe("Confirm field error placement", () => {
     expect(request).not.toHaveProperty("charges");
     expect(request).not.toHaveProperty("promo_code");
     expect(request).not.toHaveProperty("payment_method");
+    expect(request).not.toHaveProperty("luggage");
+    expect(request).toMatchObject({ large_bags: 0, small_bags: 0 });
   });
 });
 

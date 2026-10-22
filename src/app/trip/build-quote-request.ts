@@ -10,7 +10,8 @@ function dropoffAddress(form: TripFormState): string | null {
 }
 
 export function buildQuoteRequest(form: TripFormState): TaxiQuoteRequest {
-  const airportService = form.service !== "one_way";
+  const airportService = form.service === "airport_pickup" || form.service === "airport_dropoff";
+  const roundTrip = form.service === "round_trip";
   return {
     service_type: form.service,
     pickup_date: form.pickupDate,
@@ -23,12 +24,13 @@ export function buildQuoteRequest(form: TripFormState): TaxiQuoteRequest {
     dropoff_airport_id: form.service === "airport_dropoff" ? form.dropoffAirportId : null,
     airline: airportService ? form.airline?.name ?? null : null,
     flight_number: airportService ? form.flightNumber : null,
-    return_date: null,
-    return_time: null,
+    return_date: roundTrip ? form.returnDate : null,
+    return_time: roundTrip ? form.returnTime : null,
     hours: null,
     stops: [],
     passengers: form.passengers,
-    luggage: form.luggage,
+    large_bags: form.largeBags,
+    small_bags: form.smallBags,
     payment_method: null,
   };
 }

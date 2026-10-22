@@ -22,8 +22,11 @@ function formFor(service: CoreServiceCode): TripFormState {
     service,
     pickupDate: "2026-10-20",
     pickupTime: "10:00",
+    returnDate: "2026-10-21",
+    returnTime: "10:00",
     passengers: 1,
-    luggage: 0,
+    largeBags: 0,
+    smallBags: 0,
     pickupAddress: null,
     dropoffAddress: null,
     pickupAirportId: "",
@@ -63,9 +66,10 @@ function renderTrip(
   document.body.append(root);
   render(<TripDetails autoFocusHeading={autoFocusHeading}
     client={client} errors={errors} form={formFor(service)} formError={null}
-    isSubmitting={isSubmitting} limits={{ passengers: 8, luggage: 8 }} mapsKey=""
+    isSubmitting={isSubmitting} limits={{ passengers: 8, bags: 8 }} mapsKey=""
     onFieldBlur={() => undefined} onSubmit={() => undefined} routePolyline={null}
-    services={[...SERVICES]} timeZone="America/Chicago" update={() => undefined} />, root);
+    roundTripAlternative={null} services={[...SERVICES]} showMap={false}
+    showServiceDropdown timeZone="America/Chicago" update={() => undefined} />, root);
   return root;
 }
 
@@ -168,12 +172,12 @@ describe("trip field error placement", () => {
   it("renders every one-way error inside its own field", () => {
     const errors: TripErrors = {
       pickupDate: "Bad date", pickupTime: "Bad time", passengers: "Bad passengers",
-      luggage: "Bad luggage", pickupAddress: "Bad pickup", dropoffAddress: "Bad dropoff",
+      largeBags: "Bad luggage", pickupAddress: "Bad pickup", dropoffAddress: "Bad dropoff",
     };
     const root = renderTrip("one_way", mockClient(), false, errors);
     for (const [inputId, errorId] of [
       ["pickup-date", "pickup-date-error"], ["pickup-time", "pickup-time-error"],
-      ["passengers", "passengers-error"], ["luggage", "luggage-error"],
+      ["passengers", "passengers-error"], ["largeBags", "largeBags-error"],
       ["pickup-address", "pickup-address-error"], ["dropoff-address", "dropoff-address-error"],
     ]) {
       expect(root.querySelector(`#${errorId}`)?.parentElement?.querySelector(`#${inputId}`))

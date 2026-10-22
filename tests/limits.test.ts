@@ -4,7 +4,11 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import type { Business } from "../src/api/client";
-import { partyLimits, QUOTE_SCHEMA_LIMITS } from "../src/app/trip/limits";
+import {
+  BAG_COUNT_SCHEMA_LIMIT,
+  partyLimits,
+  QUOTE_SCHEMA_LIMITS,
+} from "../src/app/trip/limits";
 
 const BUSINESS = {
   id: "business-1",
@@ -23,10 +27,12 @@ const BUSINESS = {
     max_car_seats: 5,
     offer_car_seats: true,
     payment_methods: ["cash"],
+    show_map: true,
+    show_service_dropdown: true,
   },
 } satisfies Business;
 
-function schemaMaximum(field: "passengers" | "luggage"): number {
+function schemaMaximum(field: "passengers" | "large_bags" | "small_bags"): number {
   const contents = readFileSync(resolve(process.cwd(), "src/api/openapi.json"), "utf8");
   const schema = JSON.parse(contents) as {
     components: { schemas: { TaxiQuoteRequest: {
@@ -40,8 +46,8 @@ function schemaMaximum(field: "passengers" | "luggage"): number {
 
 describe("party limits", () => {
   it("uses business limits capped by the request schema", () => {
-    expect(partyLimits(BUSINESS)).toEqual({ passengers: 12, luggage: 10 });
-    expect(partyLimits({ ...BUSINESS, max_passengers: 120, max_luggage: 110 }))
+    expect(partyLimits(BUSINESS)).toEqual({ passengers: 12, bags: 10 });
+    expect(partyLimits({ ...BUSINESS, max_passengers: 120, max_luggage: 210 }))
       .toEqual(QUOTE_SCHEMA_LIMITS);
   });
 
@@ -52,6 +58,8 @@ describe("party limits", () => {
 
   it("keeps the runtime caps synchronized with OpenAPI", () => {
     expect(QUOTE_SCHEMA_LIMITS.passengers).toBe(schemaMaximum("passengers"));
-    expect(QUOTE_SCHEMA_LIMITS.luggage).toBe(schemaMaximum("luggage"));
+    expect(BAG_COUNT_SCHEMA_LIMIT).toBe(schemaMaximum("large_bags"));
+    expect(BAG_COUNT_SCHEMA_LIMIT).toBe(schemaMaximum("small_bags"));
+    expect(QUOTE_SCHEMA_LIMITS.bags).toBe(BAG_COUNT_SCHEMA_LIMIT * 2);
   });
 });

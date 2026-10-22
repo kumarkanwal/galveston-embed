@@ -20,12 +20,14 @@ const BUSINESS = {
   settings: { advance_booking_hours: 0, insurance_enabled: false,
     insurance_pct: "0.00", offer_car_seats: true, max_car_seats: 2,
     car_seat_price: "15.00", payment_methods: ["cash"],
+    show_map: true, show_service_dropdown: true,
     terms_and_conditions: null },
 } satisfies Business;
 
 const TRIP: TripFormState = {
   service: "one_way", pickupDate: "2026-10-19", pickupTime: "09:30",
-  passengers: 1, luggage: 0,
+  returnDate: "2026-10-20", returnTime: "09:30",
+  passengers: 1, largeBags: 0, smallBags: 0,
   pickupAddress: { address: "Houston, TX", zipcode: "77002", location: { lat: 1, lng: 2 } },
   dropoffAddress: { address: "Galveston, TX", zipcode: "77550", location: { lat: 3, lng: 4 } },
   pickupAirportId: "", pickupAirportName: "", pickupAirportLocation: null,

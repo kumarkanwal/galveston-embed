@@ -14,3 +14,7 @@ export function filterCoreServices(services: ServiceTypeOption[]): CoreService[]
     (service): service is CoreService => isCoreCode(service.code),
   );
 }
+
+export function firstNonRoundTripService(services: CoreService[]): CoreService | undefined {
+  return services.find((service) => service.code !== "round_trip");
+}
