@@ -25,7 +25,7 @@ Why: a code audit of the backend confirmed the key grants only the public bookin
 Consequences: no proxy server, no token exchange, no obfuscation. Abuse is controlled by the backend's per-key and per-IP rate limits (backend B-20).
 
 ## ED-003 — Taxi only
-Date: 2026-10-10 · Status: accepted
+Date: 2026-10-10 · Status: superseded by ED-029
 Decision: the widget books taxi services only.
 Why: the client removed the shuttle product from the project.
 Consequences: never call `/v1/public/shuttle/*`.
@@ -179,3 +179,9 @@ Date: 2026-10-22 · Status: accepted (supersedes the luggage-field part of ED-02
 Decision: collect `large_bags` and `small_bags` separately and never send the deprecated `luggage` alias.
 Why: B-37 publishes separate check-in/trunk and carry-on request fields while retaining one combined vehicle `luggage_capacity` and one business `max_luggage`.
 Consequences: each counter follows its generated schema maximum; their sum follows the business maximum capped by both schema fields together. The widget never calculates per-vehicle availability and displays the server's unavailable results.
+
+## ED-029 — One widget dispatches to taxi or shuttle mode
+Date: 2026-10-22 · Status: accepted (supersedes ED-003)
+Decision: `GET /v1/public/business` selects taxi or shuttle mode in the same single-file widget; customers never choose the mode.
+Why: the client restored shuttle booking and requires both products to use the same embed while preserving the completed E-8 taxi flow.
+Consequences: taxi businesses call only taxi endpoints and retain E-8 behavior; shuttle businesses call only `/v1/public/shuttle/*`. Shared presentation and pure helpers may be reused, but request/state modules remain mode-specific. ED-006 remains unchanged, so both modes are cash-only until the separate card-payment phase. E-9 remains blocked until the public scheduled-departure response includes the required vehicle/car name.

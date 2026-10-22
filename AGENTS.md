@@ -34,7 +34,7 @@ Breaking any of these is a bug, even if tests pass.
 4. **Request bodies reject unknown fields with 400.** Send only schema fields.
 5. **Never retry a POST automatically.** Booking sends an `Idempotency-Key` that stays the same for the same cart and changes only when the cart changes.
 6. **Payment method is `"cash"` only** until the card-payment phase. (ED-006)
-7. **Show only these services:** `one_way`, `round_trip`, `airport_pickup`, `airport_dropoff`. Ignore `hourly` even if the API lists it. (ED-016, ED-027)
+7. **Mode comes only from `GET /v1/public/business`.** Taxi businesses show only `one_way`, `round_trip`, `airport_pickup`, and `airport_dropoff` and still ignore `hourly`; shuttle businesses use only `/v1/public/shuttle/*`. Never mix the two endpoint families. (ED-016, ED-027, ED-029)
 8. **Names are display text.** Never read a capacity, limit or rule from a vehicle or service name.
 9. **Request a Quote vehicles skip price-breakdown** and go straight to booking. (ED-009)
 10. **Zipcodes come from Google Places `address_components`**, never from parsing typed text. (ED-010)
@@ -73,6 +73,7 @@ One phase at a time: **spec → build → report → review → merge**. Do not 
 | **E-7a** | Promo codes | Backend promos wired into the new pricing path |
 | **E-7b** | Peak/blackout display | Backend B-35 |
 | **E-8** | Taxi round trip, split luggage counts, form toggles | Backend B-37 |
+| **E-9** | Shuttle mode in the same widget | Backend B-38C; scheduled-departure vehicle name |
 | **E-11** | Hourly: hours field and Add Stops | Backend hourly pricing (Part 3, client question C-6) |
 
 ---
