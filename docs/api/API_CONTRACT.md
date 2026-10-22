@@ -6,7 +6,7 @@ Base URL: `https://api.<domain>.com/v1`
 Consumers: Booking-form embed (taxi)
 
 **Version 1.2** — generated from the implemented schemas, routers, services and
-`openapi.json` through B-35. This document covers the public
+`openapi.json` through B-37. This document covers the public
 surface; the admin surface (`/admin/*`) is not documented here.
 
 ---
@@ -15,6 +15,13 @@ surface; the admin surface (`/admin/*`) is not documented here.
 
 Read this section first if you have already built against v1.1.
 
+- **B-37 taxi round trips, luggage and form controls:** replacement Distance
+  and Flat Rate rows now price two real legs with no round-trip discount. The
+  return reuses the outbound route in reverse, while peak and blackout rules
+  are evaluated at each leg's own pickup time. The public taxi request schemas
+  accept `large_bags` and `small_bags`; deprecated `luggage` remains accepted
+  by itself for the live widget. Public business settings add
+  `show_service_dropdown` and `show_map`.
 - **B-35 peak hours and blackout rules:** active rules are evaluated at each
   leg's pickup in the business timezone. Overlapping increases now sum instead
   of selecting the highest rule, including for rules stored before B-35; the
@@ -119,9 +126,9 @@ Read this section first if you have already built against v1.1.
 
 ### Worked examples changed
 
-The verified regression fixtures are now `413.75` for Distance and `77.63` for
-Flat Rate. The old `467.15` round-trip example is **UNVERIFIED** against the
-replacement pricing-row path; see [Open questions](#open-questions).
+The verified regression fixtures are `413.75` for one-way Distance, `77.63`
+for one-way Flat Rate and `348.28` for the B-37 replacement-row round trip. The
+old legacy-path `467.15` round-trip example does not describe replacement rows.
 
 ---
 
@@ -159,12 +166,12 @@ JSON has no decimal type, so `36.10` would arrive as `36.1` and lose its trailin
 
 Line items now include `kind`, `quantity`, `unit_price` and `source_id`. **The plugin composes the `(0)` suffix from `quantity`** — do not match on label strings.
 
-### The round-trip example in v1.0 was wrong — UNVERIFIED in v1.2
+### The round-trip example in v1.0 was wrong — superseded in B-37
 
 v1.0 showed a round trip totalling `514.65`; v1.1 replaced it with the legacy
-calculator example below. **Do not implement from this example.** The replacement
-pricing-row path may not double the base or extras. A live comparison with the
-client's current system is still required (I-1).
+calculator example below. **Do not implement replacement rows from this
+example.** B-37 now has a separate verified two-leg example under
+[Verified worked examples](#verified-worked-examples).
 
 | Line | Amount |
 |---|---|
@@ -313,6 +320,8 @@ Called by both plugins on load. Supplies branding and the settings that shape th
     "offer_car_seats": true,
     "max_car_seats": 5,
     "car_seat_price": "15.00",
+    "show_service_dropdown": true,
+    "show_map": true,
     "payment_methods": ["online", "cash"],
     "terms_and_conditions": "<p>...</p>"
   },
@@ -332,6 +341,10 @@ Called by both plugins on load. Supplies branding and the settings that shape th
 `offer_car_seats`, `max_car_seats` and `car_seat_price` drive the taxi widget's
 top-level `car_seats` control. Meet & Greet is deliberately absent: it is a
 staff-only admin booking option.
+
+`show_service_dropdown` and `show_map` are per-business form presentation
+switches. Both default to `true`; hiding either control does not change server
+validation or pricing.
 
 `payments` contains Square's publishable application and location identifiers
 for Web Payments SDK tokenisation. It is `null` if either identifier is not
@@ -709,7 +722,7 @@ Customer-selectable extras only. Admin-applied charges never appear here.
 
 `max_quantity` is **omitted, not null**, when unlimited. `is_per_unit: false` means quantity is ignored and the charge applies once.
 
-### Taxi request fields added in v1.2
+### Taxi request fields added in v1.2 and B-37
 
 These are the only request fields added by pricing-rework Parts 1–2.
 
@@ -717,6 +730,16 @@ These are the only request fields added by pricing-rework Parts 1–2.
 |---|---|---|---|---|
 | `payment_method` | `/taxi/quote`, `/taxi/price-breakdown` | No; default `null` | string enum: `"online"`, `"cash"`, `"cheque"`, `"bank_transfer"`, or `null` | `"online"` applies the row's CC surcharge; every other value and `null` produces a zero CC amount |
 | `car_seats` | `/taxi/price-breakdown`, `/taxi/booking` | No; default `0` | integer `0`–`5` inclusive | On replacement Distance/Flat Rate rows, validates against public business settings and adds `car_seat_price × car_seats`; the amount is not read from `/taxi/charges` |
+| `large_bags` | all three taxi POST endpoints | No; default `0` | integer `0`–`99` inclusive | Check-in/trunk bag count; included in the existing combined luggage capacity and `per_luggage` quantity |
+| `small_bags` | all three taxi POST endpoints | No; default `0` | integer `0`–`99` inclusive | Carry-on bag count; included in the existing combined luggage capacity and `per_luggage` quantity |
+| `luggage` | all three taxi POST endpoints | Deprecated alias | integer `0`–`99` inclusive | Accepted only when neither new field is sent; maps to `large_bags`, with `small_bags: 0` |
+
+Sending `luggage` together with either `large_bags` or `small_bags` is a 422
+schema validation error. Existing vehicle `luggage_capacity` remains a limit on
+the combined count. B-37 does not introduce separate large/small capacity
+limits. Pricing is also intentionally unchanged: a configured `per_luggage`
+addition uses `large_bags + small_bags`; configure that rate as `0.00` when the
+counts are tracking-only.
 
 `/taxi/booking` does **not** accept top-level `payment_method`. It retains the
 required `payment` object with optional `payment.method` (default `"online"`)
@@ -739,6 +762,17 @@ This applies even when a zone fare exists. Out-of-area round trips now measure
 duration too: a valid, known-duration journey retains the manual-quote/request
 path, but an unresolved duration is rejected. One-way behavior is unchanged.
 
+For replacement Distance and Flat Rate rows, `round_trip_enabled: false` makes
+that vehicle unavailable. An enabled round trip uses the outbound distance or
+flat fare for both directions and does not call Maps again: the second leg is
+the same route with pickup/dropoff addresses, zipcodes and airports reversed.
+There is no round-trip discount. Each leg applies its own additions, car seats,
+staff-only Meet & Greet, gratuity, fuel, tax and pickup-time peak/blackout
+rules. A blackout on either leg makes the vehicle unavailable. The promo is
+validated once against the combined fare; the card surcharge is calculated
+last on the combined pre-card total. Both are attributed proportionally to the
+two booking rows. Legacy anchor-zone and hourly behavior is unchanged.
+
 **Query:** `hide_incapable=true` (optional) — omits vehicles that fail on capacity, so the plugin does not have to filter them out itself.
 
 One request shape covers all five service types; fields that do not apply are null.
@@ -753,7 +787,7 @@ One request shape covers all five service types; fields that do not apply are nu
   "airline": null, "flight_number": null,
   "return_date": null, "return_time": null,
   "hours": null, "stops": [],
-  "passengers": 3, "luggage": 2,
+  "passengers": 3, "large_bags": 1, "small_bags": 1,
   "payment_method": null }
 
 // request — hourly
@@ -868,7 +902,7 @@ exact order. Zero-amount rows are retained.
 |---:|---|---|---|
 | 1 | `Base` | `base` | quantity `1`; `unit_price: null` |
 | 2 | `Additional Passenger` | `charge` | `max(passengers - 1, 0)` × the row rate |
-| 3 | `Additional Luggage` | `charge` | `luggage` × the row rate |
+| 3 | `Additional Luggage` | `charge` | (`large_bags` + `small_bags`) × the row rate |
 | 4 | `Additional Stop` | `charge` | number of `stops` × the row rate |
 | 5 | `Airport Fee` | `charge` | quantity `1` × the row rate |
 | 6 | `Tolls` | `charge` | quantity `1` × the row rate |
@@ -950,6 +984,32 @@ and
 | CC Surcharge | `2.63` |
 | **Total** | **`77.63`** |
 
+**B-37 replacement-row round trip — `348.28`.** This verified fixture uses a
+`100.00` fare in each direction, two bags at `5.00` each per leg, one `15.00`
+car seat and `20.00` staff-only Meet & Greet per leg, gratuity `10%`, fuel `5%`,
+sales tax `8%`, promo `RETURN10` at `10%`, and card `3%`. Only the return pickup
+matches a `20%` peak rule.
+
+| Amount | Outbound row | Return row | Combined |
+|---|---:|---:|---:|
+| Fare before peak | `100.00` | `100.00` | `200.00` |
+| Return-only peak | `0.00` | `20.00` | `20.00` |
+| Additional luggage | `10.00` | `10.00` | `20.00` |
+| Gratuity | `10.00` | `11.80` | `21.80` |
+| Fuel surcharge | `5.00` | `5.90` | `10.90` |
+| Sales tax | `8.00` | `9.44` | `17.44` |
+| Promo | `-10.00` | `-12.00` | `-22.00` |
+| Car seat | `15.00` | `15.00` | `30.00` |
+| Meet & Greet | `20.00` | `20.00` | `40.00` |
+| Card surcharge | `4.74` | `5.40` | `10.14` |
+| **Total** | **`162.74`** | **`185.54`** | **`348.28`** |
+
+The two booking rows store those real leg totals and leg-specific peak,
+percentage, discount and card amounts; they are not an even split. Each row
+stores its own pickup date/time and direction, with addresses, zipcodes and
+airports reversed for the return. Both rows snapshot the per-leg car seat,
+Meet & Greet and luggage quantities. Existing historical rows are not changed.
+
 ### `POST /v1/public/taxi/booking`
 
 The round-trip arrival/duration validation documented under `/taxi/quote`
@@ -967,6 +1027,8 @@ Replaying a completed `Idempotency-Key` still counts toward both limits.
   "charges": [ { "charge_id": "uuid", "quantity": 2 } ],
   "promo_code": null,
   "car_seats": 0,
+  "large_bags": 1,
+  "small_bags": 1,
   "customer": { "first_name": "...", "last_name": "...",
                 "email": "...", "phone": "..." },
   "comments": "Please call on arrival",
@@ -1015,15 +1077,15 @@ later queues the confirmation email.
 These are deliberately unresolved. The embed must follow the implemented
 behavior above while product decisions and live-system comparisons are pending.
 
-### I-1 — Round trip (UNVERIFIED)
+### I-1 — Round trip (RESOLVED IN B-37)
 
-v1.1's `467.15` example says a round trip doubles the base and extras. The
-preserved legacy anchor-zone/hourly calculator still receives the round-trip
-flag and contains doubling/round-trip-discount logic. The replacement Distance
-and Flat Rate row pipeline receives passenger, luggage, stops, payment method
-and car seats, but no round-trip flag; it therefore does not perform that
-doubling. A live test against the client's current system must decide the target
-behavior. Until then, the old `467.15` example is **UNVERIFIED**.
+Replacement Distance and Flat Rate rows now use the verified B-37 behavior
+documented above: two independently calculated legs, no round-trip discount,
+one combined promo, and the card surcharge last. The preserved legacy
+anchor-zone/hourly calculator is deliberately unchanged. A configured
+`return_service_type_id` is ignored because using another row could change the
+return fare, contradicting the same-route, same-fare rule; the column remains
+available for a future product decision.
 
 ### I-2 — Subtotal
 
@@ -1050,7 +1112,7 @@ can send both. They do not currently both apply:
 The repository contract documents top-level `car_seats`, but the live widget
 source is not present here, so exclusive use could not be confirmed. The
 generic catalog row remains visible for compatibility. Replacement round trips
-charge `price × count` once per order, pending a client decision for round trips.
+charge the top-level car-seat quantity once per leg.
 
 ### I-4 — Flat Rate manual-quote booking
 

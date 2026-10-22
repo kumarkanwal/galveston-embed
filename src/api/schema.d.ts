@@ -3645,7 +3645,9 @@ export interface components {
              *       "insurance_pct": "0.00",
              *       "max_car_seats": 5,
              *       "offer_car_seats": true,
-             *       "payment_methods": []
+             *       "payment_methods": [],
+             *       "show_map": true,
+             *       "show_service_dropdown": true
              *     }
              */
             settings: components["schemas"]["BusinessSettingsPublic"];
@@ -3794,6 +3796,10 @@ export interface components {
             round_trip_discount_pct: string;
             /** Seat Hold Minutes */
             seat_hold_minutes: number;
+            /** Show Map */
+            show_map: boolean;
+            /** Show Service Dropdown */
+            show_service_dropdown: boolean;
             /** Shuttle Prepay Required */
             shuttle_prepay_required: boolean;
             /** Sms Confirmation Enabled */
@@ -3866,6 +3872,16 @@ export interface components {
              * @default []
              */
             payment_methods: string[];
+            /**
+             * Show Map
+             * @default true
+             */
+            show_map: boolean;
+            /**
+             * Show Service Dropdown
+             * @default true
+             */
+            show_service_dropdown: boolean;
             /** Terms And Conditions */
             terms_and_conditions?: string | null;
         };
@@ -3948,6 +3964,10 @@ export interface components {
             round_trip_discount_pct: string;
             /** Seat Hold Minutes */
             seat_hold_minutes: number;
+            /** Show Map */
+            show_map: boolean;
+            /** Show Service Dropdown */
+            show_service_dropdown: boolean;
             /** Shuttle Prepay Required */
             shuttle_prepay_required: boolean;
             /** Sms Confirmation Enabled */
@@ -6472,13 +6492,18 @@ export interface components {
             flight_number?: string | null;
             /** Hours */
             hours?: number | null;
+            /**
+             * Large Bags
+             * @default 0
+             */
+            large_bags: number;
             /** Lead Source Id */
             lead_source_id?: string | null;
             /**
              * Luggage
-             * @default 0
+             * @deprecated
              */
-            luggage: number;
+            luggage?: number | null;
             /**
              * Meet And Greet
              * @default false
@@ -6523,6 +6548,11 @@ export interface components {
             schedule_id?: string | null;
             /** Service Type Id */
             service_type_id?: string | null;
+            /**
+             * Small Bags
+             * @default 0
+             */
+            small_bags: number;
             /**
              * Status
              * @default confirmed
@@ -7101,6 +7131,10 @@ export interface components {
             meet_greet_price?: string | null;
             /** Offer Car Seats */
             offer_car_seats?: boolean | null;
+            /** Show Map */
+            show_map?: boolean | null;
+            /** Show Service Dropdown */
+            show_service_dropdown?: boolean | null;
         };
         /**
          * PriceOverride
@@ -7674,6 +7708,8 @@ export interface components {
             flight_number?: string | null;
             /** Hours */
             hours?: number | null;
+            /** Large Bags */
+            large_bags?: number | null;
             /** Lead Source Id */
             lead_source_id?: string | null;
             /** Luggage */
@@ -7698,6 +7734,8 @@ export interface components {
             pickup_time?: string | null;
             /** Run Notes */
             run_notes?: string | null;
+            /** Small Bags */
+            small_bags?: number | null;
             /** Stops */
             stops?: {
                 [key: string]: unknown;
@@ -8825,10 +8863,15 @@ export interface components {
             /** Hours */
             hours?: number | null;
             /**
-             * Luggage
+             * Large Bags
              * @default 0
              */
-            luggage: number;
+            large_bags: number;
+            /**
+             * Luggage
+             * @deprecated
+             */
+            luggage?: number | null;
             /**
              * Passengers
              * @default 1
@@ -8859,6 +8902,11 @@ export interface components {
             return_time?: string | null;
             /** Service Type */
             service_type: string;
+            /**
+             * Small Bags
+             * @default 0
+             */
+            small_bags: number;
             /** Stops */
             stops?: string[];
             /**
@@ -8916,6 +8964,8 @@ export interface components {
             flight_number: string | null;
             /** Hours */
             hours: number | null;
+            /** Large Bags */
+            large_bags: number;
             /** Luggage */
             luggage: number;
             /** Passengers */
@@ -8934,6 +8984,8 @@ export interface components {
             /** Pricing Basis */
             pricing_basis: string | null;
             service_type: components["schemas"]["ServiceCatalogItem"];
+            /** Small Bags */
+            small_bags: number;
             /** Stops */
             stops: {
                 [key: string]: unknown;
@@ -8965,10 +9017,15 @@ export interface components {
             /** Hours */
             hours?: number | null;
             /**
-             * Luggage
+             * Large Bags
              * @default 0
              */
-            luggage: number;
+            large_bags: number;
+            /**
+             * Luggage
+             * @deprecated
+             */
+            luggage?: number | null;
             /**
              * Passengers
              * @default 1
@@ -8999,6 +9056,11 @@ export interface components {
             return_time?: string | null;
             /** Service Type */
             service_type: string;
+            /**
+             * Small Bags
+             * @default 0
+             */
+            small_bags: number;
             /** Stops */
             stops?: string[];
             /**
@@ -9045,10 +9107,15 @@ export interface components {
             /** Hours */
             hours?: number | null;
             /**
-             * Luggage
+             * Large Bags
              * @default 0
              */
-            luggage: number;
+            large_bags: number;
+            /**
+             * Luggage
+             * @deprecated
+             */
+            luggage?: number | null;
             /**
              * Passengers
              * @default 1
@@ -9077,6 +9144,11 @@ export interface components {
             return_time?: string | null;
             /** Service Type */
             service_type: string;
+            /**
+             * Small Bags
+             * @default 0
+             */
+            small_bags: number;
             /** Stops */
             stops?: string[];
         };
