@@ -1,4 +1,4 @@
-import type { TaxiBookingResponse } from "../../api/client";
+import type { ShuttleBookingResponse, TaxiBookingResponse } from "../../api/client";
 import { formatMoney } from "../../money";
 import { ProgressSteps } from "../trip/ProgressSteps";
 import { useEffect, useRef } from "preact/hooks";
@@ -7,7 +7,8 @@ interface ConfirmationProps {
   autoFocusHeading?: boolean;
   currency: string;
   requestQuote: boolean;
-  response: TaxiBookingResponse;
+  response: TaxiBookingResponse | ShuttleBookingResponse;
+  steps?: string[];
 }
 function isPendingPricedStatus(status: string): boolean {
   return status === "requested" || status === "pending";
@@ -19,7 +20,8 @@ export function Confirmation(props: ConfirmationProps) {
     if (props.autoFocusHeading) headingRef.current?.focus();
   }, [props.autoFocusHeading]);
   return <section class="widget confirmation">
-    <ProgressSteps activeStep={3} complete />
+    <ProgressSteps activeStep={3} complete
+      {...(props.steps === undefined ? {} : { steps: props.steps })} />
     <h1 ref={headingRef} tabIndex={-1}>
       <span class="confirmation-check" aria-hidden="true">✓</span> Confirmation
     </h1>

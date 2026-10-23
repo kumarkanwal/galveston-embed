@@ -5,6 +5,7 @@ import { createApiClient, type ApiClient } from "./api/client";
 import confirmStyles from "./styles/confirm.css?inline";
 import vehicleStyles from "./styles/vehicle.css?inline";
 import widgetStyles from "./styles/widget.css?inline";
+import shuttleStyles from "./styles/shuttle.css?inline";
 
 const MOUNT_ID = "galveston-booking";
 
@@ -53,7 +54,7 @@ export function mountBookingWidget(
     const shadowRoot = mountElement.attachShadow({ mode: "open" });
     const style = documentRoot.createElement("style");
     const appRoot = documentRoot.createElement("div");
-    style.textContent = `${widgetStyles}\n${vehicleStyles}\n${confirmStyles}`;
+    style.textContent = `${widgetStyles}\n${vehicleStyles}\n${confirmStyles}\n${shuttleStyles}`;
     shadowRoot.append(style, appRoot);
     render(h(App, {
       client: createClient(config),

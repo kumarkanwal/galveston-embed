@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   createApiClient,
+  type ShuttleBookingRequest,
+  type ShuttleQuoteRequest,
   type TaxiBookingRequest,
   type TaxiBookingResponse,
   type TaxiPriceBreakdownRequest,
@@ -72,6 +74,21 @@ const BOOKED: TaxiBookingResponse = {
   amount_paid: "0.00",
   payment_method: "cash",
   confirmation_email_sent: false,
+};
+
+const SHUTTLE_QUOTE: ShuttleQuoteRequest = {
+  legs: [{ departure_type: "scheduled", schedule_id: "schedule-1",
+    pax_adult: 1, pax_senior: 0, pax_child: 0 }],
+  insurance_selected: false,
+  payment_method: "cash",
+};
+
+const SHUTTLE_BOOKING: ShuttleBookingRequest = {
+  legs: SHUTTLE_QUOTE.legs,
+  insurance_selected: false,
+  customer: { first_name: "Ada", last_name: "Lovelace", email: "ada@example.com" },
+  payment: { method: "cash" },
+  accepted_terms: true,
 };
 
 function jsonResponse(value: unknown, status = 200): Response {
@@ -156,6 +173,48 @@ describe("price breakdown API", () => {
     const request = fetch.mock.calls[0]?.[0];
     expect(request?.url).toBe("https://api.test/v1/public/taxi/price-breakdown");
     await expect(request?.clone().json()).resolves.toEqual(BREAKDOWN);
+  });
+});
+
+describe("shuttle API", () => {
+  it("loads grouped locations with the documented exclusion query", async () => {
+    const fetch = vi.fn(async (_input: Request) => jsonResponse({ data: [] }));
+    await clientWith(fetch).getShuttleLocations("origin-1");
+    const request = fetch.mock.calls[0]?.[0];
+    expect(request?.url).toBe(
+      "https://api.test/v1/public/shuttle/locations?exclude_location_id=origin-1",
+    );
+  });
+
+  it.each([
+    ["searchShuttle", "/v1/public/shuttle/search"],
+    ["searchShuttleReturn", "/v1/public/shuttle/search/return"],
+  ] as const)("sends generated query fields with %s", async (method, path) => {
+    const fetch = vi.fn(async (_input: Request) => jsonResponse({ data: {} }));
+    const query = { from_location_id: "from", to_location_id: "to", date: "2026-10-30",
+      pax_adult: 1, pax_senior: 0, pax_child: 0 };
+    await clientWith(fetch)[method](query);
+    const url = new URL(fetch.mock.calls[0]?.[0].url ?? "");
+    expect(url.pathname).toBe(path);
+    expect(Object.fromEntries(url.searchParams)).toEqual({
+      from_location_id: "from", to_location_id: "to", date: "2026-10-30",
+      pax_adult: "1", pax_senior: "0", pax_child: "0",
+    });
+  });
+
+  it("posts quote and booking bodies once with the booking idempotency key", async () => {
+    const fetch = vi.fn(async (_input: Request) => jsonResponse({ data: {} }));
+    const client = clientWith(fetch);
+    await client.quoteShuttle(SHUTTLE_QUOTE);
+    await client.bookShuttle(SHUTTLE_BOOKING, "shuttle-key");
+    expect(fetch).toHaveBeenCalledTimes(2);
+    const quoteRequest = fetch.mock.calls[0]?.[0];
+    const bookingRequest = fetch.mock.calls[1]?.[0];
+    expect(quoteRequest?.url).toBe("https://api.test/v1/public/shuttle/quote");
+    await expect(quoteRequest?.clone().json()).resolves.toEqual(SHUTTLE_QUOTE);
+    expect(bookingRequest?.url).toBe("https://api.test/v1/public/shuttle/booking");
+    expect(bookingRequest?.headers.get("Idempotency-Key")).toBe("shuttle-key");
+    await expect(bookingRequest?.clone().json()).resolves.toEqual(SHUTTLE_BOOKING);
   });
 });
 

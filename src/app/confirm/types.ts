@@ -10,6 +10,7 @@ export interface ConfirmFormState {
 export type ConfirmField =
   | keyof ConfirmFormState
   | "breakdown"
+  | "address"
   | "carSeats"
   | "comments"
   | "promoCode";

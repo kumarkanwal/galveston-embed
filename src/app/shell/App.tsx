@@ -1,8 +1,10 @@
 import { useEffect, useState } from "preact/hooks";
 
+import { isShuttleApiClient } from "../../api/client";
 import type { ApiClient, Business, ServiceTypeOption } from "../../api/client";
 import { NetworkError, UnauthorizedError } from "../../api/errors";
 import { BookingFlow } from "./BookingFlow";
+import { ShuttleFlow } from "../shuttle/ShuttleFlow";
 
 interface AppProps {
   client: ApiClient;
@@ -36,8 +38,11 @@ export function App({ client, mapsKey }: AppProps) {
 
   useEffect(() => {
     let active = true;
-    Promise.all([client.getBusiness(), client.getServiceTypes()])
-      .then(([business, services]) => {
+    client.getBusiness().then(async (business) => {
+      const services = business.type === "taxi" ? await client.getServiceTypes() : [];
+      return { business, services };
+    })
+      .then(({ business, services }) => {
         if (active) setState({ status: "ready", business, services });
       })
       .catch((error: unknown) => {
@@ -49,6 +54,19 @@ export function App({ client, mapsKey }: AppProps) {
   }, [client]);
 
   if (state.status === "ready") {
+    if (state.business.type === "shuttle") {
+      if (!isShuttleApiClient(client)) {
+        return <section class="widget status" aria-live="polite">
+          This booking form is not configured.
+        </section>;
+      }
+      return <ShuttleFlow business={state.business} client={client} />;
+    }
+    if (state.business.type !== "taxi") {
+      return <section class="widget status" aria-live="polite">
+        This booking form is not configured.
+      </section>;
+    }
     return <BookingFlow business={state.business} services={state.services}
       client={client} mapsKey={mapsKey} />;
   }

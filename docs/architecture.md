@@ -80,14 +80,28 @@ galveston-embed/
 
 ## 6. The form
 
-Copy BRO's 3-step flow. Screenshots in `docs/reference/bro/` are the reference for layout and fields. **A screenshot is not the full spec**: it may contain BRO bugs and features we dropped. The phase spec says what to keep.
+One widget dispatches by `GET /business` → `type`; there is no customer-facing
+mode selector. Taxi businesses retain BRO's 3-step flow. Shuttle businesses
+use Trip → Departures → Confirm. Screenshots in `docs/reference/bro/` are the
+reference where applicable. **A screenshot is not the full spec**: it may
+contain BRO bugs and features we dropped. The phase spec says what to keep.
 
-| Step | Calls |
-|---|---|
-| Load | `GET /business`, `GET /taxi/service-types` (and airports, airlines when needed) |
-| 1. Trip Details → Check Pricing | `POST /taxi/quote` (built in E-3; E-2 only builds and validates the request) |
-| 2. Choose Vehicle | none (uses the quote) |
-| 3. Confirm | `POST /taxi/price-breakdown` (priced vehicles only, including an applied promo code), then `POST /taxi/booking` with the same code |
+| Mode | Step | Calls |
+|---|---|---|
+| Shared | Load | `GET /business`, then dispatch by `type` |
+| Taxi | Load | `GET /taxi/service-types` (and airports, airlines when needed) |
+| Taxi | Trip Details → Check Pricing | `POST /taxi/quote` |
+| Taxi | Choose Vehicle | none (uses the quote) |
+| Taxi | Confirm | `POST /taxi/price-breakdown`, then `POST /taxi/booking` |
+| Shuttle | Trip | `GET /shuttle/locations` |
+| Shuttle | Departures | `GET /shuttle/search`, then `GET /shuttle/search/return` for round trip |
+| Shuttle | Confirm | `POST /shuttle/quote`, then `POST /shuttle/booking` |
+
+Taxi and shuttle endpoint families never mix. Their request/state modules stay
+separate while contact fields, promo presentation, server-line rendering,
+errors and idempotency may be shared. B-38C does not publish a vehicle/car name
+on scheduled departures, so scheduled cards render `service_label` only as its
+documented service text. Backend B-38D and E-9b will add the car name later.
 
 **Dropped from BRO:** the site header (Menu, Login) and customer accounts.
 Taxi round trip is an allowed `service_type`; hourly remains deferred. Businesses

@@ -1,0 +1,223 @@
+import { useEffect, useRef, useState } from "preact/hooks";
+import type { Dispatch, StateUpdater } from "preact/hooks";
+
+import type {
+  Business,
+  LocationGroup,
+  LocationOption,
+  ShuttleBookingResponse,
+  ShuttleQuoteResponse,
+  ShuttleSearchResult,
+  ShuttleApiClient,
+} from "../../api/client";
+import { ApiError } from "../../api/errors";
+import { businessDateTimeParts } from "../../time";
+import { buildReturnQuery, buildShuttleQuote, buildShuttleSearchQuery } from "./requests";
+import type {
+  PassengerPriceFlags,
+  SelectedShuttleLeg,
+  ShuttleTripErrors,
+  ShuttleTripForm,
+} from "./types";
+import { hasShuttleTripErrors, validateShuttleTrip } from "./validation";
+
+type ShuttleStep = "trip" | "outbound" | "return" | "confirm" | "done";
+
+interface ShuttleFlowState {
+  confirmation: ShuttleBookingResponse | null;
+  destinationGroups: LocationGroup[];
+  errors: ShuttleTripErrors;
+  form: ShuttleTripForm;
+  formError: string | null;
+  loadingDestinations: boolean;
+  loadingLocations: boolean;
+  notice: string | null;
+  originGroups: LocationGroup[];
+  outbound: SelectedShuttleLeg | null;
+  outboundResult: ShuttleSearchResult | null;
+  priceFlags: PassengerPriceFlags;
+  quote: ShuttleQuoteResponse | null;
+  returnLeg: SelectedShuttleLeg | null;
+  returnResult: ShuttleSearchResult | null;
+  step: ShuttleStep;
+  submitting: boolean;
+}
+
+function initialForm(business: Business): ShuttleTripForm {
+  const date = businessDateTimeParts(new Date(), business.timezone).date;
+  return {
+    date, fromId: "", paxAdult: 1, paxChild: 0, paxSenior: 0,
+    returnDate: date, roundTrip: false, toId: "",
+  };
+}
+
+function initialState(business: Business): ShuttleFlowState {
+  return {
+    confirmation: null, destinationGroups: [], errors: {}, form: initialForm(business),
+    formError: null, loadingDestinations: false, loadingLocations: true, notice: null,
+    originGroups: [], outbound: null, outboundResult: null,
+    priceFlags: { child: false, senior: false }, quote: null, returnLeg: null,
+    returnResult: null, step: "trip", submitting: false,
+  };
+}
+
+function errorMessage(error: unknown): string {
+  if (error instanceof ApiError && error.message !== "") return error.message;
+  return "The shuttle schedule could not be loaded. Please try again.";
+}
+
+function findLocation(groups: LocationGroup[], id: string): LocationOption | null {
+  for (const group of groups) {
+    const location = group.locations.find((candidate) => candidate.id === id);
+    if (location !== undefined) return location;
+  }
+  return null;
+}
+
+function priceFlags(result: ShuttleSearchResult): PassengerPriceFlags {
+  return {
+    child: result.departures.some((departure) => departure.prices.child !== null),
+    senior: result.departures.some((departure) => departure.prices.senior !== null),
+  };
+}
+
+function selectedTrip(state: ShuttleFlowState, returnLeg: SelectedShuttleLeg | null) {
+  const from = findLocation(state.originGroups, state.form.fromId);
+  const to = findLocation(state.destinationGroups, state.form.toId);
+  if (from === null || to === null || state.outbound === null) return null;
+  return { trip: state.form, from, to, outbound: state.outbound, returnLeg };
+}
+
+type SetFlowState = Dispatch<StateUpdater<ShuttleFlowState>>;
+interface FlowContext {
+  client: ShuttleApiClient;
+  minimumDate: string;
+  requestInFlight: { current: boolean };
+  setState: SetFlowState;
+  state: ShuttleFlowState;
+}
+
+function useLocations(client: ShuttleApiClient, setState: SetFlowState) {
+  useEffect(() => {
+    let active = true;
+    client.getShuttleLocations().then((groups) => {
+      if (active) setState((current) => ({ ...current, loadingLocations: false,
+        originGroups: groups }));
+    }).catch((error: unknown) => {
+      if (active) setState((current) => ({ ...current, loadingLocations: false,
+        formError: errorMessage(error) }));
+    });
+    return () => { active = false; };
+  }, [client]);
+}
+
+async function updateTrip<Key extends keyof ShuttleTripForm>(
+  context: FlowContext,
+  key: Key,
+  value: ShuttleTripForm[Key],
+) {
+  context.setState((current) => ({ ...current, errors: { ...current.errors, [key]: undefined },
+    form: { ...current.form, [key]: value }, formError: null }));
+  if (key !== "fromId") return;
+  context.setState((current) => ({ ...current, destinationGroups: [], loadingDestinations: true,
+    form: { ...current.form, toId: "" } }));
+  try {
+    const groups = value === "" ? [] : await context.client.getShuttleLocations(String(value));
+    context.setState((current) => ({ ...current, destinationGroups: groups,
+      loadingDestinations: false }));
+  } catch (error: unknown) {
+    context.setState((current) => ({ ...current, formError: errorMessage(error),
+      loadingDestinations: false }));
+  }
+}
+
+async function submitTrip(context: FlowContext, event: SubmitEvent) {
+  event.preventDefault();
+  if (context.requestInFlight.current) return;
+  const errors = validateShuttleTrip(context.state.form, context.minimumDate);
+  if (hasShuttleTripErrors(errors)) {
+    context.setState((current) => ({ ...current, errors })); return;
+  }
+  context.requestInFlight.current = true;
+  context.setState((current) => ({ ...current, errors: {}, formError: null, submitting: true }));
+  try {
+    const query = buildShuttleSearchQuery(context.state.form);
+    const result = await context.client.searchShuttle(query);
+    context.setState((current) => ({ ...current, outboundResult: result,
+      priceFlags: priceFlags(result), step: "outbound", submitting: false }));
+  } catch (error: unknown) {
+    context.setState((current) => ({ ...current, formError: errorMessage(error), submitting: false }));
+  } finally { context.requestInFlight.current = false; }
+}
+
+async function chooseOutbound(context: FlowContext, leg: SelectedShuttleLeg) {
+  if (context.requestInFlight.current) return;
+  context.requestInFlight.current = true;
+  context.setState((current) => ({ ...current, notice: null, outbound: leg, submitting: true }));
+  try {
+    if (context.state.form.roundTrip) {
+      const query = buildReturnQuery(context.state.form, leg);
+      const result = await context.client.searchShuttleReturn(query);
+      context.setState((current) => ({ ...current, outbound: leg, returnResult: result,
+        step: "return", submitting: false }));
+    } else {
+      const withLeg = { ...context.state, outbound: leg };
+      const selection = selectedTrip(withLeg, null);
+      if (selection === null) return;
+      const quote = await context.client.quoteShuttle(buildShuttleQuote(selection, null));
+      context.setState((current) => ({ ...current, outbound: leg, quote,
+        step: "confirm", submitting: false }));
+    }
+  } catch (error: unknown) {
+    context.setState((current) => ({ ...current, notice: errorMessage(error), submitting: false }));
+  } finally { context.requestInFlight.current = false; }
+}
+
+async function chooseReturn(context: FlowContext, leg: SelectedShuttleLeg) {
+  if (context.requestInFlight.current) return;
+  context.requestInFlight.current = true;
+  context.setState((current) => ({ ...current, notice: null, submitting: true }));
+  const selection = selectedTrip(context.state, leg);
+  if (selection === null) {
+    context.requestInFlight.current = false;
+    return;
+  }
+  try {
+    const quote = await context.client.quoteShuttle(buildShuttleQuote(selection, null));
+    context.setState((current) => ({ ...current, quote, returnLeg: leg,
+      step: "confirm", submitting: false }));
+  } catch (error: unknown) {
+    context.setState((current) => ({ ...current, notice: errorMessage(error), submitting: false }));
+  } finally { context.requestInFlight.current = false; }
+}
+
+async function returnToDepartures(context: FlowContext, message: string) {
+  let result = context.state.outboundResult;
+  try {
+    result = await context.client.searchShuttle(buildShuttleSearchQuery(context.state.form));
+  } catch { /* retain the last search while showing the booking error */ }
+  context.setState((current) => ({ ...current, notice: message, outbound: null,
+    outboundResult: result, quote: null, returnLeg: null, returnResult: null, step: "outbound" }));
+}
+
+export function useShuttleFlow(client: ShuttleApiClient, business: Business) {
+  const [state, setState] = useState(() => initialState(business));
+  const requestInFlight = useRef(false);
+  useLocations(client, setState);
+  const minimumDate = businessDateTimeParts(new Date(), business.timezone).date;
+  const context = { client, minimumDate, requestInFlight, setState, state };
+  const update = <Key extends keyof ShuttleTripForm>(
+    key: Key,
+    value: ShuttleTripForm[Key],
+  ) => updateTrip(context, key, value);
+  const back = () => setState((current) => ({ ...current, notice: null,
+    step: current.step === "confirm" ? (current.form.roundTrip ? "return" : "outbound")
+      : current.step === "return" ? "outbound" : "trip" }));
+  const selection = selectedTrip(state, state.returnLeg);
+  const complete = (confirmation: ShuttleBookingResponse) => setState((current) => (
+    { ...current, confirmation, step: "done" }));
+  return { back, chooseOutbound: (leg: SelectedShuttleLeg) => chooseOutbound(context, leg),
+    chooseReturn: (leg: SelectedShuttleLeg) => chooseReturn(context, leg), complete, selection, state,
+    submitTrip: (event: SubmitEvent) => submitTrip(context, event),
+    unavailable: (message: string) => returnToDepartures(context, message), update };
+}

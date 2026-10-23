@@ -3,18 +3,41 @@
 **Multi-Business Transfer Booking Platform**
 Stack: FastAPI (Python) · PostgreSQL · Square payments
 Base URL: `https://api.<domain>.com/v1`
-Consumers: Booking-form embed (taxi)
+Consumers: Booking-form embeds (taxi and shuttle)
 
-**Version 1.2** — generated from the implemented schemas, routers, services and
-`openapi.json` through B-37. This document covers the public
+**Version 1.3** — generated from the implemented schemas, routers, services and
+`openapi.json` through B-38C. This document covers the public
 surface; the admin surface (`/admin/*`) is not documented here.
 
 ---
+
+## Changes from v1.2
+
+Read this section first if you have already built against v1.2.
+
+- **B-38C on-request shuttle departures:** search publishes a custom-time
+  choice with its route, sole eligible vehicle type and capacity, without a
+  fabricated `schedule_id`. Return search accepts the selected outbound route,
+  vehicle, local date and local time as an alternative to
+  `outbound_schedule_id`. Quote and booking accept the same additive
+  `departure_type: "on_request"` leg shape. Booking creates or reuses one exact
+  route/date/time inventory row under concurrency, snapshots its configured
+  capacity and runs the unchanged multi-leg seat-lock path, so the cart remains
+  all-or-nothing and cannot oversell. Fixed-departure request and response
+  shapes are unchanged.
 
 ## Changes from v1.1
 
 Read this section first if you have already built against v1.1.
 
+- **B-38B shared fixed shuttle departures and return pricing:** an active
+  company assignment exposes the route owner's locations, fixed departures and
+  shared seat inventory through the assigned company's API key. A configured
+  passenger `round_trip_price` is the total for both legs and is allocated
+  proportionally across their one-way fares; a missing passenger-specific
+  return fare falls back to the adult return fare. Promo and insurance apply
+  once to the cart. Shuttle quote accepts `payment_method` (default `online`),
+  and the configured card surcharge is added last only for `online`.
 - **B-37 taxi round trips, luggage and form controls:** replacement Distance
   and Flat Rate rows now price two real legs with no round-trip discount. The
   return reuses the outbound route in reverse, while peak and blackout rules
@@ -386,8 +409,6 @@ Rate limited per API key and client IP as documented under Authentication.
 
 ## Shuttle plugin
 
-Legacy. Not used by the booking-form embed. Scheduled for removal.
-
 ### `GET /v1/public/shuttle/locations`
 
 Powers the From/To dropdowns, grouped by category.
@@ -446,6 +467,36 @@ The core search.
 
 No route between the two locations is a **404**, not an empty list.
 
+#### On-request search result
+
+An `on_request` route has exactly one active eligible vehicle type. Search
+returns no invented schedule row; `departures` is empty and the customer-time
+choice is published separately:
+
+```json
+{ "data": {
+  "route": { "id": "uuid", "from": "Hotel", "to": "Cruise Terminal",
+             "duration_minutes": 90, "service_label": "Direct Service" },
+  "date_strip": [
+    { "date": "2026-08-13", "from_price": "55.00", "available": true }
+  ],
+  "departures": [],
+  "filtered_summary": null,
+  "on_request": {
+    "departure_type": "on_request",
+    "route_id": "uuid",
+    "vehicle_type_id": "uuid",
+    "vehicle_type_name": "14 PAX Sprinter",
+    "seat_capacity": 14,
+    "earliest_pickup_date": null,
+    "earliest_pickup_time": null
+  }
+}}
+```
+
+The form collects a business-local `pickup_date` and `pickup_time`; it must not
+construct or retain a `schedule_id` for this choice. Capacity is server-owned.
+
 #### `filtered_summary`
 
 Populated **only when `departures` is empty**, so the plugin can explain the dead end:
@@ -466,10 +517,17 @@ Deliberately coarse. There are no per-departure reasons and no schedule ids.
 
 ### `GET /v1/public/shuttle/search/return`
 
-**Breaking change — update the shuttle widget before deploying this API:**
-`outbound_schedule_id` (UUID) is now a required query parameter. Missing,
-unknown or other-business ids return HTTP 400 `VALIDATION_ERROR`, with
-`field: "outbound_schedule_id"`. It was previously ignored.
+The selected outbound is required in one of two mutually exclusive shapes:
+
+- Fixed departure: `outbound_schedule_id`.
+- On-request departure: all four of `outbound_route_id`,
+  `outbound_vehicle_type_id`, `outbound_pickup_date` and
+  `outbound_pickup_time`.
+
+Missing, incomplete, mixed, unknown or other-business selections return HTTP
+400 `VALIDATION_ERROR`. A fixed-selection error uses
+`field: "outbound_schedule_id"`; an on-request selection error names the
+relevant on-request field.
 
 Otherwise identical to outbound search, with `from_location_id` and
 `to_location_id` still supplied in the outbound direction and reversed by the
@@ -500,6 +558,10 @@ the configured buffer.
 
 A missing reverse route returns 404 with a message you can show, not an empty list.
 
+For an on-request return route, the `on_request` search object includes
+`earliest_pickup_date` and `earliest_pickup_time`. Treat that pair as the
+server-computed lower bound for the customer's local return selection.
+
 ### `POST /v1/public/shuttle/quote`
 
 Prices a full cart. **Nothing is held and nothing is written.** Safe to call repeatedly as the customer toggles insurance or retypes a promo code.
@@ -509,13 +571,31 @@ arrival plus the configured minimum return gap. An impossible cart returns
 HTTP 400 `VALIDATION_ERROR`, `field: "legs.1.schedule_id"`, at both quote and
 booking time; clients cannot override the stored duration or gap.
 
+Each leg is either the unchanged fixed shape or this additive on-request shape:
+
+```json
+{ "departure_type": "on_request",
+  "route_id": "uuid",
+  "vehicle_type_id": "uuid",
+  "pickup_date": "2026-08-13",
+  "pickup_time": "09:30",
+  "pax_senior": 0,
+  "pax_adult": 2,
+  "pax_child": 0 }
+```
+
+Do not include `schedule_id` in an on-request leg. A fixed leg continues to send
+only `schedule_id` and passenger counts; `departure_type` may be omitted and
+defaults to `scheduled`.
+
 ```json
 // request — 1 or 2 legs
 { "legs": [
     { "schedule_id": "uuid", "pax_senior": 1, "pax_adult": 1, "pax_child": 1 }
   ],
   "insurance_selected": true,
-  "promo_code": "KIYA" }
+  "promo_code": "KIYA",
+  "payment_method": "online" }
 
 // response
 { "data": {
@@ -535,9 +615,24 @@ booking time; clients cannot override the stored duration or gap.
 }}
 ```
 
-**Order of operations:** subtotal → discount → insurance on the discounted amount → total. Insurance covers what is actually paid, so it is computed after any promo.
+**Order of operations:** subtotal → discount → insurance on the discounted
+amount → online-card surcharge → total. Insurance covers what is actually paid,
+so it is computed after any promo. The card surcharge is computed last and is
+zero for `cash`, `cheque`, and `bank_transfer`.
+
+For a two-leg return cart, a configured outbound `round_trip_price` is the
+combined fare for the passenger across both legs. The API allocates that total
+between the leg snapshots in proportion to their one-way fares before applying
+each leg's own peak increase. If the passenger type has no return fare, the
+adult return fare is used; if no return fare is configured, the two legacy
+one-way fares are added unchanged.
 
 A departure that has become unbookable since the search returns the appropriate error rather than a stale price.
+
+An on-request quote echoes `departure_type`, route, vehicle, pickup date and
+pickup time, and omits `schedule_id`. It does not create inventory. Peak and
+blackout evaluation, promo-once behavior, insurance and the card surcharge
+order are identical to fixed departures.
 
 ### `POST /v1/public/shuttle/booking`
 
@@ -582,6 +677,14 @@ bookings; B-1 does not move them into Pending Requests.
 `address` is required when any selected location has `requires_address: true`.
 
 `accepted_terms` must be `true`.
+
+Booking accepts the same fixed or on-request leg alternatives documented for
+quote. For an on-request leg the server atomically creates or reuses the exact
+`(route_id, pickup_date, pickup_time)` schedule and snapshots capacity in this
+order: matching departure-template override, route/vehicle override, then the
+vehicle type's capacity. All legs are resolved before schedule ids are sorted
+and locked. If any leg is unavailable, no leg is booked and payment is not
+attempted.
 
 **Seats are only committed on successful payment.** Two customers racing for the last seat: one receives 201, the other 409 `SEATS_UNAVAILABLE`. **This is a normal outcome, not a crash** — send them back to results with a clear message rather than an error screen.
 
