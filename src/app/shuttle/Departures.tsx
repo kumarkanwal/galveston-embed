@@ -28,7 +28,9 @@ function DepartureCard(props: {
 }) {
   const departure = props.departure;
   return <article class={`shuttle-departure${departure.selectable ? "" : " unavailable"}`}>
-    <div><strong>{departureTime(departure)}</strong><span>{departure.service_label}</span></div>
+    <div><strong>{departureTime(departure)}</strong><span>{departure.service_label}</span>
+      {departure.vehicle_type !== null && <span>Vehicle: {departure.vehicle_type.name}</span>}
+    </div>
     <div><span>{departure.seats_remaining} seats left</span>
       {departure.low_seat_warning !== null && <small>{departure.low_seat_warning}</small>}</div>
     <strong>{formatMoney(departure.total_for_selection, props.currency)}</strong>

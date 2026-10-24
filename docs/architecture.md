@@ -99,9 +99,9 @@ contain BRO bugs and features we dropped. The phase spec says what to keep.
 
 Taxi and shuttle endpoint families never mix. Their request/state modules stay
 separate while contact fields, promo presentation, server-line rendering,
-errors and idempotency may be shared. B-38C does not publish a vehicle/car name
-on scheduled departures, so scheduled cards render `service_label` only as its
-documented service text. Backend B-38D and E-9b will add the car name later.
+errors and idempotency may be shared. Scheduled shuttle cards render
+`service_label` as documented service text and, when B-38D's nullable
+`vehicle_type` is present, render its `name` as the vehicle display text.
 
 **Dropped from BRO:** the site header (Menu, Login) and customer accounts.
 Taxi round trip is an allowed `service_type`; hourly remains deferred. Businesses

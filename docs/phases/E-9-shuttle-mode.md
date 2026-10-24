@@ -33,11 +33,10 @@ rather than inventing, renaming or deriving a field, if B-38C lacks any of:
 
 The B-38C refresh at backend commit
 `2fdc7b1753dcce119b887313ebf16304341b2a0f` exposes
-`OnRequestAvailability.vehicle_type_name`, but scheduled `Departure` exposes no
-vehicle/car-name field. E-9 proceeds without that label: scheduled cards show
-time, seats, price and the documented `service_label`; on-request shows
-`vehicle_type_name`. **TODO E-9b / backend B-38D:** add `vehicle_type` to the
-public scheduled `Departure`, then display its name in a small follow-up.
+`OnRequestAvailability.vehicle_type_name`. The later B-38D refresh at backend
+commit `2b75d4dcc36e569dc2fc03e8d99221deb9f7b5ca` adds nullable
+`Departure.vehicle_type`; E-9b displays its name while retaining the documented
+`service_label`.
 
 ## Mode boundary
 

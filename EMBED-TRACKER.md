@@ -1,6 +1,6 @@
 # Booking Widget (Embed) — Tracker
 
-**Repo:** `galveston-embed` (new, separate) · **Last updated:** 23 October 2026
+**Repo:** `galveston-embed` (new, separate) · **Last updated:** 24 October 2026
 **Talks to:** the hosted `galveston-backend` API on the VPS.
 **Replaces:** the client's live Book Rides Online (BRO) booking form.
 
@@ -56,7 +56,7 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 11 | E-8 Taxi round trip, luggage counts, form toggles | Both | 5% | ✅ Complete — ready for review | 5% |
 | 12 | E-7b Taxi peak / blackout display | Both | 3% | ✅ Complete — ready for review | 3% |
 | 13 | E-9 Shuttle mode in the same widget | Both | — | ✅ Complete — ready for review | — |
-| 14 | E-9b Scheduled-departure car name | Both | — | ⛔ Backend B-38D | 0% |
+| 14 | E-9b Scheduled-departure car name | Both | — | ✅ Complete — ready for review | — |
 | 15 | E-11 Hourly (hours + Add Stops) | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
 | | **Total** | | **100%** | | **78%** |
 
@@ -71,7 +71,7 @@ dependencies: `AGENTS.md` section 3.
 | S-1 | New repo `galveston-embed` | ✅ | Separate from `galveston-widgets` (old cancelled plugin; leave untouched) |
 | S-2 | **VPS runs the latest backend**, including the pricing migration `f1a2b3c4d5e6` | ✅ | Pricing migration and B-20 are deployed on the preview VPS |
 | S-3 | D-1 (contract v1.2) and B-20 pushed to `origin` | ✅ | B-20 is included in backend commit `7e15a04` |
-| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ | Refreshed from backend commit `2fdc7b1753dcce119b887313ebf16304341b2a0f` (including B-38C scheduled and on-request shuttle contracts) |
+| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ | Refreshed from backend commit `2b75d4dcc36e569dc2fc03e8d99221deb9f7b5ca` (including P1 and B-38D) |
 | S-5 | Demo company API key, named `embed` | ✅ Ready when needed | Runbook: `docs/runbooks/embed-keys.md` (backend) |
 | S-6 | Developer's local address (e.g. `http://localhost:5173`) added to `CORS_ORIGINS` on the VPS | ⛔ Not yet | Otherwise the browser cannot read API responses |
 | S-7 | **Google Maps browser key**, HTTP-referrer restricted to dev address now, client sites later | 🔍 Key available; enable Routes API and restrict it | Must be separate from the server key. Maps JavaScript API, Places API (New), and Routes API are required; never use the server key in the browser |
@@ -143,8 +143,8 @@ dependencies: `AGENTS.md` section 3.
 | A-2 | Promo code | ✅ | E-7a uses B-30 price-breakdown and booking support on Distance and Flat Rate rows. Request-a-Quote vehicles keep ED-009 and do not show the control. |
 | A-3 | Taxi round trip | ✅ | E-8 uses the backend round-trip quote, breakdown and booking fields; return-gap and vehicle availability decisions remain server-owned. |
 | A-4 | Taxi peak / blackout display | ✅ | E-7b displays server peak lines, quote blackouts and booking-time unavailability. |
-| A-5 | Shuttle mode | ✅ | E-9 uses B-38C. Scheduled cards show time, seats, price and documented `service_label`; on-request shows `vehicle_type_name`. Cash-only quote and booking share the E-8 contact, promo, errors and idempotency primitives. |
-| A-6 | Scheduled shuttle car name | ⛔ E-9b | **TODO:** backend B-38D adds `vehicle_type` to public `Departure`; then show its name without repurposing `service_label`. |
+| A-5 | Shuttle mode | ✅ | E-9 uses B-38C. Scheduled cards show time, seats, price, documented `service_label` and the B-38D vehicle name when present; on-request shows `vehicle_type_name`. Cash-only quote and booking share the E-8 contact, promo, errors and idempotency primitives. |
+| A-6 | Scheduled shuttle car name | ✅ | E-9b shows public `Departure.vehicle_type.name` when present and hides the vehicle row when null, without repurposing `service_label`. |
 | A-7 | Per-pricing-row airport filter | ⏸ | `pricing_row_airports` exists but nothing uses it |
 | A-8 | Production hosting of `embed.js` on the VPS | ⏸ | Behind Caddy. Config only, no host-specific code |
 
@@ -217,8 +217,9 @@ dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
-| 23 Oct 2026 | E-9 complete for review: one widget now dispatches by public business type; shuttle adds grouped reachable locations, scheduled/on-request departures and returns, server-owned quote/promo lines, cash booking and stale-availability recovery while taxi stays on E-8. Bundle remains one IIFE at 33,134 bytes gzip. E-9b remains the scheduled car-name TODO after B-38D. |
-| 23 Oct 2026 | E-9 unblocked by scope decision: scheduled departures proceed with time, seats, price and documented `service_label`; on-request displays `vehicle_type_name`. Scheduled car name is deferred to backend B-38D and follow-up E-9b. |
+| 24 Oct 2026 | E-9b complete for review: refreshed and byte-verified backend `2b75d4d` with B-38D, then added the nullable scheduled-departure vehicle name without changing `service_label` or on-request behavior. |
+| 23 Oct 2026 | E-9 complete for review: one widget now dispatches by public business type; shuttle adds grouped reachable locations, scheduled/on-request departures and returns, server-owned quote/promo lines, cash booking and stale-availability recovery while taxi stays on E-8. Bundle remains one IIFE at 33,134 bytes gzip. The scheduled car name was deferred pending B-38D. |
+| 23 Oct 2026 | E-9 unblocked by scope decision: scheduled departures proceed with time, seats, price and documented `service_label`; on-request displays `vehicle_type_name`. The scheduled car name was deferred to backend B-38D and follow-up E-9b. |
 | 22 Oct 2026 | E-9 specified and B-38C refreshed byte-for-byte from backend `2fdc7b1` (including `6c4191f`). ED-029 restores shuttle mode in the shared widget while ED-006 remains cash-only. |
 | 22 Oct 2026 | E-8 complete for review: refreshed and byte-verified B-37, enabled taxi round trips with server-owned return-gap validation, replaced legacy luggage with split bag counters, displayed server unavailable rows, and honored the public service-dropdown and map toggles. Hourly remains excluded and ED-003 remains in force. |
 | 20 Oct 2026 | E-7b complete for review: refreshed and byte-verified the B-35 API sources, kept peak surcharge display entirely server-owned, labelled and disabled every unavailable vehicle consistently, and returned booking-time `VEHICLE_UNAVAILABLE` outcomes to Step 2 with the failed vehicle disabled and clear next-step guidance. Taxi only; ED-003 remains in force. |

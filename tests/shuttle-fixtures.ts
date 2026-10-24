@@ -66,6 +66,10 @@ export const DEPARTURE = {
   selectable: true,
   unselectable_reason: null,
   low_seat_warning: "Only 4 seats left",
+  vehicle_type: {
+    id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+    name: "Executive Van",
+  },
 } satisfies ShuttleDeparture;
 
 export const SEARCH_RESULT = {

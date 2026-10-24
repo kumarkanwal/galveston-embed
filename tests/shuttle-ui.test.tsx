@@ -58,16 +58,24 @@ describe("shuttle trip fields", () => {
 });
 
 describe("shuttle departures", () => {
-  it("shows time, service label, seats and server price without a car name", () => {
+  it("shows time, service label, vehicle name, seats and server price", () => {
     const hidden = { ...DEPARTURE, schedule_id: "hidden", selectable: false,
       unselectable_reason: "Return must leave later" };
     const element = renderDepartures({ ...SEARCH_RESULT, departures: [DEPARTURE, hidden] });
     expect(element.textContent).toContain("09:30 – 10:30");
     expect(element.textContent).toContain("Island Express");
+    expect(element.textContent).toContain("Vehicle: Executive Van");
     expect(element.textContent).toContain("4 seats left");
     expect(element.textContent).toContain("$70.50 USD");
     expect(element.textContent).not.toContain("Return must leave later");
     expect(element.querySelectorAll(".shuttle-departure")).toHaveLength(1);
+  });
+
+  it("hides the scheduled vehicle row when vehicle_type is null", () => {
+    const departure = { ...DEPARTURE, vehicle_type: null };
+    const element = renderDepartures({ ...SEARCH_RESULT, departures: [departure] });
+    expect(element.textContent).toContain("Island Express");
+    expect(element.textContent).not.toContain("Vehicle:");
   });
 
   it("uses the existing empty-day message", () => {
