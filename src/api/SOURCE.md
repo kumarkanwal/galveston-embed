@@ -4,11 +4,11 @@
 | Field | Value |
 |---|---|
 | Copied from | `galveston-backend/openapi.json` |
-| Backend commit | `2fdc7b1753dcce119b887313ebf16304341b2a0f` |
-| Copied on | `2026-10-22` |
+| Backend commit | `2b75d4dcc36e569dc2fc03e8d99221deb9f7b5ca` |
+| Copied on | `2026-10-24` |
 
 Refresh only after a complete backend change is committed and pushed.
 
-This source includes backend B-38C scheduled and on-request shuttle contracts.
-Backend contract commit `6c4191f` is included. The copied blob was verified
-byte-for-byte against backend `origin/main`.
+This source includes P1 card-payment configuration and backend B-38D scheduled
+vehicle types. Backend commits `ca5d892` and `6b42887` are included. The copied
+blob was verified byte-for-byte against backend `origin/main`.

@@ -5,8 +5,8 @@ Stack: FastAPI (Python) · PostgreSQL · Square payments
 Base URL: `https://api.<domain>.com/v1`
 Consumers: Booking-form embeds (taxi and shuttle)
 
-**Version 1.3** — generated from the implemented schemas, routers, services and
-`openapi.json` through B-38C. This document covers the public
+**Version 1.4** — generated from the implemented schemas, routers, services and
+`openapi.json` through P1 and B-36. This document covers the public
 surface; the admin surface (`/admin/*`) is not documented here.
 
 ---
@@ -14,6 +14,24 @@ surface; the admin surface (`/admin/*`) is not documented here.
 ## Changes from v1.2
 
 Read this section first if you have already built against v1.2.
+
+- **B-38D shuttle departure car information:** scheduled departures in public
+  outbound and return search now include `vehicle_type: {id, name} | null`;
+  `service_label` is unchanged. Admin schedule results expose the same vehicle
+  reference plus their read-only `source` and `departure_template_id` provenance.
+
+- **B-39 taxi pricing-row administration:** authenticated staff can list and
+  read a single taxi business's Distance, Flat Rate and retained legacy pricing
+  rows at `/admin/pricing-rows`; owners and managers can create, update and
+  soft-deactivate them, while dispatchers remain read-only. Money and percentage
+  inputs are non-negative strings with exactly two decimal places. The strict
+  business/service/vehicle key remains unique; posting an inactive match
+  replaces and reactivates it with `200`, while a new row returns `201`. Only
+  `distance` and `flat_rate` can be written; legacy `hourly` and `zone_to_zone`
+  rows remain readable and deactivatable. Changes invalidate pricing caches and
+  affect new quotes only; booking snapshots remain unchanged. The row-level
+  `cc_surcharge_pct` remains in this contract for now; P1 moves the card fee to
+  the company setting.
 
 - **B-38C on-request shuttle departures:** search publishes a custom-time
   choice with its route, sole eligible vehicle type and capacity, without a
@@ -29,6 +47,15 @@ Read this section first if you have already built against v1.2.
 ## Changes from v1.1
 
 Read this section first if you have already built against v1.1.
+
+- **P1 card payment and B-36 staff booking:** public card and cash submissions
+  for both taxi and shuttle now remain `requested` until staff approve them.
+  Booking and payment status are independent, and `auto_confirm_card_payments`
+  is no longer read. Shuttle seats are consumed when the requested booking is
+  committed, before a card charge. Payment webhooks settle and aggregate their
+  own attempts without confirming reservations. See
+  `docs/phases/p1-card-payment-and-b36.md` for the admin endpoints, refund
+  ledger, account routing, surcharge migration, and deployment contract.
 
 - **B-38B shared fixed shuttle departures and return pricing:** an active
   company assignment exposes the route owner's locations, fixed departures and
@@ -74,11 +101,10 @@ Read this section first if you have already built against v1.1.
   resolution. Existing endpoint paths and airport-id request fields are
   unchanged.
 - **B-1 booking email behavior:** every successful shuttle or taxi submission
-  queues a direct company alert plus the customer message matching its final
-  status. Taxi cash bookings now return `requested`; shuttle cash bookings keep
-  their existing confirmed status and seat/hold behavior. Priced taxi card
-  bookings use `auto_confirm_card_payments`: confirmed when enabled, requested
-  when disabled. Customer-facing request, confirmation and reminder messages
+  queues a direct company alert plus the customer request acknowledgement.
+  P1 supersedes B-1's auto-confirm behavior: every public booking is requested,
+  and `auto_confirm_card_payments` is retained but unused. Customer-facing
+  request, confirmation and reminder messages
   are BCCed to `alerts_email`; company and driver messages are not.
 - **B-24 admin integration:** authorized owners and managers can reveal the
   newest active API key named `embed`; owners can regenerate it, immediately
@@ -370,9 +396,11 @@ switches. Both default to `true`; hiding either control does not change server
 validation or pricing.
 
 `payments` contains Square's publishable application and location identifiers
-for Web Payments SDK tokenisation. It is `null` if either identifier is not
-configured; in that case offer only the non-card methods in `payment_methods`.
-No Square access token or secret is ever returned.
+for Web Payments SDK tokenisation. It is `null` unless the company has its own
+`businesses.square_location_id` and its complete effective shared or
+company-specific Square account is charge- and webhook-ready. There is no
+global location fallback. When it is null, offer only the non-card methods in
+`payment_methods`. No Square access token or secret is ever returned.
 
 `max_passengers` is the largest passenger capacity among the business's active,
 enabled vehicle offerings; a disabled business assignment is excluded, and the
@@ -658,9 +686,9 @@ Generate the key when the customer reaches the payment step and **reuse it acros
 { "data": {
   "order_id": "uuid",
   "order_number": "GS-2026-004821",
-  "status": "confirmed",
+  "status": "requested",
   "total": "189.75",
-  "amount_paid": "189.75",
+  "amount_paid": "0.00",
   "legs": [ { "booking_id": "uuid", "seats_confirmed": 2 } ],
   "confirmation_email_sent": true
 }}
@@ -670,9 +698,10 @@ Generate the key when the customer reaches the payment step and **reuse it acros
 asynchronous delivery queue while email delivery was enabled. It does not mean
 the SMTP server has already accepted it. When delivery is disabled, the row is
 retained for history but is permanently ineligible and this field is `false`.
-The shuttle flow also queues a direct company alert. Cash shuttle bookings keep
-the same confirmed status, hold consumption and seat mutation as online shuttle
-bookings; B-1 does not move them into Pending Requests.
+The shuttle flow also queues a direct company alert. Cash and card shuttle
+bookings both return `requested`, while their seats are consumed immediately so
+the departure cannot oversell. For card, `amount_paid` changes only as signed
+webhooks settle payment attempts.
 
 `address` is required when any selected location has `requires_address: true`.
 
@@ -686,7 +715,9 @@ vehicle type's capacity. All legs are resolved before schedule ids are sorted
 and locked. If any leg is unavailable, no leg is booked and payment is not
 attempted.
 
-**Seats are only committed on successful payment.** Two customers racing for the last seat: one receives 201, the other 409 `SEATS_UNAVAILABLE`. **This is a normal outcome, not a crash** — send them back to results with a clear message rather than an error screen.
+**Seats are committed when the requested booking is stored, before any card
+charge.** Two customers racing for the last seat: one receives 201, the other
+409 `SEATS_UNAVAILABLE`. This is a normal outcome, not a crash.
 
 ---
 
@@ -1162,8 +1193,7 @@ queued for every successful submission.
 |---|---|
 | No price was produced, including a missing/zero Flat Rate | `"requested"` — staff quote it manually |
 | Cash payment | `"requested"` — staff confirm it |
-| Priced card payment and `auto_confirm_card_payments` is on | `"confirmed"` |
-| Priced card payment and `auto_confirm_card_payments` is off | `"requested"` — staff review it |
+| Priced card payment | `"requested"` — payment settles separately; staff confirm it |
 
 An unpriced booking creates a **zero-total `requested` order and does not fail**.
 That includes an out-of-area journey, an unresolved Distance journey, and a
@@ -1259,17 +1289,18 @@ narrowed remains open.
 
 1. The plugin tokenises the card with **Square's Web Payments SDK**. Card details never reach this API.
 2. It sends the token as `payment.payment_method_token` on the booking request.
-3. The server charges Square. **A successful client call is not a settled payment** — the order becomes `processing`.
-4. Square delivers a signed webhook to `POST /v1/webhooks/square`. Only the **verified webhook** confirms settlement, at which point the order becomes `confirmed` and shuttle seats are committed.
+3. The server commits the requested reservation (and shuttle seats) before it
+   charges Square.
+4. Square delivers a signed webhook to `POST /v1/webhooks/square`. The verified
+   webhook settles only its payment attempt and aggregates gross `amount_paid`.
+   It does not confirm the booking.
 
 ### Order statuses the plugin may see
 
 | Status | Meaning |
 |---|---|
-| `pending` | Created, payment not yet resolved |
-| `processing` | Charged, awaiting webhook confirmation |
 | `requested` | Needs staff action (manual quote or review) |
-| `confirmed` | Settled and booked |
+| `confirmed` | Approved by staff; payment state is independent |
 | `cancelled` | Payment declined, expired, or cancelled |
 | `refunded` | Fully refunded |
 
@@ -1285,6 +1316,25 @@ narrowed remains open.
 | Same key already completed | `200` with the **original** response body | Show the original confirmation |
 
 The unknown-outcome case is the one to get right. An automatic retry there can double-charge a customer.
+
+### Admin payment and staff-booking additions
+
+The admin API uses JWT business scope. Owners and managers can read payment
+settings; only owners can write `card_surcharge_pct` and
+`square_location_id`. Credentials are never accepted by an API.
+
+- `POST /v1/admin/reservations/preview` accepts the create body, writes nothing,
+  and returns the complete server-calculated breakdown.
+- `POST /v1/admin/reservations` requires `Idempotency-Key`; an identical replay
+  returns the first result and a changed body returns `409`.
+- `POST /v1/admin/reservations/{booking_id}/card-payments` requires
+  `Idempotency-Key` and a Web Payments token, and charges `balance_due`.
+- `POST /v1/admin/reservations/{booking_id}/refunds` records a partial manual
+  refund with a required note and never calls Square.
+
+Reservation detail includes payment history, refund history, gross
+`amount_paid`, `refund_total`, and `balance_due`. See
+`docs/phases/p1-card-payment-and-b36.md` for request variants and permissions.
 
 ---
 
