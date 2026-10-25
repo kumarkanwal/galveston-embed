@@ -480,6 +480,30 @@ export interface paths {
         patch: operations["update_email_settings_v1_admin_businesses__business_uuid__settings_email_patch"];
         trace?: never;
     };
+    "/v1/admin/businesses/{business_uuid}/settings/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Payment Settings
+         * @description Read non-secret card pricing and tenant location settings.
+         */
+        get: operations["get_payment_settings_v1_admin_businesses__business_uuid__settings_payments_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Payment Settings
+         * @description Let an owner update card fee and the tenant's Square location.
+         */
+        patch: operations["update_payment_settings_v1_admin_businesses__business_uuid__settings_payments_patch"];
+        trace?: never;
+    };
     "/v1/admin/businesses/{business_uuid}/settings/preferences": {
         parameters: {
             query?: never;
@@ -1184,6 +1208,58 @@ export interface paths {
         patch: operations["update_anchor_v1_admin_pricing_anchors__anchor_id__patch"];
         trace?: never;
     };
+    "/v1/admin/pricing-rows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Pricing Rows
+         * @description List current and legacy pricing rows for one selected taxi business.
+         */
+        get: operations["list_pricing_rows_v1_admin_pricing_rows_get"];
+        put?: never;
+        /**
+         * Create Pricing Row
+         * @description Create a Distance/Flat Rate row or reactivate its inactive match.
+         */
+        post: operations["create_pricing_row_v1_admin_pricing_rows_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/pricing-rows/{row_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Pricing Row
+         * @description Return one tenant-owned pricing row, including a readable legacy row.
+         */
+        get: operations["get_pricing_row_v1_admin_pricing_rows__row_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Deactivate Pricing Row
+         * @description Soft-deactivate a supported or retained legacy pricing row.
+         */
+        delete: operations["deactivate_pricing_row_v1_admin_pricing_rows__row_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update Pricing Row
+         * @description Edit a supported row or explicitly convert a retained legacy row.
+         */
+        patch: operations["update_pricing_row_v1_admin_pricing_rows__row_id__patch"];
+        trace?: never;
+    };
     "/v1/admin/promo-codes": {
         parameters: {
             query?: never;
@@ -1364,6 +1440,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/reservations/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview Manual Reservation
+         * @description Return the exact create pricing while rolling back every temporary row.
+         */
+        post: operations["preview_manual_reservation_v1_admin_reservations_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/reservations/{booking_id}": {
         parameters: {
             query?: never;
@@ -1426,6 +1522,26 @@ export interface paths {
         get: operations["reservation_audit_v1_admin_reservations__booking_id__audit_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reservations/{booking_id}/card-payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Card Payment
+         * @description Charge the reservation's current balance through Square.
+         */
+        post: operations["create_card_payment_v1_admin_reservations__booking_id__card_payments_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1610,6 +1726,26 @@ export interface paths {
          * @description Store an explained owner/manager price override.
          */
         patch: operations["override_reservation_price_v1_admin_reservations__booking_id__price_patch"];
+        trace?: never;
+    };
+    "/v1/admin/reservations/{booking_id}/refunds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Manual Refund
+         * @description Record a manual refund without contacting Square.
+         */
+        post: operations["create_manual_refund_v1_admin_reservations__booking_id__refunds_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/admin/reservations/{booking_id}/status": {
@@ -2771,7 +2907,7 @@ export interface paths {
         put?: never;
         /**
          * Create Booking
-         * @description Commit a taxi journey: write the order, take payment, confirm it.
+         * @description Commit a requested taxi journey before attempting any card charge.
          *
          *     The Idempotency-Key header is required. A trip that could not be priced is
          *     still booked, as a zero-total request for staff to quote by hand -- that is
@@ -2892,6 +3028,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/webhooks/square/business/{business_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Business Square Webhook
+         * @description Process an event signed by one explicitly configured tenant account.
+         */
+        post: operations["business_square_webhook_v1_webhooks_square_business__business_id__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2968,6 +3124,38 @@ export interface components {
             zip?: string | null;
         };
         AdditionalAmount: string;
+        /**
+         * AdminCardPaymentCreate
+         * @description A token created by Square Web Payments; raw card data is never accepted.
+         */
+        AdminCardPaymentCreate: {
+            /** Payment Method Token */
+            payment_method_token: string;
+        };
+        /**
+         * AdminCardPaymentResult
+         * @description One attempt plus aggregate gross collection state.
+         */
+        AdminCardPaymentResult: {
+            /** Amount */
+            amount: string;
+            /** Amount Paid */
+            amount_paid: string;
+            /** Balance Due */
+            balance_due: string;
+            /**
+             * Order Id
+             * Format: uuid
+             */
+            order_id: string;
+            /**
+             * Payment Id
+             * Format: uuid
+             */
+            payment_id: string;
+            /** Status */
+            status: string;
+        };
         /**
          * AdminChargeCreate
          * @description One configured staff-only charge snapshotted onto a booking.
@@ -5149,6 +5337,7 @@ export interface components {
             total_for_selection: string;
             /** Unselectable Reason */
             unselectable_reason: string | null;
+            vehicle_type: components["schemas"]["VehicleTypeReference"] | null;
         };
         /**
          * DepartureTemplateMutationResult
@@ -5641,6 +5830,10 @@ export interface components {
         Envelope_AccountHolderResult_: {
             data: components["schemas"]["AccountHolderResult"];
         };
+        /** Envelope[AdminCardPaymentResult] */
+        Envelope_AdminCardPaymentResult_: {
+            data: components["schemas"]["AdminCardPaymentResult"];
+        };
         /** Envelope[AdminChargeResult] */
         Envelope_AdminChargeResult_: {
             data: components["schemas"]["AdminChargeResult"];
@@ -5809,6 +6002,10 @@ export interface components {
         Envelope_LogoutResponse_: {
             data: components["schemas"]["LogoutResponse"];
         };
+        /** Envelope[ManualBookingPreview] */
+        Envelope_ManualBookingPreview_: {
+            data: components["schemas"]["ManualBookingPreview"];
+        };
         /** Envelope[ManualBookingResult] */
         Envelope_ManualBookingResult_: {
             data: components["schemas"]["ManualBookingResult"];
@@ -5817,9 +6014,17 @@ export interface components {
         Envelope_ManualPaymentResult_: {
             data: components["schemas"]["ManualPaymentResult"];
         };
+        /** Envelope[ManualRefundResult] */
+        Envelope_ManualRefundResult_: {
+            data: components["schemas"]["ManualRefundResult"];
+        };
         /** Envelope[PasswordResetResult] */
         Envelope_PasswordResetResult_: {
             data: components["schemas"]["PasswordResetResult"];
+        };
+        /** Envelope[PaymentSettingsResult] */
+        Envelope_PaymentSettingsResult_: {
+            data: components["schemas"]["PaymentSettingsResult"];
         };
         /** Envelope[PeakRuleMutationResult] */
         Envelope_PeakRuleMutationResult_: {
@@ -5840,6 +6045,10 @@ export interface components {
         /** Envelope[PricingCheck] */
         Envelope_PricingCheck_: {
             data: components["schemas"]["PricingCheck"];
+        };
+        /** Envelope[PricingRowResult] */
+        Envelope_PricingRowResult_: {
+            data: components["schemas"]["PricingRowResult"];
         };
         /** Envelope[PromoMutationResult] */
         Envelope_PromoMutationResult_: {
@@ -6360,6 +6569,12 @@ export interface components {
             data: components["schemas"]["PendingReservationRow"][];
             meta: components["schemas"]["Meta"];
         };
+        /** ListEnvelope[PricingRowResult] */
+        ListEnvelope_PricingRowResult_: {
+            /** Data */
+            data: components["schemas"]["PricingRowResult"][];
+            meta: components["schemas"]["Meta"];
+        };
         /** ListEnvelope[PromoResult] */
         ListEnvelope_PromoResult_: {
             /** Data */
@@ -6666,8 +6881,19 @@ export interface components {
              * Format: uuid
              */
             business_id: string;
+            /**
+             * Car Seats
+             * @default 0
+             */
+            car_seats: number;
             charges?: components["schemas"]["ManualCharges"];
             customer: components["schemas"]["ManualCustomer"];
+            /**
+             * Departure Type
+             * @default scheduled
+             * @enum {string}
+             */
+            departure_type: "scheduled" | "on_request";
             dispatch?: components["schemas"]["ManualDispatch"];
             /** Distance Miles */
             distance_miles?: string | null;
@@ -6721,6 +6947,8 @@ export interface components {
              * @default 0
              */
             pax_senior: number;
+            /** Payment Method */
+            payment_method?: ("online" | "cash") | null;
             /** Pickup Address */
             pickup_address?: string | null;
             /** Pickup Date */
@@ -6733,6 +6961,8 @@ export interface components {
             return_date?: string | null;
             /** Return Time */
             return_time?: string | null;
+            /** Route Id */
+            route_id?: string | null;
             /** Schedule Id */
             schedule_id?: string | null;
             /** Service Type Id */
@@ -6770,6 +7000,28 @@ export interface components {
             driver_notes?: string | null;
             /** Run Notes */
             run_notes?: string | null;
+        };
+        /**
+         * ManualBookingPreview
+         * @description The complete immutable money shape create will snapshot.
+         */
+        ManualBookingPreview: {
+            /** Charges Total */
+            charges_total: string;
+            /** Currency */
+            currency: string;
+            /** Discount Amount */
+            discount_amount: string;
+            /** Insurance Amount */
+            insurance_amount: string;
+            /** Line Items */
+            line_items: components["schemas"]["ManualPreviewLine"][];
+            /** Subtotal */
+            subtotal: string;
+            /** Surcharge Total */
+            surcharge_total: string;
+            /** Total */
+            total: string;
         };
         /**
          * ManualBookingResult
@@ -6881,6 +7133,63 @@ export interface components {
              * Format: uuid
              */
             payment_id: string;
+        };
+        /**
+         * ManualPreviewLine
+         * @description One server-calculated or explicitly manual preview line.
+         */
+        ManualPreviewLine: {
+            /** Amount */
+            amount: string;
+            /** Kind */
+            kind: string;
+            /** Label */
+            label: string;
+            /**
+             * Quantity
+             * @default 1
+             */
+            quantity: number;
+            /** Source Id */
+            source_id?: string | null;
+            /** Unit Price */
+            unit_price?: string | null;
+        };
+        /**
+         * ManualRefundCreate
+         * @description A staff-authorized refund recorded without gateway interaction.
+         */
+        ManualRefundCreate: {
+            /** Amount */
+            amount: string;
+            /** Note */
+            note: string;
+        };
+        /**
+         * ManualRefundResult
+         * @description The appended refund and current immutable collection totals.
+         */
+        ManualRefundResult: {
+            /** Amount */
+            amount: string;
+            /** Amount Paid */
+            amount_paid: string;
+            /** Balance Due */
+            balance_due: string;
+            /** Note */
+            note: string;
+            /**
+             * Order Id
+             * Format: uuid
+             */
+            order_id: string;
+            /**
+             * Refund Id
+             * Format: uuid
+             */
+            refund_id: string;
+            /** Refund Total */
+            refund_total: string;
         };
         /**
          * Meta
@@ -7059,11 +7368,66 @@ export interface components {
             payment_method_token?: string | null;
         };
         /**
+         * PaymentHistoryItem
+         * @description One immutable collection attempt in chronological attempt order.
+         */
+        PaymentHistoryItem: {
+            /** Amount */
+            amount: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Failure Reason */
+            failure_reason: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Paid At */
+            paid_at: string | null;
+            /** Provider Payment Id */
+            provider_payment_id: string | null;
+            /** Settled Amount */
+            settled_amount: string | null;
+            /** Source */
+            source: string;
+            /** Status */
+            status: string;
+        };
+        /**
          * PaymentMethod
          * @description How the customer settles. Cash is recorded by staff, never taken online.
          * @enum {string}
          */
         PaymentMethod: "online" | "cash" | "cheque" | "bank_transfer";
+        /**
+         * PaymentSettingsResult
+         * @description The two non-secret tenant values that govern card pricing and routing.
+         */
+        PaymentSettingsResult: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Card Surcharge Pct */
+            card_surcharge_pct: string;
+            /** Square Location Id */
+            square_location_id: string | null;
+        };
+        /**
+         * PaymentSettingsUpdate
+         * @description Owner-only payment settings; credentials remain environment-only.
+         */
+        PaymentSettingsUpdate: {
+            /** Card Surcharge Pct */
+            card_surcharge_pct?: string | null;
+            /** Square Location Id */
+            square_location_id?: string | null;
+        };
         /**
          * PeakOverlapWarning
          * @description A non-blocking notice that matching increases will be summed.
@@ -7334,7 +7698,7 @@ export interface components {
          * @description A capability an endpoint can require.
          * @enum {string}
          */
-        Permission: "booking:read" | "booking:write" | "booking:assign" | "booking:status" | "communication:send" | "customer:read" | "customer:write" | "customer:manage" | "pricing:read" | "pricing:write" | "vehicle_rate:write" | "vehicle_type_catalog:write" | "service_type_assignment:write" | "service_type_catalog:write" | "taxi_catalog:manage" | "platform_catalog:manage" | "payment:read" | "payment:write" | "email:read" | "audit:read" | "config:read" | "config:write" | "zone_price:import" | "company:read" | "company:write" | "company_identity:write" | "business_settings:read" | "business_settings:write" | "team:read" | "team:write" | "settings:read" | "settings:write" | "integration:read" | "api_keys:read" | "api_keys:write" | "report:read" | "own_runs:read";
+        Permission: "booking:read" | "booking:write" | "booking:assign" | "booking:status" | "communication:send" | "customer:read" | "customer:write" | "customer:manage" | "pricing:read" | "pricing:write" | "vehicle_rate:write" | "vehicle_type_catalog:write" | "service_type_assignment:write" | "service_type_catalog:write" | "taxi_catalog:manage" | "platform_catalog:manage" | "payment:read" | "payment:write" | "payment_settings:read" | "payment_settings:write" | "email:read" | "audit:read" | "config:read" | "config:write" | "zone_price:import" | "company:read" | "company:write" | "company_identity:write" | "business_settings:read" | "business_settings:write" | "team:read" | "team:write" | "settings:read" | "settings:write" | "integration:read" | "api_keys:read" | "api_keys:write" | "report:read" | "own_runs:read";
         /**
          * PreferencesSettingsUpdate
          * @description Taxi booking choices controlled by the selected business.
@@ -7407,12 +7771,232 @@ export interface components {
             unavailable_reason: string | null;
         };
         /**
+         * PricingRowAreaRateInput
+         * @description One complete Flat Rate entry keyed by a tenant-owned coverage rule.
+         */
+        PricingRowAreaRateInput: {
+            /** Rate */
+            rate: string;
+            /**
+             * Service Area Id
+             * Format: uuid
+             */
+            service_area_id: string;
+        };
+        /**
+         * PricingRowAreaRateResult
+         * @description A Flat Rate plus enough area presentation for the Pricing tab.
+         */
+        PricingRowAreaRateResult: {
+            /** Rate */
+            rate: string;
+            /**
+             * Service Area Id
+             * Format: uuid
+             */
+            service_area_id: string;
+            /** Service Area Is Active */
+            service_area_is_active: boolean;
+            service_area_type: components["schemas"]["ServiceAreaType"];
+            /** Service Area Value */
+            service_area_value: string;
+        };
+        /**
+         * PricingRowCreate
+         * @description Create or reactivate one exact vehicle/service pricing authority.
+         */
+        PricingRowCreate: {
+            /** Additional Charge */
+            additional_charge: string;
+            /** Airport Fee */
+            airport_fee: string;
+            /** Base Price */
+            base_price?: string | null;
+            /** Cc Surcharge Pct */
+            cc_surcharge_pct: string;
+            /** Fuel Surcharge Pct */
+            fuel_surcharge_pct: string;
+            /** Gratuity Pct */
+            gratuity_pct: string;
+            /** Limit To Service Areas */
+            limit_to_service_areas: boolean;
+            /** Minimum Price */
+            minimum_price?: string | null;
+            /** Per Luggage */
+            per_luggage: string;
+            /** Per Passenger */
+            per_passenger: string;
+            /** Per Stop */
+            per_stop: string;
+            /** Price Per Mile */
+            price_per_mile?: string | null;
+            /**
+             * Pricing Type
+             * @enum {string}
+             */
+            pricing_type: "distance" | "flat_rate";
+            /** Round Trip Enabled */
+            round_trip_enabled: boolean;
+            /** Sales Tax Pct */
+            sales_tax_pct: string;
+            /** Service Area Rates */
+            service_area_rates?: components["schemas"]["PricingRowAreaRateInput"][];
+            /**
+             * Service Type Id
+             * Format: uuid
+             */
+            service_type_id: string;
+            /** Tolls */
+            tolls: string;
+            /**
+             * Vehicle Type Id
+             * Format: uuid
+             */
+            vehicle_type_id: string;
+            /** Waiting Time */
+            waiting_time: string;
+        };
+        /**
+         * PricingRowResult
+         * @description One pricing row, including readable global-catalog labels.
+         */
+        PricingRowResult: {
+            /** Additional Charge */
+            additional_charge: string;
+            /** Airport Fee */
+            airport_fee: string;
+            /** Base Price */
+            base_price: string | null;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Cc Surcharge Pct */
+            cc_surcharge_pct: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Fuel Surcharge Pct */
+            fuel_surcharge_pct: string;
+            /** Gratuity Pct */
+            gratuity_pct: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Limit To Service Areas */
+            limit_to_service_areas: boolean;
+            /** Minimum Price */
+            minimum_price: string | null;
+            /** Per Luggage */
+            per_luggage: string;
+            /** Per Passenger */
+            per_passenger: string;
+            /** Per Stop */
+            per_stop: string;
+            /** Price Per Mile */
+            price_per_mile: string | null;
+            pricing_type: components["schemas"]["PricingRowType"];
+            /** Round Trip Enabled */
+            round_trip_enabled: boolean;
+            /** Sales Tax Pct */
+            sales_tax_pct: string;
+            /** Service Area Rates */
+            service_area_rates: components["schemas"]["PricingRowAreaRateResult"][];
+            /** Service Type Code */
+            service_type_code: string;
+            /**
+             * Service Type Id
+             * Format: uuid
+             */
+            service_type_id: string;
+            /** Service Type Name */
+            service_type_name: string;
+            /** Tolls */
+            tolls: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /**
+             * Vehicle Type Id
+             * Format: uuid
+             */
+            vehicle_type_id: string;
+            /** Vehicle Type Name */
+            vehicle_type_name: string;
+            /** Waiting Time */
+            waiting_time: string;
+        };
+        /**
+         * PricingRowType
+         * @description Pricing modes owned by one business/vehicle/service pricing row.
+         *
+         *     This is intentionally separate from the legacy ``PricingType`` enum. The
+         *     old service assignment table remains readable during the staged migration
+         *     and stores ``flat``; the replacement row model uses the client's exact
+         *     ``flat_rate`` and ``zone_to_zone`` vocabulary.
+         * @enum {string}
+         */
+        PricingRowType: "distance" | "hourly" | "flat_rate" | "zone_to_zone";
+        /**
+         * PricingRowUpdate
+         * @description Partial edit whose merged configuration is revalidated by the service.
+         */
+        PricingRowUpdate: {
+            /** Additional Charge */
+            additional_charge?: string | null;
+            /** Airport Fee */
+            airport_fee?: string | null;
+            /** Base Price */
+            base_price?: string | null;
+            /** Cc Surcharge Pct */
+            cc_surcharge_pct?: string | null;
+            /** Fuel Surcharge Pct */
+            fuel_surcharge_pct?: string | null;
+            /** Gratuity Pct */
+            gratuity_pct?: string | null;
+            /** Limit To Service Areas */
+            limit_to_service_areas?: boolean | null;
+            /** Minimum Price */
+            minimum_price?: string | null;
+            /** Per Luggage */
+            per_luggage?: string | null;
+            /** Per Passenger */
+            per_passenger?: string | null;
+            /** Per Stop */
+            per_stop?: string | null;
+            /** Price Per Mile */
+            price_per_mile?: string | null;
+            /** Pricing Type */
+            pricing_type?: ("distance" | "flat_rate") | null;
+            /** Round Trip Enabled */
+            round_trip_enabled?: boolean | null;
+            /** Sales Tax Pct */
+            sales_tax_pct?: string | null;
+            /** Service Area Rates */
+            service_area_rates?: components["schemas"]["PricingRowAreaRateInput"][] | null;
+            /** Service Type Id */
+            service_type_id?: string | null;
+            /** Tolls */
+            tolls?: string | null;
+            /** Vehicle Type Id */
+            vehicle_type_id?: string | null;
+            /** Waiting Time */
+            waiting_time?: string | null;
+        };
+        /**
          * PricingSettingsUpdate
          * @description Store payment configuration without implying deposits are collected today.
          */
         PricingSettingsUpdate: {
-            /** Card Surcharge Pct */
-            card_surcharge_pct?: string | null;
             deposit_type?: components["schemas"]["DepositType"] | null;
             /** Deposit Value */
             deposit_value?: string | null;
@@ -7846,6 +8430,34 @@ export interface components {
             refresh_token: string;
         };
         /**
+         * RefundHistoryItem
+         * @description One append-only manual or provider refund.
+         */
+        RefundHistoryItem: {
+            /** Amount */
+            amount: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Created By Admin Id */
+            created_by_admin_id: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Note */
+            note: string;
+            /** Payment Id */
+            payment_id: string | null;
+            /** Provider Refund Id */
+            provider_refund_id: string | null;
+            /** Source */
+            source: string;
+        };
+        /**
          * ReservationCounts
          * @description Tab badge counts under the same scope and filters as the lists.
          */
@@ -7875,6 +8487,10 @@ export interface components {
             additional_stops: string;
             /** Airport Fee */
             airport_fee: string;
+            /** Amount Paid */
+            amount_paid: string;
+            /** Balance Due */
+            balance_due: string;
             /**
              * Booking Id
              * Format: uuid
@@ -7916,6 +8532,12 @@ export interface components {
             order_number: string;
             order_status: components["schemas"]["OrderStatus"];
             payment: components["schemas"]["PaymentDetail"];
+            /** Payments */
+            payments: components["schemas"]["PaymentHistoryItem"][];
+            /** Refund Total */
+            refund_total: string;
+            /** Refunds */
+            refunds: components["schemas"]["RefundHistoryItem"][];
             route: components["schemas"]["RouteDetail"] | null;
             /** Sibling Booking Id */
             sibling_booking_id: string | null;
@@ -8604,6 +9226,8 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /** Departure Template Id */
+            departure_template_id: string | null;
             /** End Time */
             end_time: string | null;
             /**
@@ -8629,6 +9253,7 @@ export interface components {
              * Format: date
              */
             service_date: string;
+            source: components["schemas"]["ScheduleSource"];
             /**
              * Start Time
              * Format: time
@@ -8639,6 +9264,7 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+            vehicle_type: components["schemas"]["VehicleTypeReference"] | null;
         };
         /**
          * SchedulePreviewEntry
@@ -8675,6 +9301,8 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /** Departure Template Id */
+            departure_template_id: string | null;
             /** End Time */
             end_time: string | null;
             /**
@@ -8700,6 +9328,7 @@ export interface components {
              * Format: date
              */
             service_date: string;
+            source: components["schemas"]["ScheduleSource"];
             /**
              * Start Time
              * Format: time
@@ -8710,6 +9339,7 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+            vehicle_type: components["schemas"]["VehicleTypeReference"] | null;
         };
         /**
          * ScheduleSlot
@@ -8726,6 +9356,12 @@ export interface components {
              */
             start_time: string;
         };
+        /**
+         * ScheduleSource
+         * @description How a dated shuttle departure entered inventory.
+         * @enum {string}
+         */
+        ScheduleSource: "manual" | "template" | "on_request";
         /**
          * ScheduleUpdate
          * @description Edit live inventory; confirmation is required for booked disruptions.
@@ -10164,6 +10800,19 @@ export interface components {
             new_name: string;
         };
         /**
+         * VehicleTypeReference
+         * @description Stable catalog identity without exposing pricing or capacity settings.
+         */
+        VehicleTypeReference: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+        };
+        /**
          * VehicleTypeReorder
          * @description The complete global catalog order.
          */
@@ -11510,6 +12159,80 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_BusinessSettingsMutationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_payment_settings_v1_admin_businesses__business_uuid__settings_payments_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_PaymentSettingsResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_payment_settings_v1_admin_businesses__business_uuid__settings_payments_patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaymentSettingsUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_PaymentSettingsResult_"];
                 };
             };
             /** @description Validation Error */
@@ -13496,6 +14219,211 @@ export interface operations {
             };
         };
     };
+    list_pricing_rows_v1_admin_pricing_rows_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+                /** @description 1-based page number. */
+                page?: number;
+                /** @description Items per page. */
+                per_page?: number;
+                /** @description Sort column, prefix with - for descending. */
+                sort?: string | null;
+                /** @description Free-text search term. */
+                search?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListEnvelope_PricingRowResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_pricing_row_v1_admin_pricing_rows_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PricingRowCreate"];
+            };
+        };
+        responses: {
+            /** @description An inactive strict-key match was replaced and reactivated. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_PricingRowResult_"];
+                };
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_PricingRowResult_"];
+                };
+            };
+            /** @description The payload is invalid or the strict-key match is active. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_pricing_row_v1_admin_pricing_rows__row_id__get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                row_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_PricingRowResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_pricing_row_v1_admin_pricing_rows__row_id__delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                row_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_PricingRowResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_pricing_row_v1_admin_pricing_rows__row_id__patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                row_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PricingRowUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_PricingRowResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_promo_codes_v1_admin_promo_codes_get: {
         parameters: {
             query?: {
@@ -13779,6 +14707,7 @@ export interface operations {
                 business_id?: string | null;
             };
             header?: {
+                "Idempotency-Key"?: string | null;
                 authorization?: string | null;
             };
             path?: never;
@@ -13961,6 +14890,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ListEnvelope_PendingReservationRow_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_manual_reservation_v1_admin_reservations_preview_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManualBookingCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ManualBookingPreview_"];
                 };
             };
             /** @description Validation Error */
@@ -14157,6 +15123,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ListEnvelope_AuditTrailItem_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_card_payment_v1_admin_reservations__booking_id__card_payments_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                "Idempotency-Key"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminCardPaymentCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AdminCardPaymentResult_"];
                 };
             };
             /** @description Validation Error */
@@ -14494,6 +15500,45 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_PriceOverrideResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_manual_refund_v1_admin_reservations__booking_id__refunds_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManualRefundCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ManualRefundResult_"];
                 };
             };
             /** @description Validation Error */
@@ -17638,6 +18683,39 @@ export interface operations {
                 "x-square-hmacsha256-signature"?: string | null;
             };
             path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_WebhookReceipt_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    business_square_webhook_v1_webhooks_square_business__business_id__post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-square-hmacsha256-signature"?: string | null;
+            };
+            path: {
+                business_id: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
