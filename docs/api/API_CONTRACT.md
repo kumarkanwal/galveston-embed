@@ -5,11 +5,60 @@ Stack: FastAPI (Python) · PostgreSQL · Square payments
 Base URL: `https://api.<domain>.com/v1`
 Consumers: Booking-form embeds (taxi and shuttle)
 
-**Version 1.4** — generated from the implemented schemas, routers, services and
-`openapi.json` through P1 and B-36. This document covers the public
-surface; the admin surface (`/admin/*`) is not documented here.
+**Version 1.6** — generated from the implemented schemas, routers, services and
+`openapi.json` through B-41. This document covers the public surface and the
+B-41 admin additions below; older admin endpoints remain defined by OpenAPI.
 
 ---
+
+## Changes from v1.5
+
+- **B-41 team and drivers:** tenant owners now use explicit business grants,
+  managers may directly create and manage dispatcher/driver accounts, dispatch
+  may assign a driver without clearing the vehicle, and drivers receive
+  privacy-limited upcoming, completed, detail, trip-sheet, and completion
+  operations. `/admin/my/history` is deprecated in favor of
+  `/admin/my/reservations/completed`. Invitations are deliberately excluded
+  until a future email-enabled phase.
+
+## B-41 admin team and driver contract
+
+All paths below are relative to `/v1`. Team creation is direct account creation
+with a generated or caller-supplied password; it does not send email.
+
+| Method and path | Permission | Contract |
+| --- | --- | --- |
+| `GET /admin/team` | owner, manager | List staff overlapping the resolved business scope. |
+| `POST /admin/team` | owner; manager for dispatcher/driver only | Create an account directly. Managers may grant only the selected business. |
+| `GET /admin/team/{admin_id}` | owner, manager | Return a scope-visible account without credentials. |
+| `PATCH /admin/team/{admin_id}` | owner; manager for dispatcher/driver only | Edit account fields or switch between dispatcher and driver. |
+| `DELETE /admin/team/{admin_id}` | owner; manager for dispatcher/driver only | Deactivate while preserving historical assignments. |
+| `PUT /admin/team/{admin_id}/businesses` | owner only | Replace explicit business grants. |
+| `POST /admin/team/{admin_id}/reset-password` | owner only | Generate a password and revoke refresh tokens. |
+| `PUT /admin/reservations/{booking_id}/driver` | owner, manager, dispatcher | Assign or clear the driver and preserve the existing vehicle. |
+| `GET /admin/my/reservations` | driver only | Alias of the upcoming collection. |
+| `GET /admin/my/reservations/upcoming` | driver only | Assigned future runs in `confirmed` or `assigned` state. |
+| `GET /admin/my/reservations/completed` | driver only | Assigned runs whose status is `completed`. |
+| `GET /admin/my/reservations/{booking_id}` | assigned driver only | Operational detail without money or free-text notes. |
+| `GET /admin/my/reservations/{booking_id}/trip-sheet` | assigned driver only | JSON/text trip sheet without notes, totals, payment method, or balance. |
+| `POST /admin/my/reservations/{booking_id}/complete` | assigned driver only | Idempotently change `assigned` to `completed`; audit once and send no customer email. |
+
+Non-platform owners resolve businesses exclusively through
+`admin_business_access`. Platform administrators retain all active businesses.
+An active owner cannot be demoted, deactivated, or lose a grant when that would
+leave a business without an active owner.
+
+Invitations and invitation email delivery are reserved for a future phase; B-41
+adds no invitation table, token, or endpoint.
+
+## Changes from v1.4
+
+- **P3 public card capability:** `GET /v1/public/business` adds
+  `payments.environment` (`"sandbox"` or `"production"`) and
+  `payments.card_available`. The `payments` object remains `null` unless the
+  business has its own Square location and its effective account is complete,
+  including webhook verification configuration; when present,
+  `card_available` is always `true`.
 
 ## Changes from v1.2
 
@@ -376,7 +425,9 @@ Called by both plugins on load. Supplies branding and the settings that shape th
   },
   "payments": {
     "square_application_id": "sandbox-sq0idb-...",
-    "square_location_id": "L..."
+    "square_location_id": "L...",
+    "environment": "sandbox",
+    "card_available": true
   },
   "max_passengers": 14,
   "max_luggage": 20
@@ -395,12 +446,16 @@ staff-only admin booking option.
 switches. Both default to `true`; hiding either control does not change server
 validation or pricing.
 
-`payments` contains Square's publishable application and location identifiers
-for Web Payments SDK tokenisation. It is `null` unless the company has its own
+`payments` contains Square's publishable application and location identifiers,
+effective `environment`, and affirmative `card_available` capability for Web
+Payments SDK tokenisation. It is `null` unless the company has its own
 `businesses.square_location_id` and its complete effective shared or
-company-specific Square account is charge- and webhook-ready. There is no
-global location fallback. When it is null, offer only the non-card methods in
-`payment_methods`. No Square access token or secret is ever returned.
+company-specific Square account is charge- and webhook-ready, including a
+webhook signature key. Therefore `card_available` is always `true` when the
+object is present; a null object means card is unavailable. There is no global
+location fallback. When it is null, offer only the non-card methods in
+`payment_methods`. No Square access token, webhook key, or other secret is ever
+returned.
 
 `max_passengers` is the largest passenger capacity among the business's active,
 enabled vehicle offerings; a disabled business assignment is excluded, and the

@@ -4,11 +4,11 @@
 | Field | Value |
 |---|---|
 | Copied from | `galveston-backend/openapi.json` |
-| Backend commit | `2b75d4dcc36e569dc2fc03e8d99221deb9f7b5ca` |
-| Copied on | `2026-10-24` |
+| Backend commit | `771cb28ac4519b7d16e0b3ffe182acf224940846` |
+| Copied on | `2026-10-26` |
 
 Refresh only after a complete backend change is committed and pushed.
 
-This source includes P1 card-payment configuration and backend B-38D scheduled
-vehicle types. Backend commits `ca5d892` and `6b42887` are included. The copied
-blob was verified byte-for-byte against backend `origin/main`.
+This source includes the P3 public payment environment and card-availability
+fields, P1 card-payment configuration, B-38D scheduled vehicle types, and B-41.
+The copied blob was verified byte-for-byte against backend `origin/main`.
