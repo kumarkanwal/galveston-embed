@@ -1,4 +1,5 @@
 import type {
+  PaymentMethod,
   TaxiBookingRequest,
   TaxiPriceBreakdownRequest,
 } from "../../api/client";
@@ -11,11 +12,12 @@ export function buildBreakdownRequest(
   vehicleTypeId: string,
   carSeats: number,
   promoCode: string | null = null,
+  paymentMethod: PaymentMethod = "cash",
 ): TaxiPriceBreakdownRequest {
   return {
     ...buildQuoteRequest(form),
     vehicle_type_id: vehicleTypeId,
-    payment_method: "cash",
+    payment_method: paymentMethod,
     car_seats: carSeats,
     ...(promoCode === null ? {} : { promo_code: promoCode }),
   };
@@ -27,6 +29,7 @@ export function buildBookingRequest(
   carSeats: number,
   form: ConfirmFormState,
   promoCode: string | null = null,
+  paymentMethod: PaymentMethod = "cash",
 ): TaxiBookingRequest {
   const { payment_method: _paymentMethod, ...journey } = buildQuoteRequest(trip);
   return {
@@ -40,7 +43,7 @@ export function buildBookingRequest(
       phone: form.phone.trim() || null,
     },
     comments: form.comments.trim() || null,
-    payment: { method: "cash" },
+    payment: { method: paymentMethod },
     accepted_terms: form.acceptedTerms,
     ...(promoCode === null ? {} : { promo_code: promoCode }),
   };

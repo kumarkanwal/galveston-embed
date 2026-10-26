@@ -14,6 +14,7 @@ interface ConfirmFormProps {
   isSubmitting: boolean;
   onChange: () => void;
   onValid: Parameters<typeof useConfirmForm>[2];
+  submissionReady?: boolean;
   terms: string | null | undefined;
   extraFields?: ComponentChildren;
 }
@@ -48,7 +49,8 @@ export function ConfirmForm(props: ConfirmFormProps) {
       onChange={(value) => state.update("acceptedTerms", value)} />
     <FieldError id="breakdown-error" message={errors.breakdown} />
     {props.failure?.field === null && <FormError>{props.failure.message}</FormError>}
-    <button class="create-trip" type="submit" disabled={props.isSubmitting}>
+    <button class="create-trip" type="submit"
+      disabled={props.isSubmitting || props.submissionReady === false}>
       {props.isSubmitting ? "Submitting…" : `${props.buttonLabel} ›`}
     </button>
   </form>;

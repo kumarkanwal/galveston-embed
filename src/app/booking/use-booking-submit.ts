@@ -1,6 +1,6 @@
 import { useRef, useState } from "preact/hooks";
 
-import type { ApiClient, TaxiBookingResponse } from "../../api/client";
+import type { ApiClient, PaymentMethod, TaxiBookingResponse } from "../../api/client";
 import { ApiError, UnauthorizedError } from "../../api/errors";
 import { IdempotencyKeyManager } from "../../api/idempotency";
 import type { TripFormState } from "../trip/types";
@@ -13,6 +13,7 @@ interface BookingSubmitOptions {
   client: ApiClient;
   onSuccess: (response: TaxiBookingResponse) => void;
   onVehicleUnavailable: (message: string) => void;
+  paymentMethod: PaymentMethod;
   promoCode: string | null;
   trip: TripFormState;
   vehicleTypeId: string;
@@ -30,6 +31,7 @@ export function useBookingSubmit(options: BookingSubmitOptions) {
     inFlight.current = true;
     const body = buildBookingRequest(
       options.trip, options.vehicleTypeId, options.carSeats, form, options.promoCode,
+      options.paymentMethod,
     );
     setFailure(null);
     setIsSubmitting(true);

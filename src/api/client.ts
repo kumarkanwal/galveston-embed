@@ -5,6 +5,8 @@ import { validateAirlines, validateAirports } from "./airport-data";
 import { ApiError, NetworkError, parseApiError, RequestTimeoutError } from "./errors";
 
 export type Business = components["schemas"]["BusinessPublic"];
+export type BusinessPayments = components["schemas"]["BusinessPaymentsPublic"];
+export type PaymentMethod = Extract<components["schemas"]["PaymentMethod"], "cash" | "online">;
 export type ServiceTypeOption = components["schemas"]["ServiceTypeOption"];
 export type Airport = components["schemas"]["AirportOption"];
 export type Airline = components["schemas"]["AirlineOption"];
