@@ -90,7 +90,9 @@ describe("shuttle departures", () => {
     expect(element.textContent).toContain(reason);
     expect(element.querySelector<HTMLButtonElement>(".shuttle-departure button")?.disabled).toBe(true);
   });
+});
 
+describe("on-request shuttle departures", () => {
   it("shows the API vehicle type name for an on-request route", () => {
     const result = { ...SEARCH_RESULT, departures: [], on_request: {
       departure_type: "on_request" as const,

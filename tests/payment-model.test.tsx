@@ -9,6 +9,7 @@ import type {
   PaymentMethod,
   TaxiPriceBreakdownResponse,
 } from "../src/api/client";
+import { IdempotencyKeyManager, stableSerialize } from "../src/api/idempotency";
 import { buildBookingRequest, buildBreakdownRequest } from "../src/app/confirm/build-requests";
 import { cardPaymentSettings } from "../src/app/confirm/payment";
 import { PaymentMethodField } from "../src/app/confirm/PaymentMethodField";
@@ -125,5 +126,18 @@ describe("payment request models", () => {
     expect(buildShuttleQuote(SELECTION, null, "online").payment_method).toBe("online");
     expect(buildShuttleBooking(SELECTION, CONTACT, "", null, "online").payment)
       .toEqual({ method: "online" });
+  });
+
+  it("changes the idempotency key when Cash or Card changes", async () => {
+    let next = 0;
+    const manager = new IdempotencyKeyManager(
+      () => `key-${++next}`,
+      null,
+      async (body) => stableSerialize(body),
+    );
+    const cash = buildBookingRequest(TRIP, "vehicle-1", 0, CONTACT, null, "cash");
+    const online = buildBookingRequest(TRIP, "vehicle-1", 0, CONTACT, null, "online");
+    const cashKey = await manager.getKey(cash);
+    await expect(manager.getKey(online)).resolves.not.toBe(cashKey);
   });
 });

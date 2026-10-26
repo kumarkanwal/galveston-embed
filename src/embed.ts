@@ -1,6 +1,7 @@
 import { h, render } from "preact";
 
 import { App } from "./app/shell/App";
+import { SQUARE_CARD_CONTAINER_ID, SQUARE_CARD_SLOT } from "./app/confirm/square-sdk";
 import { createApiClient, type ApiClient } from "./api/client";
 import confirmStyles from "./styles/confirm.css?inline";
 import vehicleStyles from "./styles/vehicle.css?inline";
@@ -38,6 +39,16 @@ function reportMountError(): void {
   console.error("Galveston booking widget could not mount.");
 }
 
+function appendSquareCardContainer(
+  documentRoot: Document,
+  mountElement: HTMLElement,
+): void {
+  const container = documentRoot.createElement("div");
+  container.id = SQUARE_CARD_CONTAINER_ID;
+  container.slot = SQUARE_CARD_SLOT;
+  mountElement.append(container);
+}
+
 export function mountBookingWidget(
   config: EmbedConfig,
   documentRoot: Document = document,
@@ -52,6 +63,7 @@ export function mountBookingWidget(
     if (mountElement.shadowRoot !== null) return;
 
     const shadowRoot = mountElement.attachShadow({ mode: "open" });
+    appendSquareCardContainer(documentRoot, mountElement);
     const style = documentRoot.createElement("style");
     const appRoot = documentRoot.createElement("div");
     style.textContent = `${widgetStyles}\n${vehicleStyles}\n${confirmStyles}\n${shuttleStyles}`;

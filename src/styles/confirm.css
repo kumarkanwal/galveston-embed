@@ -220,6 +220,32 @@
   width: 18px;
 }
 
+.square-card-field {
+  margin: 12px 0;
+}
+
+.square-card-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.square-card-frame {
+  min-height: 44px;
+}
+
+::slotted([slot="galveston-square-card"]) {
+  min-height: 44px;
+  width: 100%;
+}
+
+.square-card-status {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 4px 0 0;
+}
+
 .terms-field {
   margin: 12px 0;
 }

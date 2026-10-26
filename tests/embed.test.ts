@@ -3,6 +3,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ApiClient, Business, ServiceTypeOption } from "../src/api/client";
 import { NetworkError, UnauthorizedError } from "../src/api/errors";
 import { captureScriptConfig, mountBookingWidget } from "../src/embed";
+import {
+  SQUARE_CARD_CONTAINER_ID,
+  SQUARE_CARD_SLOT,
+} from "../src/app/confirm/square-sdk";
 
 const BUSINESS: Business = {
   id: "11111111-1111-1111-1111-111111111111",
@@ -73,6 +77,10 @@ describe("embed loader", () => {
     expect(mount.shadowRoot).not.toBeNull();
     expect(factory).toHaveBeenCalledOnce();
     expect(document.head.querySelector("style")).toBeNull();
+    const cardContainer = mount.querySelector<HTMLElement>(`#${SQUARE_CARD_CONTAINER_ID}`);
+    expect(cardContainer?.slot).toBe(SQUARE_CARD_SLOT);
+    expect(cardContainer?.childNodes).toHaveLength(0);
+    expect(mount.querySelectorAll(`#${SQUARE_CARD_CONTAINER_ID}`)).toHaveLength(1);
   });
 
   it("does not log the business key when mounting fails", () => {

@@ -6,6 +6,7 @@ import {
   UnauthorizedError,
 } from "../../api/errors";
 import type { ConfirmField } from "../confirm/types";
+import { CardTokenizationError } from "../confirm/square-sdk";
 
 export interface BookingFailure {
   field: ConfirmField | null;
@@ -31,6 +32,10 @@ const FIELD_MAP: Record<string, ConfirmField> = {
 };
 
 function apiFailure(error: ApiError): BookingFailure {
+  if (error.status === 402 || error.code === "PAYMENT_FAILED") {
+    return { field: null,
+      message: "Your card could not be processed. Check the details or try another card." };
+  }
   if (error.status >= 500 && error.status !== 503) {
     return { field: null, message: UNKNOWN_OUTCOME };
   }
@@ -41,6 +46,9 @@ function apiFailure(error: ApiError): BookingFailure {
 }
 
 export function bookingFailure(error: unknown): BookingFailure {
+  if (error instanceof CardTokenizationError) {
+    return { field: null, message: error.message };
+  }
   if (error instanceof UnauthorizedError) {
     return { field: null, message: "This booking form is not configured." };
   }

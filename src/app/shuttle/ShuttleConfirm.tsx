@@ -12,11 +12,13 @@ import { IdempotencyKeyManager } from "../../api/idempotency";
 import { formatMoney } from "../../money";
 import { bookingFailure, type BookingFailure } from "../booking/booking-error";
 import { ConfirmForm } from "../confirm/ConfirmForm";
-import { cardPaymentSettings } from "../confirm/payment";
+import { cardPaymentSettings, withPaymentToken } from "../confirm/payment";
 import { PaymentMethodField } from "../confirm/PaymentMethodField";
 import { PromoCodeField } from "../confirm/PromoCodeField";
 import type { PromoCodeState } from "../confirm/use-price-breakdown";
 import type { ConfirmFormState } from "../confirm/types";
+import { SquareCardField } from "../confirm/SquareCardField";
+import { useSquareCard } from "../confirm/use-square-card";
 import { FieldError, FormError } from "../trip/FieldError";
 import { ProgressSteps } from "../trip/ProgressSteps";
 import { buildShuttleBooking, buildShuttleQuote } from "./requests";
@@ -28,7 +30,7 @@ interface ShuttleConfirmProps {
   quote: ShuttleQuoteResponse;
   selection: ShuttleSelection;
   onBack: () => void;
-  onBooked: (response: ShuttleBookingResponse) => void;
+  onBooked: (response: ShuttleBookingResponse, paymentMethod: PaymentMethod) => void;
   onUnavailable: (message: string) => void;
 }
 
@@ -142,6 +144,8 @@ function useShuttlePromo(props: ShuttleConfirmProps, paymentMethod: PaymentMetho
 function useShuttleConfirm(props: ShuttleConfirmProps) {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
   const pricing = useShuttlePromo(props, paymentMethod);
+  const paymentSettings = cardPaymentSettings(props.business);
+  const card = useSquareCard(paymentMethod === "online", paymentSettings);
   const [failure, setFailure] = useState<BookingFailure | null>(null);
   const [address, setAddress] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -154,12 +158,15 @@ function useShuttleConfirm(props: ShuttleConfirmProps) {
       setFailure({ field: "address", message: "Enter the street address for this trip." }); return;
     }
     inFlight.current = true; setFailure(null); setSubmitting(true);
-    const body = buildShuttleBooking(
+    const cart = buildShuttleBooking(
       props.selection, form, address, pricing.promo.appliedCode, paymentMethod,
     );
     try {
-      const key = await manager.current.getKey(body);
-      props.onBooked(await props.client.bookShuttle(body, key));
+      const key = await manager.current.getKey(cart);
+      const body = paymentMethod === "online"
+        ? withPaymentToken(cart, await card.tokenize())
+        : cart;
+      props.onBooked(await props.client.bookShuttle(body, key), paymentMethod);
     } catch (error: unknown) {
       if (error instanceof UnauthorizedError) {
         console.error("Galveston booking widget configuration was rejected.");
@@ -169,8 +176,8 @@ function useShuttleConfirm(props: ShuttleConfirmProps) {
       else setFailure(bookingFailure(error));
     } finally { inFlight.current = false; setSubmitting(false); }
   };
-  return { address, failure, paymentMethod, setAddress, setFailure, setPaymentMethod,
-    submit, submitting, ...pricing };
+  return { address, card, failure, paymentMethod, setAddress, setFailure,
+    setPaymentMethod, submit, submitting, ...pricing };
 }
 
 export function ShuttleConfirm(props: ShuttleConfirmProps) {
@@ -193,13 +200,15 @@ export function ShuttleConfirm(props: ShuttleConfirmProps) {
     </div><ConfirmForm breakdownReady={view.quoteError === null && !view.busy}
       buttonLabel="Create Trip"
       failure={formFailure} isSubmitting={view.submitting} onChange={() => view.setFailure(null)}
-      submissionReady={view.paymentMethod === "cash"}
+      submissionReady={view.paymentMethod === "cash" || view.card.ready}
       onValid={(form) => { void view.submit(form); }} terms={props.business.settings.terms_and_conditions}
       extraFields={<>
         <AddressField required={addressRequired} value={view.address}
           error={addressError} onInput={(value) => { view.setAddress(value); view.setFailure(null); }} />
         <PaymentMethodField cardAvailable={cardAvailable} method={view.paymentMethod}
           onChange={(method) => { view.setFailure(null); view.setPaymentMethod(method); }} />
+        {cardAvailable && view.paymentMethod === "online"
+          && <SquareCardField state={view.card.state} />}
       </>} />
     </div>
   </section>;

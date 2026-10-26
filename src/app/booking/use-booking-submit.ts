@@ -5,17 +5,19 @@ import { ApiError, UnauthorizedError } from "../../api/errors";
 import { IdempotencyKeyManager } from "../../api/idempotency";
 import type { TripFormState } from "../trip/types";
 import { buildBookingRequest } from "../confirm/build-requests";
+import { withPaymentToken } from "../confirm/payment";
 import type { ConfirmFormState } from "../confirm/types";
 import { bookingFailure, type BookingFailure } from "./booking-error";
 
 interface BookingSubmitOptions {
   carSeats: number;
   client: ApiClient;
-  onSuccess: (response: TaxiBookingResponse) => void;
+  onSuccess: (response: TaxiBookingResponse, paymentMethod: PaymentMethod) => void;
   onVehicleUnavailable: (message: string) => void;
   paymentMethod: PaymentMethod;
   promoCode: string | null;
   trip: TripFormState;
+  tokenizeCard: () => Promise<string>;
   vehicleTypeId: string;
 }
 
@@ -29,15 +31,18 @@ export function useBookingSubmit(options: BookingSubmitOptions) {
   const submit = async (form: ConfirmFormState) => {
     if (inFlight.current) return;
     inFlight.current = true;
-    const body = buildBookingRequest(
+    const cart = buildBookingRequest(
       options.trip, options.vehicleTypeId, options.carSeats, form, options.promoCode,
       options.paymentMethod,
     );
     setFailure(null);
     setIsSubmitting(true);
     try {
-      const key = await manager.current.getKey(body);
-      options.onSuccess(await options.client.book(body, key));
+      const key = await manager.current.getKey(cart);
+      const body = options.paymentMethod === "online"
+        ? withPaymentToken(cart, await options.tokenizeCard())
+        : cart;
+      options.onSuccess(await options.client.book(body, key), options.paymentMethod);
     } catch (error: unknown) {
       if (error instanceof UnauthorizedError && !unauthorizedLogged.current) {
         unauthorizedLogged.current = true;

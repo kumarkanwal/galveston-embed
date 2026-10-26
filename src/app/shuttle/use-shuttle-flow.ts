@@ -5,6 +5,7 @@ import type {
   Business,
   LocationGroup,
   LocationOption,
+  PaymentMethod,
   ShuttleBookingResponse,
   ShuttleQuoteResponse,
   ShuttleSearchResult,
@@ -24,7 +25,7 @@ import { hasShuttleTripErrors, validateShuttleTrip } from "./validation";
 type ShuttleStep = "trip" | "outbound" | "return" | "confirm" | "done";
 
 interface ShuttleFlowState {
-  confirmation: ShuttleBookingResponse | null;
+  confirmation: { paymentMethod: PaymentMethod; response: ShuttleBookingResponse } | null;
   destinationGroups: LocationGroup[];
   errors: ShuttleTripErrors;
   form: ShuttleTripForm;
@@ -214,8 +215,11 @@ export function useShuttleFlow(client: ShuttleApiClient, business: Business) {
     step: current.step === "confirm" ? (current.form.roundTrip ? "return" : "outbound")
       : current.step === "return" ? "outbound" : "trip" }));
   const selection = selectedTrip(state, state.returnLeg);
-  const complete = (confirmation: ShuttleBookingResponse) => setState((current) => (
-    { ...current, confirmation, step: "done" }));
+  const complete = (
+    response: ShuttleBookingResponse,
+    paymentMethod: PaymentMethod = "cash",
+  ) => setState((current) => (
+    { ...current, confirmation: { paymentMethod, response }, step: "done" }));
   return { back, chooseOutbound: (leg: SelectedShuttleLeg) => chooseOutbound(context, leg),
     chooseReturn: (leg: SelectedShuttleLeg) => chooseReturn(context, leg), complete, selection, state,
     submitTrip: (event: SubmitEvent) => submitTrip(context, event),

@@ -127,6 +127,25 @@ describe("shuttle confirmation pricing", () => {
   });
 });
 
+describe("shuttle payment pricing race", () => {
+  it("keeps the latest method when an older quote finishes last", async () => {
+    const resolvers: Array<(quote: ShuttleQuoteResponse) => void> = [];
+    const quote = vi.fn(() => new Promise<ShuttleQuoteResponse>((resolve) => {
+      resolvers.push(resolve);
+    }));
+    const { root } = mount(clientWith(quote), vi.fn(), CARD_BUSINESS);
+    act(() => root.querySelector<HTMLInputElement>('input[value="online"]')?.click());
+    await vi.waitFor(() => expect(quote).toHaveBeenCalledOnce());
+    act(() => root.querySelector<HTMLInputElement>('input[value="cash"]')?.click());
+    await vi.waitFor(() => expect(quote).toHaveBeenCalledTimes(2));
+    resolvers[1]?.({ ...SHUTTLE_QUOTE, total: "69.00" });
+    await vi.waitFor(() => expect(root.textContent).toContain("$69.00 USD"));
+    resolvers[0]?.({ ...SHUTTLE_QUOTE, total: "99.00" });
+    await Promise.resolve();
+    expect(root.textContent).not.toContain("$99.00 USD");
+  });
+});
+
 describe("shuttle availability errors", () => {
   it.each([
     [409, "SEATS_UNAVAILABLE", "Those seats were just booked."],
