@@ -130,7 +130,7 @@ describe("booking submission", () => {
     expect(book.mock.calls[0]?.[0]).not.toHaveProperty("luggage");
     expect(book.mock.calls[0]?.[1]).toMatch(/^[0-9a-f-]{36}$/u);
     resolve?.(BOOKED);
-    await vi.waitFor(() => expect(onBooked).toHaveBeenCalledWith(BOOKED, false));
+    await vi.waitFor(() => expect(onBooked).toHaveBeenCalledWith(BOOKED, false, "cash"));
   });
   it("sends once when Enter submission and click happen together", async () => {
     let resolve: ((value: TaxiBookingResponse) => void) | undefined;
@@ -278,7 +278,7 @@ describe("request quote booking", () => {
     await vi.waitFor(() => expect(book).toHaveBeenCalledOnce());
     expect(book.mock.calls[0]?.[0]).toMatchObject({ car_seats: 2 });
     await vi.waitFor(() => expect(onBooked).toHaveBeenCalledWith(
-      expect.objectContaining({ status: "requested", total: "0.00" }), true,
+      expect.objectContaining({ status: "requested", total: "0.00" }), true, "cash",
     ));
   });
 });

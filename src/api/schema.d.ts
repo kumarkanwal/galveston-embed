@@ -1033,7 +1033,8 @@ export interface paths {
         };
         /**
          * My Reservation History
-         * @description Return past runs assigned to the calling driver.
+         * @deprecated
+         * @description Deprecated alias for completed reservations.
          */
         get: operations["my_reservation_history_v1_admin_my_history_get"];
         put?: never;
@@ -1058,6 +1059,86 @@ export interface paths {
         get: operations["my_upcoming_reservations_v1_admin_my_reservations_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/my/reservations/completed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Completed Reservations
+         * @description Return completed runs assigned to the calling driver.
+         */
+        get: operations["my_completed_reservations_v1_admin_my_reservations_completed_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/my/reservations/upcoming": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Explicit Upcoming Reservations
+         * @description Return dispatchable future runs assigned to the calling driver.
+         */
+        get: operations["my_explicit_upcoming_reservations_v1_admin_my_reservations_upcoming_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/my/reservations/{booking_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Reservation Detail
+         * @description Return one assigned run without money or free-text notes.
+         */
+        get: operations["my_reservation_detail_v1_admin_my_reservations__booking_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/my/reservations/{booking_id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Complete My Reservation
+         * @description Mark the calling driver's assigned trip completed without customer email.
+         */
+        post: operations["complete_my_reservation_v1_admin_my_reservations__booking_id__complete_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1642,6 +1723,26 @@ export interface paths {
          * @description Queue one SMS for the assigned driver.
          */
         post: operations["queue_dispatch_sms_v1_admin_reservations__booking_id__dispatch_sms_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reservations/{booking_id}/driver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Assign Reservation Driver
+         * @description Assign or unassign a driver without changing the existing vehicle.
+         */
+        put: operations["assign_reservation_driver_v1_admin_reservations__booking_id__driver_put"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3867,6 +3968,13 @@ export interface components {
          * @description Publishable Square identifiers required by the browser SDK.
          */
         BusinessPaymentsPublic: {
+            /** Card Available */
+            card_available: boolean;
+            /**
+             * Environment
+             * @enum {string}
+             */
+            environment: "sandbox" | "production";
             /** Square Application Id */
             square_application_id: string;
             /** Square Location Id */
@@ -5523,6 +5631,14 @@ export interface components {
          */
         DiscountType: "percent" | "amount" | "none";
         /**
+         * DriverAssignmentRequest
+         * @description Assign or clear only the driver while retaining the booking vehicle.
+         */
+        DriverAssignmentRequest: {
+            /** Driver Id */
+            driver_id: string | null;
+        };
+        /**
          * DriverRunRow
          * @description Driver-safe run details; internal additional notes are intentionally absent.
          */
@@ -5541,8 +5657,6 @@ export interface components {
             /** Business Name */
             business_name: string;
             business_type: components["schemas"]["BusinessType"];
-            /** Driver Notes */
-            driver_notes: string | null;
             /** Dropoff Address */
             dropoff_address: string | null;
             /** Dropoff Time */
@@ -5566,14 +5680,12 @@ export interface components {
             pickup_date: string;
             /** Pickup Time */
             pickup_time: string | null;
-            /** Run Notes */
-            run_notes: string | null;
             status: components["schemas"]["BookingStatus"];
             vehicle: components["schemas"]["AssignmentSummary"];
         };
         /**
          * DriverTripSheet
-         * @description Driver-safe sheet with no free-text notes that could leak a phone.
+         * @description Driver-safe sheet without free-text notes or financial data.
          */
         DriverTripSheet: {
             /**
@@ -5582,7 +5694,6 @@ export interface components {
              */
             booking_id: string;
             business: components["schemas"]["TripSheetBusiness"];
-            charges_summary: components["schemas"]["TripSheetCharges"];
             driver: components["schemas"]["TripSheetDriver"];
             dropoff: components["schemas"]["TripSheetDropoff"];
             /**
@@ -5953,6 +6064,10 @@ export interface components {
         /** Envelope[DepartureTemplatesResult] */
         Envelope_DepartureTemplatesResult_: {
             data: components["schemas"]["DepartureTemplatesResult"];
+        };
+        /** Envelope[DriverRunRow] */
+        Envelope_DriverRunRow_: {
+            data: components["schemas"]["DriverRunRow"];
         };
         /** Envelope[DriverTripSheet] */
         Envelope_DriverTripSheet_: {
@@ -7698,7 +7813,7 @@ export interface components {
          * @description A capability an endpoint can require.
          * @enum {string}
          */
-        Permission: "booking:read" | "booking:write" | "booking:assign" | "booking:status" | "communication:send" | "customer:read" | "customer:write" | "customer:manage" | "pricing:read" | "pricing:write" | "vehicle_rate:write" | "vehicle_type_catalog:write" | "service_type_assignment:write" | "service_type_catalog:write" | "taxi_catalog:manage" | "platform_catalog:manage" | "payment:read" | "payment:write" | "payment_settings:read" | "payment_settings:write" | "email:read" | "audit:read" | "config:read" | "config:write" | "zone_price:import" | "company:read" | "company:write" | "company_identity:write" | "business_settings:read" | "business_settings:write" | "team:read" | "team:write" | "settings:read" | "settings:write" | "integration:read" | "api_keys:read" | "api_keys:write" | "report:read" | "own_runs:read";
+        Permission: "booking:read" | "booking:write" | "booking:assign" | "booking:status" | "communication:send" | "customer:read" | "customer:write" | "customer:manage" | "pricing:read" | "pricing:write" | "vehicle_rate:write" | "vehicle_type_catalog:write" | "service_type_assignment:write" | "service_type_catalog:write" | "taxi_catalog:manage" | "platform_catalog:manage" | "payment:read" | "payment:write" | "payment_settings:read" | "payment_settings:write" | "email:read" | "audit:read" | "config:read" | "config:write" | "zone_price:import" | "company:read" | "company:write" | "company_identity:write" | "business_settings:read" | "business_settings:write" | "team:read" | "team:manage" | "team:write" | "settings:read" | "settings:write" | "integration:read" | "api_keys:read" | "api_keys:write" | "report:read" | "own_runs:read";
         /**
          * PreferencesSettingsUpdate
          * @description Taxi booking choices controlled by the selected business.
@@ -13771,6 +13886,158 @@ export interface operations {
             };
         };
     };
+    my_completed_reservations_v1_admin_my_reservations_completed_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+                /** @description 1-based page number. */
+                page?: number;
+                /** @description Items per page. */
+                per_page?: number;
+                /** @description Sort column, prefix with - for descending. */
+                sort?: string | null;
+                /** @description Free-text search term. */
+                search?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListEnvelope_DriverRunRow_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_explicit_upcoming_reservations_v1_admin_my_reservations_upcoming_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+                /** @description 1-based page number. */
+                page?: number;
+                /** @description Items per page. */
+                per_page?: number;
+                /** @description Sort column, prefix with - for descending. */
+                sort?: string | null;
+                /** @description Free-text search term. */
+                search?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListEnvelope_DriverRunRow_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_reservation_detail_v1_admin_my_reservations__booking_id__get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_DriverRunRow_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    complete_my_reservation_v1_admin_my_reservations__booking_id__complete_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_StatusResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     my_reservation_trip_sheet_v1_admin_my_reservations__booking_id__trip_sheet_get: {
         parameters: {
             query?: {
@@ -15347,6 +15614,45 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_QueuedSmsResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assign_reservation_driver_v1_admin_reservations__booking_id__driver_put: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DriverAssignmentRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AssignmentResult_"];
                 };
             };
             /** @description Validation Error */

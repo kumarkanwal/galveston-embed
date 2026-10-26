@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 
-import type { ApiClient, TaxiPriceBreakdownResponse } from "../../api/client";
+import type { ApiClient, PaymentMethod, TaxiPriceBreakdownResponse } from "../../api/client";
 import type { TripFormState } from "../trip/types";
 import { breakdownFailure } from "./breakdown-error";
 import { buildBreakdownRequest } from "./build-requests";
@@ -33,6 +33,7 @@ interface PricingInput {
   carSeats: number;
   client: ApiClient;
   form: TripFormState;
+  paymentMethod: PaymentMethod;
   vehicleTypeId: string;
 }
 
@@ -45,7 +46,7 @@ interface PricingRuntime {
 
 function price(input: PricingInput, promoCode: string | null) {
   return input.client.priceBreakdown(buildBreakdownRequest(
-    input.form, input.vehicleTypeId, input.carSeats, promoCode,
+    input.form, input.vehicleTypeId, input.carSeats, promoCode, input.paymentMethod,
   ));
 }
 
@@ -79,7 +80,7 @@ function useAutomaticPrice(input: PricingInput, enabled: boolean, runtime: Prici
         runtime.setPromo((current) => ({ ...current, error: failure.message }));
       }
     });
-  }, [input.carSeats, input.client, enabled, input.form, input.vehicleTypeId]);
+  }, [input.carSeats, input.client, enabled, input.form, input.paymentMethod, input.vehicleTypeId]);
 }
 
 async function applyPromoCode(
@@ -140,6 +141,7 @@ export function usePriceBreakdown(
   vehicleTypeId: string,
   carSeats: number,
   enabled = true,
+  paymentMethod: PaymentMethod = "cash",
 ): PriceBreakdownController {
   const [state, setState] = useState<BreakdownState>(
     enabled ? { status: "loading" } : { status: "skipped" },
@@ -151,7 +153,7 @@ export function usePriceBreakdown(
     setPromo,
     setState,
   };
-  const input = { carSeats, client, form, vehicleTypeId };
+  const input = { carSeats, client, form, paymentMethod, vehicleTypeId };
   useAutomaticPrice(input, enabled, runtime);
   const setPromoInput = (value: string) => {
     if (promo.status === "idle") {

@@ -28,6 +28,22 @@ pnpm check
 
 The dev harness is at `http://127.0.0.1:5173/dev/`. A production build creates only `dist/embed.js` and `dist/embed.js.map`.
 
+## Card-payment Content Security Policy
+
+Card-ready companies load Square's Web Payments SDK only after the customer
+selects Card. A client site that sets Content Security Policy headers must merge
+Square's current directives into its policy; the widget never changes host-page
+headers or `<meta>` tags.
+
+For Sandbox, allow `https://sandbox.web.squarecdn.com` in `script-src`,
+`frame-src`, and `style-src`, and `https://pci-connect.squareupsandbox.com` in
+`connect-src`. For Production, use `https://web.squarecdn.com` in `script-src`,
+`frame-src`, and `style-src`, and `https://pci-connect.squareup.com` in
+`connect-src`. Square also documents `https://o160250.ingest.sentry.io` for
+`connect-src` and `https://square-fonts-production-f.squarecdn.com` plus
+`https://d1g145x70srn7h.cloudfront.net` for `font-src`. Keep the rest of the
+site's existing policy. See Square's [Web Payments SDK CSP guide](https://developer.squareup.com/docs/web-payments/content-security-policy).
+
 ## Refreshing API files
 
 Refresh the contract only at a backend commit supplied by the project owner, after that commit has been pushed:

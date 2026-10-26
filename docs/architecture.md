@@ -22,6 +22,7 @@ Client website (any CMS)
 - **embed.js is a static file hosted on our VPS.** It holds no secrets.
 - **The business key is in the script tag and is public by design** (decision ED-002). It grants only the public booking endpoints.
 - **Google Maps** (Places autocomplete and the route map) loads in the browser with a **browser key**, restricted by HTTP referrer. It is separate from the backend's server key.
+- **Square Web Payments SDK** loads only after a card-ready business selects Card. The public business response selects Square's sandbox or production script; no Square secret enters the browser.
 
 ## 2. Stack
 
@@ -68,6 +69,7 @@ galveston-embed/
 - Optional `data-api-base` overrides the API base URL (for staging). Default comes from the build-time `VITE_API_BASE`. No hardcoded URLs.
 - Mount into `#galveston-booking`. If it is missing, log one `console.error` and stop.
 - Create a Shadow DOM on the mount element; render everything inside it.
+- Add one empty `#galveston-square-card` light-DOM child inside the mount. A named Shadow DOM slot projects it only for Card, allowing Square to own its iframe while every widget-owned field and style stays isolated (ED-030).
 - If the script is included twice, mount once.
 
 ## 5. API layer (`src/api/`)
@@ -108,7 +110,14 @@ Taxi round trip is an allowed `service_type`; hourly remains deferred. Businesse
 may hide the service dropdown or map through public settings. Hidden service
 selection uses the first permitted non-round-trip service in API order, with a
 One way / Round trip switch when both paths are offered (ED-027).
-**Added beyond BRO (later):** card payment.
+**Added beyond BRO:** card payment.
+
+Card-ready businesses expose Cash / Card on confirmation. Selecting Card
+re-prices with `payment_method: "online"`; Cash uses `"cash"`. Square tokenizes
+only after a valid submit. The one-time token is added only to the booking POST
+and is excluded from the persisted cart fingerprint, so a retry gets a new
+token while reusing the unchanged cart's idempotency key. Cash-only and manual
+quote paths never load Square.
 
 ## 7. Environments
 

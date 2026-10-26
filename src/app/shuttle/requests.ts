@@ -1,4 +1,5 @@
 import type {
+  PaymentMethod,
   ShuttleBookingRequest,
   ShuttleQuoteLeg,
   ShuttleQuoteRequest,
@@ -68,13 +69,14 @@ export function buildShuttleLeg(
 export function buildShuttleQuote(
   selection: ShuttleSelection,
   promoCode: string | null,
+  paymentMethod: PaymentMethod = "cash",
 ): ShuttleQuoteRequest {
   const legs = [buildShuttleLeg(selection.outbound, selection.trip)];
   if (selection.returnLeg !== null) legs.push(buildShuttleLeg(selection.returnLeg, selection.trip));
   return {
     legs,
     insurance_selected: false,
-    payment_method: "cash",
+    payment_method: paymentMethod,
     ...(promoCode === null ? {} : { promo_code: promoCode }),
   };
 }
@@ -84,8 +86,9 @@ export function buildShuttleBooking(
   form: ConfirmFormState,
   address: string,
   promoCode: string | null,
+  paymentMethod: PaymentMethod = "cash",
 ): ShuttleBookingRequest {
-  const quote = buildShuttleQuote(selection, promoCode);
+  const quote = buildShuttleQuote(selection, promoCode, paymentMethod);
   return {
     legs: quote.legs,
     insurance_selected: false,
@@ -95,7 +98,7 @@ export function buildShuttleBooking(
     },
     comments: form.comments.trim() || null,
     address: address.trim() || null,
-    payment: { method: "cash" },
+    payment: { method: paymentMethod },
     accepted_terms: form.acceptedTerms,
     ...(promoCode === null ? {} : { promo_code: promoCode }),
   };

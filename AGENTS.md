@@ -33,12 +33,12 @@ Breaking any of these is a bug, even if tests pass.
 3. **Never invent API shapes.** Types come only from `src/api/openapi.json` via openapi-typescript. If the widget needs a field that is not there, **stop and report it as a backend gap**. Never hardcode, fake or compute it — unless the phase spec explicitly allows a marked temporary constant.
 4. **Request bodies reject unknown fields with 400.** Send only schema fields.
 5. **Never retry a POST automatically.** Booking sends an `Idempotency-Key` that stays the same for the same cart and changes only when the cart changes.
-6. **Payment method is `"cash"` only** until the card-payment phase. (ED-006)
+6. **Payment capability comes only from `GET /v1/public/business`.** Cash-only and Request a Quote paths send `"cash"`. Offer Card and send `"online"` only when `payments.card_available` is true; select Square's SDK only from `payments.environment`. (ED-030)
 7. **Mode comes only from `GET /v1/public/business`.** Taxi businesses show only `one_way`, `round_trip`, `airport_pickup`, and `airport_dropoff` and still ignore `hourly`; shuttle businesses use only `/v1/public/shuttle/*`. Never mix the two endpoint families. (ED-016, ED-027, ED-029)
 8. **Names are display text.** Never read a capacity, limit or rule from a vehicle or service name.
 9. **Request a Quote vehicles skip price-breakdown** and go straight to booking. (ED-009)
 10. **Zipcodes come from Google Places `address_components`**, never from parsing typed text. (ED-010)
-11. **All UI and CSS live inside a Shadow DOM.** No global styles, no writes to the host page outside our mount element — except loading the Google Maps script once (ED-017). (ED-008)
+11. **All widget-owned UI and CSS live inside a Shadow DOM.** The only scoped exceptions are loading the Google Maps script once (ED-017), and, for an explicitly card-ready business, loading Square's environment-specific script once plus projecting one empty light-DOM card container inside `#galveston-booking` through a named slot for Square's managed iframe (ED-030). No other host-page writes. (ED-008)
 12. **Never throw into the host page.** Catch at the mount boundary; log one `console.error`.
 13. **Output is one file:** `dist/embed.js`. No code splitting, no extra CSS file.
 14. **Nothing from `dev/` ships.** A test fails if `dist/` contains anything except `embed.js` and its sourcemap.

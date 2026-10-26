@@ -52,6 +52,7 @@ function BookingFlowReady(props: Omit<BookingFlowProps, "services"> & {
   if (flow.state.confirmation !== null) {
     return <Confirmation autoFocusHeading={autoFocusHeading} currency={props.business.currency}
       requestQuote={flow.state.confirmation.requestQuote}
+      paymentMethod={flow.state.confirmation.paymentMethod}
       response={flow.state.confirmation.response} />;
   }
   if (flow.state.step === 2 && flow.state.quote !== null) {

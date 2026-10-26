@@ -1,6 +1,6 @@
 # Booking Widget (Embed) — Tracker
 
-**Repo:** `galveston-embed` (new, separate) · **Last updated:** 24 October 2026
+**Repo:** `galveston-embed` (new, separate) · **Last updated:** 26 October 2026
 **Talks to:** the hosted `galveston-backend` API on the VPS.
 **Replaces:** the client's live Book Rides Online (BRO) booking form.
 
@@ -38,7 +38,7 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 
 ## Progress
 
-**Overall: 78%** ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░ · **"Built" means 100%, add-ons included.**
+**Overall: 87%** ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░ · **"Built" means 100%, add-ons included.**
 
 | # | Phase | Side | Weight | Status | Done |
 |---|---|---|---|---|---|
@@ -51,14 +51,14 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 6 | E-4 Step 3 — Confirm & breakdown | Widget | 9% | ✅ Complete — ready for review | 9% |
 | 7 | E-5 Create Trip, confirmation, errors | Widget + Admin | 9% | ✅ Complete — merged and verified live | 9% |
 | 8 | E-6 Mobile, side-by-side with BRO, hosting | Both | 12% | 🔄 E-6e exact airport pin complete; BRO/hosting pending | 4% |
-| 9 | E-7 Card payment (Square) | Both | 9% | ⛔ B-16 | 0% |
+| 9 | E-7 Card payment (Square) | Both | 9% | ✅ Complete — ready for review | 9% |
 | 10 | E-7a Promo codes | Both | 4% | ✅ Complete — ready for review | 4% |
 | 11 | E-8 Taxi round trip, luggage counts, form toggles | Both | 5% | ✅ Complete — ready for review | 5% |
 | 12 | E-7b Taxi peak / blackout display | Both | 3% | ✅ Complete — ready for review | 3% |
 | 13 | E-9 Shuttle mode in the same widget | Both | — | ✅ Complete — ready for review | — |
 | 14 | E-9b Scheduled-departure car name | Both | — | ✅ Complete — ready for review | — |
 | 15 | E-11 Hourly (hours + Add Stops) | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
-| | **Total** | | **100%** | | **78%** |
+| | **Total** | | **100%** | | **87%** |
 
 Weights are estimates. E-9 and E-9b were added after the 100% weighting was
 agreed and must be rebaselined separately. Phase details and
@@ -71,7 +71,7 @@ dependencies: `AGENTS.md` section 3.
 | S-1 | New repo `galveston-embed` | ✅ | Separate from `galveston-widgets` (old cancelled plugin; leave untouched) |
 | S-2 | **VPS runs the latest backend**, including the pricing migration `f1a2b3c4d5e6` | ✅ | Pricing migration and B-20 are deployed on the preview VPS |
 | S-3 | D-1 (contract v1.2) and B-20 pushed to `origin` | ✅ | B-20 is included in backend commit `7e15a04` |
-| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ | Refreshed from backend commit `2b75d4dcc36e569dc2fc03e8d99221deb9f7b5ca` (including P1 and B-38D) |
+| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ | Refreshed from backend commit `771cb28ac4519b7d16e0b3ffe182acf224940846` (including P3 public payment capability and environment) |
 | S-5 | Demo company API key, named `embed` | ✅ Ready when needed | Runbook: `docs/runbooks/embed-keys.md` (backend) |
 | S-6 | Developer's local address (e.g. `http://localhost:5173`) added to `CORS_ORIGINS` on the VPS | ⛔ Not yet | Otherwise the browser cannot read API responses |
 | S-7 | **Google Maps browser key**, HTTP-referrer restricted to dev address now, client sites later | 🔍 Key available; enable Routes API and restrict it | Must be separate from the server key. Maps JavaScript API, Places API (New), and Routes API are required; never use the server key in the browser |
@@ -139,7 +139,7 @@ dependencies: `AGENTS.md` section 3.
 
 | # | Item | Status | Why later / what blocks it |
 |---|---|---|---|
-| A-1 | **Card payment** (new; BRO has none) | ⛔ | C-15 answered: one Square account, one location per company (ED-015). Still needs B-20 pushed, each company's Square location id, and B-16 sandbox test |
+| A-1 | **Card payment** (new; BRO has none) | ✅ | Public capability and environment fail closed. Card-ready taxi and shuttle confirmation re-price online, tokenize only on Book, and submit once with token-free idempotency fingerprints (ED-030). Live Square sandbox browser test remains **UNVERIFIED**. |
 | A-2 | Promo code | ✅ | E-7a uses B-30 price-breakdown and booking support on Distance and Flat Rate rows. Request-a-Quote vehicles keep ED-009 and do not show the control. |
 | A-3 | Taxi round trip | ✅ | E-8 uses the backend round-trip quote, breakdown and booking fields; return-gap and vehicle availability decisions remain server-owned. |
 | A-4 | Taxi peak / blackout display | ✅ | E-7b displays server peak lines, quote blackouts and booking-time unavailability. |
@@ -155,7 +155,7 @@ dependencies: `AGENTS.md` section 3.
 | Rule | Why |
 |---|---|
 | **Money is a string.** Never `parseFloat`, `Number()`, `toFixed()` or arithmetic on money | The server prices and re-prices everything. A browser-calculated total can only disagree with what is charged |
-| **Send only `"cash"` as payment method** in the core | Booking accepts only `online` and `cash`; card is an add-on |
+| **Use only the backend-published payment capability** | Cash-only and manual quote paths send `"cash"`; `"online"` is available only when `payments.card_available` is true (ED-030) |
 | **Never retry a booking POST automatically.** Reuse the same `Idempotency-Key` if the customer retries the same cart; new key only if the cart changes | Stops double bookings and, later, double charges |
 | **Never invent API fields.** If something is missing from `openapi.json`, stop and report it | Request bodies reject unknown fields with 400 |
 | **Shadow DOM** for all widget UI and styles | Client site CSS must not break the form, and ours must not break their site |
@@ -171,6 +171,7 @@ dependencies: `AGENTS.md` section 3.
 | `401` | "This booking form is not configured."; one sanitized developer log, with no key |
 | `403`, `404`, `503` | The API message, or a friendly fallback; never retry automatically |
 | `409 REQUEST_IN_FLIGHT` | "Your booking is still being processed. Please wait a moment and try again."; a customer retry reuses the same key |
+| `402 PAYMENT_FAILED` | "Your card could not be processed. Check the details or try another card."; preserve Card and never retry automatically |
 | `422 ADVANCE_BOOKING_VIOLATION`, `OUT_OF_SERVICE_AREA`, `VEHICLE_UNAVAILABLE`, `BELOW_MINIMUM_HOURS`, `PAYMENT_METHOD_NOT_OFFERED`, `AIRPORT_ADDRESS_MISSING` | The API's `message` |
 | `422 PROMO_INVALID` | The API's `message` under Promo code; Remove restores pricing and booking without the code |
 | `429 RATE_LIMITED` | "Too many requests, please wait a moment and try again." |
@@ -208,8 +209,8 @@ dependencies: `AGENTS.md` section 3.
 
 ## Sources of truth
 
-- `galveston-backend/docs/API_CONTRACT.md` (commit `2fdc7b1753dcce119b887313ebf16304341b2a0f`)
-- `galveston-backend/openapi.json` (commit `2fdc7b1753dcce119b887313ebf16304341b2a0f`)
+- `galveston-backend/docs/API_CONTRACT.md` (commit `771cb28ac4519b7d16e0b3ffe182acf224940846`)
+- `galveston-backend/openapi.json` (commit `771cb28ac4519b7d16e0b3ffe182acf224940846`)
 - `galveston-backend/docs/PROJECT-TRACKER.md`
 - BRO screenshots in this repo
 
@@ -217,6 +218,7 @@ dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 26 Oct 2026 | P3 card payment complete for review: refreshed backend `771cb28` with explicit public readiness and environment, added conditional Cash / Card pricing to taxi and shuttle, integrated Square through the scoped named-slot exception, kept tokens local and outside idempotency fingerprints, and documented client CSP requirements. Live Square sandbox browser test is **UNVERIFIED**. |
 | 24 Oct 2026 | E-9b complete for review: refreshed and byte-verified backend `2b75d4d` with B-38D, then added the nullable scheduled-departure vehicle name without changing `service_label` or on-request behavior. |
 | 23 Oct 2026 | E-9 complete for review: one widget now dispatches by public business type; shuttle adds grouped reachable locations, scheduled/on-request departures and returns, server-owned quote/promo lines, cash booking and stale-availability recovery while taxi stays on E-8. Bundle remains one IIFE at 33,134 bytes gzip. The scheduled car name was deferred pending B-38D. |
 | 23 Oct 2026 | E-9 unblocked by scope decision: scheduled departures proceed with time, seats, price and documented `service_label`; on-request displays `vehicle_type_name`. The scheduled car name was deferred to backend B-38D and follow-up E-9b. |

@@ -2,7 +2,7 @@ import { render } from "preact";
 import { act } from "preact/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { ShuttleApiClient, ShuttleQuoteResponse } from "../src/api/client";
+import type { Business, ShuttleApiClient, ShuttleQuoteResponse } from "../src/api/client";
 import { ApiError } from "../src/api/errors";
 import { ShuttleConfirm } from "../src/app/shuttle/ShuttleConfirm";
 import type { ShuttleSelection } from "../src/app/shuttle/types";
@@ -30,6 +30,16 @@ const SELECTION = {
   returnLeg: null,
 } satisfies ShuttleSelection;
 
+const CARD_BUSINESS = {
+  ...SHUTTLE_BUSINESS,
+  payments: {
+    card_available: true,
+    environment: "sandbox",
+    square_application_id: "sandbox-app-id",
+    square_location_id: "sandbox-location-id",
+  },
+} satisfies Business;
+
 function clientWith(
   quoteShuttle: ShuttleApiClient["quoteShuttle"] = vi.fn(async () => SHUTTLE_QUOTE),
   bookShuttle: ShuttleApiClient["bookShuttle"] = vi.fn(async () => SHUTTLE_BOOKED),
@@ -44,10 +54,14 @@ function clientWith(
   };
 }
 
-function mount(client: ShuttleApiClient, onUnavailable = vi.fn()) {
+function mount(
+  client: ShuttleApiClient,
+  onUnavailable = vi.fn(),
+  business = SHUTTLE_BUSINESS,
+) {
   const root = document.createElement("div");
   document.body.append(root);
-  render(<ShuttleConfirm business={SHUTTLE_BUSINESS} client={client}
+  render(<ShuttleConfirm business={business} client={client}
     quote={SHUTTLE_QUOTE} selection={SELECTION} onBack={() => undefined}
     onBooked={() => undefined} onUnavailable={onUnavailable} />, root);
   return { onUnavailable, root };
@@ -99,6 +113,36 @@ describe("shuttle confirmation pricing", () => {
     act(() => root.querySelector<HTMLButtonElement>(".promo-code button")?.click());
     await vi.waitFor(() => expect(quote).toHaveBeenCalledTimes(2));
     expect(quote.mock.calls[1]?.[0]).not.toHaveProperty("promo_code");
+  });
+
+  it("re-quotes online only when public card capability is true", async () => {
+    const quote = vi.fn<ShuttleApiClient["quoteShuttle"]>(async () => SHUTTLE_QUOTE);
+    const cash = mount(clientWith(quote));
+    expect(cash.root.querySelector(".payment-method")).toBeNull();
+
+    const card = mount(clientWith(quote), vi.fn(), CARD_BUSINESS);
+    card.root.querySelector<HTMLInputElement>('input[value="online"]')?.click();
+    await vi.waitFor(() => expect(quote).toHaveBeenCalledOnce());
+    expect(quote.mock.calls[0]?.[0].payment_method).toBe("online");
+  });
+});
+
+describe("shuttle payment pricing race", () => {
+  it("keeps the latest method when an older quote finishes last", async () => {
+    const resolvers: Array<(quote: ShuttleQuoteResponse) => void> = [];
+    const quote = vi.fn(() => new Promise<ShuttleQuoteResponse>((resolve) => {
+      resolvers.push(resolve);
+    }));
+    const { root } = mount(clientWith(quote), vi.fn(), CARD_BUSINESS);
+    act(() => root.querySelector<HTMLInputElement>('input[value="online"]')?.click());
+    await vi.waitFor(() => expect(quote).toHaveBeenCalledOnce());
+    act(() => root.querySelector<HTMLInputElement>('input[value="cash"]')?.click());
+    await vi.waitFor(() => expect(quote).toHaveBeenCalledTimes(2));
+    resolvers[1]?.({ ...SHUTTLE_QUOTE, total: "69.00" });
+    await vi.waitFor(() => expect(root.textContent).toContain("$69.00 USD"));
+    resolvers[0]?.({ ...SHUTTLE_QUOTE, total: "99.00" });
+    await Promise.resolve();
+    expect(root.textContent).not.toContain("$99.00 USD");
   });
 });
 

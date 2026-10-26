@@ -146,6 +146,7 @@ describe("Confirm pricing request", () => {
     expect(request).toMatchObject({ large_bags: 0, small_bags: 0 });
     expect(request).not.toHaveProperty("luggage");
   });
+
 });
 
 describe("Server-owned round-trip lines", () => {
@@ -353,6 +354,7 @@ describe("Confirm field error placement", () => {
     expect(request).not.toHaveProperty("luggage");
     expect(request).toMatchObject({ large_bags: 0, small_bags: 0 });
   });
+
 });
 
 describe("breakdown errors", () => {

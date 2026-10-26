@@ -43,7 +43,7 @@ Why: customers and staff already know it; the screenshots in `docs/reference/bro
 Consequences: drop BRO's site header (Menu, Login) and customer accounts — out of scope.
 
 ## ED-006 — Cash only in the core
-Date: 2026-10-10 · Status: accepted
+Date: 2026-10-10 · Status: superseded by ED-030
 Decision: send `payment: { "method": "cash" }` only. Card payment is a later add-on.
 Why: BRO's live form has no online payment. Card payment depends on backend B-20 (Square ids), the client's answer on Square accounts (C-15) and a Square sandbox test (B-16).
 Consequences: no Square SDK in the core build. `payment_method: "cash"` on price-breakdown.
@@ -185,3 +185,9 @@ Date: 2026-10-22 · Status: accepted (supersedes ED-003)
 Decision: `GET /v1/public/business` selects taxi or shuttle mode in the same single-file widget; customers never choose the mode.
 Why: the client restored shuttle booking and requires both products to use the same embed while preserving the completed E-8 taxi flow.
 Consequences: taxi businesses call only taxi endpoints and retain E-8 behavior; shuttle businesses call only `/v1/public/shuttle/*`. Shared presentation and pure helpers may be reused, but request/state modules remain mode-specific. ED-006 remains unchanged, so both modes are cash-only until the separate card-payment phase. Scheduled cards show their documented service label, time, seats and price; on-request shows `vehicle_type_name`. Backend B-38D and E-9b will add the scheduled car name later.
+
+## ED-030 — Conditional Square card payment through a named slot
+Date: 2026-10-26 · Status: accepted (supersedes ED-006; scopes an exception to ED-008)
+Decision: offer Cash / Card only when public `payments.card_available` is true, select Square's exact sandbox or production SDK from public `payments.environment`, and project one empty light-DOM container through a named Shadow DOM slot for Square's managed card iframe.
+Why: the backend now publishes an explicit, fail-closed capability and environment, while Square's Web Payments SDK must attach its iframe to a document-visible element. Inferring readiness or environment from an identifier risks sending real cards to the wrong system.
+Consequences: Cash and manual quote behavior remain unchanged and load no Square script. Card re-prices with `"online"`, tokenizes only on valid Book, sends the one-time token in one booking POST, never stores or logs it, and fingerprints the token-free cart so a retry uses the same idempotency key with a new token. The Square script and empty slotted container are the only additional Shadow DOM exceptions; the client site's CSP must allow Square's documented environment-specific origins.

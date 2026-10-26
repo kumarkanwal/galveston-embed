@@ -3,6 +3,7 @@ import { useRef, useState } from "preact/hooks";
 import type {
   ApiClient,
   Business,
+  PaymentMethod,
   QuotedVehicle,
   TaxiBookingResponse,
   TaxiQuoteResponse,
@@ -15,7 +16,11 @@ import type { CoreServiceCode, TripErrors, TripField, TripFormState } from "../t
 import { firstTripError, validateTrip } from "../trip/validation";
 
 export interface BookingFlowState {
-  confirmation: { requestQuote: boolean; response: TaxiBookingResponse } | null;
+  confirmation: {
+    paymentMethod: PaymentMethod;
+    requestQuote: boolean;
+    response: TaxiBookingResponse;
+  } | null;
   errors: TripErrors;
   errorFocusField: TripField | null;
   errorFocusVersion: number;
@@ -132,8 +137,10 @@ function createVehicleUnavailable(setState: FlowSetter) {
 }
 
 function createComplete(setState: FlowSetter) {
-  return (response: TaxiBookingResponse, requestQuote: boolean) => setState((current) => ({
-    ...current, confirmation: { requestQuote, response }, quote: null, selectedVehicle: null,
+  return (response: TaxiBookingResponse, requestQuote: boolean, paymentMethod: PaymentMethod = "cash") =>
+    setState((current) => ({
+    ...current, confirmation: { paymentMethod, requestQuote, response }, quote: null,
+    selectedVehicle: null,
   }));
 }
 

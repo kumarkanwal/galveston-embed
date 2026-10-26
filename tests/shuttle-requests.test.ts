@@ -84,6 +84,7 @@ describe("shuttle request builders", () => {
     expect(body).not.toHaveProperty("total");
     expect(body).not.toHaveProperty("promo_code");
   });
+
 });
 
 describe("shuttle cart idempotency", () => {

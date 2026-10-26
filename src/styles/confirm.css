@@ -183,6 +183,69 @@
   gap: 22px;
 }
 
+.payment-method {
+  border: 0;
+  margin: 24px 0 12px;
+  padding: 0;
+}
+
+.payment-method legend {
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 12px;
+}
+
+.payment-options {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.payment-options label {
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  min-height: 44px;
+  padding: 8px 10px;
+}
+
+.payment-options input {
+  height: 18px;
+  margin: 0;
+  width: 18px;
+}
+
+.square-card-field {
+  margin: 12px 0;
+}
+
+.square-card-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.square-card-frame {
+  min-height: 44px;
+}
+
+::slotted([slot="galveston-square-card"]) {
+  min-height: 44px;
+  width: 100%;
+}
+
+.square-card-status {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 4px 0 0;
+}
+
 .terms-field {
   margin: 12px 0;
 }
