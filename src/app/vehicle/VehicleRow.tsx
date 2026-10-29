@@ -8,13 +8,19 @@ interface VehicleRowProps {
   vehicle: QuotedVehicle;
 }
 
-const UNAVAILABLE_TEXT = "Not available at this time";
-
-function fare(vehicle: QuotedVehicle, currency: string): string {
+function fare(vehicle: QuotedVehicle, currency: string): string | null {
   if (vehicle.quote_status === "request_quote") return "Request a Quote";
-  if (vehicle.quote_status === "unavailable") return UNAVAILABLE_TEXT;
+  if (vehicle.quote_status === "unavailable") return null;
   if (vehicle.base_price === null || vehicle.base_price === undefined) return "Price unavailable";
   return formatMoney(vehicle.base_price, currency);
+}
+
+export function unavailableVehicleText(reason: string | null | undefined): string {
+  if (reason === "capacity") return "Too many passengers or bags for this vehicle";
+  if (reason === "blackout" || reason === "time" || reason == null) {
+    return "Not available at this time";
+  }
+  return "Not available";
 }
 
 function httpsPhotoUrl(value: string | null | undefined): string | null {
@@ -49,22 +55,23 @@ function VehiclePhoto({ vehicle }: { vehicle: QuotedVehicle }) {
 
 export function VehicleRow({ currency, onChoose, vehicle }: VehicleRowProps) {
   const unavailable = vehicle.quote_status === "unavailable";
-  return <article class={`vehicle-row${unavailable ? " unavailable" : ""}`}>
+  const price = fare(vehicle, currency);
+  return <article class={`vehicle-row${unavailable ? " unavailable" : ""}`}
+    aria-disabled={unavailable || undefined}>
     <VehiclePhoto vehicle={vehicle} />
     <div class="vehicle-summary">
       <h3>{vehicle.name}</h3>
       <div class="vehicle-capacity">
-        <span aria-label={`${vehicle.passenger_capacity} passengers`}>
-          ♟ {vehicle.passenger_capacity}
-        </span>
-        <span aria-label={`${vehicle.luggage_capacity} luggage`}>
-          ▣ {vehicle.luggage_capacity}
-        </span>
+        <span><span aria-hidden="true">♟ </span>{vehicle.passenger_capacity}
+          {vehicle.passenger_capacity === 1 ? " passenger" : " passengers"}</span>
+        <span><span aria-hidden="true">· ▣ </span>{vehicle.luggage_capacity}
+          {vehicle.luggage_capacity === 1 ? " bag" : " bags"}</span>
       </div>
     </div>
-    <div class="vehicle-fare">{fare(vehicle, currency)}</div>
-    <button class="vehicle-choose" type="button" disabled={unavailable}
-      aria-label={unavailable ? `${vehicle.name}: ${UNAVAILABLE_TEXT}` : `Choose ${vehicle.name}`}
-      onClick={() => onChoose(vehicle)}>{unavailable ? UNAVAILABLE_TEXT : "Choose"}</button>
+    <div class="vehicle-fare">{price}</div>
+    {unavailable
+      ? <span class="vehicle-unavailable">{unavailableVehicleText(vehicle.unavailable_reason)}</span>
+      : <button class="vehicle-choose" type="button" aria-label={`Choose ${vehicle.name}`}
+        onClick={() => onChoose(vehicle)}>Choose</button>}
   </article>;
 }

@@ -36,11 +36,10 @@ export function TripSummary(props: TripSummaryProps) {
           Return: {formatBusinessLocalDateTime(props.form.returnDate, props.form.returnTime)}
         </p>}
         <div class="summary-counts">
-          <span aria-label={`${props.form.passengers} passengers`}>♟ {props.form.passengers}</span>
-          <span aria-label={`${props.form.largeBags} check-in or trunk bags`}>
-            ▣ {props.form.largeBags}
-          </span>
-          <span aria-label={`${props.form.smallBags} carry-on bags`}>▫ {props.form.smallBags}</span>
+          <span><span aria-hidden="true">♟ </span>{props.form.passengers}
+            {props.form.passengers === 1 ? " passenger" : " passengers"}</span>
+          <span><span aria-hidden="true">· ▣ </span>{props.form.largeBags} check-in</span>
+          <span><span aria-hidden="true">· ▫ </span>{props.form.smallBags} carry-on</span>
         </div>
         <div class="summary-address"><span class="pickup-pin">●</span>{tripAddress(props.form, "pickup")}</div>
         <div class="summary-address"><span class="dropoff-pin">●</span>{tripAddress(props.form, "dropoff")}</div>

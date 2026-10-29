@@ -178,6 +178,13 @@ describe("trip field validation", () => {
     expect(validateTrip(form, VALIDATION_CONTEXT)).toHaveProperty(field);
   });
 
+  it("uses the precise-place message for taxi addresses", () => {
+    const form = formFor("one_way");
+    form.pickupAddress = null;
+    expect(validateTrip(form, VALIDATION_CONTEXT).pickupAddress)
+      .toBe("Please choose a street address or airport.");
+  });
+
   it("requires both round-trip return fields and rejects a return not after pickup", () => {
     const form = formFor("round_trip");
     form.returnDate = ""; form.returnTime = "";

@@ -99,6 +99,8 @@ describe("Confirm price breakdown", () => {
       .toEqual(["Base Price$90.00 USD", "Fuel Surcharge$2.70 USD"]);
     expect(root.textContent).not.toContain("Unrelated Zero");
     expect(root.textContent).toContain("One Way Transfer on Monday, October 12, 2026 at 12:44 AM");
+    expect(root.querySelector(".summary-counts")?.textContent)
+      .toBe("♟ 1 passenger· ▣ 0 check-in· ▫ 0 carry-on");
   });
 
   it("shows the server peak surcharge line unchanged without client math", async () => {

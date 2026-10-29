@@ -59,6 +59,19 @@ function CounterHarness() {
 beforeEach(() => document.body.replaceChildren());
 
 describe("business form toggles", () => {
+  it("renders non-focusable decorative map pins beside taxi addresses", () => {
+    const root = mount({ show_service_dropdown: true }, [SERVICES[2]!]);
+    const pins = [...root.querySelectorAll<HTMLElement>(".address-pin")];
+    expect(pins).toHaveLength(2);
+    for (const pin of pins) {
+      expect(pin.tagName).toBe("SPAN");
+      expect(pin.getAttribute("aria-hidden")).toBe("true");
+      expect(pin.getAttribute("tabindex")).toBeNull();
+      expect(pin.querySelector("svg")).not.toBeNull();
+    }
+    expect(root.querySelector("button.address-pin")).toBeNull();
+  });
+
   it("shows the API-ordered service dropdown including round trip", () => {
     const root = mount({ show_service_dropdown: true });
     const options = [...root.querySelectorAll<HTMLOptionElement>("#service option")];

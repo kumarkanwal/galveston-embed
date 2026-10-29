@@ -32,10 +32,10 @@ function validateParty(form: TripFormState, errors: TripErrors, limits: PartyLim
 
 function validateAddresses(form: TripFormState, errors: TripErrors): void {
   if (form.service !== "airport_pickup" && form.pickupAddress === null) {
-    errors.pickupAddress = "Choose a pickup address from the suggestions.";
+    errors.pickupAddress = "Please choose a street address or airport.";
   }
   if (form.service !== "airport_dropoff" && form.dropoffAddress === null) {
-    errors.dropoffAddress = "Choose a dropoff address from the suggestions.";
+    errors.dropoffAddress = "Please choose a street address or airport.";
   }
 }
 

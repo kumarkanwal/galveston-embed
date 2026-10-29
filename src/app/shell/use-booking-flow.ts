@@ -26,10 +26,12 @@ export interface BookingFlowState {
   errorFocusVersion: number;
   form: TripFormState;
   formError: string | null;
+  hasCheckedPricing: boolean;
   isSubmitting: boolean;
   quote: TaxiQuoteResponse | null;
   selectedVehicle: QuotedVehicle | null;
   step: 1 | 2 | 3;
+  touchedFields: Partial<Record<TripField, true>>;
   vehicleNotice: string | null;
 }
 
@@ -79,39 +81,53 @@ function initialState(business: Business, service: CoreServiceCode): BookingFlow
     errorFocusVersion: 0,
     form: initialForm(business, service),
     formError: null,
+    hasCheckedPricing: false,
     isSubmitting: false,
     quote: null,
     selectedVehicle: null,
     step: 1,
+    touchedFields: {},
     vehicleNotice: null,
   };
 }
 
 type FlowSetter = (update: (current: BookingFlowState) => BookingFlowState) => void;
 
-function createUpdate(setState: FlowSetter) {
+function visibleTripErrors(
+  form: TripFormState,
+  business: Business,
+  limits: PartyLimits,
+  showAll: boolean,
+  touchedFields: BookingFlowState["touchedFields"],
+): TripErrors {
+  const errors = validateTrip(form, { now: new Date(), timeZone: business.timezone,
+    advanceBookingHours: business.settings.advance_booking_hours, limits });
+  if (showAll) return errors;
+  const visible: TripErrors = {};
+  for (const field of Object.keys(touchedFields) as TripField[]) {
+    if (touchedFields[field] && errors[field] !== undefined) visible[field] = errors[field];
+  }
+  return visible;
+}
+
+function createUpdate(setState: FlowSetter, business: Business, limits: PartyLimits) {
   return <Key extends keyof TripFormState>(key: Key, value: TripFormState[Key]) => {
-    setState((current) => ({ ...current,
-      confirmation: null,
-      errors: { ...current.errors, [key]: undefined },
-      form: updatedForm(current.form, key, value),
-      formError: null,
-      quote: null,
-      selectedVehicle: null,
-      vehicleNotice: null,
-    }));
+    setState((current) => {
+      const form = updatedForm(current.form, key, value);
+      return { ...current, confirmation: null,
+        errors: visibleTripErrors(form, business, limits,
+          current.hasCheckedPricing, current.touchedFields),
+        form, formError: null, quote: null, selectedVehicle: null, vehicleNotice: null };
+    });
   };
 }
 
 function createBlur(setState: FlowSetter, business: Business, limits: PartyLimits) {
   return (key: TripField) => setState((current) => {
-    const nextErrors = validateTrip(current.form, {
-      now: new Date(),
-      timeZone: business.timezone,
-      advanceBookingHours: business.settings.advance_booking_hours,
-      limits,
-    });
-    return { ...current, errors: { ...current.errors, [key]: nextErrors[key] } };
+    const touchedFields = { ...current.touchedFields, [key]: true as const };
+    return { ...current, touchedFields,
+      errors: visibleTripErrors(current.form, business, limits,
+        current.hasCheckedPricing, touchedFields) };
   });
 }
 
@@ -148,23 +164,24 @@ export function useBookingFlow(client: ApiClient, business: Business,
   service: CoreServiceCode, limits: PartyLimits) {
   const [state, setState] = useState(() => initialState(business, service));
   const requestInFlight = useRef(false);
-  const update = createUpdate(setState); const blur = createBlur(setState, business, limits);
-  const vehicleUnavailable = createVehicleUnavailable(setState);
-  const complete = createComplete(setState);
+  const update = createUpdate(setState, business, limits),
+    blur = createBlur(setState, business, limits);
+  const vehicleUnavailable = createVehicleUnavailable(setState), complete = createComplete(setState);
   const submit = async (event: SubmitEvent) => {
-    event.preventDefault();
-    if (requestInFlight.current) return;
+    event.preventDefault(); if (requestInFlight.current) return;
     const errors = validateTrip(state.form, { now: new Date(), timeZone: business.timezone,
       advanceBookingHours: business.settings.advance_booking_hours, limits });
     if (Object.keys(errors).length > 0) {
       setState((current) => ({ ...current, errors,
         errorFocusField: firstTripError(errors),
         errorFocusVersion: current.errorFocusVersion + 1,
+        hasCheckedPricing: true,
       })); return;
     }
     requestInFlight.current = true;
     const submittedForm = state.form;
-    setState((current) => ({ ...current, errors: {}, formError: null, isSubmitting: true }));
+    setState((current) => ({ ...current, errors: {}, formError: null,
+      hasCheckedPricing: true, isSubmitting: true }));
     try {
       const quote = await client.quote(buildQuoteRequest(submittedForm));
       setState((current) => current.form === submittedForm

@@ -56,7 +56,9 @@ export function usePlaceAutocomplete(query: string, mapsKey: string) {
     prediction: google.maps.places.PlacePrediction,
   ): Promise<SelectedAddress | null> => {
     const place = prediction.toPlace();
-    await place.fetchFields({ fields: ["formattedAddress", "addressComponents", "location"] });
+    await place.fetchFields({
+      fields: ["formattedAddress", "addressComponents", "location", "types"],
+    });
     token.current = null;
     setState(INITIAL_STATE);
     return selectedAddressFromPlace(place);
