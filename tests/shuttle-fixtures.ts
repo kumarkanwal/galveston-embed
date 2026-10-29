@@ -76,7 +76,9 @@ export const SEARCH_RESULT = {
   route: {
     id: "77777777-7777-7777-7777-777777777777",
     from: "Hobby Airport",
+    from_requires_address: false,
     to: "Cruise Terminal",
+    to_requires_address: true,
     duration_minutes: 60,
     service_label: "Island Express",
   },

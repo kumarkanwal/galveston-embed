@@ -3,6 +3,8 @@ import { act } from "preact/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ShuttleApiClient, ShuttleDeparture, ShuttleReturnQuery } from "../src/api/client";
+import { ApiError } from "../src/api/errors";
+import { SHUTTLE_UNAVAILABLE_MESSAGE } from "../src/app/shuttle/availability";
 import { ShuttleFlow } from "../src/app/shuttle/ShuttleFlow";
 import {
   DEPARTURE,
@@ -98,5 +100,19 @@ describe("same-page shuttle departures", () => {
     expect(root.querySelector(".departure-section.return")).toBeNull();
     expect(root.textContent).not.toContain("Choose Return");
     expect(searchShuttleReturn).not.toHaveBeenCalled();
+  });
+
+  it("refreshes Departures and clears a remembered route after not found", async () => {
+    const { client } = clientWith();
+    client.quoteShuttle = vi.fn(async () => {
+      throw new ApiError(404, { code: "NOT_FOUND", message: "Route removed." });
+    });
+    const root = mount(client);
+    await fillTrip(root, false);
+    act(() => root.querySelector<HTMLButtonElement>(".departure-section.outbound button")?.click());
+    await vi.waitFor(() => expect(client.searchShuttle).toHaveBeenCalledTimes(2));
+    await vi.waitFor(() => expect(root.textContent).toContain(SHUTTLE_UNAVAILABLE_MESSAGE));
+    expect(root.textContent).toContain("Choose Departure");
+    expect(root.textContent).not.toContain("Trip Summary");
   });
 });

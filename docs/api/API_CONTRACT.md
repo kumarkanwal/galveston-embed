@@ -5,11 +5,39 @@ Stack: FastAPI (Python) · PostgreSQL · Square payments
 Base URL: `https://api.<domain>.com/v1`
 Consumers: Booking-form embeds (taxi and shuttle)
 
-**Version 1.6** — generated from the implemented schemas, routers, services and
-`openapi.json` through B-43. This document covers the public surface and the
-B-43, B-42 and B-41 admin additions below; older admin endpoints remain defined by OpenAPI.
+**Version 1.7** — generated from the implemented schemas, routers, services and
+`openapi.json` through B-45. This document covers the public surface and the
+B-45, B-43, B-42 and B-41 admin additions below; older admin endpoints remain defined by OpenAPI.
 
 ---
+
+## B-45 shuttle zones, addresses, and named-stop display
+
+Changes: explicit category/location lifecycle and usage APIs, side-specific shuttle
+addresses, route address-requirement flags, and named-stop display fallbacks.
+
+- Admin lifecycle operations use `POST /admin/categories/{id}/deactivate`,
+  `POST /admin/categories/{id}/reactivate`, `DELETE /admin/categories/{id}/hard`,
+  and equivalent `/admin/locations/{id}` paths. Existing `DELETE /admin/.../{id}`
+  and `PATCH {"is_active": true}` forms remain deprecated aliases. Category
+  reactivation returns `active_location_count` and `reactivated_location_count: 0`;
+  it never reactivates child locations.
+- `GET /admin/categories/{id}/usage` and `/admin/locations/{id}/usage` return
+  `can_delete`, dependency counts in `blockers`, and deterministic active/inactive
+  `linked_routes`. A blocked hard delete returns `409 RESOURCE_IN_USE` with those
+  values in the optional error-envelope `details` object.
+- Public and manual shuttle booking legs accept optional `pickup_address` and
+  `dropoff_address`. Each is required only when its own location has
+  `requires_address`; deprecated top-level `address` remains a fallback. Text sent
+  for a named stop is ignored. Shuttle quote remains address-free.
+- Admin and public route results add `from_requires_address` and
+  `to_requires_address`. Admin shuttle reservation detail adds effective
+  `pickup_address` and `dropoff_address`; legacy `journey.address` remains the
+  effective pickup value.
+- Inactive categories, locations, and routes are excluded from fixed and on-request
+  search, return search, quote, and booking even when a client retains old ids.
+  Staff/driver trip sheets and all booking emails display named location labels when
+  no street address is stored.
 
 ## B-40A backend hardening
 
@@ -17,7 +45,7 @@ Changes: optional idempotency headers on admin financial mutations, bounded type
 admin reservation edits, shuttle throttling, and generic payment/SMTP failures.
 
 - `Idempotency-Key` is optional on manual payment, manual refund, manual void, and
-  add-charge. When supplied it must be printable ASCII, at most 128 characters,
+  add-charge. When supplied it must be 1-128 printable ASCII characters without spaces,
   and a replay returns the original mutation response.
 - Admin reservation PATCH accepts at most 10 typed `BookingStop` values and now
   publishes explicit bounds for addresses, passenger/bag counts, hours, airline,

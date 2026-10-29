@@ -25,8 +25,10 @@ export type ShuttleSearchResult = components["schemas"]["SearchResult"];
 export type ShuttleQuoteRequest = components["schemas"]["QuoteRequest"];
 export type ShuttleQuoteResponse = components["schemas"]["QuoteResponse"];
 export type ShuttleQuoteLeg = components["schemas"]["QuoteLegRequest"];
+export type ShuttleBookingLeg = components["schemas"]["BookingLegRequest"];
 export type ShuttleBookingRequest = components["schemas"]["BookingRequest"];
 export type ShuttleBookingResponse = components["schemas"]["BookingResponse"];
+export type ShuttleRoute = components["schemas"]["RouteSummary"];
 export type ShuttleSearchQuery =
   operations["search_v1_public_shuttle_search_get"]["parameters"]["query"];
 export type ShuttleReturnQuery =

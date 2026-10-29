@@ -157,6 +157,20 @@
   margin: 0 0 10px;
 }
 
+.shuttle-addresses {
+  border: 0;
+  display: grid;
+  gap: 12px;
+  margin: 24px 0 0;
+  padding: 0;
+}
+
+.shuttle-addresses legend {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
 @media (max-width: 700px) {
   .shuttle-trip {
     padding: 16px;

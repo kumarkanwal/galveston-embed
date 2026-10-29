@@ -8,7 +8,9 @@ import {
   buildShuttleSearchQuery,
 } from "../src/app/shuttle/requests";
 import type { ShuttleSelection, ShuttleTripForm } from "../src/app/shuttle/types";
-import { DEPARTURE, DESTINATION_LOCATION, ORIGIN_LOCATION } from "./shuttle-fixtures";
+import {
+  DEPARTURE, DESTINATION_LOCATION, ORIGIN_LOCATION, SEARCH_RESULT,
+} from "./shuttle-fixtures";
 
 const TRIP: ShuttleTripForm = {
   fromId: ORIGIN_LOCATION.id,
@@ -20,10 +22,12 @@ const TRIP: ShuttleTripForm = {
   paxSenior: 1,
   paxChild: 0,
 };
-const SCHEDULED = { kind: "scheduled", date: TRIP.date, departure: DEPARTURE } as const;
+const SCHEDULED = { kind: "scheduled", date: TRIP.date, departure: DEPARTURE,
+  route: SEARCH_RESULT.route } as const;
 const ON_REQUEST = {
   kind: "on_request", date: TRIP.date, time: "14:15",
   routeId: "77777777-7777-7777-7777-777777777777",
+  route: SEARCH_RESULT.route,
   vehicleTypeId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
   vehicleTypeName: "Executive Van",
 } as const;
@@ -71,20 +75,43 @@ describe("shuttle request builders", () => {
       }],
       insurance_selected: false, payment_method: "cash", promo_code: "SAVE10",
     });
+    for (const leg of buildShuttleQuote(selection, null).legs) {
+      expect(leg).not.toHaveProperty("pickup_address");
+      expect(leg).not.toHaveProperty("dropoff_address");
+    }
   });
+});
 
-  it("builds a cash booking without client-owned amounts", () => {
-    const body = buildShuttleBooking(BASE_SELECTION, CONTACT, " Terminal curb ", null);
+describe("shuttle booking request builder", () => {
+  it("puts separate addresses inside each booking leg and omits the deprecated top level", () => {
+    const addressRoute = { ...SEARCH_RESULT.route,
+      from_requires_address: true, to_requires_address: true };
+    const selection = { ...BASE_SELECTION,
+      outbound: { ...SCHEDULED, route: addressRoute },
+      returnLeg: { ...SCHEDULED, route: { ...addressRoute, id: "return-route" } } };
+    const body = buildShuttleBooking(selection, CONTACT, {
+      outboundPickup: { address: " Airport curb ", zipcode: null, location: { lat: 1, lng: 2 } },
+      outboundDropoff: { address: " Hotel lobby ", zipcode: "77550",
+        location: { lat: 3, lng: 4 } },
+      returnPickup: { address: " Hotel side door ", zipcode: "77550",
+        location: { lat: 3, lng: 4 } },
+      returnDropoff: { address: " Airport terminal ", zipcode: null,
+        location: { lat: 1, lng: 2 } },
+    }, null);
     expect(body).toMatchObject({
       payment: { method: "cash" }, insurance_selected: false,
       customer: { first_name: "Ada", last_name: "Lovelace",
         email: "ada@example.com", phone: "555-0100" },
-      comments: "Dock 2", address: "Terminal curb", accepted_terms: true,
+      comments: "Dock 2", accepted_terms: true,
+      legs: [
+        { pickup_address: "Airport curb", dropoff_address: "Hotel lobby" },
+        { pickup_address: "Hotel side door", dropoff_address: "Airport terminal" },
+      ],
     });
+    expect(body).not.toHaveProperty("address");
     expect(body).not.toHaveProperty("total");
     expect(body).not.toHaveProperty("promo_code");
   });
-
 });
 
 describe("shuttle cart idempotency", () => {
@@ -92,7 +119,9 @@ describe("shuttle cart idempotency", () => {
     let next = 0;
     const fingerprints = async (body: object) => stableSerialize(body);
     const manager = new IdempotencyKeyManager(() => `key-${++next}`, null, fingerprints);
-    const body = buildShuttleBooking(BASE_SELECTION, CONTACT, "", null);
+    const body = buildShuttleBooking(BASE_SELECTION, CONTACT, {
+      outboundPickup: null, outboundDropoff: null, returnPickup: null, returnDropoff: null,
+    }, null);
     const first = await manager.getKey(body);
     await expect(manager.getKey({ ...body })).resolves.toBe(first);
     await expect(manager.getKey({ ...body, promo_code: "SAVE10" })).resolves.not.toBe(first);

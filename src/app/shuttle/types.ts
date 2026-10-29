@@ -1,6 +1,7 @@
 import type {
   LocationOption,
   ShuttleDeparture,
+  ShuttleRoute,
   ShuttleSearchResult,
 } from "../../api/client";
 
@@ -22,6 +23,7 @@ export interface ScheduledLeg {
   kind: "scheduled";
   date: string;
   departure: ShuttleDeparture;
+  route: ShuttleRoute;
 }
 
 export interface OnRequestLeg {
@@ -29,6 +31,7 @@ export interface OnRequestLeg {
   date: string;
   time: string;
   routeId: string;
+  route: ShuttleRoute;
   vehicleTypeId: string;
   vehicleTypeName: string;
 }
