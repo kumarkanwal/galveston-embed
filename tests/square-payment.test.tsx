@@ -72,7 +72,7 @@ const BOOKED = { order_id: "order-1", order_number: "HVT-1", status: "requested"
 const SELECTION = { trip: { fromId: ORIGIN_LOCATION.id, toId: DESTINATION_LOCATION.id,
   date: "2026-10-30", returnDate: "2026-11-01", roundTrip: false,
   paxAdult: 1, paxSenior: 1, paxChild: 0 }, from: ORIGIN_LOCATION,
-  to: DESTINATION_LOCATION,
+  to: { ...DESTINATION_LOCATION, requires_address: false },
   outbound: { kind: "scheduled", date: "2026-10-30", departure: DEPARTURE },
   returnLeg: null } satisfies ShuttleSelection;
 
@@ -207,10 +207,10 @@ describe("shuttle card booking and confirmation", () => {
       quoteShuttle: vi.fn(async () => SHUTTLE_QUOTE), bookShuttle } satisfies ShuttleApiClient;
     const business = { ...SHUTTLE_BUSINESS, payments: CARD_BUSINESS.payments } satisfies Business;
     const root = addRoot(); const onBooked = vi.fn();
-    render(<ShuttleConfirm business={business} client={client} quote={SHUTTLE_QUOTE}
+    render(<ShuttleConfirm business={business} client={client} mapsKey="maps-key" quote={SHUTTLE_QUOTE}
       selection={SELECTION} onBack={vi.fn()} onBooked={onBooked} onUnavailable={vi.fn()} />, root);
     chooseCard(root); await vi.waitFor(() => expect(card.attach).toHaveBeenCalledOnce());
-    fillContact(root); enter(root, "shuttle-address", "Terminal curb");
+    fillContact(root);
     act(() => root.querySelector<HTMLButtonElement>(".create-trip")?.click());
     await vi.waitFor(() => expect(bookShuttle).toHaveBeenCalledOnce());
     expect(bookShuttle.mock.calls[0]?.[0].payment)

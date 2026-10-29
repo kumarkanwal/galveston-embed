@@ -63,7 +63,7 @@ async function fillTrip(root: HTMLElement, roundTrip: boolean) {
 function mount(client: ShuttleApiClient) {
   const root = document.createElement("div");
   document.body.append(root);
-  render(<ShuttleFlow business={SHUTTLE_BUSINESS} client={client} />, root);
+  render(<ShuttleFlow business={SHUTTLE_BUSINESS} client={client} mapsKey="maps-key" />, root);
   return root;
 }
 

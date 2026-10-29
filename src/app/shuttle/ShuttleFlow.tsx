@@ -9,6 +9,7 @@ import { useShuttleFlow } from "./use-shuttle-flow";
 interface ShuttleFlowProps {
   business: Business;
   client: ShuttleApiClient;
+  mapsKey: string;
 }
 
 export function ShuttleFlow(props: ShuttleFlowProps) {
@@ -22,6 +23,7 @@ export function ShuttleFlow(props: ShuttleFlowProps) {
   }
   if (state.step === "confirm" && state.quote !== null && flow.selection !== null) {
     return <ShuttleConfirm business={props.business} client={props.client}
+      mapsKey={props.mapsKey}
       quote={state.quote} selection={flow.selection} onBack={flow.back}
       onBooked={flow.complete} onUnavailable={(message) => { void flow.unavailable(message); }} />;
   }

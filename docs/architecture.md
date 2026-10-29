@@ -96,7 +96,7 @@ contain BRO bugs and features we dropped. The phase spec says what to keep.
 | Taxi | Choose Vehicle | none (uses the quote) |
 | Taxi | Confirm | `POST /taxi/price-breakdown`, then `POST /taxi/booking` |
 | Shuttle | Trip | `GET /shuttle/locations` |
-| Shuttle | Departures | `GET /shuttle/search`, then `GET /shuttle/search/return` for round trip |
+| Shuttle | Departures | `GET /shuttle/search`, then `GET /shuttle/search/return` after an outbound is selected for round trip; both lists remain on one page |
 | Shuttle | Confirm | `POST /shuttle/quote`, then `POST /shuttle/booking` |
 
 Taxi and shuttle endpoint families never mix. Their request/state modules stay
@@ -104,6 +104,11 @@ separate while contact fields, promo presentation, server-line rendering,
 errors and idempotency may be shared. Scheduled shuttle cards render
 `service_label` as documented service text and, when B-38D's nullable
 `vehicle_type` is present, render its `name` as the vehicle display text.
+Shuttle passenger categories remain separate request counts inside one dropdown.
+When either selected shuttle location has `requires_address=true`, confirmation
+reuses the precise Places address field and sends its selected formatted value in
+the contract's single `address` field. Changing From or To clears that selection.
+Separate pickup and drop-off address fields remain backend gap B-45.
 
 **Dropped from BRO:** the site header (Menu, Login) and customer accounts.
 Taxi round trip is an allowed `service_type`; hourly remains deferred. Businesses
