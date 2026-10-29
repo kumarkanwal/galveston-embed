@@ -98,12 +98,11 @@ export function ShuttleTrip(props: ShuttleTripProps) {
         {props.priceFlags.child && <CountField id="paxChild" label="Children"
           value={props.form.paxChild} error={undefined} update={props.update} />}
       </div>}
-      <fieldset class="trip-kind"><legend>Trip type</legend>
-        <label><input type="radio" name="trip-kind" checked={!props.form.roundTrip}
-          onChange={() => props.update("roundTrip", false)} /> One way</label>
-        <label><input type="radio" name="trip-kind" checked={props.form.roundTrip}
-          onChange={() => props.update("roundTrip", true)} /> Round trip</label>
-      </fieldset>
+      <div class="trip-kind">
+        <label><input type="checkbox" checked={props.form.roundTrip}
+          onChange={(event) => props.update("roundTrip", event.currentTarget.checked)} />
+          Round trip</label>
+      </div>
       {props.form.roundTrip && <div class="field"><label for="returnDate">Return Date</label>
         <input id="returnDate" type="date" min={props.form.date} value={props.form.returnDate}
           aria-invalid={props.errors.returnDate !== undefined}

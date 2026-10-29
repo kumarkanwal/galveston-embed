@@ -17,15 +17,9 @@
 
 .trip-kind {
   display: flex;
-  gap: 24px;
   margin: 20px 0;
   padding: 16px;
   border: 1px solid var(--border);
-}
-
-.trip-kind legend {
-  padding: 0 6px;
-  font-weight: 700;
 }
 
 .trip-kind label {
@@ -35,6 +29,10 @@
 }
 
 .trip-kind input {
+  box-shadow: none;
+  height: 18px;
+  margin: 0;
+  padding: 0;
   width: auto;
 }
 
@@ -123,8 +121,4 @@
     min-height: 44px;
   }
 
-  .trip-kind {
-    flex-direction: column;
-    gap: 12px;
-  }
 }

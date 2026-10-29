@@ -1,6 +1,6 @@
 import { render } from "preact";
 import { act } from "preact/test-utils";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ShuttleSearchResult } from "../src/api/client";
 import { ShuttleDepartures } from "../src/app/shuttle/Departures";
@@ -54,6 +54,27 @@ describe("shuttle trip fields", () => {
     const priced = renderTrip({ senior: true, child: true });
     expect(priced.querySelector("#paxSenior")).not.toBeNull();
     expect(priced.querySelector("#paxChild")).not.toBeNull();
+  });
+
+  it("uses one unchecked Round trip checkbox and no trip-type radios", () => {
+    const element = renderTrip();
+    const checkbox = element.querySelector<HTMLInputElement>('.trip-kind input[type="checkbox"]');
+    expect(checkbox?.checked).toBe(false);
+    expect(element.querySelectorAll('.trip-kind input[type="checkbox"]')).toHaveLength(1);
+    expect(element.querySelector('.trip-kind input[type="radio"]')).toBeNull();
+    expect(element.querySelector("#returnDate")).toBeNull();
+  });
+
+  it("sends false when Round trip is unchecked", () => {
+    const update = vi.fn();
+    const element = root();
+    render(<ShuttleTrip destinationGroups={LOCATION_GROUPS.slice(1)} errors={{}}
+      form={{ ...TRIP, roundTrip: true }} formError={null} loadingDestinations={false}
+      loadingLocations={false} minimumDate="2026-10-23" originGroups={LOCATION_GROUPS}
+      priceFlags={{ senior: false, child: false }} submitting={false}
+      timeZone="America/Chicago" onSubmit={() => undefined} update={update} />, element);
+    act(() => element.querySelector<HTMLInputElement>('.trip-kind input')?.click());
+    expect(update).toHaveBeenCalledWith("roundTrip", false);
   });
 });
 

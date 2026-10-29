@@ -48,7 +48,7 @@ function initialForm(business: Business): ShuttleTripForm {
   const date = businessDateTimeParts(new Date(), business.timezone).date;
   return {
     date, fromId: "", paxAdult: 1, paxChild: 0, paxSenior: 0,
-    returnDate: date, roundTrip: false, toId: "",
+    returnDate: "", roundTrip: false, toId: "",
   };
 }
 
@@ -117,11 +117,16 @@ async function updateTrip<Key extends keyof ShuttleTripForm>(
   key: Key,
   value: ShuttleTripForm[Key],
 ) {
-  context.setState((current) => ({ ...current, errors: { ...current.errors, [key]: undefined },
-    form: { ...current.form, [key]: value }, formError: null }));
+  context.setState((current) => {
+    const form = { ...current.form, [key]: value };
+    if (key === "roundTrip" && value === false) form.returnDate = "";
+    if (key === "fromId") form.toId = "";
+    return { ...current, errors: { ...current.errors, [key]: undefined }, form,
+      formError: null, notice: null, outbound: null, outboundResult: null, quote: null,
+      returnLeg: null, returnResult: null };
+  });
   if (key !== "fromId") return;
-  context.setState((current) => ({ ...current, destinationGroups: [], loadingDestinations: true,
-    form: { ...current.form, toId: "" } }));
+  context.setState((current) => ({ ...current, destinationGroups: [], loadingDestinations: true }));
   try {
     const groups = value === "" ? [] : await context.client.getShuttleLocations(String(value));
     context.setState((current) => ({ ...current, destinationGroups: groups,
