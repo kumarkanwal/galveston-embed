@@ -22,7 +22,7 @@ import type {
 } from "./types";
 import { hasShuttleTripErrors, validateShuttleTrip } from "./validation";
 
-type ShuttleStep = "trip" | "outbound" | "return" | "confirm" | "done";
+type ShuttleStep = "trip" | "outbound" | "confirm" | "done";
 
 interface ShuttleFlowState {
   confirmation: { paymentMethod: PaymentMethod; response: ShuttleBookingResponse } | null;
@@ -48,7 +48,7 @@ function initialForm(business: Business): ShuttleTripForm {
   const date = businessDateTimeParts(new Date(), business.timezone).date;
   return {
     date, fromId: "", paxAdult: 1, paxChild: 0, paxSenior: 0,
-    returnDate: date, roundTrip: false, toId: "",
+    returnDate: "", roundTrip: false, toId: "",
   };
 }
 
@@ -117,11 +117,16 @@ async function updateTrip<Key extends keyof ShuttleTripForm>(
   key: Key,
   value: ShuttleTripForm[Key],
 ) {
-  context.setState((current) => ({ ...current, errors: { ...current.errors, [key]: undefined },
-    form: { ...current.form, [key]: value }, formError: null }));
+  context.setState((current) => {
+    const form = { ...current.form, [key]: value };
+    if (key === "roundTrip" && value === false) form.returnDate = "";
+    if (key === "fromId") form.toId = "";
+    return { ...current, errors: { ...current.errors, [key]: undefined }, form,
+      formError: null, notice: null, outbound: null, outboundResult: null, quote: null,
+      returnLeg: null, returnResult: null };
+  });
   if (key !== "fromId") return;
-  context.setState((current) => ({ ...current, destinationGroups: [], loadingDestinations: true,
-    form: { ...current.form, toId: "" } }));
+  context.setState((current) => ({ ...current, destinationGroups: [], loadingDestinations: true }));
   try {
     const groups = value === "" ? [] : await context.client.getShuttleLocations(String(value));
     context.setState((current) => ({ ...current, destinationGroups: groups,
@@ -154,13 +159,14 @@ async function submitTrip(context: FlowContext, event: SubmitEvent) {
 async function chooseOutbound(context: FlowContext, leg: SelectedShuttleLeg) {
   if (context.requestInFlight.current) return;
   context.requestInFlight.current = true;
-  context.setState((current) => ({ ...current, notice: null, outbound: leg, submitting: true }));
+  context.setState((current) => ({ ...current, notice: null, outbound: leg, quote: null,
+    returnLeg: null, returnResult: null, submitting: true }));
   try {
     if (context.state.form.roundTrip) {
       const query = buildReturnQuery(context.state.form, leg);
       const result = await context.client.searchShuttleReturn(query);
       context.setState((current) => ({ ...current, outbound: leg, returnResult: result,
-        step: "return", submitting: false }));
+        step: "outbound", submitting: false }));
     } else {
       const withLeg = { ...context.state, outbound: leg };
       const selection = selectedTrip(withLeg, null);
@@ -212,8 +218,7 @@ export function useShuttleFlow(client: ShuttleApiClient, business: Business) {
     value: ShuttleTripForm[Key],
   ) => updateTrip(context, key, value);
   const back = () => setState((current) => ({ ...current, notice: null,
-    step: current.step === "confirm" ? (current.form.roundTrip ? "return" : "outbound")
-      : current.step === "return" ? "outbound" : "trip" }));
+    step: current.step === "confirm" ? "outbound" : "trip" }));
   const selection = selectedTrip(state, state.returnLeg);
   const complete = (
     response: ShuttleBookingResponse,

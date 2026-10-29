@@ -9,6 +9,7 @@ import { useShuttleFlow } from "./use-shuttle-flow";
 interface ShuttleFlowProps {
   business: Business;
   client: ShuttleApiClient;
+  mapsKey: string;
 }
 
 export function ShuttleFlow(props: ShuttleFlowProps) {
@@ -22,18 +23,19 @@ export function ShuttleFlow(props: ShuttleFlowProps) {
   }
   if (state.step === "confirm" && state.quote !== null && flow.selection !== null) {
     return <ShuttleConfirm business={props.business} client={props.client}
+      mapsKey={props.mapsKey}
       quote={state.quote} selection={flow.selection} onBack={flow.back}
       onBooked={flow.complete} onUnavailable={(message) => { void flow.unavailable(message); }} />;
   }
-  if (state.step === "return" && state.returnResult !== null) {
-    return <ShuttleDepartures currency={props.business.currency} notice={state.notice}
-      data={{ result: state.returnResult, date: state.form.returnDate, direction: "return" }}
-      onBack={flow.back} onChoose={(leg) => { void flow.chooseReturn(leg); }} />;
-  }
   if (state.step === "outbound" && state.outboundResult !== null) {
     return <ShuttleDepartures currency={props.business.currency} notice={state.notice}
-      data={{ result: state.outboundResult, date: state.form.date, direction: "outbound" }}
-      onBack={flow.back} onChoose={(leg) => { void flow.chooseOutbound(leg); }} />;
+      outboundData={{ result: state.outboundResult, date: state.form.date, direction: "outbound" }}
+      returnData={state.form.roundTrip && state.returnResult !== null
+        ? { result: state.returnResult, date: state.form.returnDate, direction: "return" }
+        : null}
+      loadingReturn={state.form.roundTrip && state.outbound !== null && state.submitting}
+      onBack={flow.back} onChooseOutbound={(leg) => { void flow.chooseOutbound(leg); }}
+      onChooseReturn={(leg) => { void flow.chooseReturn(leg); }} />;
   }
   return <ShuttleTrip destinationGroups={state.destinationGroups} errors={state.errors}
     form={state.form} formError={state.formError} loadingDestinations={state.loadingDestinations}

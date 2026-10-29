@@ -75,7 +75,8 @@ One phase at a time: **spec → build → report → review → merge**. Do not 
 | **E-8** | Taxi round trip, split luggage counts, form toggles | Backend B-37 |
 | **E-9** | Shuttle mode in the same widget | Backend B-38C |
 | **E-9b** | Scheduled-departure car name | Backend B-38D public `Departure.vehicle_type` |
-| **E-11** | Hourly: hours field and Add Stops | Backend hourly pricing (Part 3, client question C-6) |
+| **E-11** | Shuttle live-test UI fixes | E-9; backend B-45 remains separate-address gap |
+| **Future** | Hourly: hours field and Add Stops | Backend hourly pricing (Part 3, client question C-6) |
 
 ---
 

@@ -60,7 +60,7 @@ export function App({ client, mapsKey }: AppProps) {
           This booking form is not configured.
         </section>;
       }
-      return <ShuttleFlow business={state.business} client={client} />;
+      return <ShuttleFlow business={state.business} client={client} mapsKey={mapsKey} />;
     }
     if (state.business.type !== "taxi") {
       return <section class="widget status" aria-live="polite">

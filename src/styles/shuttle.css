@@ -11,21 +11,54 @@
   align-items: start;
 }
 
-.passenger-field input {
+.passenger-trigger {
+  align-items: center;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  height: 32px;
+  justify-content: space-between;
+  padding: 5px 9px;
   width: 100%;
+}
+
+.passenger-trigger[aria-invalid="true"] {
+  border-color: var(--error);
+}
+
+.passenger-menu {
+  background: #fff;
+  border: 1px solid var(--border);
+  box-shadow: 0 5px 10px rgb(0 0 0 / 20%);
+  display: grid;
+  gap: 12px;
+  left: 0;
+  padding: 14px;
+  position: absolute;
+  right: 0;
+  top: 58px;
+  z-index: 20;
+}
+
+.passenger-row {
+  align-items: center;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(80px, 1fr) minmax(130px, 1fr);
+}
+
+.passenger-row .counter-controls {
+  min-height: 36px;
 }
 
 .trip-kind {
   display: flex;
-  gap: 24px;
   margin: 20px 0;
   padding: 16px;
   border: 1px solid var(--border);
-}
-
-.trip-kind legend {
-  padding: 0 6px;
-  font-weight: 700;
 }
 
 .trip-kind label {
@@ -35,6 +68,10 @@
 }
 
 .trip-kind input {
+  box-shadow: none;
+  height: 18px;
+  margin: 0;
+  padding: 0;
   width: auto;
 }
 
@@ -42,6 +79,17 @@
   display: grid;
   gap: 12px;
   margin: 20px 0;
+}
+
+.departure-section.return {
+  border-top: 1px solid var(--border);
+  margin-top: 28px;
+  padding-top: 4px;
+}
+
+.return-loading {
+  color: var(--muted);
+  margin: 28px 0;
 }
 
 .shuttle-departure {
@@ -123,8 +171,8 @@
     min-height: 44px;
   }
 
-  .trip-kind {
-    flex-direction: column;
-    gap: 12px;
+  .passenger-trigger {
+    height: 44px;
   }
+
 }

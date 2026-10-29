@@ -210,7 +210,7 @@ button {
   font: inherit;
 }
 
-input,
+input:not([type="checkbox"]):not([type="radio"]),
 select {
   background: #ffffff;
   border: 1px solid var(--border);
@@ -221,7 +221,7 @@ select {
   width: 100%;
 }
 
-input:focus,
+input:not([type="checkbox"]):not([type="radio"]):focus,
 select:focus {
   border-color: #66afe9;
   box-shadow: 0 0 4px rgb(102 175 233 / 55%);
@@ -233,7 +233,7 @@ select:focus {
   outline-offset: 2px;
 }
 
-input[aria-invalid="true"],
+input:not([type="checkbox"]):not([type="radio"])[aria-invalid="true"],
 select[aria-invalid="true"] {
   border-color: var(--error);
 }
@@ -461,7 +461,7 @@ select[aria-invalid="true"] {
 }
 
 @media (max-width: 900px) {
-  input,
+  input:not([type="checkbox"]):not([type="radio"]),
   select {
     font-size: 16px;
     height: 44px;

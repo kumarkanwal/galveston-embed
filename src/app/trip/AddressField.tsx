@@ -6,10 +6,12 @@ import type { SelectedAddress } from "./types";
 import { usePlaceAutocomplete } from "./use-place-autocomplete";
 
 interface AddressFieldProps {
+  dataConfirmField?: string;
   error: string | undefined;
-  id: "pickup-address" | "dropoff-address";
+  id: string;
   label: string;
   mapsKey: string;
+  required?: boolean;
   onBlur: () => void;
   onChange: (address: SelectedAddress | null) => void;
   value: SelectedAddress | null;
@@ -70,7 +72,6 @@ export function AddressField(props: AddressFieldProps) {
     ? comboboxOptionId(optionsId, activeIndex) : undefined;
   useEffect(() => setText(props.value?.address ?? ""), [props.value]);
   useEffect(() => setOpen(suggestions.length > 0), [suggestions]);
-
   const choose = (prediction: google.maps.places.PlacePrediction) => {
     setOpen(false); void autocomplete.select(prediction).then((address) => {
       if (address !== null) setText(address.address); props.onChange(address);
@@ -94,7 +95,8 @@ export function AddressField(props: AddressFieldProps) {
     <label for={props.id}>{props.label}</label>
     <div class="input-with-icon address-input">
       <input id={props.id} role="combobox" placeholder={props.label}
-        value={text} aria-expanded={open} aria-controls={optionsId} aria-autocomplete="list"
+        data-confirm-field={props.dataConfirmField} required={props.required} value={text}
+        aria-expanded={open} aria-controls={optionsId} aria-autocomplete="list"
         aria-activedescendant={activeOptionId} aria-invalid={props.error !== undefined}
         aria-describedby={describedBy} onBlur={props.onBlur} onKeyDown={keyDown} onInput={(event) => {
           setText(event.currentTarget.value); props.onChange(null);

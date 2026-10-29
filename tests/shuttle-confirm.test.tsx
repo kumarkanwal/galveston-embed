@@ -25,7 +25,7 @@ const SELECTION = {
     paxAdult: 1, paxSenior: 1, paxChild: 0,
   },
   from: ORIGIN_LOCATION,
-  to: DESTINATION_LOCATION,
+  to: { ...DESTINATION_LOCATION, requires_address: false },
   outbound: { kind: "scheduled", date: "2026-10-30", departure: DEPARTURE },
   returnLeg: null,
 } satisfies ShuttleSelection;
@@ -62,7 +62,7 @@ function mount(
   const root = document.createElement("div");
   document.body.append(root);
   render(<ShuttleConfirm business={business} client={client}
-    quote={SHUTTLE_QUOTE} selection={SELECTION} onBack={() => undefined}
+    mapsKey="maps-key" quote={SHUTTLE_QUOTE} selection={SELECTION} onBack={() => undefined}
     onBooked={() => undefined} onUnavailable={onUnavailable} />, root);
   return { onUnavailable, root };
 }
@@ -80,7 +80,6 @@ function fill(root: HTMLElement) {
   enter(root, "firstName", "Ada");
   enter(root, "lastName", "Lovelace");
   enter(root, "email", "ada@example.com");
-  enter(root, "shuttle-address", "Terminal curb");
   act(() => {
     root.querySelector<HTMLInputElement>('[data-confirm-field="acceptedTerms"]')?.click();
   });
