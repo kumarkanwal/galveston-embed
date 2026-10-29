@@ -19,6 +19,14 @@ function predictionText(prediction: google.maps.places.PlacePrediction): string 
   return prediction.text.toString();
 }
 
+function MapPinIcon() {
+  return <span class="address-pin" aria-hidden="true">
+    <svg viewBox="0 0 24 24" focusable="false">
+      <path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 10a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
+    </svg>
+  </span>;
+}
+
 function AddressOptions(props: {
   activeIndex: number;
   choose: (prediction: google.maps.places.PlacePrediction) => void;
@@ -84,14 +92,14 @@ export function AddressField(props: AddressFieldProps) {
   };
   return <div class="field address-field">
     <label for={props.id}>{props.label}</label>
-    <div class="input-with-icon">
+    <div class="input-with-icon address-input">
       <input id={props.id} role="combobox" placeholder={props.label}
         value={text} aria-expanded={open} aria-controls={optionsId} aria-autocomplete="list"
         aria-activedescendant={activeOptionId} aria-invalid={props.error !== undefined}
         aria-describedby={describedBy} onBlur={props.onBlur} onKeyDown={keyDown} onInput={(event) => {
           setText(event.currentTarget.value); props.onChange(null);
         }} />
-      <span aria-hidden="true">⌖</span>
+      <MapPinIcon />
     </div>
     <AddressMessages error={error} loading={loading} lookupErrorId={lookupErrorId} />
     {open && <AddressOptions activeIndex={activeIndex} choose={choose}

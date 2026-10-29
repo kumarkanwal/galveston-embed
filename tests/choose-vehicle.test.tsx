@@ -55,11 +55,14 @@ describe("Choose Vehicle", () => {
     expect(root.textContent).toContain("$1,413.75 USD");
     expect(root.textContent).toContain("Request a Quote");
     const buttons = [...root.querySelectorAll<HTMLButtonElement>(".vehicle-choose")];
-    expect(buttons.map((button) => button.textContent))
-      .toEqual(["Choose", "Choose", "Not available at this time"]);
+    expect(buttons.map((button) => button.textContent)).toEqual(["Choose", "Choose"]);
     expect(buttons.map((button) => button.getAttribute("aria-label")))
-      .toEqual(["Choose Sedan", "Choose Van", "Bus: Not available at this time"]);
-    expect(buttons[2]?.disabled).toBe(true);
+      .toEqual(["Choose Sedan", "Choose Van"]);
+    expect(root.querySelector(".vehicle-unavailable")?.textContent)
+      .toBe("Not available at this time");
+    expect(root.textContent?.match(/Not available at this time/g)).toHaveLength(1);
+    expect(root.querySelector("[aria-disabled='true'] .vehicle-choose")).toBeNull();
+    expect(root.querySelector(".vehicle-capacity")?.textContent).toBe("♟ 3 passengers· ▣ 2 bags");
     buttons[0]?.click();
     expect(onChoose).toHaveBeenCalledWith(VEHICLES[0]);
   });
@@ -88,7 +91,10 @@ describe("Choose Vehicle", () => {
     expect(root.querySelector(".back-button")).not.toBeNull();
   });
 
-  it("shows a booking-time availability notice with next-step guidance", () => {
+});
+
+describe("Booking-time vehicle availability", () => {
+  it("shows a notice with next-step guidance", () => {
     const { root } = mountQuote({ out_of_service_area: false, vehicles: VEHICLES });
     render(<ChooseVehicle business={BUSINESS} quote={{ out_of_service_area: false, vehicles: VEHICLES }}
       notice="No vehicle is available for the requested time."
@@ -103,9 +109,26 @@ describe("Server-owned vehicle availability", () => {
     const vehicle = { ...VEHICLES[0]!, available: false, quote_status: "unavailable",
       unavailable_reason: "capacity" } satisfies QuotedVehicle;
     const { root } = mountQuote({ out_of_service_area: false, vehicles: [vehicle] });
-    const button = root.querySelector<HTMLButtonElement>(".vehicle-choose");
-    expect(button?.disabled).toBe(true);
-    expect(button?.textContent).toBe("Not available at this time");
+    expect(root.querySelector(".vehicle-choose")).toBeNull();
+    expect(root.querySelector(".vehicle-unavailable")?.textContent)
+      .toBe("Too many passengers or bags for this vehicle");
+  });
+
+  it.each([
+    ["blackout", "Not available at this time"],
+    ["time", "Not available at this time"],
+    ["admin_disabled", "Not available"],
+    [undefined, "Not available at this time"],
+  ])("maps %s to one plain unavailable message", (reason, message) => {
+    const unavailable = { ...VEHICLES[0]!, available: false,
+      quote_status: "unavailable" as const };
+    const vehicle: QuotedVehicle = reason === undefined
+      ? unavailable
+      : { ...unavailable, unavailable_reason: reason };
+    const { root } = mountQuote({ out_of_service_area: false, vehicles: [vehicle] });
+    expect(root.querySelector(".vehicle-unavailable")?.textContent).toBe(message);
+    expect(root.textContent?.match(new RegExp(message, "g"))).toHaveLength(1);
+    expect(root.querySelector(".vehicle-choose")).toBeNull();
   });
 });
 

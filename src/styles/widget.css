@@ -258,6 +258,37 @@ select[aria-invalid="true"] {
   justify-content: center;
 }
 
+.address-field .address-input {
+  display: block;
+  position: relative;
+}
+
+.address-field .address-input input {
+  border-radius: 3px;
+  padding-right: 36px;
+}
+
+.address-field .address-pin {
+  background: transparent;
+  border: 0;
+  color: #526078;
+  display: block;
+  height: 20px;
+  pointer-events: none;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+}
+
+.address-field .address-pin svg {
+  display: block;
+  fill: currentcolor;
+  height: 100%;
+  width: 100%;
+}
+
 .options {
   background: #ffffff;
   border: 1px solid var(--border);

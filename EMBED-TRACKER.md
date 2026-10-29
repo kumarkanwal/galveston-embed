@@ -1,6 +1,6 @@
 # Booking Widget (Embed) — Tracker
 
-**Repo:** `galveston-embed` (new, separate) · **Last updated:** 26 October 2026
+**Repo:** `galveston-embed` (new, separate) · **Last updated:** 29 October 2026
 **Talks to:** the hosted `galveston-backend` API on the VPS.
 **Replaces:** the client's live Book Rides Online (BRO) booking form.
 
@@ -57,7 +57,8 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 12 | E-7b Taxi peak / blackout display | Both | 3% | ✅ Complete — ready for review | 3% |
 | 13 | E-9 Shuttle mode in the same widget | Both | — | ✅ Complete — ready for review | — |
 | 14 | E-9b Scheduled-departure car name | Both | — | ✅ Complete — ready for review | — |
-| 15 | E-11 Hourly (hours + Add Stops) | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
+| 15 | E-10 Live-test widget UI fixes | Widget | — | ✅ Complete — ready for review | — |
+| 16 | E-11 Hourly (hours + Add Stops) | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
 | | **Total** | | **100%** | | **87%** |
 
 Weights are estimates. E-9 and E-9b were added after the 100% weighting was
@@ -89,7 +90,7 @@ dependencies: `AGENTS.md` section 3.
 | 1.2 | Pickup date and time | ✅ | `GET /business` → `timezone`, `advance_booking_hours` | Times and advance-booking validation use the **business's timezone**, not the visitor's browser. Server enforcement remains authoritative |
 | 1.3 | Passengers dropdown | ✅ | `GET /business` → `max_passengers` | Uses the business limit capped at the request-schema maximum. Null means no vehicles are available (ED-020, ED-024) |
 | 1.4 | Check-in/trunk and carry-on counters | ✅ | `GET /business` → `max_luggage` | Sends `large_bags` and `small_bags`, never legacy `luggage`; the combined business limit and per-field schema limits are enforced before quote (ED-028) |
-| 1.5 | Pickup / dropoff address autocomplete | ✅ | Google Places (browser key, S-7) | US-only suggestions allow cities, street addresses and places such as hotels, terminals and airports; country, state, region and postal-code-only suggestions are excluded. Send **both** the address text and the zipcode. **Take the zipcode from Places `address_components` (`postal_code`), never by parsing the typed text.** Why: zipcodes decide zone prices; a wrong guess is a wrong price |
+| 1.5 | Pickup / dropoff address autocomplete | ✅ | Google Places (browser key, S-7) | US-only suggestions accept precise street addresses, establishments and airports; city/region-only results are rejected. Send **both** the address text and the zipcode. **Take the zipcode from Places `address_components` (`postal_code`), never by parsing the typed text.** Why: zipcodes decide zone prices; a wrong guess is a wrong price |
 | 1.6 | Pin icon beside each address | ✅ | — | Decorative icon only, no action (ED-014) |
 | 1.7 | Map | ✅ | Google Maps JavaScript API + Routes API | Draws and updates a browser route as soon as both Step 1 endpoints are known; `show_map=false` omits the map without disabling Places autocomplete; the decoded backend quote route takes over after pricing (ED-025, ED-027) |
 | 1.8 | Airport Pickup / Dropoff fields: airport, airline, flight number | ✅ | `GET /taxi/airports`, `GET /taxi/airlines` | Airport is a plain select; airline is searchable. The BRO airport screenshots are present |
@@ -103,8 +104,8 @@ dependencies: `AGENTS.md` section 3.
 |---|---|---|---|
 | 2.1 | Vehicle list | ✅ | From the quote response `vehicles[]` |
 | 2.2 | Photo | ✅ | HTTPS `photo_url` images are fixed-size, lazy-loaded and contained; null, invalid, non-HTTPS and failed images use the same-size inline car placeholder |
-| 2.3 | Name and capacity icons | ✅ | **Names are display text only.** Capacity from `passenger_capacity` and `luggage_capacity`. Why: real data has a vehicle named "up to 14 pax" with capacity 9 |
-| 2.4 | Three states | ✅ | `quote_status`: `"priced"` → show price · `"request_quote"` → "Request a Quote", Choose stays active · `"unavailable"` → greyed, button reads "Unavailable" |
+| 2.3 | Name and capacity icons | ✅ | **Names are display text only.** Capacity icons retain visible “passengers” and “bags” text from `passenger_capacity` and `luggage_capacity`. Why: real data has a vehicle named "up to 14 pax" with capacity 9 |
+| 2.4 | Three states | ✅ | `quote_status`: `"priced"` → show price · `"request_quote"` → "Request a Quote", Choose stays active · `"unavailable"` → greyed and non-selectable with one plain reason message, never a button |
 | 2.5 | Base fare column | ✅ | `base_price` (string). Format only; never calculate |
 | 2.6 | Vehicles too small for the party | ✅ | Use `?hide_incapable=false` and display the server's unavailable rows; never calculate passenger or combined-luggage availability in the widget |
 | 2.7 | Back button | ✅ | Keeps step 1 inputs |
@@ -114,7 +115,7 @@ dependencies: `AGENTS.md` section 3.
 
 | # | Item | Status | Notes |
 |---|---|---|---|
-| 3.1 | Trip summary | ✅ | Service, date/time, vehicle, distance (`distance_miles`), passengers, luggage, addresses |
+| 3.1 | Trip summary | ✅ | Service, date/time, vehicle, distance (`distance_miles`), visible passenger/check-in/carry-on text with icons, and addresses |
 | 3.2 | Charges breakdown | ✅ | `POST /taxi/price-breakdown` with `payment_method: "cash"`. Display `line_items` and `total` exactly as returned |
 | 3.3 | Line-item labels | ✅ | Show exactly what the API returns (ED-011). Any label change happens in the backend |
 | 3.4 | Zero-value lines | ✅ | Hide every line whose amount string is exactly `"0.00"` (ED-022); never identify lines by label |
@@ -205,6 +206,7 @@ dependencies: `AGENTS.md` section 3.
 ## Open items
 
 - **B-26:** document the taxi-booking `200` idempotent replay response in OpenAPI, mark `Idempotency-Key` required there, and document server retention. This does not block the widget, which always sends a UUID and scopes a key to one unchanged request body.
+- **Backend gap — public Terms URL:** `GET /v1/public/business` has no `terms_url`. The widget cannot create an external Terms & Conditions link without inventing an API field, so it keeps the current literal plain-text terms behavior.
 - **E-6 deployment:** enable Routes API on the referrer-restricted Maps browser-key project, finish BRO side-by-side verification, configure client-domain CORS, and deploy the reviewed bundle.
 
 ## Sources of truth
@@ -218,6 +220,7 @@ dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 29 Oct 2026 | E-10 complete for review: delayed taxi field errors until blur or Check Pricing, replaced the add-like address adornment with a decorative map pin, made unavailable rows non-selectable with one API-reason-based message, added visible capacity/summary text, and restricted taxi Places results to precise addresses, establishments and airports. Public business config still has no `terms_url`; recorded as a backend gap and kept literal plain-text terms behavior. Cash/card, pricing, shuttle and E-11 Add Stops behavior are unchanged. |
 | 26 Oct 2026 | P3 card payment complete for review: refreshed backend `771cb28` with explicit public readiness and environment, added conditional Cash / Card pricing to taxi and shuttle, integrated Square through the scoped named-slot exception, kept tokens local and outside idempotency fingerprints, and documented client CSP requirements. Live Square sandbox browser test is **UNVERIFIED**. |
 | 24 Oct 2026 | E-9b complete for review: refreshed and byte-verified backend `2b75d4d` with B-38D, then added the nullable scheduled-departure vehicle name without changing `service_label` or on-request behavior. |
 | 23 Oct 2026 | E-9 complete for review: one widget now dispatches by public business type; shuttle adds grouped reachable locations, scheduled/on-request departures and returns, server-owned quote/promo lines, cash booking and stale-availability recovery while taxi stays on E-8. Bundle remains one IIFE at 33,134 bytes gzip. The scheduled car name was deferred pending B-38D. |

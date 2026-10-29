@@ -84,7 +84,28 @@ function submitEvent(): SubmitEvent {
 
 beforeEach(() => {
   latestFlow = undefined;
+  render(null, document.body);
   document.body.replaceChildren();
+});
+
+describe("quote validation timing", () => {
+  it("reveals errors only after blur or the first Check Pricing attempt", async () => {
+    render(<Harness client={clientWith(vi.fn(async () => QUOTE))} />, document.body);
+    expect(flow().state.errors).toEqual({});
+    flow().blur("pickupAddress");
+    await vi.waitFor(() => expect(flow().state.errors).toEqual({
+      pickupAddress: "Please choose a street address or airport.",
+    }));
+    flow().update("pickupAddress", { address: "2021 Strand St", zipcode: "77550",
+      location: { lat: 29.3, lng: -94.8 } });
+    await vi.waitFor(() => expect(flow().state.errors).toEqual({}));
+    await flow().submit(submitEvent());
+    expect(flow().state.hasCheckedPricing).toBe(true);
+    expect(flow().state.errors).toMatchObject({
+      dropoffAddress: "Please choose a street address or airport.",
+      pickupTime: "Select a pickup time.",
+    });
+  });
 });
 
 describe("quote submission", () => {
@@ -128,7 +149,6 @@ describe("quote submission", () => {
     expect(flow().state.errors.returnDate).toBe(error.message);
     expect(flow().state.form.returnDate).toBe("2026-12-02");
   });
-
 });
 
 describe("booking navigation", () => {

@@ -1,15 +1,11 @@
 import type { SelectedAddress } from "../app/trip/types";
 
-const EXCLUDED_ADDRESS_TYPES = new Set([
-  "country",
-  "postal_code",
-  "administrative_area_level_1",
-  "administrative_area_level_2",
-  "administrative_area_level_3",
-  "administrative_area_level_4",
-  "administrative_area_level_5",
-  "administrative_area_level_6",
-  "administrative_area_level_7",
+const PRECISE_PLACE_TYPES = new Set([
+  "airport",
+  "establishment",
+  "premise",
+  "street_address",
+  "subpremise",
 ]);
 
 export function addressAutocompleteRequest(
@@ -22,7 +18,7 @@ export function addressAutocompleteRequest(
 export function isAllowedAddressSuggestion(
   prediction: Pick<google.maps.places.PlacePrediction, "types">,
 ): boolean {
-  return !prediction.types.some((type) => EXCLUDED_ADDRESS_TYPES.has(type));
+  return prediction.types.some((type) => PRECISE_PLACE_TYPES.has(type));
 }
 
 export function postalCode(
@@ -40,7 +36,8 @@ export function postalCode(
 export function selectedAddressFromPlace(
   place: google.maps.places.Place,
 ): SelectedAddress | null {
-  if (place.formattedAddress == null || place.location == null) return null;
+  if (!place.types?.some((type) => PRECISE_PLACE_TYPES.has(type))
+    || place.formattedAddress == null || place.location == null) return null;
   return {
     address: place.formattedAddress,
     zipcode: postalCode(place.addressComponents),
