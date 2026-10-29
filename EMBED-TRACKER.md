@@ -1,6 +1,6 @@
 # Booking Widget (Embed) — Tracker
 
-**Repo:** `galveston-embed` (new, separate) · **Last updated:** 29 October 2026
+**Repo:** `galveston-embed` (new, separate) · **Last updated:** 30 October 2026
 **Talks to:** the hosted `galveston-backend` API on the VPS.
 **Replaces:** the client's live Book Rides Online (BRO) booking form.
 
@@ -59,7 +59,8 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 14 | E-9b Scheduled-departure car name | Both | — | ✅ Complete — ready for review | — |
 | 15 | E-10 Live-test widget UI fixes | Widget | — | ✅ Complete — ready for review | — |
 | 16 | E-11 Shuttle live-test UI fixes | Widget | — | ✅ Complete — ready for review | — |
-| 17 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
+| 17 | E-12 Shuttle separate addresses | Widget | — | ✅ Complete — ready for review | — |
+| 18 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
 | | **Total** | | **100%** | | **87%** |
 
 Weights are estimates. E-9 and E-9b were added after the 100% weighting was
@@ -73,7 +74,7 @@ dependencies: `AGENTS.md` section 3.
 | S-1 | New repo `galveston-embed` | ✅ | Separate from `galveston-widgets` (old cancelled plugin; leave untouched) |
 | S-2 | **VPS runs the latest backend**, including the pricing migration `f1a2b3c4d5e6` | ✅ | Pricing migration and B-20 are deployed on the preview VPS |
 | S-3 | D-1 (contract v1.2) and B-20 pushed to `origin` | ✅ | B-20 is included in backend commit `7e15a04` |
-| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ | Refreshed from backend commit `8acc27f25bf784229923593d4023e2eb09b1a0a1` (including B-40A through B-43) |
+| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ | Refreshed from backend commit `6b6fb8e14169cd7e01a6a8e47a893e02ce9d0f9b` (including B-45) |
 | S-5 | Demo company API key, named `embed` | ✅ Ready when needed | Runbook: `docs/runbooks/embed-keys.md` (backend) |
 | S-6 | Developer's local address (e.g. `http://localhost:5173`) added to `CORS_ORIGINS` on the VPS | ⛔ Not yet | Otherwise the browser cannot read API responses |
 | S-7 | **Google Maps browser key**, HTTP-referrer restricted to dev address now, client sites later | 🔍 Key available; enable Routes API and restrict it | Must be separate from the server key. Maps JavaScript API, Places API (New), and Routes API are required; never use the server key in the browser |
@@ -145,11 +146,12 @@ dependencies: `AGENTS.md` section 3.
 | A-2 | Promo code | ✅ | E-7a uses B-30 price-breakdown and booking support on Distance and Flat Rate rows. Request-a-Quote vehicles keep ED-009 and do not show the control. |
 | A-3 | Taxi round trip | ✅ | E-8 uses the backend round-trip quote, breakdown and booking fields; return-gap and vehicle availability decisions remain server-owned. |
 | A-4 | Taxi peak / blackout display | ✅ | E-7b displays server peak lines, quote blackouts and booking-time unavailability. |
-| A-5 | Shuttle mode | ✅ | E-9 uses B-38C. E-11 presents outbound and valid return departures on one page, uses one Round trip checkbox and one category-preserving passenger dropdown, and reuses precise Places suggestions for locations requiring the single public `address` field. Scheduled cards show time, seats, price, documented `service_label` and the B-38D vehicle name when present; on-request shows `vehicle_type_name`. |
+| A-5 | Shuttle mode | ✅ | E-9 uses B-38C. E-11 presents outbound and valid return departures on one page, uses one Round trip checkbox and one category-preserving passenger dropdown, and established precise Places suggestions for required addresses. E-12 moves those addresses to B-45's separate per-leg fields. Scheduled cards show time, seats, price, documented `service_label` and the B-38D vehicle name when present; on-request shows `vehicle_type_name`. |
 | A-6 | Scheduled shuttle car name | ✅ | E-9b shows public `Departure.vehicle_type.name` when present and hides the vehicle row when null, without repurposing `service_label`. |
 | A-7 | Shuttle live-test UI fixes | ✅ | E-11 keeps taxi behavior unchanged while fixing round-trip, same-page departure/return, passenger and required-address UI. |
-| A-8 | Per-pricing-row airport filter | ⏸ | `pricing_row_airports` exists but nothing uses it |
-| A-9 | Production hosting of `embed.js` on the VPS | ⏸ | Behind Caddy. Config only, no host-specific code |
+| A-8 | Shuttle separate pickup/drop-off addresses | ✅ | E-12 uses B-45 route-side flags, sends precise addresses per booking leg, reverses editable round-trip defaults, keeps quotes address-free, and refreshes Departures after stale availability. |
+| A-9 | Per-pricing-row airport filter | ⏸ | `pricing_row_airports` exists but nothing uses it |
+| A-10 | Production hosting of `embed.js` on the VPS | ⏸ | Behind Caddy. Config only, no host-specific code |
 
 ---
 
@@ -208,14 +210,13 @@ dependencies: `AGENTS.md` section 3.
 ## Open items
 
 - **B-26:** document the taxi-booking `200` idempotent replay response in OpenAPI, mark `Idempotency-Key` required there, and document server retention. This does not block the widget, which always sends a UUID and scopes a key to one unchanged request body.
-- **B-45 — separate shuttle pickup/drop-off addresses:** the public shuttle booking contract exposes one nullable `address` field. E-11 uses that field when either selected location requires a customer address; distinct pickup and drop-off address fields require a backend contract change and are not inferred or added to the request.
 - **Backend gap — public Terms URL:** `GET /v1/public/business` has no `terms_url`. The widget cannot create an external Terms & Conditions link without inventing an API field, so it keeps the current literal plain-text terms behavior.
 - **E-6 deployment:** enable Routes API on the referrer-restricted Maps browser-key project, finish BRO side-by-side verification, configure client-domain CORS, and deploy the reviewed bundle.
 
 ## Sources of truth
 
-- `galveston-backend/docs/API_CONTRACT.md` (commit `8acc27f25bf784229923593d4023e2eb09b1a0a1`)
-- `galveston-backend/openapi.json` (commit `8acc27f25bf784229923593d4023e2eb09b1a0a1`)
+- `galveston-backend/docs/API_CONTRACT.md` (commit `6b6fb8e14169cd7e01a6a8e47a893e02ce9d0f9b`)
+- `galveston-backend/openapi.json` (commit `6b6fb8e14169cd7e01a6a8e47a893e02ce9d0f9b`)
 - `galveston-backend/docs/PROJECT-TRACKER.md`
 - BRO screenshots in this repo
 
@@ -223,6 +224,7 @@ dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 30 Oct 2026 | E-12 complete for review: refreshed and byte-verified B-45, used route-side flags for separate precise shuttle pickup/drop-off fields, moved addresses into each booking leg, added editable reversed round-trip defaults, kept quote bodies address-free, and refreshed Departures after stale route or schedule errors. Taxi behavior is unchanged. |
 | 29 Oct 2026 | E-11 complete for review: shuttle trip type is one Round trip checkbox, outbound and return choices share one page with server-refreshed valid returns, passenger categories live in one accessible dropdown without changing request counts, and required-location customer addresses reuse precise taxi Places selection through the single public `address` field. Recorded separate pickup/drop-off fields as backend gap B-45; taxi behavior is unchanged. |
 | 29 Oct 2026 | E-10 complete for review: delayed taxi field errors until blur or Check Pricing, replaced the add-like address adornment with a decorative map pin, made unavailable rows non-selectable with one API-reason-based message, added visible capacity/summary text, and restricted taxi Places results to precise addresses, establishments and airports. Public business config still has no `terms_url`; recorded as a backend gap and kept literal plain-text terms behavior. Cash/card, pricing, shuttle and future hourly/Add Stops behavior are unchanged. |
 | 26 Oct 2026 | P3 card payment complete for review: refreshed backend `771cb28` with explicit public readiness and environment, added conditional Cash / Card pricing to taxi and shuttle, integrated Square through the scoped named-slot exception, kept tokens local and outside idempotency fingerprints, and documented client CSP requirements. Live Square sandbox browser test is **UNVERIFIED**. |

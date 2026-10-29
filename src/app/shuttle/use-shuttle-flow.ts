@@ -14,6 +14,7 @@ import type {
 import { ApiError } from "../../api/errors";
 import { businessDateTimeParts } from "../../time";
 import { buildReturnQuery, buildShuttleQuote, buildShuttleSearchQuery } from "./requests";
+import { isShuttleAvailabilityError, SHUTTLE_UNAVAILABLE_MESSAGE } from "./availability";
 import type {
   PassengerPriceFlags,
   SelectedShuttleLeg,
@@ -176,7 +177,11 @@ async function chooseOutbound(context: FlowContext, leg: SelectedShuttleLeg) {
         step: "confirm", submitting: false }));
     }
   } catch (error: unknown) {
-    context.setState((current) => ({ ...current, notice: errorMessage(error), submitting: false }));
+    if (isShuttleAvailabilityError(error)) {
+      await returnToDepartures(context, SHUTTLE_UNAVAILABLE_MESSAGE);
+    } else {
+      context.setState((current) => ({ ...current, notice: errorMessage(error), submitting: false }));
+    }
   } finally { context.requestInFlight.current = false; }
 }
 
@@ -194,17 +199,26 @@ async function chooseReturn(context: FlowContext, leg: SelectedShuttleLeg) {
     context.setState((current) => ({ ...current, quote, returnLeg: leg,
       step: "confirm", submitting: false }));
   } catch (error: unknown) {
-    context.setState((current) => ({ ...current, notice: errorMessage(error), submitting: false }));
+    if (isShuttleAvailabilityError(error)) {
+      await returnToDepartures(context, SHUTTLE_UNAVAILABLE_MESSAGE);
+    } else {
+      context.setState((current) => ({ ...current, notice: errorMessage(error), submitting: false }));
+    }
   } finally { context.requestInFlight.current = false; }
 }
 
 async function returnToDepartures(context: FlowContext, message: string) {
-  let result = context.state.outboundResult;
-  try {
-    result = await context.client.searchShuttle(buildShuttleSearchQuery(context.state.form));
-  } catch { /* retain the last search while showing the booking error */ }
   context.setState((current) => ({ ...current, notice: message, outbound: null,
-    outboundResult: result, quote: null, returnLeg: null, returnResult: null, step: "outbound" }));
+    outboundResult: null, quote: null, returnLeg: null, returnResult: null,
+    step: "outbound", submitting: true }));
+  try {
+    const result = await context.client.searchShuttle(buildShuttleSearchQuery(context.state.form));
+    context.setState((current) => ({ ...current, outboundResult: result,
+      priceFlags: priceFlags(result), submitting: false }));
+  } catch {
+    context.setState((current) => ({ ...current, notice:
+      `${message} Go back and choose the locations again.`, submitting: false }));
+  }
 }
 
 export function useShuttleFlow(client: ShuttleApiClient, business: Business) {

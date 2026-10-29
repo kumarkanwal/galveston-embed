@@ -1,5 +1,6 @@
 import type {
   PaymentMethod,
+  ShuttleBookingLeg,
   ShuttleBookingRequest,
   ShuttleQuoteLeg,
   ShuttleQuoteRequest,
@@ -7,6 +8,7 @@ import type {
   ShuttleSearchQuery,
 } from "../../api/client";
 import type { ConfirmFormState } from "../confirm/types";
+import { requiredShuttleAddresses, type ShuttleAddressValues } from "./address";
 import type { SelectedShuttleLeg, ShuttleSelection, ShuttleTripForm } from "./types";
 
 function passengerCounts(trip: ShuttleTripForm) {
@@ -84,20 +86,29 @@ export function buildShuttleQuote(
 export function buildShuttleBooking(
   selection: ShuttleSelection,
   form: ConfirmFormState,
-  address: string,
+  addresses: ShuttleAddressValues,
   promoCode: string | null,
   paymentMethod: PaymentMethod = "cash",
 ): ShuttleBookingRequest {
   const quote = buildShuttleQuote(selection, promoCode, paymentMethod);
+  const required = requiredShuttleAddresses(selection);
+  const legs: ShuttleBookingLeg[] = quote.legs.map((leg, index) => {
+    const pickupField = index === 0 ? "outboundPickup" : "returnPickup";
+    const dropoffField = index === 0 ? "outboundDropoff" : "returnDropoff";
+    const pickup = required.includes(pickupField) ? addresses[pickupField] : null;
+    const dropoff = required.includes(dropoffField) ? addresses[dropoffField] : null;
+    return { ...leg,
+      pickup_address: pickup?.address.trim() || null,
+      dropoff_address: dropoff?.address.trim() || null };
+  });
   return {
-    legs: quote.legs,
+    legs,
     insurance_selected: false,
     customer: {
       first_name: form.firstName.trim(), last_name: form.lastName.trim(),
       email: form.email.trim(), phone: form.phone.trim() || null,
     },
     comments: form.comments.trim() || null,
-    address: address.trim() || null,
     payment: { method: paymentMethod },
     accepted_terms: form.acceptedTerms,
     ...(promoCode === null ? {} : { promo_code: promoCode }),

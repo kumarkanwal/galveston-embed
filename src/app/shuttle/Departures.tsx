@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 
-import type { ShuttleDeparture } from "../../api/client";
+import type { ShuttleDeparture, ShuttleRoute } from "../../api/client";
 import { formatMoney } from "../../money";
 import { FormError } from "../trip/FieldError";
 import { ProgressSteps } from "../trip/ProgressSteps";
@@ -8,9 +8,10 @@ import type { DepartureViewData, OnRequestLeg, ScheduledLeg } from "./types";
 
 interface ShuttleDeparturesProps {
   currency: string;
+  loadingOutbound: boolean;
   loadingReturn: boolean;
   notice: string | null;
-  outboundData: DepartureViewData;
+  outboundData: DepartureViewData | null;
   returnData: DepartureViewData | null;
   onBack: () => void;
   onChooseOutbound: (leg: ScheduledLeg | OnRequestLeg) => void;
@@ -34,6 +35,7 @@ function DepartureCard(props: {
   date: string;
   departure: ShuttleDeparture;
   onChoose: DepartureSectionProps["onChoose"];
+  route: ShuttleRoute;
 }) {
   const departure = props.departure;
   return <article class={`shuttle-departure${departure.selectable ? "" : " unavailable"}`}>
@@ -44,7 +46,8 @@ function DepartureCard(props: {
       {departure.low_seat_warning !== null && <small>{departure.low_seat_warning}</small>}</div>
     <strong>{formatMoney(departure.total_for_selection, props.currency)}</strong>
     <button type="button" disabled={!departure.selectable}
-      onClick={() => props.onChoose({ kind: "scheduled", date: props.date, departure })}>
+      onClick={() => props.onChoose({ kind: "scheduled", date: props.date, departure,
+        route: props.route })}>
       {departure.selectable ? "Choose" : "Unavailable"}
     </button>
     {!departure.selectable && departure.unselectable_reason !== null &&
@@ -67,6 +70,7 @@ function OnRequestChoice(props: DepartureSectionProps) {
     kind: "on_request",
     date: props.data.date,
     routeId: option.route_id,
+    route: props.data.result.route,
     time,
     vehicleTypeId: option.vehicle_type_id,
     vehicleTypeName: option.vehicle_type_name,
@@ -110,7 +114,7 @@ function DepartureSection(props: DepartureSectionProps) {
     {departures.length > 0 && <div class="shuttle-departures">
       {departures.map((departure) => <DepartureCard key={departure.schedule_id}
         currency={props.currency} date={props.data.date} departure={departure}
-        onChoose={props.onChoose} />)}
+        onChoose={props.onChoose} route={props.data.result.route} />)}
     </div>}
     <OnRequestChoice {...props} />
   </section>;
@@ -121,8 +125,12 @@ export function ShuttleDepartures(props: ShuttleDeparturesProps) {
     <header class="widget-heading"><h1>Reservations</h1><p>Choose your shuttle departure.</p></header>
     <ProgressSteps activeStep={2} steps={["Trip", "Departures", "Confirm"]} />
     {props.notice !== null && <div class="service-area-note" role="alert">{props.notice}</div>}
-    <DepartureSection currency={props.currency} data={props.outboundData}
-      onChoose={props.onChooseOutbound} />
+    {props.loadingOutbound && <p class="return-loading" role="status">Refreshing departures…</p>}
+    {props.outboundData === null && !props.loadingOutbound && <div class="empty-vehicles">
+      No departures are available for the remembered route. Go back and search again.
+    </div>}
+    {props.outboundData !== null && <DepartureSection currency={props.currency}
+      data={props.outboundData} onChoose={props.onChooseOutbound} />}
     {props.loadingReturn && <p class="return-loading" role="status">Finding return departures…</p>}
     {props.returnData !== null && <DepartureSection currency={props.currency}
       data={props.returnData} onChoose={props.onChooseReturn} />}

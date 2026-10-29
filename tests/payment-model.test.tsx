@@ -18,7 +18,9 @@ import { usePriceBreakdown } from "../src/app/confirm/use-price-breakdown";
 import { buildShuttleBooking, buildShuttleQuote } from "../src/app/shuttle/requests";
 import type { ShuttleSelection } from "../src/app/shuttle/types";
 import type { TripFormState } from "../src/app/trip/types";
-import { DEPARTURE, DESTINATION_LOCATION, ORIGIN_LOCATION } from "./shuttle-fixtures";
+import {
+  DEPARTURE, DESTINATION_LOCATION, ORIGIN_LOCATION, SEARCH_RESULT,
+} from "./shuttle-fixtures";
 
 const TRIP = {
   service: "one_way", pickupDate: "2026-10-30", pickupTime: "10:00",
@@ -45,7 +47,8 @@ const SELECTION = {
     date: "2026-10-30", returnDate: "2026-10-31", roundTrip: false,
     paxAdult: 1, paxSenior: 0, paxChild: 0 },
   from: ORIGIN_LOCATION, to: DESTINATION_LOCATION,
-  outbound: { kind: "scheduled", date: "2026-10-30", departure: DEPARTURE },
+  outbound: { kind: "scheduled", date: "2026-10-30", departure: DEPARTURE,
+    route: SEARCH_RESULT.route },
   returnLeg: null,
 } satisfies ShuttleSelection;
 
@@ -124,7 +127,9 @@ describe("payment request models", () => {
     expect(buildBookingRequest(TRIP, "vehicle-1", 0, CONTACT, null, "online").payment)
       .toEqual({ method: "online" });
     expect(buildShuttleQuote(SELECTION, null, "online").payment_method).toBe("online");
-    expect(buildShuttleBooking(SELECTION, CONTACT, "", null, "online").payment)
+    expect(buildShuttleBooking(SELECTION, CONTACT, {
+      outboundPickup: null, outboundDropoff: null, returnPickup: null, returnDropoff: null,
+    }, null, "online").payment)
       .toEqual({ method: "online" });
   });
 

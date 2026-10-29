@@ -27,13 +27,16 @@ export function ShuttleFlow(props: ShuttleFlowProps) {
       quote={state.quote} selection={flow.selection} onBack={flow.back}
       onBooked={flow.complete} onUnavailable={(message) => { void flow.unavailable(message); }} />;
   }
-  if (state.step === "outbound" && state.outboundResult !== null) {
+  if (state.step === "outbound") {
     return <ShuttleDepartures currency={props.business.currency} notice={state.notice}
-      outboundData={{ result: state.outboundResult, date: state.form.date, direction: "outbound" }}
+      loadingOutbound={state.outboundResult === null && state.submitting}
+      outboundData={state.outboundResult === null ? null
+        : { result: state.outboundResult, date: state.form.date, direction: "outbound" }}
       returnData={state.form.roundTrip && state.returnResult !== null
         ? { result: state.returnResult, date: state.form.returnDate, direction: "return" }
         : null}
-      loadingReturn={state.form.roundTrip && state.outbound !== null && state.submitting}
+      loadingReturn={state.outboundResult !== null && state.form.roundTrip
+        && state.outbound !== null && state.submitting}
       onBack={flow.back} onChooseOutbound={(leg) => { void flow.chooseOutbound(leg); }}
       onChooseReturn={(leg) => { void flow.chooseReturn(leg); }} />;
   }

@@ -19,12 +19,19 @@ import type { PromoCodeState } from "../confirm/use-price-breakdown";
 import type { ConfirmFormState } from "../confirm/types";
 import { SquareCardField } from "../confirm/SquareCardField";
 import { useSquareCard } from "../confirm/use-square-card";
-import { AddressField } from "../trip/AddressField";
 import { FormError } from "../trip/FieldError";
 import { ProgressSteps } from "../trip/ProgressSteps";
-import type { SelectedAddress } from "../trip/types";
-import { addressAfterRouteChange } from "./address";
+import {
+  initialShuttleAddresses,
+  addressesAfterRouteChange,
+  requiredShuttleAddresses,
+  shuttleAddressRouteKey,
+  updateShuttleAddress,
+  type ShuttleAddressField,
+} from "./address";
+import { isShuttleAvailabilityError, SHUTTLE_UNAVAILABLE_MESSAGE } from "./availability";
 import { buildShuttleBooking, buildShuttleQuote } from "./requests";
+import { ShuttleAddressFields } from "./ShuttleAddressFields";
 import type { SelectedShuttleLeg, ShuttleSelection } from "./types";
 
 interface ShuttleConfirmProps {
@@ -103,7 +110,9 @@ function useShuttlePromo(props: ShuttleConfirmProps, paymentMethod: PaymentMetho
     }
     catch (error: unknown) {
       if (latestRequest.current !== requestId) return false;
-      if (error instanceof ApiError && error.code === "PROMO_INVALID") {
+      if (isShuttleAvailabilityError(error)) {
+        props.onUnavailable(SHUTTLE_UNAVAILABLE_MESSAGE);
+      } else if (error instanceof ApiError && error.code === "PROMO_INVALID") {
         setPromo((current) => ({ ...current, error: error.message, status: "idle" }));
       } else setQuoteError(error instanceof Error ? error.message : "Pricing failed.");
       return false;
@@ -136,21 +145,19 @@ function useShuttleConfirm(props: ShuttleConfirmProps) {
   const paymentSettings = cardPaymentSettings(props.business);
   const card = useSquareCard(paymentMethod === "online", paymentSettings);
   const [failure, setFailure] = useState<BookingFailure | null>(null);
-  const [address, setAddress] = useState<SelectedAddress | null>(null);
+  const [addressError, setAddressError] = useState<ShuttleAddressField | null>(null);
+  const [addresses, setAddresses] = useState(initialShuttleAddresses);
   const [submitting, setSubmitting] = useState(false);
-  const manager = useRef(new IdempotencyKeyManager());
-  const inFlight = useRef(false);
-  const route = useRef(`${props.selection.from.id}:${props.selection.to.id}`);
+  const manager = useRef(new IdempotencyKeyManager()), inFlight = useRef(false);
+  const route = useRef(shuttleAddressRouteKey(props.selection));
   const submit = async (form: ConfirmFormState) => {
     if (inFlight.current) return;
-    const addressRequired = props.selection.from.requires_address || props.selection.to.requires_address;
-    if (addressRequired && address === null) {
-      setFailure({ field: "address",
-        message: "Choose a street address or airport for this trip." }); return;
-    }
+    const missing = requiredShuttleAddresses(props.selection)
+      .find((field) => addresses.values[field] === null);
+    if (missing !== undefined) { setAddressError(missing); return; }
     inFlight.current = true; setFailure(null); setSubmitting(true);
     const cart = buildShuttleBooking(
-      props.selection, form, address?.address ?? "", pricing.promo.appliedCode, paymentMethod,
+      props.selection, form, addresses.values, pricing.promo.appliedCode, paymentMethod,
     );
     try {
       const key = await manager.current.getKey(cart);
@@ -162,28 +169,29 @@ function useShuttleConfirm(props: ShuttleConfirmProps) {
       if (error instanceof UnauthorizedError) {
         console.error("Galveston booking widget configuration was rejected.");
       }
-      if (error instanceof ApiError && (error.code === "SEATS_UNAVAILABLE"
-        || error.code === "SCHEDULE_INACTIVE")) props.onUnavailable(error.message);
+      if (isShuttleAvailabilityError(error)) props.onUnavailable(SHUTTLE_UNAVAILABLE_MESSAGE);
       else setFailure(bookingFailure(error));
     } finally { inFlight.current = false; setSubmitting(false); }
   };
   useEffect(() => {
-    const nextRoute = `${props.selection.from.id}:${props.selection.to.id}`;
+    const nextRoute = shuttleAddressRouteKey(props.selection);
     if (route.current === nextRoute) return;
     const previousRoute = route.current;
     route.current = nextRoute;
-    setAddress((current) => addressAfterRouteChange(current, previousRoute, nextRoute));
+    setAddresses((current) => addressesAfterRouteChange(current, previousRoute, nextRoute));
+    setAddressError(null);
     setFailure(null);
-  }, [props.selection.from.id, props.selection.to.id]);
-  return { address, card, failure, paymentMethod, setAddress, setFailure,
-    setPaymentMethod, submit, submitting, ...pricing };
+  }, [props.selection]);
+  const changeAddress = (field: ShuttleAddressField, value: Parameters<typeof updateShuttleAddress>[2]) => {
+    setAddresses((current) => updateShuttleAddress(current, field, value));
+    setAddressError(null); setFailure(null);
+  };
+  return { addressError, addresses, card, changeAddress, failure, paymentMethod,
+    setFailure, setPaymentMethod, submit, submitting, ...pricing };
 }
 
 export function ShuttleConfirm(props: ShuttleConfirmProps) {
   const view = useShuttleConfirm(props);
-  const addressRequired = props.selection.from.requires_address || props.selection.to.requires_address;
-  const addressError = view.failure?.field === "address" ? view.failure.message : undefined;
-  const formFailure = view.failure?.field === "address" ? null : view.failure;
   const cardAvailable = cardPaymentSettings(props.business) !== null;
   return <section class="widget"><header class="widget-heading">
     <h1>Reservations</h1><p>Review and confirm your shuttle trip.</p></header>
@@ -198,14 +206,13 @@ export function ShuttleConfirm(props: ShuttleConfirmProps) {
       <button class="back-button" type="button" onClick={props.onBack}>↶ Back</button>
     </div><ConfirmForm breakdownReady={view.quoteError === null && !view.busy}
       buttonLabel="Create Trip"
-      failure={formFailure} isSubmitting={view.submitting} onChange={() => view.setFailure(null)}
+      failure={view.failure} isSubmitting={view.submitting} onChange={() => view.setFailure(null)}
       submissionReady={view.paymentMethod === "cash" || view.card.ready}
       onValid={(form) => { void view.submit(form); }} terms={props.business.settings.terms_and_conditions}
       extraFields={<>
-        {addressRequired && <AddressField id="shuttle-address" label="Street Address"
-          dataConfirmField="address" mapsKey={props.mapsKey} required value={view.address}
-          error={addressError} onBlur={() => undefined}
-          onChange={(value) => { view.setAddress(value); view.setFailure(null); }} />}
+        <ShuttleAddressFields errorField={view.addressError} mapsKey={props.mapsKey}
+          selection={props.selection} values={view.addresses.values}
+          onChange={view.changeAddress} />
         <PaymentMethodField cardAvailable={cardAvailable} method={view.paymentMethod}
           onChange={(method) => { view.setFailure(null); view.setPaymentMethod(method); }} />
         {cardAvailable && view.paymentMethod === "online"

@@ -76,6 +76,7 @@ One phase at a time: **spec → build → report → review → merge**. Do not 
 | **E-9** | Shuttle mode in the same widget | Backend B-38C |
 | **E-9b** | Scheduled-departure car name | Backend B-38D public `Departure.vehicle_type` |
 | **E-11** | Shuttle live-test UI fixes | E-9; backend B-45 remains separate-address gap |
+| **E-12** | Shuttle separate pickup/drop-off addresses | E-11; backend B-45 |
 | **Future** | Hourly: hours field and Add Stops | Backend hourly pricing (Part 3, client question C-6) |
 
 ---

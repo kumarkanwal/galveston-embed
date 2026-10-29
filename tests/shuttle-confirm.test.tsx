@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Business, ShuttleApiClient, ShuttleQuoteResponse } from "../src/api/client";
 import { ApiError } from "../src/api/errors";
+import { SHUTTLE_UNAVAILABLE_MESSAGE } from "../src/app/shuttle/availability";
 import { ShuttleConfirm } from "../src/app/shuttle/ShuttleConfirm";
 import type { ShuttleSelection } from "../src/app/shuttle/types";
 import {
@@ -26,7 +27,9 @@ const SELECTION = {
   },
   from: ORIGIN_LOCATION,
   to: { ...DESTINATION_LOCATION, requires_address: false },
-  outbound: { kind: "scheduled", date: "2026-10-30", departure: DEPARTURE },
+  outbound: { kind: "scheduled", date: "2026-10-30", departure: DEPARTURE,
+    route: { ...SEARCH_RESULT.route, from_requires_address: false,
+      to_requires_address: false } },
   returnLeg: null,
 } satisfies ShuttleSelection;
 
@@ -149,6 +152,7 @@ describe("shuttle availability errors", () => {
   it.each([
     [409, "SEATS_UNAVAILABLE", "Those seats were just booked."],
     [422, "SCHEDULE_INACTIVE", "That departure is no longer active."],
+    [404, "NOT_FOUND", "That route was removed."],
   ])("returns %s %s to Departures without retrying", async (status, code, message) => {
     const book = vi.fn<ShuttleApiClient["bookShuttle"]>(async () => {
       throw new ApiError(status, { code, message });
@@ -159,7 +163,7 @@ describe("shuttle availability errors", () => {
       root.querySelector<HTMLFormElement>(".confirm-form")
         ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     });
-    await vi.waitFor(() => expect(onUnavailable).toHaveBeenCalledWith(message));
+    await vi.waitFor(() => expect(onUnavailable).toHaveBeenCalledWith(SHUTTLE_UNAVAILABLE_MESSAGE));
     expect(book).toHaveBeenCalledOnce();
   });
 });

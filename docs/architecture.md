@@ -105,10 +105,12 @@ errors and idempotency may be shared. Scheduled shuttle cards render
 `service_label` as documented service text and, when B-38D's nullable
 `vehicle_type` is present, render its `name` as the vehicle display text.
 Shuttle passenger categories remain separate request counts inside one dropdown.
-When either selected shuttle location has `requires_address=true`, confirmation
-reuses the precise Places address field and sends its selected formatted value in
-the contract's single `address` field. Changing From or To clears that selection.
-Separate pickup and drop-off address fields remain backend gap B-45.
+Each search result's `route.from_requires_address` and
+`route.to_requires_address` flags control separate precise Places pickup and
+drop-off fields. Booking sends those values only inside their corresponding leg;
+quote bodies remain address-free. Round-trip return fields use the reversed
+outbound values as editable defaults. Changing a location or resolved route
+clears its remembered addresses.
 
 **Dropped from BRO:** the site header (Menu, Login) and customer accounts.
 Taxi round trip is an allowed `service_type`; hourly remains deferred. Businesses

@@ -33,7 +33,7 @@ function renderTrip(priceFlags = { senior: false, child: false }) {
 
 function renderDepartures(result: ShuttleSearchResult, direction: "outbound" | "return" = "outbound") {
   const element = root();
-  render(<ShuttleDepartures currency="USD" notice={null}
+  render(<ShuttleDepartures currency="USD" notice={null} loadingOutbound={false}
     outboundData={{ result: direction === "outbound" ? result
       : { ...SEARCH_RESULT, departures: [] }, date: "2026-10-30", direction: "outbound" }}
     returnData={direction === "return" ? { result, date: "2026-10-30", direction } : null}
