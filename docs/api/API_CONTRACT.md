@@ -6,10 +6,65 @@ Base URL: `https://api.<domain>.com/v1`
 Consumers: Booking-form embeds (taxi and shuttle)
 
 **Version 1.6** — generated from the implemented schemas, routers, services and
-`openapi.json` through B-41. This document covers the public surface and the
-B-41 admin additions below; older admin endpoints remain defined by OpenAPI.
+`openapi.json` through B-43. This document covers the public surface and the
+B-43, B-42 and B-41 admin additions below; older admin endpoints remain defined by OpenAPI.
 
 ---
+
+## B-40A backend hardening
+
+Changes: optional idempotency headers on admin financial mutations, bounded typed
+admin reservation edits, shuttle throttling, and generic payment/SMTP failures.
+
+- `Idempotency-Key` is optional on manual payment, manual refund, manual void, and
+  add-charge. When supplied it must be printable ASCII, at most 128 characters,
+  and a replay returns the original mutation response.
+- Admin reservation PATCH accepts at most 10 typed `BookingStop` values and now
+  publishes explicit bounds for addresses, passenger/bag counts, hours, airline,
+  and flight number.
+- Public shuttle search, return search, quote, and booking are rate limited per
+  API key and per client IP. A booking is refused when the limiter is unavailable.
+- Provider failures expose stable generic categories; raw SMTP and payment-provider
+  detail is not an API response contract.
+
+## B-43 manual-booking customers and stops
+
+Changes: additive manual-customer VIP input and a shared typed intermediate-stop contract.
+
+- `ManualCustomer.is_vip` is optional and defaults to `false`. When staff explicitly
+  supply it, create saves the value on the shared customer record surfaced by
+  reservation detail; omission does not clear an existing customer's VIP status.
+- Manual create and preview accept at most 10 `stops`. Each stop requires `address`
+  (1-500 characters) and `sequence` (positive integer), with optional `zip` (up to
+  10 characters) and `note` (up to 2,000 characters). Reservation detail returns
+  the same typed shape; legacy address-only rows receive their stored order as sequence.
+- Stop pricing is unchanged: a configured `per_stop` rate still multiplies the
+  validated stop count, and preview uses the same pricing path and total as create.
+
+## B-42 reservation money display
+
+Changes: additive admin reservation-detail money metadata; no stored money or payment lifecycle changes.
+
+- `totals_scope: "order"` identifies the shared order summary, including when an
+  outbound or return booking is selected. `leg_prices` lists each scoped booking's
+  `booking_id`, nullable `leg`, and stored `leg_price`; no equal split is inferred.
+- `credit_amount = max(amount_paid - refund_total - charges.total, 0)` is unrefunded
+  overpayment. `balance_due` remains `max(charges.total - amount_paid, 0)`; no refund
+  is initiated. `amount_paid` remains gross collections, with refunds kept separate.
+- `price_overridden` mirrors `charges.price_overridden`. Nullable `price_override`
+  contains the latest explicit override audit's `reason`, `actor_admin_id`,
+  `actor_type`, and `created_at`. Missing legacy provenance remains null.
+- `payment.last_successful_payment` contains the last settled, non-voided attempt's
+  `amount` (settled amount, or legacy amount when unavailable) and nullable `paid_at`.
+  Subsequently partially/fully refunded payments remain historical successes.
+  `payment.latest_attempt` independently exposes `status` and `created_at`.
+  Each is null when absent. Legacy `payment` fields retain their existing meanings.
+- Every `payments` history item exposes both `created_at` and nullable `paid_at`;
+  attempt creation must not be labeled payment settlement.
+- Replayable B-37 pairs show full order snapshot lines from both directions and all
+  stored charges, regardless of which leg is selected. Stored order totals and leg
+  prices remain authoritative, including after an override. Legacy pairs lacking
+  replay snapshots retain the `Booking fare` fallback; current rates are never used.
 
 ## Changes from v1.5
 
