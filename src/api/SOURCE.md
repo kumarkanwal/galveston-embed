@@ -4,12 +4,11 @@
 | Field | Value |
 |---|---|
 | Copied from | `galveston-backend/openapi.json` |
-| Backend commit | `8acc27f25bf784229923593d4023e2eb09b1a0a1` |
-| Copied on | `2026-10-29` |
+| Backend commit | `6b6fb8e14169cd7e01a6a8e47a893e02ce9d0f9b` |
+| Copied on | `2026-10-30` |
 
 Refresh only after a complete backend change is committed and pushed.
 
-This source includes the P3 public payment environment and card-availability
-fields, P1 card-payment configuration, B-38D scheduled vehicle types, B-41,
-and the B-40A through B-43 contract additions.
+This source includes B-45 shuttle route address flags and per-leg pickup and
+drop-off booking addresses, plus the preceding contract additions.
 The copied blob was verified byte-for-byte against backend `origin/main`.

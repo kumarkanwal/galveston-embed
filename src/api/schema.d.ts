@@ -2540,10 +2540,11 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * Deactivate Category
-         * @description Deactivate a category and report active locations hidden by it.
+         * Deactivate Category Alias
+         * @deprecated
+         * @description Deprecated alias for the explicit category deactivation endpoint.
          */
-        delete: operations["deactivate_category_v1_admin_categories__category_id__delete"];
+        delete: operations["deactivate_category_alias_v1_admin_categories__category_id__delete"];
         options?: never;
         head?: never;
         /**
@@ -2551,6 +2552,86 @@ export interface paths {
          * @description Edit category presentation without bypassing deactivation warnings.
          */
         patch: operations["update_category_v1_admin_categories__category_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/categories/{category_id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deactivate Category
+         * @description Deactivate a category and report active locations hidden by it.
+         */
+        post: operations["deactivate_category_v1_admin_categories__category_id__deactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/categories/{category_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reactivate Category
+         * @description Reactivate a category without changing any child location.
+         */
+        post: operations["reactivate_category_v1_admin_categories__category_id__reactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/categories/{category_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Category Usage
+         * @description Return hard-delete readiness and all downstream dependency counts.
+         */
+        get: operations["category_usage_v1_admin_categories__category_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/categories/{category_id}/hard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Hard Delete Category
+         * @description Permanently delete an unused category.
+         */
+        delete: operations["hard_delete_category_v1_admin_categories__category_id__hard_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/admin/locations": {
@@ -2612,10 +2693,11 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * Deactivate Location
-         * @description Deactivate a location and disclose every active route it removes publicly.
+         * Deactivate Location Alias
+         * @deprecated
+         * @description Deprecated alias for the explicit location deactivation endpoint.
          */
-        delete: operations["deactivate_location_v1_admin_locations__location_id__delete"];
+        delete: operations["deactivate_location_alias_v1_admin_locations__location_id__delete"];
         options?: never;
         head?: never;
         /**
@@ -2623,6 +2705,86 @@ export interface paths {
          * @description Edit a location and its public address requirement.
          */
         patch: operations["update_location_v1_admin_locations__location_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/locations/{location_id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deactivate Location
+         * @description Deactivate a location and disclose every active route it removes publicly.
+         */
+        post: operations["deactivate_location_v1_admin_locations__location_id__deactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/locations/{location_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reactivate Location
+         * @description Reactivate a location without changing its category or routes.
+         */
+        post: operations["reactivate_location_v1_admin_locations__location_id__reactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/locations/{location_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Location Usage
+         * @description Return hard-delete readiness and every linked route.
+         */
+        get: operations["location_usage_v1_admin_locations__location_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/locations/{location_id}/hard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Hard Delete Location
+         * @description Permanently delete an unused location.
+         */
+        delete: operations["hard_delete_location_v1_admin_locations__location_id__hard_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/admin/routes": {
@@ -3843,6 +4005,47 @@ export interface components {
          */
         BookingLeg: "outbound" | "return";
         /**
+         * BookingLegRequest
+         * @description A quoted leg plus customer text for address-required endpoints.
+         */
+        BookingLegRequest: {
+            /** Schedule Id */
+            schedule_id?: string | null;
+            /**
+             * Departure Type
+             * @default scheduled
+             * @enum {string}
+             */
+            departure_type: "scheduled" | "on_request";
+            /** Route Id */
+            route_id?: string | null;
+            /** Vehicle Type Id */
+            vehicle_type_id?: string | null;
+            /** Pickup Date */
+            pickup_date?: string | null;
+            /** Pickup Time */
+            pickup_time?: string | null;
+            /**
+             * Pax Senior
+             * @default 0
+             */
+            pax_senior: number;
+            /**
+             * Pax Adult
+             * @default 0
+             */
+            pax_adult: number;
+            /**
+             * Pax Child
+             * @default 0
+             */
+            pax_child: number;
+            /** Pickup Address */
+            pickup_address?: string | null;
+            /** Dropoff Address */
+            dropoff_address?: string | null;
+        };
+        /**
          * BookingRequest
          * @description A cart being committed to.
          *
@@ -3851,7 +4054,7 @@ export interface components {
          */
         BookingRequest: {
             /** Legs */
-            legs: components["schemas"]["QuoteLegRequest"][];
+            legs: components["schemas"]["BookingLegRequest"][];
             customer: components["schemas"]["CustomerDetails"];
             payment: components["schemas"]["PaymentDetails"];
             /**
@@ -3868,7 +4071,10 @@ export interface components {
             promo_code?: string | null;
             /** Comments */
             comments?: string | null;
-            /** Address */
+            /**
+             * Address
+             * @deprecated
+             */
             address?: string | null;
         };
         /**
@@ -4833,6 +5039,45 @@ export interface components {
             affected_active_location_count: number;
         };
         /**
+         * CategoryReactivationResult
+         * @description A restored group whose child activation state remains untouched.
+         */
+        CategoryReactivationResult: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Name */
+            name: string;
+            /** Sort Order */
+            sort_order: number;
+            /** Is Active */
+            is_active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Active Location Count */
+            active_location_count: number;
+            /**
+             * Reactivated Location Count
+             * @default 0
+             */
+            reactivated_location_count: number;
+        };
+        /**
          * CategoryReorder
          * @description The category ids in their desired drag-and-drop order.
          */
@@ -4881,7 +5126,10 @@ export interface components {
             name?: string | null;
             /** Sort Order */
             sort_order?: number | null;
-            /** Is Active */
+            /**
+             * Is Active
+             * @deprecated
+             */
             is_active?: boolean | null;
         };
         /**
@@ -6039,6 +6287,10 @@ export interface components {
         Envelope_CategoryDeactivationResult_: {
             data: components["schemas"]["CategoryDeactivationResult"];
         };
+        /** Envelope[CategoryReactivationResult] */
+        Envelope_CategoryReactivationResult_: {
+            data: components["schemas"]["CategoryReactivationResult"];
+        };
         /** Envelope[CategoryResult] */
         Envelope_CategoryResult_: {
             data: components["schemas"]["CategoryResult"];
@@ -6106,6 +6358,10 @@ export interface components {
         /** Envelope[GlobalSettingsResult] */
         Envelope_GlobalSettingsResult_: {
             data: components["schemas"]["GlobalSettingsResult"];
+        };
+        /** Envelope[HardDeleteResult] */
+        Envelope_HardDeleteResult_: {
+            data: components["schemas"]["HardDeleteResult"];
         };
         /** Envelope[IntegrationResult] */
         Envelope_IntegrationResult_: {
@@ -6210,6 +6466,10 @@ export interface components {
         /** Envelope[ReservationDetail] */
         Envelope_ReservationDetail_: {
             data: components["schemas"]["ReservationDetail"];
+        };
+        /** Envelope[ResourceUsage] */
+        Envelope_ResourceUsage_: {
+            data: components["schemas"]["ResourceUsage"];
         };
         /** Envelope[RouteBusinessesResult] */
         Envelope_RouteBusinessesResult_: {
@@ -6391,6 +6651,10 @@ export interface components {
             message: string;
             /** Field */
             field?: string | null;
+            /** Details */
+            details?: {
+                [key: string]: unknown;
+            } | null;
         };
         /**
          * ErrorEnvelope
@@ -6513,6 +6777,22 @@ export interface components {
             detail?: components["schemas"]["ValidationError"][];
         };
         /**
+         * HardDeleteResult
+         * @description Stable confirmation that a configuration identity no longer exists.
+         */
+        HardDeleteResult: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Deleted
+             * @default true
+             */
+            deleted: boolean;
+        };
+        /**
          * HealthResponse
          * @description Liveness body. Health endpoints are the one documented exception to the envelope.
          */
@@ -6628,6 +6908,19 @@ export interface components {
             leg: components["schemas"]["BookingLeg"] | null;
             /** Leg Price */
             leg_price: string;
+        };
+        /**
+         * LinkedRoute
+         * @description A route using a category or location, regardless of activation state.
+         */
+        LinkedRoute: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
         };
         /** ListEnvelope[AirlineResult] */
         ListEnvelope_AirlineResult_: {
@@ -6973,7 +7266,10 @@ export interface components {
             sort_order?: number | null;
             /** Requires Address */
             requires_address?: boolean | null;
-            /** Is Active */
+            /**
+             * Is Active
+             * @deprecated
+             */
             is_active?: boolean | null;
         };
         /**
@@ -8859,6 +9155,17 @@ export interface components {
             run_notes: string | null;
         };
         /**
+         * ResourceUsage
+         * @description Hard-delete readiness with deterministic dependency detail.
+         */
+        ResourceUsage: {
+            /** Can Delete */
+            can_delete: boolean;
+            blockers: components["schemas"]["UsageBlockers"];
+            /** Linked Routes */
+            linked_routes: components["schemas"]["LinkedRoute"][];
+        };
+        /**
          * RouteBusinessResult
          * @description One company assignment, including the route owner's immutable row.
          */
@@ -8950,6 +9257,8 @@ export interface components {
             from_location_id: string;
             /** From Location Name */
             from_location_name: string;
+            /** From Requires Address */
+            from_requires_address: boolean;
             /**
              * To Location Id
              * Format: uuid
@@ -8957,6 +9266,8 @@ export interface components {
             to_location_id: string;
             /** To Location Name */
             to_location_name: string;
+            /** To Requires Address */
+            to_requires_address: boolean;
             /** Duration Minutes */
             duration_minutes: number;
             /** Service Label */
@@ -9057,6 +9368,8 @@ export interface components {
             from_location_id: string;
             /** From Location Name */
             from_location_name: string;
+            /** From Requires Address */
+            from_requires_address: boolean;
             /**
              * To Location Id
              * Format: uuid
@@ -9064,6 +9377,8 @@ export interface components {
             to_location_id: string;
             /** To Location Name */
             to_location_name: string;
+            /** To Requires Address */
+            to_requires_address: boolean;
             /** Duration Minutes */
             duration_minutes: number;
             /** Service Label */
@@ -9107,8 +9422,18 @@ export interface components {
             id: string;
             /** From */
             from: string;
+            /**
+             * From Requires Address
+             * @default false
+             */
+            from_requires_address: boolean;
             /** To */
             to: string;
+            /**
+             * To Requires Address
+             * @default false
+             */
+            to_requires_address: boolean;
             /** Duration Minutes */
             duration_minutes: number;
             /** Service Label */
@@ -9908,6 +10233,10 @@ export interface components {
             seats: number;
             /** Insurance Selected */
             insurance_selected: boolean;
+            /** Pickup Address */
+            pickup_address: string | null;
+            /** Dropoff Address */
+            dropoff_address: string | null;
             /** Address */
             address: string | null;
         };
@@ -10674,6 +11003,20 @@ export interface components {
             name: string | null;
             /** License Plate */
             license_plate: string | null;
+        };
+        /**
+         * UsageBlockers
+         * @description Dependency counts that explain whether a category or location is removable.
+         */
+        UsageBlockers: {
+            /** Locations */
+            locations: number;
+            /** Routes */
+            routes: number;
+            /** Schedules */
+            schedules: number;
+            /** Bookings */
+            bookings: number;
         };
         /** ValidationError */
         ValidationError: {
@@ -16068,6 +16411,7 @@ export interface operations {
                 business_id?: string | null;
             };
             header?: {
+                /** @description Optional replay key for this financial mutation. Supply 1-128 printable ASCII characters excluding spaces, and reuse the same value when retrying the request. */
                 "Idempotency-Key"?: string | null;
                 authorization?: string | null;
             };
@@ -16108,6 +16452,7 @@ export interface operations {
                 business_id?: string | null;
             };
             header?: {
+                /** @description Optional replay key for this financial mutation. Supply 1-128 printable ASCII characters excluding spaces, and reuse the same value when retrying the request. */
                 "Idempotency-Key"?: string | null;
                 authorization?: string | null;
             };
@@ -16148,6 +16493,7 @@ export interface operations {
                 business_id?: string | null;
             };
             header?: {
+                /** @description Optional replay key for this financial mutation. Supply 1-128 printable ASCII characters excluding spaces, and reuse the same value when retrying the request. */
                 "Idempotency-Key"?: string | null;
                 authorization?: string | null;
             };
@@ -16188,6 +16534,7 @@ export interface operations {
                 business_id?: string | null;
             };
             header?: {
+                /** @description Optional replay key for this financial mutation. Supply 1-128 printable ASCII characters excluding spaces, and reuse the same value when retrying the request. */
                 "Idempotency-Key"?: string | null;
                 authorization?: string | null;
             };
@@ -17392,7 +17739,7 @@ export interface operations {
             };
         };
     };
-    deactivate_category_v1_admin_categories__category_id__delete: {
+    deactivate_category_alias_v1_admin_categories__category_id__delete: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -17453,6 +17800,146 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_CategoryResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_category_v1_admin_categories__category_id__deactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                category_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_CategoryDeactivationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactivate_category_v1_admin_categories__category_id__reactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                category_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_CategoryReactivationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    category_usage_v1_admin_categories__category_id__usage_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                category_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ResourceUsage_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    hard_delete_category_v1_admin_categories__category_id__hard_delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                category_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_HardDeleteResult_"];
                 };
             };
             /** @description Validation Error */
@@ -17618,7 +18105,7 @@ export interface operations {
             };
         };
     };
-    deactivate_location_v1_admin_locations__location_id__delete: {
+    deactivate_location_alias_v1_admin_locations__location_id__delete: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -17679,6 +18166,146 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_LocationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_location_v1_admin_locations__location_id__deactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_LocationDeactivationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactivate_location_v1_admin_locations__location_id__reactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_LocationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    location_usage_v1_admin_locations__location_id__usage_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ResourceUsage_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    hard_delete_location_v1_admin_locations__location_id__hard_delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_HardDeleteResult_"];
                 };
             };
             /** @description Validation Error */
