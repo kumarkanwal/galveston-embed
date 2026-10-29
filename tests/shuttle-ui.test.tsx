@@ -1,9 +1,11 @@
 import { render } from "preact";
 import { act } from "preact/test-utils";
+import { useState } from "preact/hooks";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ShuttleSearchResult } from "../src/api/client";
 import { ShuttleDepartures } from "../src/app/shuttle/Departures";
+import { PassengerDropdown } from "../src/app/shuttle/PassengerDropdown";
 import { ShuttleTrip } from "../src/app/shuttle/Trip";
 import type { ShuttleTripForm } from "../src/app/shuttle/types";
 import { DEPARTURE, LOCATION_GROUPS, SEARCH_RESULT } from "./shuttle-fixtures";
@@ -40,6 +42,25 @@ function renderDepartures(result: ShuttleSearchResult, direction: "outbound" | "
   return element;
 }
 
+function PassengerHarness(props: {
+  form?: ShuttleTripForm;
+  priceFlags?: { senior: boolean; child: boolean };
+}) {
+  const [form, setForm] = useState(props.form ?? TRIP);
+  const update = <Key extends keyof ShuttleTripForm>(key: Key, value: ShuttleTripForm[Key]) => {
+    setForm((current) => ({ ...current, [key]: value }));
+  };
+  return <PassengerDropdown error={undefined} form={form}
+    priceFlags={props.priceFlags ?? { senior: false, child: false }} update={update} />;
+}
+
+function renderPassengers(props: Parameters<typeof PassengerHarness>[0] = {}) {
+  const element = root();
+  render(<PassengerHarness {...props} />, element);
+  act(() => element.querySelector<HTMLButtonElement>(".passenger-trigger")?.click());
+  return element;
+}
+
 beforeEach(() => document.body.replaceChildren());
 
 describe("shuttle trip fields", () => {
@@ -53,8 +74,11 @@ describe("shuttle trip fields", () => {
   });
 
   it("shows senior and child controls only when separate prices are returned", () => {
-    expect(renderTrip().querySelector("#paxSenior")).toBeNull();
+    const unpriced = renderTrip();
+    act(() => unpriced.querySelector<HTMLButtonElement>(".passenger-trigger")?.click());
+    expect(unpriced.querySelector("#paxSenior")).toBeNull();
     const priced = renderTrip({ senior: true, child: true });
+    act(() => priced.querySelector<HTMLButtonElement>(".passenger-trigger")?.click());
     expect(priced.querySelector("#paxSenior")).not.toBeNull();
     expect(priced.querySelector("#paxChild")).not.toBeNull();
   });
@@ -78,6 +102,41 @@ describe("shuttle trip fields", () => {
       timeZone="America/Chicago" onSubmit={() => undefined} update={update} />, element);
     act(() => element.querySelector<HTMLInputElement>('.trip-kind input')?.click());
     expect(update).toHaveBeenCalledWith("roundTrip", false);
+  });
+});
+
+describe("shuttle passenger dropdown", () => {
+  it("defaults to one adult and updates the closed-state total", () => {
+    const element = renderPassengers();
+    expect(element.querySelector("#paxAdult")?.textContent).toBe("1");
+    expect(element.querySelector<HTMLButtonElement>('[aria-label="Decrease Adults"]')?.disabled)
+      .toBe(true);
+    act(() => element.querySelector<HTMLButtonElement>('[aria-label="Increase Adults"]')?.click());
+    act(() => element.querySelector<HTMLButtonElement>('[aria-label="Increase Adults"]')?.click());
+    expect(element.querySelector(".passenger-trigger")?.textContent).toContain("3 passengers");
+  });
+
+  it("keeps category counters within their schema limits", () => {
+    const element = renderPassengers({ form: { ...TRIP, paxAdult: 99 },
+      priceFlags: { senior: true, child: true } });
+    expect(element.querySelector<HTMLButtonElement>('[aria-label="Increase Adults"]')?.disabled)
+      .toBe(true);
+    expect(element.querySelector<HTMLButtonElement>('[aria-label="Decrease Seniors"]')?.disabled)
+      .toBe(true);
+    expect(element.querySelector<HTMLButtonElement>('[aria-label="Decrease Children"]')?.disabled)
+      .toBe(true);
+  });
+
+  it("closes on Escape and returns focus to the trigger", () => {
+    const element = renderPassengers();
+    const increase = element.querySelector<HTMLButtonElement>('[aria-label="Increase Adults"]');
+    increase?.focus();
+    act(() => {
+      increase?.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, key: "Escape" }));
+    });
+    const trigger = element.querySelector<HTMLButtonElement>(".passenger-trigger");
+    expect(trigger?.getAttribute("aria-expanded")).toBe("false");
+    expect(document.activeElement).toBe(trigger);
   });
 });
 

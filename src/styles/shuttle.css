@@ -11,8 +11,47 @@
   align-items: start;
 }
 
-.passenger-field input {
+.passenger-trigger {
+  align-items: center;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  height: 32px;
+  justify-content: space-between;
+  padding: 5px 9px;
   width: 100%;
+}
+
+.passenger-trigger[aria-invalid="true"] {
+  border-color: var(--error);
+}
+
+.passenger-menu {
+  background: #fff;
+  border: 1px solid var(--border);
+  box-shadow: 0 5px 10px rgb(0 0 0 / 20%);
+  display: grid;
+  gap: 12px;
+  left: 0;
+  padding: 14px;
+  position: absolute;
+  right: 0;
+  top: 58px;
+  z-index: 20;
+}
+
+.passenger-row {
+  align-items: center;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(80px, 1fr) minmax(130px, 1fr);
+}
+
+.passenger-row .counter-controls {
+  min-height: 36px;
 }
 
 .trip-kind {
@@ -130,6 +169,10 @@
 
   .shuttle-departure button {
     min-height: 44px;
+  }
+
+  .passenger-trigger {
+    height: 44px;
   }
 
 }

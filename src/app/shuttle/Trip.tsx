@@ -1,6 +1,7 @@
 import type { LocationGroup } from "../../api/client";
 import { FieldError, FormError } from "../trip/FieldError";
 import { ProgressSteps } from "../trip/ProgressSteps";
+import { PassengerDropdown } from "./PassengerDropdown";
 import type {
   PassengerPriceFlags,
   ShuttleTripErrors,
@@ -29,22 +30,6 @@ function GroupedOptions({ groups }: { groups: LocationGroup[] }) {
       {location.name}
     </option>)}
   </optgroup>)}</>;
-}
-
-function CountField(props: {
-  error: string | undefined;
-  id: "paxAdult" | "paxSenior" | "paxChild";
-  label: string;
-  value: number;
-  update: ShuttleTripProps["update"];
-}) {
-  return <div class="field passenger-field">
-    <label for={props.id}>{props.label}</label>
-    <input id={props.id} type="number" min="0" max="99" value={props.value}
-      aria-invalid={props.error !== undefined}
-      onInput={(event) => props.update(props.id, Number(event.currentTarget.value))} />
-    <FieldError id={`${props.id}-error`} message={props.error} />
-  </div>;
 }
 
 function LocationField(props: {
@@ -89,15 +74,9 @@ export function ShuttleTrip(props: ShuttleTripProps) {
             onInput={(event) => props.update("date", event.currentTarget.value)} />
           <FieldError id="date-error" message={props.errors.date} />
         </div>
-        <CountField id="paxAdult" label="Adults" value={props.form.paxAdult}
-          error={props.errors.paxAdult} update={props.update} />
+        <PassengerDropdown error={props.errors.paxAdult} form={props.form}
+          priceFlags={props.priceFlags} update={props.update} />
       </div>
-      {(props.priceFlags.senior || props.priceFlags.child) && <div class="field-row">
-        {props.priceFlags.senior && <CountField id="paxSenior" label="Seniors"
-          value={props.form.paxSenior} error={undefined} update={props.update} />}
-        {props.priceFlags.child && <CountField id="paxChild" label="Children"
-          value={props.form.paxChild} error={undefined} update={props.update} />}
-      </div>}
       <div class="trip-kind">
         <label><input type="checkbox" checked={props.form.roundTrip}
           onChange={(event) => props.update("roundTrip", event.currentTarget.checked)} />
