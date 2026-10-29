@@ -22,7 +22,7 @@ import type {
 } from "./types";
 import { hasShuttleTripErrors, validateShuttleTrip } from "./validation";
 
-type ShuttleStep = "trip" | "outbound" | "return" | "confirm" | "done";
+type ShuttleStep = "trip" | "outbound" | "confirm" | "done";
 
 interface ShuttleFlowState {
   confirmation: { paymentMethod: PaymentMethod; response: ShuttleBookingResponse } | null;
@@ -159,13 +159,14 @@ async function submitTrip(context: FlowContext, event: SubmitEvent) {
 async function chooseOutbound(context: FlowContext, leg: SelectedShuttleLeg) {
   if (context.requestInFlight.current) return;
   context.requestInFlight.current = true;
-  context.setState((current) => ({ ...current, notice: null, outbound: leg, submitting: true }));
+  context.setState((current) => ({ ...current, notice: null, outbound: leg, quote: null,
+    returnLeg: null, returnResult: null, submitting: true }));
   try {
     if (context.state.form.roundTrip) {
       const query = buildReturnQuery(context.state.form, leg);
       const result = await context.client.searchShuttleReturn(query);
       context.setState((current) => ({ ...current, outbound: leg, returnResult: result,
-        step: "return", submitting: false }));
+        step: "outbound", submitting: false }));
     } else {
       const withLeg = { ...context.state, outbound: leg };
       const selection = selectedTrip(withLeg, null);
@@ -217,8 +218,7 @@ export function useShuttleFlow(client: ShuttleApiClient, business: Business) {
     value: ShuttleTripForm[Key],
   ) => updateTrip(context, key, value);
   const back = () => setState((current) => ({ ...current, notice: null,
-    step: current.step === "confirm" ? (current.form.roundTrip ? "return" : "outbound")
-      : current.step === "return" ? "outbound" : "trip" }));
+    step: current.step === "confirm" ? "outbound" : "trip" }));
   const selection = selectedTrip(state, state.returnLeg);
   const complete = (
     response: ShuttleBookingResponse,

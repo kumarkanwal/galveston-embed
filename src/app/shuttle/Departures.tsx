@@ -8,9 +8,18 @@ import type { DepartureViewData, OnRequestLeg, ScheduledLeg } from "./types";
 
 interface ShuttleDeparturesProps {
   currency: string;
-  data: DepartureViewData;
+  loadingReturn: boolean;
   notice: string | null;
+  outboundData: DepartureViewData;
+  returnData: DepartureViewData | null;
   onBack: () => void;
+  onChooseOutbound: (leg: ScheduledLeg | OnRequestLeg) => void;
+  onChooseReturn: (leg: ScheduledLeg | OnRequestLeg) => void;
+}
+
+interface DepartureSectionProps {
+  currency: string;
+  data: DepartureViewData;
   onChoose: (leg: ScheduledLeg | OnRequestLeg) => void;
 }
 
@@ -24,7 +33,7 @@ function DepartureCard(props: {
   currency: string;
   date: string;
   departure: ShuttleDeparture;
-  onChoose: ShuttleDeparturesProps["onChoose"];
+  onChoose: DepartureSectionProps["onChoose"];
 }) {
   const departure = props.departure;
   return <article class={`shuttle-departure${departure.selectable ? "" : " unavailable"}`}>
@@ -43,7 +52,7 @@ function DepartureCard(props: {
   </article>;
 }
 
-function OnRequestChoice(props: ShuttleDeparturesProps) {
+function OnRequestChoice(props: DepartureSectionProps) {
   const option = props.data.result.on_request;
   const [time, setTime] = useState("");
   if (option == null) return null;
@@ -89,16 +98,13 @@ function emptyMessage(data: DepartureViewData): string {
   return "No departures are available for this day. Please choose another date.";
 }
 
-export function ShuttleDepartures(props: ShuttleDeparturesProps) {
+function DepartureSection(props: DepartureSectionProps) {
   const departures = props.data.direction === "outbound"
     ? props.data.result.departures.filter((departure) => departure.selectable)
     : props.data.result.departures;
   const title = props.data.direction === "outbound" ? "Choose Departure" : "Choose Return";
-  return <section class="widget">
-    <header class="widget-heading"><h1>Reservations</h1><p>Choose your shuttle departure.</p></header>
-    <ProgressSteps activeStep={2} steps={["Trip", "Departures", "Confirm"]} />
+  return <section class={`departure-section ${props.data.direction}`}>
     <h2 class="step-title">{title}</h2>
-    {props.notice !== null && <div class="service-area-note" role="alert">{props.notice}</div>}
     {departures.length === 0 && props.data.result.on_request == null &&
       <div class="empty-vehicles">{emptyMessage(props.data)}</div>}
     {departures.length > 0 && <div class="shuttle-departures">
@@ -107,6 +113,19 @@ export function ShuttleDepartures(props: ShuttleDeparturesProps) {
         onChoose={props.onChoose} />)}
     </div>}
     <OnRequestChoice {...props} />
+  </section>;
+}
+
+export function ShuttleDepartures(props: ShuttleDeparturesProps) {
+  return <section class="widget">
+    <header class="widget-heading"><h1>Reservations</h1><p>Choose your shuttle departure.</p></header>
+    <ProgressSteps activeStep={2} steps={["Trip", "Departures", "Confirm"]} />
+    {props.notice !== null && <div class="service-area-note" role="alert">{props.notice}</div>}
+    <DepartureSection currency={props.currency} data={props.outboundData}
+      onChoose={props.onChooseOutbound} />
+    {props.loadingReturn && <p class="return-loading" role="status">Finding return departures…</p>}
+    {props.returnData !== null && <DepartureSection currency={props.currency}
+      data={props.returnData} onChoose={props.onChooseReturn} />}
     <button class="back-button" type="button" onClick={props.onBack}>↶ Back</button>
   </section>;
 }

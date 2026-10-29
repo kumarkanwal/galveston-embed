@@ -32,8 +32,11 @@ function renderTrip(priceFlags = { senior: false, child: false }) {
 function renderDepartures(result: ShuttleSearchResult, direction: "outbound" | "return" = "outbound") {
   const element = root();
   render(<ShuttleDepartures currency="USD" notice={null}
-    data={{ result, date: "2026-10-30", direction }}
-    onBack={() => undefined} onChoose={() => undefined} />, element);
+    outboundData={{ result: direction === "outbound" ? result
+      : { ...SEARCH_RESULT, departures: [] }, date: "2026-10-30", direction: "outbound" }}
+    returnData={direction === "return" ? { result, date: "2026-10-30", direction } : null}
+    loadingReturn={false} onBack={() => undefined}
+    onChooseOutbound={() => undefined} onChooseReturn={() => undefined} />, element);
   return element;
 }
 
@@ -109,7 +112,8 @@ describe("shuttle departures", () => {
     const unavailable = { ...DEPARTURE, selectable: false, unselectable_reason: reason };
     const element = renderDepartures({ ...SEARCH_RESULT, departures: [unavailable] }, "return");
     expect(element.textContent).toContain(reason);
-    expect(element.querySelector<HTMLButtonElement>(".shuttle-departure button")?.disabled).toBe(true);
+    expect(element.querySelector<HTMLButtonElement>(".departure-section.return button")?.disabled)
+      .toBe(true);
   });
 });
 

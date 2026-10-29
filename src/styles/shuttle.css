@@ -42,6 +42,17 @@
   margin: 20px 0;
 }
 
+.departure-section.return {
+  border-top: 1px solid var(--border);
+  margin-top: 28px;
+  padding-top: 4px;
+}
+
+.return-loading {
+  color: var(--muted);
+  margin: 28px 0;
+}
+
 .shuttle-departure {
   display: grid;
   grid-template-columns: minmax(150px, 1.4fr) minmax(130px, 1fr) auto auto;
