@@ -4,6 +4,7 @@ import { App } from "./app/shell/App";
 import { SQUARE_CARD_CONTAINER_ID, SQUARE_CARD_SLOT } from "./app/confirm/square-sdk";
 import { createApiClient, type ApiClient } from "./api/client";
 import confirmStyles from "./styles/confirm.css?inline";
+import paymentStyles from "./styles/payment.css?inline";
 import vehicleStyles from "./styles/vehicle.css?inline";
 import widgetStyles from "./styles/widget.css?inline";
 import shuttleStyles from "./styles/shuttle.css?inline";
@@ -66,7 +67,8 @@ export function mountBookingWidget(
     appendSquareCardContainer(documentRoot, mountElement);
     const style = documentRoot.createElement("style");
     const appRoot = documentRoot.createElement("div");
-    style.textContent = `${widgetStyles}\n${vehicleStyles}\n${confirmStyles}\n${shuttleStyles}`;
+    style.textContent = [widgetStyles, vehicleStyles, confirmStyles, paymentStyles, shuttleStyles]
+      .join("\n");
     shadowRoot.append(style, appRoot);
     render(h(App, {
       client: createClient(config),

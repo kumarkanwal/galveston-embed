@@ -11,7 +11,7 @@ import type {
 } from "../src/api/client";
 import { IdempotencyKeyManager, stableSerialize } from "../src/api/idempotency";
 import { buildBookingRequest, buildBreakdownRequest } from "../src/app/confirm/build-requests";
-import { cardPaymentSettings } from "../src/app/confirm/payment";
+import { cardPaymentSettings, paymentAvailability } from "../src/app/confirm/payment";
 import { PaymentMethodField } from "../src/app/confirm/PaymentMethodField";
 import type { ConfirmFormState } from "../src/app/confirm/types";
 import { usePriceBreakdown } from "../src/app/confirm/use-price-breakdown";
@@ -19,7 +19,7 @@ import { buildShuttleBooking, buildShuttleQuote } from "../src/app/shuttle/reque
 import type { ShuttleSelection } from "../src/app/shuttle/types";
 import type { TripFormState } from "../src/app/trip/types";
 import {
-  DEPARTURE, DESTINATION_LOCATION, ORIGIN_LOCATION, SEARCH_RESULT,
+  DEPARTURE, DESTINATION_LOCATION, ORIGIN_LOCATION, SEARCH_RESULT, SHUTTLE_BUSINESS,
 } from "./shuttle-fixtures";
 
 const TRIP = {
@@ -66,7 +66,8 @@ function PricingHarness({ client, cardAvailable }: {
   const [method, setMethod] = useState<PaymentMethod>("cash");
   const pricing = usePriceBreakdown(client, TRIP, "vehicle-1", 0, true, method);
   return <div>
-    <PaymentMethodField cardAvailable={cardAvailable} method={method} onChange={setMethod} />
+    <PaymentMethodField cardAvailable={cardAvailable} cashAvailable
+      method={method} onChange={setMethod} />
     {pricing.state.status === "ready" && <output>{pricing.state.data.total}</output>}
   </div>;
 }
@@ -91,11 +92,51 @@ describe("payment capability and pricing", () => {
       square_application_id: "app", square_location_id: "location",
     } })).toBeNull();
   });
+});
 
+describe("payment method availability", () => {
+  it.each([
+    ["cash only", ["cash"], false, { card: false, cash: true, defaultMethod: "cash" }],
+    ["card only", ["online"], true, { card: true, cash: false, defaultMethod: "online" }],
+    ["both", ["cash", "online"], true, { card: true, cash: true, defaultMethod: "cash" }],
+    ["empty", [], true, { card: false, cash: false, defaultMethod: null }],
+    ["unconfigured card", ["online"], false, { card: false, cash: false, defaultMethod: null }],
+  ])("derives the %s method matrix from settings and capability", (
+    _label, methods, cardReady, expected,
+  ) => {
+    const business = {
+      ...SHUTTLE_BUSINESS,
+      settings: { ...SHUTTLE_BUSINESS.settings, payment_methods: methods },
+      payments: cardReady ? {
+        card_available: true as const, environment: "sandbox" as const,
+        square_application_id: "app", square_location_id: "location",
+      } : null,
+    } satisfies Business;
+    expect(paymentAvailability(business)).toEqual(expected);
+  });
+
+  it("shows one method as text, both as a choice, and no method as a blocking message", () => {
+    const root = document.createElement("div");
+    render(<PaymentMethodField cardAvailable={false} cashAvailable
+      method="cash" onChange={vi.fn()} />, root);
+    expect(root.querySelector(".payment-summary")?.textContent).toBe("Payment: Cash");
+    render(<PaymentMethodField cardAvailable cashAvailable
+      method="cash" onChange={vi.fn()} />, root);
+    expect(root.querySelectorAll('.payment-method input[type="radio"]')).toHaveLength(2);
+    render(<PaymentMethodField cardAvailable={false} cashAvailable={false}
+      method="cash" onChange={vi.fn()} />, root);
+    expect(root.querySelector(".payment-unavailable")?.textContent).toBe(
+      "Online booking is temporarily unavailable. Please contact us to book.",
+    );
+  });
+});
+
+describe("payment pricing changes", () => {
   it("hides Card when unavailable and re-prices online when selected", async () => {
     const priceBreakdown = vi.fn<ApiClient["priceBreakdown"]>(async () => BREAKDOWN);
     const root = document.createElement("div");
-    render(<PaymentMethodField cardAvailable={false} method="cash" onChange={vi.fn()} />, root);
+    render(<PaymentMethodField cardAvailable={false} cashAvailable
+      method="cash" onChange={vi.fn()} />, root);
     expect(root.querySelector(".payment-method")).toBeNull();
     render(<PricingHarness cardAvailable client={clientWith(priceBreakdown)} />, root);
     await vi.waitFor(() => expect(priceBreakdown).toHaveBeenCalledOnce());

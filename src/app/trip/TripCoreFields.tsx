@@ -31,8 +31,8 @@ function DateTimeFields(props: Pick<
   "errors" | "form" | "onFieldBlur" | "timeZone" | "update"
 >) {
   const minimum = businessDateTimeParts(new Date(), props.timeZone);
-  return <>
-    <div class="field passenger-field">
+  return <div class="field-row pickup-datetime-fields">
+    <div class="field" data-trip-field="pickupDate">
         <label for="pickup-date">Pickup Date</label>
         <input id="pickup-date" type="date" value={props.form.pickupDate}
           min={minimum.date} required aria-invalid={props.errors.pickupDate !== undefined}
@@ -41,7 +41,7 @@ function DateTimeFields(props: Pick<
           onInput={(event) => props.update("pickupDate", event.currentTarget.value)} />
         <FieldError id="pickup-date-error" message={props.errors.pickupDate} />
       </div>
-      <div class="field">
+      <div class="field" data-trip-field="pickupTime">
         <label for="pickup-time">Pickup Time</label>
         <input id="pickup-time" type="time" value={props.form.pickupTime} required
           min={props.form.pickupDate === minimum.date ? minimum.time : undefined}
@@ -51,7 +51,7 @@ function DateTimeFields(props: Pick<
           onInput={(event) => props.update("pickupTime", event.currentTarget.value)} />
         <FieldError id="pickup-time-error" message={props.errors.pickupTime} />
     </div>
-  </>;
+  </div>;
 }
 
 function ReturnDateTimeFields(props: Pick<
@@ -121,8 +121,9 @@ export function TripCoreFields({
     <DateTimeFields errors={errors} form={form} onFieldBlur={onFieldBlur}
       timeZone={timeZone} update={update} />
     <ReturnDateTimeFields errors={errors} form={form} onFieldBlur={onFieldBlur} update={update} />
-    <div class="field-row">
-      <div class="field">
+    <fieldset class="party-fields">
+      <legend class="visually-hidden">Passengers and luggage</legend>
+      <div class="field" data-trip-field="passengers">
         <label for="passengers">Passengers</label>
         <select id="passengers" value={form.passengers}
           aria-invalid={errors.passengers !== undefined}
@@ -135,8 +136,8 @@ export function TripCoreFields({
         </select>
         <FieldError id="passengers-error" message={errors.passengers} />
       </div>
-    </div>
-    <LuggageCounters errors={errors} form={form} maximum={limits.bags}
-      onFieldBlur={onFieldBlur} update={update} />
+      <LuggageCounters errors={errors} form={form} maximum={limits.bags}
+        onFieldBlur={onFieldBlur} update={update} />
+    </fieldset>
   </>;
 }

@@ -21,11 +21,11 @@ function root(): HTMLElement {
   return element;
 }
 
-function renderTrip(priceFlags = { senior: false, child: false }) {
+function renderTrip() {
   const element = root();
   render(<ShuttleTrip destinationGroups={LOCATION_GROUPS.slice(1)} errors={{}}
     form={TRIP} formError={null} loadingDestinations={false} loadingLocations={false}
-    minimumDate="2026-10-23" originGroups={LOCATION_GROUPS} priceFlags={priceFlags}
+    minimumDate="2026-10-23" originGroups={LOCATION_GROUPS}
     submitting={false} timeZone="America/Chicago" onSubmit={() => undefined}
     update={() => undefined} />, element);
   return element;
@@ -44,14 +44,13 @@ function renderDepartures(result: ShuttleSearchResult, direction: "outbound" | "
 
 function PassengerHarness(props: {
   form?: ShuttleTripForm;
-  priceFlags?: { senior: boolean; child: boolean };
 }) {
   const [form, setForm] = useState(props.form ?? TRIP);
   const update = <Key extends keyof ShuttleTripForm>(key: Key, value: ShuttleTripForm[Key]) => {
     setForm((current) => ({ ...current, [key]: value }));
   };
   return <PassengerDropdown error={undefined} form={form}
-    priceFlags={props.priceFlags ?? { senior: false, child: false }} update={update} />;
+    update={update} />;
 }
 
 function renderPassengers(props: Parameters<typeof PassengerHarness>[0] = {}) {
@@ -73,14 +72,12 @@ describe("shuttle trip fields", () => {
     expect(element.textContent).toContain("Dates and times use America/Chicago");
   });
 
-  it("shows senior and child controls only when separate prices are returned", () => {
+  it("shows adult, senior and child controls before the first search", () => {
     const unpriced = renderTrip();
     act(() => unpriced.querySelector<HTMLButtonElement>(".passenger-trigger")?.click());
-    expect(unpriced.querySelector("#paxSenior")).toBeNull();
-    const priced = renderTrip({ senior: true, child: true });
-    act(() => priced.querySelector<HTMLButtonElement>(".passenger-trigger")?.click());
-    expect(priced.querySelector("#paxSenior")).not.toBeNull();
-    expect(priced.querySelector("#paxChild")).not.toBeNull();
+    expect(unpriced.querySelector("#paxAdult")?.textContent).toBe("1");
+    expect(unpriced.querySelector("#paxSenior")?.textContent).toBe("0");
+    expect(unpriced.querySelector("#paxChild")?.textContent).toBe("0");
   });
 
   it("uses one unchecked Round trip checkbox and no trip-type radios", () => {
@@ -98,7 +95,7 @@ describe("shuttle trip fields", () => {
     render(<ShuttleTrip destinationGroups={LOCATION_GROUPS.slice(1)} errors={{}}
       form={{ ...TRIP, roundTrip: true }} formError={null} loadingDestinations={false}
       loadingLocations={false} minimumDate="2026-10-23" originGroups={LOCATION_GROUPS}
-      priceFlags={{ senior: false, child: false }} submitting={false}
+      submitting={false}
       timeZone="America/Chicago" onSubmit={() => undefined} update={update} />, element);
     act(() => element.querySelector<HTMLInputElement>('.trip-kind input')?.click());
     expect(update).toHaveBeenCalledWith("roundTrip", false);
@@ -117,8 +114,7 @@ describe("shuttle passenger dropdown", () => {
   });
 
   it("keeps category counters within their schema limits", () => {
-    const element = renderPassengers({ form: { ...TRIP, paxAdult: 99 },
-      priceFlags: { senior: true, child: true } });
+    const element = renderPassengers({ form: { ...TRIP, paxAdult: 99 } });
     expect(element.querySelector<HTMLButtonElement>('[aria-label="Increase Adults"]')?.disabled)
       .toBe(true);
     expect(element.querySelector<HTMLButtonElement>('[aria-label="Decrease Seniors"]')?.disabled)

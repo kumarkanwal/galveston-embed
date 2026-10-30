@@ -51,8 +51,3 @@ export interface DepartureViewData {
   date: string;
   direction: "outbound" | "return";
 }
-
-export interface PassengerPriceFlags {
-  child: boolean;
-  senior: boolean;
-}

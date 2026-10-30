@@ -1,14 +1,22 @@
 import type { PaymentMethod } from "../../api/client";
+import { PAYMENT_UNAVAILABLE_MESSAGE, paymentLabel } from "./payment";
 
 interface PaymentMethodFieldProps {
   cardAvailable: boolean;
+  cashAvailable: boolean;
   disabled?: boolean;
   method: PaymentMethod;
   onChange: (method: PaymentMethod) => void;
 }
 
 export function PaymentMethodField(props: PaymentMethodFieldProps) {
-  if (!props.cardAvailable) return null;
+  if (!props.cashAvailable && !props.cardAvailable) {
+    return <p class="payment-unavailable" role="alert">{PAYMENT_UNAVAILABLE_MESSAGE}</p>;
+  }
+  if (!props.cashAvailable || !props.cardAvailable) {
+    const method = props.cardAvailable ? "online" : "cash";
+    return <p class="payment-summary">Payment: {paymentLabel(method)}</p>;
+  }
   return <fieldset class="payment-method">
     <legend>Payment Method</legend>
     <div class="payment-options">

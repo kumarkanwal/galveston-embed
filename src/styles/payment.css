@@ -1,0 +1,13 @@
+.payment-summary {
+  font-weight: 700;
+  margin: 14px 0;
+}
+
+.payment-unavailable {
+  background: #f2dede;
+  border: 1px solid #ebccd1;
+  border-radius: 3px;
+  color: var(--error);
+  margin: 14px 0;
+  padding: 12px;
+}

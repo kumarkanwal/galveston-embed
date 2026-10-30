@@ -3,7 +3,6 @@ import { FieldError, FormError } from "../trip/FieldError";
 import { ProgressSteps } from "../trip/ProgressSteps";
 import { PassengerDropdown } from "./PassengerDropdown";
 import type {
-  PassengerPriceFlags,
   ShuttleTripErrors,
   ShuttleTripForm,
 } from "./types";
@@ -17,7 +16,6 @@ interface ShuttleTripProps {
   loadingLocations: boolean;
   minimumDate: string;
   originGroups: LocationGroup[];
-  priceFlags: PassengerPriceFlags;
   submitting: boolean;
   timeZone: string;
   onSubmit: (event: SubmitEvent) => void;
@@ -75,7 +73,7 @@ export function ShuttleTrip(props: ShuttleTripProps) {
           <FieldError id="date-error" message={props.errors.date} />
         </div>
         <PassengerDropdown error={props.errors.paxAdult} form={props.form}
-          priceFlags={props.priceFlags} update={props.update} />
+          update={props.update} />
       </div>
       <div class="trip-kind">
         <label><input type="checkbox" checked={props.form.roundTrip}

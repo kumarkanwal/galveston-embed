@@ -44,7 +44,9 @@ const BUSINESS = {
     terms_and_conditions: "Be ready." },
 } satisfies Business;
 
-const CARD_BUSINESS = { ...BUSINESS, payments: { card_available: true,
+const CARD_BUSINESS = { ...BUSINESS,
+  settings: { ...BUSINESS.settings, payment_methods: ["cash", "online"] },
+  payments: { card_available: true,
   environment: "sandbox", square_application_id: "sandbox-app-id",
   square_location_id: "sandbox-location-id" } } satisfies Business;
 
@@ -207,7 +209,9 @@ describe("shuttle card booking and confirmation", () => {
       searchShuttle: vi.fn(async () => SEARCH_RESULT),
       searchShuttleReturn: vi.fn(async () => SEARCH_RESULT),
       quoteShuttle: vi.fn(async () => SHUTTLE_QUOTE), bookShuttle } satisfies ShuttleApiClient;
-    const business = { ...SHUTTLE_BUSINESS, payments: CARD_BUSINESS.payments } satisfies Business;
+    const business = { ...SHUTTLE_BUSINESS,
+      settings: { ...SHUTTLE_BUSINESS.settings, payment_methods: ["cash", "online"] },
+      payments: CARD_BUSINESS.payments } satisfies Business;
     const root = addRoot(); const onBooked = vi.fn();
     render(<ShuttleConfirm business={business} client={client} mapsKey="maps-key" quote={SHUTTLE_QUOTE}
       selection={SELECTION} onBack={vi.fn()} onBooked={onBooked} onUnavailable={vi.fn()} />, root);

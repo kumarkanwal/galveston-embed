@@ -15,7 +15,7 @@ import { ProgressSteps } from "../trip/ProgressSteps";
 import type { TripFormState } from "../trip/types";
 import { Charges } from "./Charges";
 import { ConfirmForm } from "./ConfirmForm";
-import { cardPaymentSettings } from "./payment";
+import { cardPaymentSettings, paymentAvailability } from "./payment";
 import { PaymentMethodField } from "./PaymentMethodField";
 import { RequestQuotePrice } from "./RequestQuotePrice";
 import { SquareCardField } from "./SquareCardField";
@@ -85,12 +85,14 @@ function useConfirmFocus(
 function useConfirmController(props: ConfirmProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const [carSeats, setCarSeats] = useState(0);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
   const carSeatMax = props.business.settings.offer_car_seats ? props.business.settings.max_car_seats : 0;
   const requestQuote = props.vehicle.quote_status === "request_quote";
-  const paymentSettings = cardPaymentSettings(props.business);
-  const cardAvailable = !requestQuote && paymentSettings !== null;
-  const card = useSquareCard(paymentMethod === "online" && cardAvailable, paymentSettings);
+  const payment = paymentAvailability(props.business, !requestQuote);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
+    payment.defaultMethod ?? "cash",
+  );
+  const paymentSettings = payment.card ? cardPaymentSettings(props.business) : null;
+  const card = useSquareCard(paymentMethod === "online" && payment.card, paymentSettings);
   const pricing = usePriceBreakdown(
     props.client, props.form, props.vehicle.vehicle_type_id, carSeats, !requestQuote,
     paymentMethod,
@@ -120,9 +122,9 @@ function useConfirmController(props: ConfirmProps) {
   const resetFormFailure = isPriceFieldFailure(booking.failure)
     ? () => undefined : booking.resetFailure;
   useConfirmFocus(sectionRef, props.autoFocusHeading, carSeatError, promoError);
-  return { applyPromo, booking, card, cardAvailable, carSeatError, carSeatMax, carSeats,
+  return { applyPromo, booking, card, carSeatError, carSeatMax, carSeats,
     changeCarSeats, changePayment, changePromo, formFailure, paymentMethod, pricing,
-    promoError, removePromo, requestQuote, resetFormFailure, sectionRef };
+    payment, promoError, removePromo, requestQuote, resetFormFailure, sectionRef };
 }
 
 export function Confirm(props: ConfirmProps) {
@@ -153,13 +155,15 @@ export function Confirm(props: ConfirmProps) {
         (view.pricing.state.status === "ready" && !view.pricing.busy)}
         buttonLabel={view.requestQuote ? "Request Quote" : "Create Trip"}
         failure={view.formFailure} isSubmitting={view.booking.isSubmitting}
-        onChange={view.resetFormFailure} onValid={view.booking.submit}
-        submissionReady={view.paymentMethod === "cash" || view.card.ready}
+        onChange={view.resetFormFailure}
+        onValid={view.payment.defaultMethod === null ? () => undefined : view.booking.submit}
+        submissionReady={view.payment.defaultMethod !== null
+          && (view.paymentMethod === "cash" ? view.payment.cash : view.card.ready)}
         terms={props.business.settings.terms_and_conditions}
         extraFields={<>
-          <PaymentMethodField cardAvailable={view.cardAvailable}
+          <PaymentMethodField cardAvailable={view.payment.card} cashAvailable={view.payment.cash}
             method={view.paymentMethod} onChange={view.changePayment} />
-          {view.cardAvailable && view.paymentMethod === "online"
+          {view.payment.card && view.paymentMethod === "online"
             && <SquareCardField state={view.card.state} />}
         </>} />
     </div>

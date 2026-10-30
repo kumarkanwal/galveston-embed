@@ -35,6 +35,7 @@ const SELECTION = {
 
 const CARD_BUSINESS = {
   ...SHUTTLE_BUSINESS,
+  settings: { ...SHUTTLE_BUSINESS.settings, payment_methods: ["cash", "online"] },
   payments: {
     card_available: true,
     environment: "sandbox",
@@ -126,6 +127,27 @@ describe("shuttle confirmation pricing", () => {
     card.root.querySelector<HTMLInputElement>('input[value="online"]')?.click();
     await vi.waitFor(() => expect(quote).toHaveBeenCalledOnce());
     expect(quote.mock.calls[0]?.[0].payment_method).toBe("online");
+  });
+});
+
+describe("shuttle unavailable payment", () => {
+  it("blocks booking with the contact message when no payment method is available", async () => {
+    const book = vi.fn<ShuttleApiClient["bookShuttle"]>(async () => SHUTTLE_BOOKED);
+    const business = { ...SHUTTLE_BUSINESS, settings: {
+      ...SHUTTLE_BUSINESS.settings, payment_methods: [],
+    } } satisfies Business;
+    const { root } = mount(clientWith(undefined, book), vi.fn(), business);
+    expect(root.querySelector(".payment-unavailable")?.textContent).toBe(
+      "Online booking is temporarily unavailable. Please contact us to book.",
+    );
+    expect(root.querySelector<HTMLButtonElement>(".create-trip")?.disabled).toBe(true);
+    fill(root);
+    act(() => {
+      root.querySelector<HTMLFormElement>(".confirm-form")
+        ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    });
+    await Promise.resolve();
+    expect(book).not.toHaveBeenCalled();
   });
 });
 
