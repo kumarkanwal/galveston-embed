@@ -9,6 +9,10 @@
   font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
   line-height: 1.35;
+  display: block;
+  max-width: 100%;
+  overflow-x: clip;
+  width: 100%;
 }
 
 *,
@@ -23,7 +27,16 @@
   border-radius: 3px;
   margin: 16px auto;
   max-width: 940px;
+  min-width: 0;
   padding: 12px;
+  width: 100%;
+}
+
+.widget-root {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+  width: 100%;
 }
 
 .widget-heading h1 {
@@ -106,6 +119,11 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.pickup-datetime-fields {
+  gap: 8px;
+  grid-template-columns: minmax(150px, 1.35fr) minmax(110px, 0.85fr);
+}
+
 .trip-kind-toggle {
   display: grid;
   gap: 0;
@@ -138,8 +156,8 @@
 .party-fields {
   border: 0;
   display: grid;
-  gap: 22px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  grid-template-columns: minmax(88px, 0.8fr) repeat(2, minmax(100px, 1fr));
   margin: 2px 0 9px;
   min-width: 0;
   padding: 0;
@@ -151,20 +169,22 @@
   font-size: 12px;
   gap: 6px;
   margin-bottom: 4px;
+  white-space: nowrap;
 }
 
 .bag-icon {
   fill: #526078;
-  height: 22px;
-  width: 22px;
+  height: 18px;
+  width: 18px;
 }
 
 .counter-controls {
   border: 1px solid var(--border);
   border-radius: 3px;
   display: grid;
-  grid-template-columns: 38px minmax(38px, 1fr) 38px;
-  min-height: 34px;
+  grid-template-columns: 34px minmax(28px, 1fr) 34px;
+  height: 40px;
+  min-height: 40px;
 }
 
 .counter-controls[aria-invalid="true"] {
@@ -177,6 +197,10 @@
   color: #333333;
   cursor: pointer;
   font-size: 20px;
+}
+
+.party-fields select {
+  height: 40px;
 }
 
 .counter-controls button:disabled {
@@ -438,64 +462,69 @@ select[aria-invalid="true"] {
   min-height: 76px;
 }
 
-@media (max-width: 760px) {
-  .widget {
-    margin: 0;
-    padding: 12px;
-  }
-
-  .trip-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .map-panel,
-  .map-canvas {
-    min-height: 280px;
-  }
-
+:is(.layout-compact, .layout-narrow, .layout-micro) .widget {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0;
+  max-width: none;
+  padding: 8px;
 }
 
-@media (max-width: 900px) {
-  input:not([type="checkbox"]):not([type="radio"]),
-  select {
-    font-size: 16px;
-    height: 44px;
-  }
+:is(.layout-compact, .layout-narrow, .layout-micro) .trip-layout {
+  grid-template-columns: 1fr;
+}
 
-  button,
-  .options li {
-    min-height: 44px;
-  }
+:is(.layout-compact, .layout-narrow, .layout-micro) :is(.map-panel, .map-canvas) {
+  min-height: 280px;
+}
 
-  .check-pricing,
-  .vehicle-choose,
-  .back-button,
-  .create-trip,
-  .terms-close {
-    min-height: 44px;
-  }
+:is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
+  :is(input:not([type="checkbox"]):not([type="radio"]), select) {
+  font-size: 16px;
+  height: 44px;
+}
 
+:is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
+  :is(button, .options li) {
+  min-height: 44px;
+}
+
+:is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
+  :is(.check-pricing, .vehicle-choose, .back-button, .create-trip, .terms-close) {
+  min-height: 44px;
+}
+
+:is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
   .input-with-icon {
-    grid-template-columns: minmax(0, 1fr) 44px;
-  }
+  grid-template-columns: minmax(0, 1fr) 44px;
 }
 
-@media (max-width: 440px) {
-  .field-row {
-    gap: 0;
-    grid-template-columns: 1fr;
-  }
-
-  .widget-heading h1 {
-    font-size: 23px;
-  }
-
+:is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
+  .counter-controls {
+  grid-template-columns: 36px minmax(28px, 1fr) 36px;
+  height: 44px;
+  min-height: 44px;
 }
 
-@container trip-form (max-width: 440px) {
-  .pickup-datetime-fields,
-  .party-fields {
-    gap: 0;
-    grid-template-columns: 1fr;
-  }
+:is(.layout-narrow, .layout-micro) .field-row:not(.pickup-datetime-fields) {
+  gap: 0;
+  grid-template-columns: 1fr;
+}
+
+:is(.layout-narrow, .layout-micro) .widget-heading h1 {
+  font-size: 23px;
+}
+
+.layout-micro :is(.pickup-datetime-fields, .party-fields) {
+  gap: 6px;
+  grid-template-columns: 1fr;
+}
+
+.layout-micro .party-fields {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.layout-micro .party-fields > [data-trip-field="passengers"] {
+  grid-column: 1 / -1;
 }

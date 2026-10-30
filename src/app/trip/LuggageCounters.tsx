@@ -19,6 +19,7 @@ function BagIcon({ small }: { small: boolean }) {
 }
 
 interface CounterProps {
+  accessibleLabel: string;
   count: number;
   disabledUp: boolean;
   error: string | undefined;
@@ -34,15 +35,15 @@ function BagCounter(props: CounterProps) {
   return <div class="bag-counter field" data-trip-field={props.field}>
     <div class="bag-label"><BagIcon small={props.smallIcon} /><span>{props.label}</span></div>
     <div class="counter-controls" id={props.field} role="group"
-      aria-label={`${props.label} bags`} aria-invalid={props.error !== undefined}
+      aria-label={`${props.accessibleLabel} bags`} aria-invalid={props.error !== undefined}
       aria-describedby={props.error === undefined ? undefined : errorId}>
-      <button type="button" aria-label={`Decrease ${props.label} bags`}
+      <button type="button" aria-label={`Decrease ${props.accessibleLabel} bags`}
         disabled={props.count === 0} onBlur={props.onBlur}
         onClick={() => props.onChange(props.count - 1)}>−</button>
-      <output aria-live="polite" aria-label={`${props.count} ${props.label} bags`}>
+      <output aria-live="polite" aria-label={`${props.count} ${props.accessibleLabel} bags`}>
         {props.count}
       </output>
-      <button type="button" aria-label={`Increase ${props.label} bags`}
+      <button type="button" aria-label={`Increase ${props.accessibleLabel} bags`}
         disabled={props.disabledUp} onBlur={props.onBlur}
         onClick={() => props.onChange(props.count + 1)}>+</button>
     </div>
@@ -54,12 +55,12 @@ export function LuggageCounters(props: LuggageCountersProps) {
   const total = props.form.largeBags + props.form.smallBags;
   const disabledUp = total >= props.maximum;
   return <>
-    <BagCounter count={props.form.largeBags}
+    <BagCounter accessibleLabel="Check-in / trunk" count={props.form.largeBags}
       disabledUp={disabledUp || props.form.largeBags >= BAG_COUNT_SCHEMA_LIMIT}
-      error={props.errors.largeBags} field="largeBags" label="Check-in / trunk"
+      error={props.errors.largeBags} field="largeBags" label="Bags"
       smallIcon={false} onBlur={() => props.onFieldBlur("largeBags")}
       onChange={(value) => props.update("largeBags", value)} />
-    <BagCounter count={props.form.smallBags}
+    <BagCounter accessibleLabel="Carry-on" count={props.form.smallBags}
       disabledUp={disabledUp || props.form.smallBags >= BAG_COUNT_SCHEMA_LIMIT}
       error={props.errors.smallBags} field="smallBags" label="Carry-on"
       smallIcon onBlur={() => props.onFieldBlur("smallBags")}

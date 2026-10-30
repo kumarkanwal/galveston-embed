@@ -418,58 +418,53 @@
   width: 1px;
 }
 
-@media (max-width: 760px) {
-  .confirm-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .create-trip {
-    float: none;
-    margin-top: 24px;
-    width: 100%;
-  }
+:is(.layout-full, .layout-compact, .layout-narrow, .layout-micro) .confirm-layout {
+  grid-template-columns: 1fr;
 }
 
-@media (max-width: 900px) {
-  .checkbox-target,
-  .terms-copy label,
-  .terms-link {
-    min-height: 44px;
-  }
+:is(.layout-full, .layout-compact, .layout-narrow, .layout-micro) .create-trip {
+  float: none;
+  margin-top: 24px;
+  width: 100%;
+}
 
+:is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
+  :is(.checkbox-target, .terms-copy label, .terms-link) {
+  min-height: 44px;
+}
+
+:is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
   .checkbox-target {
-    min-width: 44px;
-  }
-
-  .terms-copy label,
-  .terms-link {
-    align-items: center;
-    display: inline-flex;
-  }
-
-  .terms-label input[type="checkbox"] {
-    height: 20px;
-    width: 20px;
-  }
-
-  .create-trip {
-    min-height: 44px;
-  }
-
-  .promo-code button,
-  .promo-code input {
-    min-height: 44px;
-  }
+  min-width: 44px;
 }
 
-@media (max-width: 440px) {
-  .summary-content {
-    grid-template-columns: 92px minmax(0, 1fr);
-  }
+:is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
+  :is(.terms-copy label, .terms-link) {
+  align-items: center;
+  display: inline-flex;
+}
 
-  .summary-content .vehicle-photo,
-  .summary-content .vehicle-photo-placeholder {
-    height: 64px;
-    width: 92px;
-  }
+:is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
+  .terms-label input[type="checkbox"] {
+  height: 20px;
+  width: 20px;
+}
+
+:is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro) .create-trip {
+  min-height: 44px;
+}
+
+:is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
+  :is(.promo-code button, .promo-code input) {
+  min-height: 44px;
+}
+
+:is(.layout-narrow, .layout-micro) .summary-content {
+  grid-template-columns: 92px minmax(0, 1fr);
+}
+
+:is(.layout-narrow, .layout-micro)
+  .summary-content :is(.vehicle-photo, .vehicle-photo-placeholder) {
+  height: 64px;
+  width: 92px;
 }

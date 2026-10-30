@@ -51,18 +51,17 @@ describe("responsive accessibility styles", () => {
   const vehicleCss = readFileSync(resolve("src/styles/vehicle.css"), "utf8");
 
   it("uses 44px targets, 16px controls, and a visible focus ring", () => {
-    const tabletRules = widgetCss.slice(widgetCss.indexOf("@media (max-width: 900px)"));
-    const confirmTabletRules = confirmCss.slice(confirmCss.indexOf("@media (max-width: 900px)"));
-    expect(tabletRules).toContain("font-size: 16px");
-    expect(tabletRules).toContain("height: 44px");
-    expect(tabletRules).toContain("min-height: 44px");
-    expect(tabletRules).toContain(".check-pricing,");
-    expect(tabletRules).toContain(".vehicle-choose,");
-    expect(tabletRules).toContain(".create-trip,");
+    const compactRules = widgetCss.slice(widgetCss.indexOf(":is(.layout-medium"));
+    expect(compactRules).toContain("font-size: 16px");
+    expect(compactRules).toContain("height: 44px");
+    expect(compactRules).toContain("min-height: 44px");
+    expect(compactRules).toContain(".check-pricing");
+    expect(compactRules).toContain(".vehicle-choose");
+    expect(compactRules).toContain(".create-trip");
     expect(confirmCss).toContain("min-width: 44px");
     expect(widgetCss).toContain(".widget :where(input, select, button, [tabindex]):focus-visible");
     expect(widgetCss).toContain("outline: 3px solid var(--blue)");
-    expect(confirmTabletRules).toMatch(/\.create-trip\s*\{\s*min-height:\s*44px;/);
+    expect(confirmCss).toMatch(/\.layout-micro\) \.create-trip \{\s*min-height:\s*44px;/);
   });
 
   it.each(["#2f7d32", "#256528", "#b52b27", "#6b6b6b", "#337ab7"])(
@@ -71,13 +70,13 @@ describe("responsive accessibility styles", () => {
   );
 
   it("reserves photo space and keeps 320px vehicle cards with 44px actions", () => {
-    const phoneRules = vehicleCss.slice(vehicleCss.indexOf("@media (max-width: 440px)"));
+    const phoneRules = vehicleCss.slice(vehicleCss.indexOf(":is(.layout-narrow"));
     expect(vehicleCss).toMatch(/\.vehicle-photo-frame[\s\S]*height:\s*70px;[\s\S]*width:\s*110px;/);
     expect(vehicleCss).toMatch(/\.vehicle-photo\s*\{[\s\S]*object-fit:\s*contain;/);
     expect(phoneRules).toContain("grid-template-columns: 72px minmax(0, 1fr)");
     expect(phoneRules).toContain("height: 50px");
     expect(phoneRules).toContain("width: 66px");
-    expect(widgetCss).toMatch(/\.vehicle-choose,[\s\S]*min-height:\s*44px;/);
+    expect(widgetCss).toMatch(/\.vehicle-choose[\s\S]*min-height:\s*44px;/);
   });
 });
 
