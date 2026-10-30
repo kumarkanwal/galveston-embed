@@ -37,7 +37,8 @@ import {
 
 const BUSINESS = {
   id: "business-1", name: "Island Transit", type: "taxi", currency: "USD",
-  timezone: "America/Chicago", distance_unit: "miles", max_passengers: 8, max_luggage: 8,
+  timezone: "America/Chicago", distance_unit: "miles", emails_enabled: false,
+  max_passengers: 8, max_luggage: 8,
   settings: { advance_booking_hours: 0, insurance_enabled: false, insurance_pct: "0.00",
     offer_car_seats: true, max_car_seats: 5, car_seat_price: "15.00",
     payment_methods: ["cash"], show_map: true, show_service_dropdown: true,
@@ -193,7 +194,9 @@ describe("taxi card booking", () => {
     expect(book.mock.calls[1]?.[1]).toBe(book.mock.calls[0]?.[1]);
     expect(sessionStorage.getItem("galveston-booking-idempotency")).not.toContain("token-");
     expect(consoleError).not.toHaveBeenCalled();
-    await vi.waitFor(() => expect(onBooked).toHaveBeenCalledWith(BOOKED, false, "online"));
+    await vi.waitFor(() => expect(onBooked).toHaveBeenCalledWith(
+      BOOKED, false, "online", "ada@example.com",
+    ));
   });
 });
 
@@ -221,7 +224,7 @@ describe("shuttle card booking and confirmation", () => {
     await vi.waitFor(() => expect(bookShuttle).toHaveBeenCalledOnce());
     expect(bookShuttle.mock.calls[0]?.[0].payment)
       .toEqual({ method: "online", payment_method_token: "shuttle-token" });
-    expect(onBooked).toHaveBeenCalledWith(SHUTTLE_BOOKED, "online");
+    expect(onBooked).toHaveBeenCalledWith(SHUTTLE_BOOKED, "online", "ada@example.com");
   });
 
   it("replaces provider decline details with a stable customer-safe message", () => {
@@ -236,8 +239,8 @@ describe("shuttle card booking and confirmation", () => {
 
   it("treats the card booking response as final", () => {
     const root = addRoot();
-    render(<Confirmation currency="USD" paymentMethod="online" requestQuote={false}
-      response={BOOKED} />, root);
+    render(<Confirmation currency="USD" customerEmail="ada@example.com"
+      paymentMethod="online" requestQuote={false} response={BOOKED} />, root);
     expect(root.textContent).toContain(
       "Payment submitted. Your booking is requested. Our team will contact you to confirm.",
     );

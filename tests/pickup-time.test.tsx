@@ -8,7 +8,7 @@ import { businessDateTimeParts } from "../src/time";
 
 const BUSINESS = {
   id: "business-1", name: "Island Transit", type: "taxi", currency: "USD",
-  timezone: "America/Chicago", distance_unit: "miles",
+  timezone: "America/Chicago", distance_unit: "miles", emails_enabled: false,
   max_passengers: 8, max_luggage: 8,
   settings: { advance_booking_hours: 6, insurance_enabled: false,
     insurance_pct: "0.00", offer_car_seats: true, max_car_seats: 5,

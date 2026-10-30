@@ -24,14 +24,13 @@ import type { TripFormState } from "../src/app/trip/types";
 
 const BUSINESS = {
   id: "business-1", name: "Island Transit", type: "taxi", currency: "USD",
-  timezone: "America/Chicago", distance_unit: "miles",
+  timezone: "America/Chicago", distance_unit: "miles", emails_enabled: false,
   max_passengers: 8, max_luggage: 8,
   settings: { advance_booking_hours: 0, insurance_enabled: false,
     insurance_pct: "0.00", offer_car_seats: true, max_car_seats: 5,
     car_seat_price: "15.00", payment_methods: ["cash"], show_map: true,
     show_service_dropdown: true, terms_and_conditions: "Be ready." },
 } satisfies Business;
-
 const TRIP: TripFormState = {
   service: "one_way", pickupDate: "2026-10-12", pickupTime: "10:00",
   returnDate: "2026-10-13", returnTime: "10:00",
@@ -42,13 +41,11 @@ const TRIP: TripFormState = {
   pickupAirportLocation: null, dropoffAirportName: "", dropoffAirportLocation: null,
   airline: null, flightNumber: "",
 };
-
 const PRICED = {
   vehicle_type_id: "11111111-1111-1111-1111-111111111111",
   name: "Sedan", passenger_capacity: 3, luggage_capacity: 3,
   base_price: "90.00", available: true, quote_status: "priced",
 } satisfies QuotedVehicle;
-
 const MANUAL = {
   ...PRICED, vehicle_type_id: "22222222-2222-2222-2222-222222222222",
   name: "Van", base_price: null, quote_status: "request_quote",
@@ -130,7 +127,8 @@ describe("booking submission", () => {
     expect(book.mock.calls[0]?.[0]).not.toHaveProperty("luggage");
     expect(book.mock.calls[0]?.[1]).toMatch(/^[0-9a-f-]{36}$/u);
     resolve?.(BOOKED);
-    await vi.waitFor(() => expect(onBooked).toHaveBeenCalledWith(BOOKED, false, "cash"));
+    await vi.waitFor(() => expect(onBooked).toHaveBeenCalledWith(
+      BOOKED, false, "cash", "ada@example.com"));
   });
   it("sends once when Enter submission and click happen together", async () => {
     let resolve: ((value: TaxiBookingResponse) => void) | undefined;
@@ -279,6 +277,7 @@ describe("request quote booking", () => {
     expect(book.mock.calls[0]?.[0]).toMatchObject({ car_seats: 2 });
     await vi.waitFor(() => expect(onBooked).toHaveBeenCalledWith(
       expect.objectContaining({ status: "requested", total: "0.00" }), true, "cash",
+      "ada@example.com",
     ));
   });
 });
@@ -356,7 +355,8 @@ describe("booking error submission", () => {
 describe("confirmation", () => {
   it("shows the requested cash message, reference and response total", () => {
     const root = document.createElement("div");
-    render(<Confirmation currency="USD" requestQuote={false} response={BOOKED} />, root);
+    render(<Confirmation currency="USD" customerEmail="ada@example.com" requestQuote={false}
+      response={BOOKED} />, root);
     expect(root.textContent).toContain("HVT-2026-003211");
     expect(root.textContent).toContain("Your booking is requested. Our team will contact you to confirm.");
     expect(root.textContent).toContain("$92.70 USD");
@@ -372,14 +372,14 @@ describe("confirmation", () => {
   it("moves focus to the confirmation heading", async () => {
     const root = document.createElement("div");
     document.body.append(root);
-    render(<Confirmation autoFocusHeading currency="USD" requestQuote={false}
-      response={BOOKED} />, root);
+    render(<Confirmation autoFocusHeading currency="USD" customerEmail="ada@example.com"
+      requestQuote={false} response={BOOKED} />, root);
     await vi.waitFor(() => expect(root.querySelector("h1")).toBe(document.activeElement));
   });
 
   it.each(["requested", "pending"])("uses final requested wording for %s", (status) => {
     const root = document.createElement("div");
-    render(<Confirmation currency="USD" requestQuote={false}
+    render(<Confirmation currency="USD" customerEmail="ada@example.com" requestQuote={false}
       response={{ ...BOOKED, status, confirmation_email_sent: true }} />, root);
     expect(root.textContent).toContain("Your booking is requested.");
     expect(root.textContent).toContain("Our team will contact you to confirm.");
@@ -389,9 +389,9 @@ describe("confirmation", () => {
 
   it("uses requested wording for a manual quote and never promises an email", () => {
     const root = document.createElement("div");
-    render(<Confirmation currency="USD" requestQuote
-      response={{ ...BOOKED, status: "requested", total: "0.00", confirmation_email_sent: true }} />,
-    root);
+    render(<Confirmation currency="USD" customerEmail="ada@example.com" requestQuote response={{
+      ...BOOKED, status: "requested", total: "0.00", confirmation_email_sent: true,
+    }} />, root);
     expect(root.textContent).toContain("Your booking is requested.");
     expect(root.textContent).toContain("Booking reference:");
     expect(root.textContent).not.toContain("receive an email");

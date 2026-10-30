@@ -12,7 +12,11 @@ import { bookingFailure, type BookingFailure } from "./booking-error";
 interface BookingSubmitOptions {
   carSeats: number;
   client: ApiClient;
-  onSuccess: (response: TaxiBookingResponse, paymentMethod: PaymentMethod) => void;
+  onSuccess: (
+    response: TaxiBookingResponse,
+    paymentMethod: PaymentMethod,
+    customerEmail: string,
+  ) => void;
   onVehicleUnavailable: (message: string) => void;
   paymentMethod: PaymentMethod;
   promoCode: string | null;
@@ -42,7 +46,11 @@ export function useBookingSubmit(options: BookingSubmitOptions) {
       const body = options.paymentMethod === "online"
         ? withPaymentToken(cart, await options.tokenizeCard())
         : cart;
-      options.onSuccess(await options.client.book(body, key), options.paymentMethod);
+      options.onSuccess(
+        await options.client.book(body, key),
+        options.paymentMethod,
+        form.email.trim(),
+      );
     } catch (error: unknown) {
       if (error instanceof UnauthorizedError && !unauthorizedLogged.current) {
         unauthorizedLogged.current = true;

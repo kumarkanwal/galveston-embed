@@ -13,7 +13,7 @@ import { quoteFailure } from "../src/app/trip/quote-error";
 
 const BUSINESS = {
   id: "business-1", name: "Island Transit", type: "taxi", currency: "USD",
-  timezone: "America/Chicago", distance_unit: "miles",
+  timezone: "America/Chicago", distance_unit: "miles", emails_enabled: false,
   max_passengers: 8, max_luggage: 8,
   settings: { advance_booking_hours: 0, insurance_enabled: false,
     insurance_pct: "0.00", offer_car_seats: true, max_car_seats: 5,
@@ -211,7 +211,7 @@ describe("booking success navigation", () => {
     if (vehicle === undefined) throw new Error("Fixture vehicle missing.");
     flow().choose(vehicle);
     await vi.waitFor(() => expect(flow().state.selectedVehicle).toBe(vehicle));
-    flow().complete(BOOKED, false);
+    flow().complete(BOOKED, false, "cash", "ada@example.com");
     await vi.waitFor(() => expect(flow().state.confirmation?.response).toBe(BOOKED));
     expect(flow().state.quote).toBeNull();
     expect(flow().state.selectedVehicle).toBeNull();

@@ -26,7 +26,11 @@ import { hasShuttleTripErrors, validateShuttleTrip } from "./validation";
 type ShuttleStep = "trip" | "outbound" | "confirm" | "done";
 
 interface ShuttleFlowState {
-  confirmation: { paymentMethod: PaymentMethod; response: ShuttleBookingResponse } | null;
+  confirmation: {
+    customerEmail: string;
+    paymentMethod: PaymentMethod;
+    response: ShuttleBookingResponse;
+  } | null;
   destinationGroups: LocationGroup[];
   errors: ShuttleTripErrors;
   form: ShuttleTripForm;
@@ -233,9 +237,10 @@ export function useShuttleFlow(client: ShuttleApiClient, business: Business) {
   const selection = selectedTrip(state, state.returnLeg);
   const complete = (
     response: ShuttleBookingResponse,
-    paymentMethod: PaymentMethod = "cash",
+    paymentMethod: PaymentMethod,
+    customerEmail: string,
   ) => setState((current) => (
-    { ...current, confirmation: { paymentMethod, response }, step: "done" }));
+    { ...current, confirmation: { customerEmail, paymentMethod, response }, step: "done" }));
   return { back, chooseOutbound: (leg: SelectedShuttleLeg) => chooseOutbound(context, leg),
     chooseReturn: (leg: SelectedShuttleLeg) => chooseReturn(context, leg), complete, selection, state,
     submitTrip: (event: SubmitEvent) => submitTrip(context, event),

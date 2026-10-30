@@ -1,6 +1,6 @@
 # Booking Widget (Embed) — Tracker
 
-**Repo:** `galveston-embed` (new, separate) · **Last updated:** 30 October 2026
+**Repo:** `galveston-embed` (new, separate) · **Last updated:** 31 October 2026
 **Talks to:** the hosted `galveston-backend` API on the VPS.
 **Replaces:** the client's live Book Rides Online (BRO) booking form.
 
@@ -63,7 +63,8 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 18 | E-13 Widget fixes from live testing | Widget | — | ✅ Complete — ready for review | — |
 | 19 | E-14 Widget confirmation messages | Widget | — | ✅ Complete — ready for review | — |
 | 20 | E-15 Widget compact layout + mobile full width | Widget | — | ✅ Complete — ready for review | — |
-| 21 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
+| 21 | E-16 Confirmation email message | Widget | — | ✅ Complete — ready for review | — |
+| 22 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
 | | **Total** | | **100%** | | **87%** |
 
 Weights are estimates. E-9 and E-9b were added after the 100% weighting was
@@ -77,7 +78,7 @@ dependencies: `AGENTS.md` section 3.
 | S-1 | New repo `galveston-embed` | ✅ | Separate from `galveston-widgets` (old cancelled plugin; leave untouched) |
 | S-2 | **VPS runs the latest backend**, including the pricing migration `f1a2b3c4d5e6` | ✅ | Pricing migration and B-20 are deployed on the preview VPS |
 | S-3 | D-1 (contract v1.2) and B-20 pushed to `origin` | ✅ | B-20 is included in backend commit `7e15a04` |
-| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ | Refreshed from backend commit `6b6fb8e14169cd7e01a6a8e47a893e02ce9d0f9b` (including B-45) |
+| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ | Refreshed from backend commit `98457f560b722463ca7297a6cc068a40db6e5a59` (including B-46) |
 | S-5 | Demo company API key, named `embed` | ✅ Ready when needed | Runbook: `docs/runbooks/embed-keys.md` (backend) |
 | S-6 | Developer's local address (e.g. `http://localhost:5173`) added to `CORS_ORIGINS` on the VPS | ⛔ Not yet | Otherwise the browser cannot read API responses |
 | S-7 | **Google Maps browser key**, HTTP-referrer restricted to dev address now, client sites later | 🔍 Key available; enable Routes API and restrict it | Must be separate from the server key. Maps JavaScript API, Places API (New), and Routes API are required; never use the server key in the browser |
@@ -217,14 +218,13 @@ dependencies: `AGENTS.md` section 3.
 - **Backend gap — public Terms URL:** `GET /v1/public/business` has no `terms_url`. The widget cannot create an external Terms & Conditions link without inventing an API field, so it keeps the current literal plain-text terms behavior.
 - **Backend gap — public company phone:** `GET /v1/public/business` has no public company phone field, so an unavailable online-booking message cannot include a contact number.
 - **Backend gap — public payment requirement and configuration consistency:** `GET /v1/public/business` does not publish `require_payment`, and `settings.payment_methods` can contain only `"online"` while `payments.card_available` is false. The widget fails closed when the intersection of configured methods and usable capabilities is empty.
-- **Backend gap — public confirmation-email capability:** `GET /v1/public/business` has no email-enabled flag. The widget cannot promise a confirmation email from a booking-response outcome field; it will add the sentence only when public business config explicitly exposes the capability.
 - **Backend gap — public booking-status endpoint:** no public endpoint lets the widget poll a booking after submission. A successful booking response is therefore final for the widget, and it shows the returned reference immediately without polling.
 - **E-6 deployment:** enable Routes API on the referrer-restricted Maps browser-key project, finish BRO side-by-side verification, configure client-domain CORS, and deploy the reviewed bundle.
 
 ## Sources of truth
 
-- `galveston-backend/docs/API_CONTRACT.md` (commit `6b6fb8e14169cd7e01a6a8e47a893e02ce9d0f9b`)
-- `galveston-backend/openapi.json` (commit `6b6fb8e14169cd7e01a6a8e47a893e02ce9d0f9b`)
+- `galveston-backend/docs/API_CONTRACT.md` (commit `98457f560b722463ca7297a6cc068a40db6e5a59`)
+- `galveston-backend/openapi.json` (commit `98457f560b722463ca7297a6cc068a40db6e5a59`)
 - `galveston-backend/docs/PROJECT-TRACKER.md`
 - BRO screenshots in this repo
 
@@ -232,6 +232,7 @@ dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 31 Oct 2026 | E-16 complete for review: refreshed and byte-verified backend B-46, then added the customer-addressed confirmation-email sentence for taxi and shuttle Cash/Card bookings only when public `emails_enabled` is exactly true. False and missing values keep the E-14 confirmation unchanged. |
 | 30 Oct 2026 | E-15 complete for review: taxi and shuttle presentation now responds to the embed container rather than the page viewport, narrow widgets use a full-width undecorated shell without horizontal scrolling, and taxi pickup date/time plus passengers and compact bag counters stay on one row through 320px with a below-320px fallback. Shuttle passenger behavior and all pricing, booking, payment and validation logic are unchanged. |
 | 30 Oct 2026 | E-14 complete for review: taxi and shuttle confirmations now show the returned booking reference prominently with a copy button, use exact Cash/Card requested-booking wording, and treat the successful response as final without an email promise, processing state or polling. Recorded missing public email-capability and booking-status endpoints as backend gaps; pricing, payment, Square, seats and booking logic are unchanged. |
 | 30 Oct 2026 | E-13 complete for review: made taxi pickup date/time and passenger/bag controls responsive rows, exposed Adults/Seniors/Children before shuttle search, gated Cash/Card by `payment_methods` plus card readiness with visible single-method text, blocked unusable payment configurations, and verified the existing accessible Terms dialog against public terms text. Recorded public phone and payment-consistency gaps; pricing, Square and booking behavior remain server-owned. |

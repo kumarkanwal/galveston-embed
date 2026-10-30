@@ -15,6 +15,7 @@ export const SHUTTLE_BUSINESS = {
   currency: "USD",
   timezone: "America/Chicago",
   distance_unit: "miles",
+  emails_enabled: false,
   max_passengers: 12,
   max_luggage: 12,
   settings: {

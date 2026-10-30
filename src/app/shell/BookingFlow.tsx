@@ -51,6 +51,8 @@ function BookingFlowReady(props: Omit<BookingFlowProps, "services"> & {
   useEffect(() => { previousView.current = view; }, [view]);
   if (flow.state.confirmation !== null) {
     return <Confirmation autoFocusHeading={autoFocusHeading} currency={props.business.currency}
+      customerEmail={flow.state.confirmation.customerEmail}
+      emailsEnabled={props.business.emails_enabled}
       requestQuote={flow.state.confirmation.requestQuote}
       paymentMethod={flow.state.confirmation.paymentMethod}
       response={flow.state.confirmation.response} />;

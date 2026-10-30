@@ -15,6 +15,7 @@ const BUSINESS: Business = {
   currency: "USD",
   timezone: "America/Chicago",
   distance_unit: "miles",
+  emails_enabled: false,
   max_passengers: 8,
   max_luggage: 8,
   settings: {
