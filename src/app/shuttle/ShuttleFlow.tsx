@@ -18,6 +18,8 @@ export function ShuttleFlow(props: ShuttleFlowProps) {
   const minimumDate = businessDateTimeParts(new Date(), props.business.timezone).date;
   if (state.step === "done" && state.confirmation !== null) {
     return <Confirmation currency={props.business.currency} requestQuote={false}
+      customerEmail={state.confirmation.customerEmail}
+      emailsEnabled={props.business.emails_enabled}
       paymentMethod={state.confirmation.paymentMethod}
       response={state.confirmation.response} steps={["Trip", "Departures", "Confirm"]} />;
   }

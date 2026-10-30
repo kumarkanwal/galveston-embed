@@ -17,11 +17,17 @@ const TAXI_BOOKED = {
 } satisfies TaxiBookingResponse;
 
 let writeText = vi.fn(async (_text: string) => undefined);
+const CUSTOMER_EMAIL = "ada@example.com";
 
-function mount(response: TaxiBookingResponse | typeof SHUTTLE_BOOKED, paymentMethod: "cash" | "online") {
+function mount(
+  response: TaxiBookingResponse | typeof SHUTTLE_BOOKED,
+  paymentMethod: "cash" | "online",
+  emailsEnabled?: boolean,
+) {
   const root = document.createElement("div");
-  render(<Confirmation currency="USD" paymentMethod={paymentMethod} requestQuote={false}
-    response={response} />, root);
+  render(<Confirmation currency="USD" customerEmail={CUSTOMER_EMAIL}
+    {...(emailsEnabled === undefined ? {} : { emailsEnabled })} paymentMethod={paymentMethod}
+    requestQuote={false} response={response} />, root);
   return root;
 }
 
@@ -37,25 +43,34 @@ describe.each([
   ["taxi", TAXI_BOOKED],
   ["shuttle", SHUTTLE_BOOKED],
 ] as const)("%s confirmation", (_mode, response) => {
-  it("shows final cash wording and copies the prominent booking reference", async () => {
-    const root = mount(response, "cash");
+  it.each([
+    ["cash", true],
+    ["cash", false],
+    ["cash", undefined],
+    ["online", true],
+    ["online", false],
+    ["online", undefined],
+  ] as const)("uses %s wording when emails_enabled is %s", (paymentMethod, emailsEnabled) => {
+    const root = mount(response, paymentMethod, emailsEnabled);
+    const prefix = paymentMethod === "online" ? "Payment submitted. " : "";
     expect(root.textContent).toContain(
-      "Your booking is requested. Our team will contact you to confirm.",
+      `${prefix}Your booking is requested. Our team will contact you to confirm.`,
     );
     expect(root.querySelector(".confirmation-reference")?.textContent)
       .toContain(`Booking reference: ${response.order_number}`);
     expect(root.textContent).not.toContain("Payment processing");
-    expect(root.textContent?.toLowerCase()).not.toContain("email");
-    act(() => root.querySelector<HTMLButtonElement>(".confirmation-reference button")?.click());
-    await vi.waitFor(() => expect(writeText).toHaveBeenCalledWith(response.order_number));
+    if (emailsEnabled === true) {
+      expect(root.textContent).toContain(
+        `A confirmation email has been sent to ${CUSTOMER_EMAIL}.`,
+      );
+    } else {
+      expect(root.textContent?.toLowerCase()).not.toContain("email");
+    }
   });
 
-  it("shows final card wording without processing or email promises", () => {
-    const root = mount(response, "online");
-    expect(root.textContent).toContain(
-      "Payment submitted. Your booking is requested. Our team will contact you to confirm.",
-    );
-    expect(root.textContent).not.toContain("Payment processing");
-    expect(root.textContent?.toLowerCase()).not.toContain("email");
+  it("copies the prominent booking reference", async () => {
+    const root = mount(response, "cash", false);
+    act(() => root.querySelector<HTMLButtonElement>(".confirmation-reference button")?.click());
+    await vi.waitFor(() => expect(writeText).toHaveBeenCalledWith(response.order_number));
   });
 });

@@ -33,6 +33,7 @@ interface ConfirmProps {
     response: TaxiBookingResponse,
     requestQuote: boolean,
     paymentMethod: PaymentMethod,
+    customerEmail: string,
   ) => void;
   onVehicleUnavailable: (message: string) => void;
   quote: TaxiQuoteResponse;
@@ -100,7 +101,9 @@ function useConfirmController(props: ConfirmProps) {
   const booking = useBookingSubmit({
     carSeats,
     client: props.client,
-    onSuccess: (response, method) => props.onBooked(response, requestQuote, method),
+    onSuccess: (response, method, email) => props.onBooked(
+      response, requestQuote, method, email,
+    ),
     onVehicleUnavailable: props.onVehicleUnavailable,
     paymentMethod,
     promoCode: pricing.promo.appliedCode,

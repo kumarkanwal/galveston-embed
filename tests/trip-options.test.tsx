@@ -10,7 +10,8 @@ import type { TripFormState } from "../src/app/trip/types";
 
 const BUSINESS = {
   id: "business-1", name: "Island Transit", type: "taxi", currency: "USD",
-  timezone: "America/Chicago", distance_unit: "miles", max_passengers: 8, max_luggage: 8,
+  timezone: "America/Chicago", distance_unit: "miles", emails_enabled: false,
+  max_passengers: 8, max_luggage: 8,
   settings: { advance_booking_hours: 0, insurance_enabled: false, insurance_pct: "0.00",
     offer_car_seats: true, max_car_seats: 5, car_seat_price: "15.00",
     payment_methods: ["cash"], show_map: false, show_service_dropdown: true },

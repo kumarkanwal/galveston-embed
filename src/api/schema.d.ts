@@ -604,6 +604,30 @@ export interface paths {
         patch: operations["update_business_v1_admin_businesses__business_uuid__patch"];
         trace?: never;
     };
+    "/v1/admin/businesses/{business_uuid}/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload Business Logo
+         * @description Normalize and replace the selected company's logo.
+         */
+        post: operations["upload_business_logo_v1_admin_businesses__business_uuid__logo_post"];
+        /**
+         * Remove Business Logo
+         * @description Clear the selected company's logo and its managed file.
+         */
+        delete: operations["remove_business_logo_v1_admin_businesses__business_uuid__logo_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/reservations/{booking_id}/assign": {
         parameters: {
             query?: never;
@@ -3977,6 +4001,14 @@ export interface components {
              */
             created_at: string;
         };
+        /** Body_upload_business_logo_v1_admin_businesses__business_uuid__logo_post */
+        Body_upload_business_logo_v1_admin_businesses__business_uuid__logo_post: {
+            /**
+             * File
+             * @description JPEG, PNG, or WebP; maximum 5 MB
+             */
+            file: string;
+        };
         /** Body_upload_vehicle_type_image_v1_admin_vehicle_types__vehicle_type_id__image_post */
         Body_upload_vehicle_type_image_v1_admin_vehicle_types__vehicle_type_id__image_post: {
             /**
@@ -4115,8 +4147,6 @@ export interface components {
             low_seat_warning_threshold?: number | null;
             /** Taxi Auto Confirm */
             taxi_auto_confirm?: boolean | null;
-            /** Shuttle Prepay Required */
-            shuttle_prepay_required?: boolean | null;
             /** Sms Confirmation Enabled */
             sms_confirmation_enabled?: boolean | null;
             /** Sms Dispatch Enabled */
@@ -4224,6 +4254,15 @@ export interface components {
             logo_url?: string | null;
             /** Brand Color */
             brand_color?: string | null;
+            /** Phone */
+            phone?: string | null;
+            /** Contact Email */
+            contact_email?: string | null;
+            /**
+             * Emails Enabled
+             * @default false
+             */
+            emails_enabled: boolean;
             /**
              * @default {
              *       "advance_booking_hours": 0,
@@ -4265,6 +4304,8 @@ export interface components {
             order_prefix: string;
             /** Website Url */
             website_url: string | null;
+            /** Allowed Websites */
+            allowed_websites: string[];
             /** Contact Email */
             contact_email: string | null;
             /** Phone */
@@ -4333,8 +4374,6 @@ export interface components {
             low_seat_warning_threshold: number;
             /** Taxi Auto Confirm */
             taxi_auto_confirm: boolean;
-            /** Shuttle Prepay Required */
-            shuttle_prepay_required: boolean;
             /** Sms Confirmation Enabled */
             sms_confirmation_enabled: boolean;
             /** Sms Dispatch Enabled */
@@ -4361,14 +4400,11 @@ export interface components {
             show_service_dropdown: boolean;
             /** Show Map */
             show_map: boolean;
-            /** Require Payment */
-            require_payment: boolean;
+            payment_method_mode: components["schemas"]["PaymentMethodMode"];
             payment_capture_type: components["schemas"]["PaymentCaptureType"] | null;
             deposit_type: components["schemas"]["DepositType"];
             /** Deposit Value */
             deposit_value: string;
-            /** Payment Methods */
-            payment_methods: string[];
             /** Cancellation Fee Pct */
             cancellation_fee_pct: string;
             /** Cancellation Notice Hours */
@@ -4503,8 +4539,6 @@ export interface components {
             low_seat_warning_threshold: number;
             /** Taxi Auto Confirm */
             taxi_auto_confirm: boolean;
-            /** Shuttle Prepay Required */
-            shuttle_prepay_required: boolean;
             /** Sms Confirmation Enabled */
             sms_confirmation_enabled: boolean;
             /** Sms Dispatch Enabled */
@@ -4531,14 +4565,11 @@ export interface components {
             show_service_dropdown: boolean;
             /** Show Map */
             show_map: boolean;
-            /** Require Payment */
-            require_payment: boolean;
+            payment_method_mode: components["schemas"]["PaymentMethodMode"];
             payment_capture_type: components["schemas"]["PaymentCaptureType"] | null;
             deposit_type: components["schemas"]["DepositType"];
             /** Deposit Value */
             deposit_value: string;
-            /** Payment Methods */
-            payment_methods: string[];
             /** Cancellation Fee Pct */
             cancellation_fee_pct: string;
             /** Cancellation Notice Hours */
@@ -4641,6 +4672,8 @@ export interface components {
             name?: string | null;
             /** Website Url */
             website_url?: string | null;
+            /** Allowed Websites */
+            allowed_websites?: string[] | null;
             /** Contact Email */
             contact_email?: string | null;
             /** Phone */
@@ -4708,6 +4741,8 @@ export interface components {
             order_prefix: string;
             /** Website Url */
             website_url: string | null;
+            /** Allowed Websites */
+            allowed_websites: string[];
             /** Contact Email */
             contact_email: string | null;
             /** Phone */
@@ -4973,6 +5008,12 @@ export interface components {
             /** Cancellation Notice Hours */
             cancellation_notice_hours?: number | null;
         };
+        /**
+         * CardReadinessReason
+         * @description Stable reason codes explaining why online card payment is unavailable.
+         * @enum {string}
+         */
+        CardReadinessReason: "square_location_missing" | "square_access_token_missing" | "square_application_id_missing" | "square_webhook_signature_key_missing" | "square_webhook_url_missing";
         /**
          * CatalogItem
          * @description Named catalog row referenced by a historical booking.
@@ -7861,8 +7902,14 @@ export interface components {
          */
         PaymentMethod: "online" | "cash" | "cheque" | "bank_transfer";
         /**
+         * PaymentMethodMode
+         * @description Customer-facing methods a business chooses to offer.
+         * @enum {string}
+         */
+        PaymentMethodMode: "cash" | "card" | "both";
+        /**
          * PaymentSettingsResult
-         * @description The two non-secret tenant values that govern card pricing and routing.
+         * @description Non-secret method selection, readiness, card pricing and routing.
          */
         PaymentSettingsResult: {
             /**
@@ -7870,16 +7917,24 @@ export interface components {
              * Format: uuid
              */
             business_id: string;
+            payment_method_mode: components["schemas"]["PaymentMethodMode"];
+            /** Payment Methods */
+            payment_methods: string[];
             /** Card Surcharge Pct */
             card_surcharge_pct: string;
             /** Square Location Id */
             square_location_id: string | null;
+            /** Card Ready */
+            card_ready: boolean;
+            /** Card Readiness Reasons */
+            card_readiness_reasons: components["schemas"]["CardReadinessReason"][];
         };
         /**
          * PaymentSettingsUpdate
          * @description Owner-only payment settings; credentials remain environment-only.
          */
         PaymentSettingsUpdate: {
+            payment_method_mode?: components["schemas"]["PaymentMethodMode"] | null;
             /** Card Surcharge Pct */
             card_surcharge_pct?: string | null;
             /** Square Location Id */
@@ -8477,8 +8532,6 @@ export interface components {
             insurance_pct?: string | null;
             /** Round Trip Discount Pct */
             round_trip_discount_pct?: string | null;
-            /** Require Payment */
-            require_payment?: boolean | null;
             payment_capture_type?: components["schemas"]["PaymentCaptureType"] | null;
             deposit_type?: components["schemas"]["DepositType"] | null;
             /** Deposit Value */
@@ -12813,6 +12866,80 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_BusinessUpdateResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_business_logo_v1_admin_businesses__business_uuid__logo_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_business_logo_v1_admin_businesses__business_uuid__logo_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_BusinessResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_business_logo_v1_admin_businesses__business_uuid__logo_delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_BusinessResult_"];
                 };
             };
             /** @description Validation Error */

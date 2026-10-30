@@ -41,7 +41,11 @@ interface ShuttleConfirmProps {
   quote: ShuttleQuoteResponse;
   selection: ShuttleSelection;
   onBack: () => void;
-  onBooked: (response: ShuttleBookingResponse, paymentMethod: PaymentMethod) => void;
+  onBooked: (
+    response: ShuttleBookingResponse,
+    paymentMethod: PaymentMethod,
+    customerEmail: string,
+  ) => void;
   onUnavailable: (message: string) => void;
 }
 
@@ -172,7 +176,7 @@ function useShuttleConfirm(props: ShuttleConfirmProps) {
       const body = paymentMethod === "online"
         ? withPaymentToken(cart, await card.tokenize())
         : cart;
-      props.onBooked(await props.client.bookShuttle(body, key), paymentMethod);
+      props.onBooked(await props.client.bookShuttle(body, key), paymentMethod, form.email.trim());
     } catch (error: unknown) {
       if (error instanceof UnauthorizedError) {
         console.error("Galveston booking widget configuration was rejected.");

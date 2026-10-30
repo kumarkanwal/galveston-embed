@@ -17,6 +17,7 @@ import { firstTripError, validateTrip } from "../trip/validation";
 
 export interface BookingFlowState {
   confirmation: {
+    customerEmail: string;
     paymentMethod: PaymentMethod;
     requestQuote: boolean;
     response: TaxiBookingResponse;
@@ -153,9 +154,14 @@ function createVehicleUnavailable(setState: FlowSetter) {
 }
 
 function createComplete(setState: FlowSetter) {
-  return (response: TaxiBookingResponse, requestQuote: boolean, paymentMethod: PaymentMethod = "cash") =>
+  return (
+    response: TaxiBookingResponse,
+    requestQuote: boolean,
+    paymentMethod: PaymentMethod,
+    customerEmail: string,
+  ) =>
     setState((current) => ({
-    ...current, confirmation: { paymentMethod, requestQuote, response }, quote: null,
+    ...current, confirmation: { customerEmail, paymentMethod, requestQuote, response }, quote: null,
     selectedVehicle: null,
   }));
 }

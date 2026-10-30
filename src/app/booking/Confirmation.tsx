@@ -10,6 +10,8 @@ import { useEffect, useRef, useState } from "preact/hooks";
 interface ConfirmationProps {
   autoFocusHeading?: boolean;
   currency: string;
+  customerEmail: string;
+  emailsEnabled?: boolean;
   paymentMethod?: PaymentMethod;
   requestQuote: boolean;
   response: TaxiBookingResponse | ShuttleBookingResponse;
@@ -45,6 +47,8 @@ export function Confirmation(props: ConfirmationProps) {
       <p>{props.paymentMethod === "online"
         ? "Payment submitted. Your booking is requested. Our team will contact you to confirm."
         : "Your booking is requested. Our team will contact you to confirm."}</p>
+      {props.emailsEnabled === true
+        && <p>A confirmation email has been sent to {props.customerEmail}.</p>}
       <p class="confirmation-reference">
         <span>Booking reference:</span> <strong>{props.response.order_number}</strong>
         <button type="button" onClick={() => { void handleCopy(); }}>Copy</button>
