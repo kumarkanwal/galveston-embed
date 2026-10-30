@@ -1,6 +1,7 @@
 import { h, render } from "preact";
 
 import { App } from "./app/shell/App";
+import { ResponsiveRoot } from "./app/shell/ResponsiveRoot";
 import { SQUARE_CARD_CONTAINER_ID, SQUARE_CARD_SLOT } from "./app/confirm/square-sdk";
 import { createApiClient, type ApiClient } from "./api/client";
 import confirmStyles from "./styles/confirm.css?inline";
@@ -70,10 +71,11 @@ export function mountBookingWidget(
     style.textContent = [widgetStyles, vehicleStyles, confirmStyles, paymentStyles, shuttleStyles]
       .join("\n");
     shadowRoot.append(style, appRoot);
-    render(h(App, {
+    const app = h(App, {
       client: createClient(config),
       mapsKey: import.meta.env.VITE_MAPS_BROWSER_KEY ?? "",
-    }), appRoot);
+    });
+    render(h(ResponsiveRoot, null, app), appRoot);
   } catch {
     reportMountError();
   }

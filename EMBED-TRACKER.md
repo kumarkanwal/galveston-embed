@@ -62,7 +62,8 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 17 | E-12 Shuttle separate addresses | Widget | — | ✅ Complete — ready for review | — |
 | 18 | E-13 Widget fixes from live testing | Widget | — | ✅ Complete — ready for review | — |
 | 19 | E-14 Widget confirmation messages | Widget | — | ✅ Complete — ready for review | — |
-| 20 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
+| 20 | E-15 Widget compact layout + mobile full width | Widget | — | ✅ Complete — ready for review | — |
+| 21 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
 | | **Total** | | **100%** | | **87%** |
 
 Weights are estimates. E-9 and E-9b were added after the 100% weighting was
@@ -231,6 +232,7 @@ dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 30 Oct 2026 | E-15 complete for review: taxi and shuttle presentation now responds to the embed container rather than the page viewport, narrow widgets use a full-width undecorated shell without horizontal scrolling, and taxi pickup date/time plus passengers and compact bag counters stay on one row through 320px with a below-320px fallback. Shuttle passenger behavior and all pricing, booking, payment and validation logic are unchanged. |
 | 30 Oct 2026 | E-14 complete for review: taxi and shuttle confirmations now show the returned booking reference prominently with a copy button, use exact Cash/Card requested-booking wording, and treat the successful response as final without an email promise, processing state or polling. Recorded missing public email-capability and booking-status endpoints as backend gaps; pricing, payment, Square, seats and booking logic are unchanged. |
 | 30 Oct 2026 | E-13 complete for review: made taxi pickup date/time and passenger/bag controls responsive rows, exposed Adults/Seniors/Children before shuttle search, gated Cash/Card by `payment_methods` plus card readiness with visible single-method text, blocked unusable payment configurations, and verified the existing accessible Terms dialog against public terms text. Recorded public phone and payment-consistency gaps; pricing, Square and booking behavior remain server-owned. |
 | 30 Oct 2026 | E-12 complete for review: refreshed and byte-verified B-45, used route-side flags for separate precise shuttle pickup/drop-off fields, moved addresses into each booking leg, added editable reversed round-trip defaults, kept quote bodies address-free, and refreshed Departures after stale route or schedule errors. Taxi behavior is unchanged. |

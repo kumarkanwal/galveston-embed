@@ -67,6 +67,13 @@ describe("taxi responsive field groups", () => {
     expect([...root.querySelectorAll(".party-fields > .field")]
       .map((field) => field.getAttribute("data-trip-field")))
       .toEqual(["passengers", "largeBags", "smallBags"]);
+    expect(root.querySelector(".pickup-datetime-fields")?.classList.contains("compact-row"))
+      .toBe(true);
+    expect(root.querySelector(".party-fields")?.classList.contains("compact-row")).toBe(true);
+    expect([...root.querySelectorAll(".bag-label span")].map((label) => label.textContent))
+      .toEqual(["Bags", "Carry-on"]);
+    expect(root.querySelector("#largeBags")?.getAttribute("aria-label"))
+      .toBe("Check-in / trunk bags");
     expect(root.querySelector(".party-fields .bag-icon")).not.toBeNull();
   });
 });
