@@ -12,7 +12,7 @@ import { IdempotencyKeyManager } from "../../api/idempotency";
 import { formatMoney } from "../../money";
 import { bookingFailure, type BookingFailure } from "../booking/booking-error";
 import { ConfirmForm } from "../confirm/ConfirmForm";
-import { cardPaymentSettings, withPaymentToken } from "../confirm/payment";
+import { cardPaymentSettings, paymentAvailability, withPaymentToken } from "../confirm/payment";
 import { PaymentMethodField } from "../confirm/PaymentMethodField";
 import { PromoCodeField } from "../confirm/PromoCodeField";
 import type { PromoCodeState } from "../confirm/use-price-breakdown";
@@ -139,11 +139,19 @@ function useShuttlePromo(props: ShuttleConfirmProps, paymentMethod: PaymentMetho
   return { apply, busy, promo, quote, quoteError, remove, setPromo };
 }
 
+function useShuttlePayment(business: Business) {
+  const payment = paymentAvailability(business);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
+    payment.defaultMethod ?? "cash",
+  );
+  const settings = payment.card ? cardPaymentSettings(business) : null;
+  const card = useSquareCard(paymentMethod === "online" && payment.card, settings);
+  return { card, payment, paymentMethod, setPaymentMethod };
+}
+
 function useShuttleConfirm(props: ShuttleConfirmProps) {
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
+  const { card, payment, paymentMethod, setPaymentMethod } = useShuttlePayment(props.business);
   const pricing = useShuttlePromo(props, paymentMethod);
-  const paymentSettings = cardPaymentSettings(props.business);
-  const card = useSquareCard(paymentMethod === "online", paymentSettings);
   const [failure, setFailure] = useState<BookingFailure | null>(null);
   const [addressError, setAddressError] = useState<ShuttleAddressField | null>(null);
   const [addresses, setAddresses] = useState(initialShuttleAddresses);
@@ -151,7 +159,7 @@ function useShuttleConfirm(props: ShuttleConfirmProps) {
   const manager = useRef(new IdempotencyKeyManager()), inFlight = useRef(false);
   const route = useRef(shuttleAddressRouteKey(props.selection));
   const submit = async (form: ConfirmFormState) => {
-    if (inFlight.current) return;
+    if (inFlight.current || payment.defaultMethod === null) return;
     const missing = requiredShuttleAddresses(props.selection)
       .find((field) => addresses.values[field] === null);
     if (missing !== undefined) { setAddressError(missing); return; }
@@ -186,13 +194,12 @@ function useShuttleConfirm(props: ShuttleConfirmProps) {
     setAddresses((current) => updateShuttleAddress(current, field, value));
     setAddressError(null); setFailure(null);
   };
-  return { addressError, addresses, card, changeAddress, failure, paymentMethod,
+  return { addressError, addresses, card, changeAddress, failure, payment, paymentMethod,
     setFailure, setPaymentMethod, submit, submitting, ...pricing };
 }
 
 export function ShuttleConfirm(props: ShuttleConfirmProps) {
   const view = useShuttleConfirm(props);
-  const cardAvailable = cardPaymentSettings(props.business) !== null;
   return <section class="widget"><header class="widget-heading">
     <h1>Reservations</h1><p>Review and confirm your shuttle trip.</p></header>
     <ProgressSteps activeStep={3} steps={["Trip", "Departures", "Confirm"]} />
@@ -207,15 +214,17 @@ export function ShuttleConfirm(props: ShuttleConfirmProps) {
     </div><ConfirmForm breakdownReady={view.quoteError === null && !view.busy}
       buttonLabel="Create Trip"
       failure={view.failure} isSubmitting={view.submitting} onChange={() => view.setFailure(null)}
-      submissionReady={view.paymentMethod === "cash" || view.card.ready}
+      submissionReady={view.payment.defaultMethod !== null
+        && (view.paymentMethod === "cash" ? view.payment.cash : view.card.ready)}
       onValid={(form) => { void view.submit(form); }} terms={props.business.settings.terms_and_conditions}
       extraFields={<>
         <ShuttleAddressFields errorField={view.addressError} mapsKey={props.mapsKey}
           selection={props.selection} values={view.addresses.values}
           onChange={view.changeAddress} />
-        <PaymentMethodField cardAvailable={cardAvailable} method={view.paymentMethod}
+        <PaymentMethodField cardAvailable={view.payment.card} cashAvailable={view.payment.cash}
+          method={view.paymentMethod}
           onChange={(method) => { view.setFailure(null); view.setPaymentMethod(method); }} />
-        {cardAvailable && view.paymentMethod === "online"
+        {view.payment.card && view.paymentMethod === "online"
           && <SquareCardField state={view.card.state} />}
       </>} />
     </div>

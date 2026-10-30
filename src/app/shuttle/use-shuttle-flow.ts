@@ -13,10 +13,10 @@ import type {
 } from "../../api/client";
 import { ApiError } from "../../api/errors";
 import { businessDateTimeParts } from "../../time";
+import { paymentAvailability } from "../confirm/payment";
 import { buildReturnQuery, buildShuttleQuote, buildShuttleSearchQuery } from "./requests";
 import { isShuttleAvailabilityError, SHUTTLE_UNAVAILABLE_MESSAGE } from "./availability";
 import type {
-  PassengerPriceFlags,
   SelectedShuttleLeg,
   ShuttleTripErrors,
   ShuttleTripForm,
@@ -37,7 +37,6 @@ interface ShuttleFlowState {
   originGroups: LocationGroup[];
   outbound: SelectedShuttleLeg | null;
   outboundResult: ShuttleSearchResult | null;
-  priceFlags: PassengerPriceFlags;
   quote: ShuttleQuoteResponse | null;
   returnLeg: SelectedShuttleLeg | null;
   returnResult: ShuttleSearchResult | null;
@@ -58,7 +57,7 @@ function initialState(business: Business): ShuttleFlowState {
     confirmation: null, destinationGroups: [], errors: {}, form: initialForm(business),
     formError: null, loadingDestinations: false, loadingLocations: true, notice: null,
     originGroups: [], outbound: null, outboundResult: null,
-    priceFlags: { child: false, senior: false }, quote: null, returnLeg: null,
+    quote: null, returnLeg: null,
     returnResult: null, step: "trip", submitting: false,
   };
 }
@@ -76,13 +75,6 @@ function findLocation(groups: LocationGroup[], id: string): LocationOption | nul
   return null;
 }
 
-function priceFlags(result: ShuttleSearchResult): PassengerPriceFlags {
-  return {
-    child: result.departures.some((departure) => departure.prices.child !== null),
-    senior: result.departures.some((departure) => departure.prices.senior !== null),
-  };
-}
-
 function selectedTrip(state: ShuttleFlowState, returnLeg: SelectedShuttleLeg | null) {
   const from = findLocation(state.originGroups, state.form.fromId);
   const to = findLocation(state.destinationGroups, state.form.toId);
@@ -94,6 +86,7 @@ type SetFlowState = Dispatch<StateUpdater<ShuttleFlowState>>;
 interface FlowContext {
   client: ShuttleApiClient;
   minimumDate: string;
+  paymentMethod: PaymentMethod;
   requestInFlight: { current: boolean };
   setState: SetFlowState;
   state: ShuttleFlowState;
@@ -151,7 +144,7 @@ async function submitTrip(context: FlowContext, event: SubmitEvent) {
     const query = buildShuttleSearchQuery(context.state.form);
     const result = await context.client.searchShuttle(query);
     context.setState((current) => ({ ...current, outboundResult: result,
-      priceFlags: priceFlags(result), step: "outbound", submitting: false }));
+      step: "outbound", submitting: false }));
   } catch (error: unknown) {
     context.setState((current) => ({ ...current, formError: errorMessage(error), submitting: false }));
   } finally { context.requestInFlight.current = false; }
@@ -172,7 +165,9 @@ async function chooseOutbound(context: FlowContext, leg: SelectedShuttleLeg) {
       const withLeg = { ...context.state, outbound: leg };
       const selection = selectedTrip(withLeg, null);
       if (selection === null) return;
-      const quote = await context.client.quoteShuttle(buildShuttleQuote(selection, null));
+      const quote = await context.client.quoteShuttle(
+        buildShuttleQuote(selection, null, context.paymentMethod),
+      );
       context.setState((current) => ({ ...current, outbound: leg, quote,
         step: "confirm", submitting: false }));
     }
@@ -195,7 +190,9 @@ async function chooseReturn(context: FlowContext, leg: SelectedShuttleLeg) {
     return;
   }
   try {
-    const quote = await context.client.quoteShuttle(buildShuttleQuote(selection, null));
+    const quote = await context.client.quoteShuttle(
+      buildShuttleQuote(selection, null, context.paymentMethod),
+    );
     context.setState((current) => ({ ...current, quote, returnLeg: leg,
       step: "confirm", submitting: false }));
   } catch (error: unknown) {
@@ -213,8 +210,7 @@ async function returnToDepartures(context: FlowContext, message: string) {
     step: "outbound", submitting: true }));
   try {
     const result = await context.client.searchShuttle(buildShuttleSearchQuery(context.state.form));
-    context.setState((current) => ({ ...current, outboundResult: result,
-      priceFlags: priceFlags(result), submitting: false }));
+    context.setState((current) => ({ ...current, outboundResult: result, submitting: false }));
   } catch {
     context.setState((current) => ({ ...current, notice:
       `${message} Go back and choose the locations again.`, submitting: false }));
@@ -226,7 +222,8 @@ export function useShuttleFlow(client: ShuttleApiClient, business: Business) {
   const requestInFlight = useRef(false);
   useLocations(client, setState);
   const minimumDate = businessDateTimeParts(new Date(), business.timezone).date;
-  const context = { client, minimumDate, requestInFlight, setState, state };
+  const paymentMethod = paymentAvailability(business).defaultMethod ?? "cash";
+  const context = { client, minimumDate, paymentMethod, requestInFlight, setState, state };
   const update = <Key extends keyof ShuttleTripForm>(
     key: Key,
     value: ShuttleTripForm[Key],

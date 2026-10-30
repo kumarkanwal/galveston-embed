@@ -60,7 +60,8 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 15 | E-10 Live-test widget UI fixes | Widget | — | ✅ Complete — ready for review | — |
 | 16 | E-11 Shuttle live-test UI fixes | Widget | — | ✅ Complete — ready for review | — |
 | 17 | E-12 Shuttle separate addresses | Widget | — | ✅ Complete — ready for review | — |
-| 18 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
+| 18 | E-13 Widget fixes from live testing | Widget | — | ✅ Complete — ready for review | — |
+| 19 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
 | | **Total** | | **100%** | | **87%** |
 
 Weights are estimates. E-9 and E-9b were added after the 100% weighting was
@@ -124,8 +125,8 @@ dependencies: `AGENTS.md` section 3.
 | 3.5 | Company-configured Car Seats | ✅ with backend gap | `/business` settings show or hide the control, set options `0..max_car_seats`, and provide the per-seat label. Send only top-level `car_seats`; re-call price-breakdown on change; server lines and totals remain authoritative. A stale-preference 400 stays under the control without changing the customer's choice. Request a Quote shows no price. **Legacy anchor-zone/hourly pricing still ignores top-level `car_seats` (backend I-3).** |
 | 3.6 | Special requests | ✅ | Booking `comments` |
 | 3.7 | First name, last name, phone, email | ✅ | Booking `customer` |
-| 3.8 | Terms & Conditions checkbox and link | ✅ | `terms_and_conditions` from `/business` may be **null**: hide the link when null and render admin-entered content as literal plain text, never `innerHTML`. `accepted_terms` must be `true` |
-| 3.9 | Create Trip (cash) | ✅ | Sends once with a request-bound UUID idempotency key. A fingerprint/key pair (no customer data) survives reloads; retries reuse it until trip, vehicle, car seats, or customer details change (ED-026) |
+| 3.8 | Terms & Conditions checkbox and link | ✅ | `terms_and_conditions` from `/business` may be **null**: hide the link when null; otherwise open the literal text in a focus-trapped dialog that closes with Escape. Never use `innerHTML`. `accepted_terms` must be `true` |
+| 3.9 | Create Trip | ✅ | Sends the customer-visible allowed Cash or Card method once with a request-bound UUID idempotency key. A fingerprint/key pair (no customer data) survives reloads; retries reuse it until trip, vehicle, car seats, payment method, or customer details change (ED-026, ED-031) |
 | 3.10 | Request a Quote vehicle chosen | ✅ | Shows Step 3 without charges, never calls price-breakdown, and submits a zero-total manual quote request |
 | 3.11 | Back button | ✅ | Returns to step 2 |
 | 3.12 | Promo code | ✅ | Priced vehicles only. Apply re-runs price-breakdown with the exact entered code; discount lines and totals remain server-owned. Tracking-only codes show `Code applied` without a discount line. Invalid codes retain the normal total and booking path; Remove re-prices without the code. The same applied code is sent with booking for the server to re-check. |
@@ -142,7 +143,7 @@ dependencies: `AGENTS.md` section 3.
 
 | # | Item | Status | Why later / what blocks it |
 |---|---|---|---|
-| A-1 | **Card payment** (new; BRO has none) | ✅ | Public capability and environment fail closed. Card-ready taxi and shuttle confirmation re-price online, tokenize only on Book, and submit once with token-free idempotency fingerprints (ED-030). Live Square sandbox browser test remains **UNVERIFIED**. |
+| A-1 | **Card payment** (new; BRO has none) | ✅ | Public method setting, capability and environment fail closed. Card-ready taxi and shuttle confirmation re-price online, tokenize only on Book, and submit once with token-free idempotency fingerprints (ED-030, ED-031). Live Square sandbox browser test remains **UNVERIFIED**. |
 | A-2 | Promo code | ✅ | E-7a uses B-30 price-breakdown and booking support on Distance and Flat Rate rows. Request-a-Quote vehicles keep ED-009 and do not show the control. |
 | A-3 | Taxi round trip | ✅ | E-8 uses the backend round-trip quote, breakdown and booking fields; return-gap and vehicle availability decisions remain server-owned. |
 | A-4 | Taxi peak / blackout display | ✅ | E-7b displays server peak lines, quote blackouts and booking-time unavailability. |
@@ -150,8 +151,9 @@ dependencies: `AGENTS.md` section 3.
 | A-6 | Scheduled shuttle car name | ✅ | E-9b shows public `Departure.vehicle_type.name` when present and hides the vehicle row when null, without repurposing `service_label`. |
 | A-7 | Shuttle live-test UI fixes | ✅ | E-11 keeps taxi behavior unchanged while fixing round-trip, same-page departure/return, passenger and required-address UI. |
 | A-8 | Shuttle separate pickup/drop-off addresses | ✅ | E-12 uses B-45 route-side flags, sends precise addresses per booking leg, reverses editable round-trip defaults, keeps quotes address-free, and refreshes Departures after stale availability. |
-| A-9 | Per-pricing-row airport filter | ⏸ | `pricing_row_airports` exists but nothing uses it |
-| A-10 | Production hosting of `embed.js` on the VPS | ⏸ | Behind Caddy. Config only, no host-specific code |
+| A-9 | Live-test layout, passenger and payment fixes | ✅ | E-13 groups taxi pickup and party controls responsively, always exposes all shuttle passenger categories, and gates Cash/Card by both public method settings and card readiness. |
+| A-10 | Per-pricing-row airport filter | ⏸ | `pricing_row_airports` exists but nothing uses it |
+| A-11 | Production hosting of `embed.js` on the VPS | ⏸ | Behind Caddy. Config only, no host-specific code |
 
 ---
 
@@ -160,7 +162,7 @@ dependencies: `AGENTS.md` section 3.
 | Rule | Why |
 |---|---|
 | **Money is a string.** Never `parseFloat`, `Number()`, `toFixed()` or arithmetic on money | The server prices and re-prices everything. A browser-calculated total can only disagree with what is charged |
-| **Use only the backend-published payment capability** | Cash-only and manual quote paths send `"cash"`; `"online"` is available only when `payments.card_available` is true (ED-030) |
+| **Use only the backend-published payment methods and capability** | Cash requires `settings.payment_methods` to contain `"cash"`; `"online"` requires both its method entry and `payments.card_available`. Manual quote paths remain cash-only (ED-030, ED-031) |
 | **Never retry a booking POST automatically.** Reuse the same `Idempotency-Key` if the customer retries the same cart; new key only if the cart changes | Stops double bookings and, later, double charges |
 | **Never invent API fields.** If something is missing from `openapi.json`, stop and report it | Request bodies reject unknown fields with 400 |
 | **Shadow DOM** for all widget UI and styles | Client site CSS must not break the form, and ours must not break their site |
@@ -211,6 +213,8 @@ dependencies: `AGENTS.md` section 3.
 
 - **B-26:** document the taxi-booking `200` idempotent replay response in OpenAPI, mark `Idempotency-Key` required there, and document server retention. This does not block the widget, which always sends a UUID and scopes a key to one unchanged request body.
 - **Backend gap — public Terms URL:** `GET /v1/public/business` has no `terms_url`. The widget cannot create an external Terms & Conditions link without inventing an API field, so it keeps the current literal plain-text terms behavior.
+- **Backend gap — public company phone:** `GET /v1/public/business` has no public company phone field, so an unavailable online-booking message cannot include a contact number.
+- **Backend gap — public payment requirement and configuration consistency:** `GET /v1/public/business` does not publish `require_payment`, and `settings.payment_methods` can contain only `"online"` while `payments.card_available` is false. The widget fails closed when the intersection of configured methods and usable capabilities is empty.
 - **E-6 deployment:** enable Routes API on the referrer-restricted Maps browser-key project, finish BRO side-by-side verification, configure client-domain CORS, and deploy the reviewed bundle.
 
 ## Sources of truth
@@ -224,6 +228,7 @@ dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 30 Oct 2026 | E-13 complete for review: made taxi pickup date/time and passenger/bag controls responsive rows, exposed Adults/Seniors/Children before shuttle search, gated Cash/Card by `payment_methods` plus card readiness with visible single-method text, blocked unusable payment configurations, and verified the existing accessible Terms dialog against public terms text. Recorded public phone and payment-consistency gaps; pricing, Square and booking behavior remain server-owned. |
 | 30 Oct 2026 | E-12 complete for review: refreshed and byte-verified B-45, used route-side flags for separate precise shuttle pickup/drop-off fields, moved addresses into each booking leg, added editable reversed round-trip defaults, kept quote bodies address-free, and refreshed Departures after stale route or schedule errors. Taxi behavior is unchanged. |
 | 29 Oct 2026 | E-11 complete for review: shuttle trip type is one Round trip checkbox, outbound and return choices share one page with server-refreshed valid returns, passenger categories live in one accessible dropdown without changing request counts, and required-location customer addresses reuse precise taxi Places selection through the single public `address` field. Recorded separate pickup/drop-off fields as backend gap B-45; taxi behavior is unchanged. |
 | 29 Oct 2026 | E-10 complete for review: delayed taxi field errors until blur or Check Pricing, replaced the add-like address adornment with a decorative map pin, made unavailable rows non-selectable with one API-reason-based message, added visible capacity/summary text, and restricted taxi Places results to precise addresses, establishments and airports. Public business config still has no `terms_url`; recorded as a backend gap and kept literal plain-text terms behavior. Cash/card, pricing, shuttle and future hourly/Add Stops behavior are unchanged. |

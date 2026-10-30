@@ -44,7 +44,7 @@ export function ShuttleFlow(props: ShuttleFlowProps) {
     form={state.form} formError={state.formError} loadingDestinations={state.loadingDestinations}
     loadingLocations={state.loadingLocations} minimumDate={minimumDate}
     originGroups={state.originGroups}
-    priceFlags={state.priceFlags} submitting={state.submitting} timeZone={props.business.timezone}
+    submitting={state.submitting} timeZone={props.business.timezone}
     onSubmit={(event) => { void flow.submitTrip(event); }}
     update={(key, value) => { void flow.update(key, value); }} />;
 }

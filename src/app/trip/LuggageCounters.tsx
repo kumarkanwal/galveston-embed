@@ -53,19 +53,16 @@ function BagCounter(props: CounterProps) {
 export function LuggageCounters(props: LuggageCountersProps) {
   const total = props.form.largeBags + props.form.smallBags;
   const disabledUp = total >= props.maximum;
-  return <fieldset class="bag-fields">
-    <legend>Luggage</legend>
-    <div class="field-row">
-      <BagCounter count={props.form.largeBags}
-        disabledUp={disabledUp || props.form.largeBags >= BAG_COUNT_SCHEMA_LIMIT}
-        error={props.errors.largeBags} field="largeBags" label="Check-in / trunk"
-        smallIcon={false} onBlur={() => props.onFieldBlur("largeBags")}
-        onChange={(value) => props.update("largeBags", value)} />
-      <BagCounter count={props.form.smallBags}
-        disabledUp={disabledUp || props.form.smallBags >= BAG_COUNT_SCHEMA_LIMIT}
-        error={props.errors.smallBags} field="smallBags" label="Carry-on"
-        smallIcon onBlur={() => props.onFieldBlur("smallBags")}
-        onChange={(value) => props.update("smallBags", value)} />
-    </div>
-  </fieldset>;
+  return <>
+    <BagCounter count={props.form.largeBags}
+      disabledUp={disabledUp || props.form.largeBags >= BAG_COUNT_SCHEMA_LIMIT}
+      error={props.errors.largeBags} field="largeBags" label="Check-in / trunk"
+      smallIcon={false} onBlur={() => props.onFieldBlur("largeBags")}
+      onChange={(value) => props.update("largeBags", value)} />
+    <BagCounter count={props.form.smallBags}
+      disabledUp={disabledUp || props.form.smallBags >= BAG_COUNT_SCHEMA_LIMIT}
+      error={props.errors.smallBags} field="smallBags" label="Carry-on"
+      smallIcon onBlur={() => props.onFieldBlur("smallBags")}
+      onChange={(value) => props.update("smallBags", value)} />
+  </>;
 }

@@ -119,12 +119,16 @@ selection uses the first permitted non-round-trip service in API order, with a
 One way / Round trip switch when both paths are offered (ED-027).
 **Added beyond BRO:** card payment.
 
-Card-ready businesses expose Cash / Card on confirmation. Selecting Card
-re-prices with `payment_method: "online"`; Cash uses `"cash"`. Square tokenizes
-only after a valid submit. The one-time token is added only to the booking POST
-and is excluded from the persisted cart fingerprint, so a retry gets a new
-token while reusing the unchanged cart's idempotency key. Cash-only and manual
-quote paths never load Square.
+Public `settings.payment_methods` and usable capability jointly determine the
+confirmation payment UI. Cash requires `"cash"`; Card requires both `"online"`
+and `payments.card_available`. Both methods render a choice, one method renders
+plain `Payment: Cash` or `Payment: Card` text, and no usable method blocks
+submission with the contact-company message. Selecting Card re-prices with
+`payment_method: "online"`; Cash uses `"cash"`. Square tokenizes only after a
+valid submit. The one-time token is added only to the booking POST and is
+excluded from the persisted cart fingerprint, so a retry gets a new token while
+reusing the unchanged cart's idempotency key. Cash-only and manual quote paths
+never load Square.
 
 ## 7. Environments
 

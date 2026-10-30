@@ -1,7 +1,7 @@
 import { useRef, useState } from "preact/hooks";
 
 import { FieldError } from "../trip/FieldError";
-import type { PassengerPriceFlags, ShuttleTripForm } from "./types";
+import type { ShuttleTripForm } from "./types";
 
 const PASSENGER_LIMIT = 99;
 type PassengerField = "paxAdult" | "paxSenior" | "paxChild";
@@ -9,7 +9,6 @@ type PassengerField = "paxAdult" | "paxSenior" | "paxChild";
 interface PassengerDropdownProps {
   error: string | undefined;
   form: ShuttleTripForm;
-  priceFlags: PassengerPriceFlags;
   update: <Key extends keyof ShuttleTripForm>(key: Key, value: ShuttleTripForm[Key]) => void;
 }
 
@@ -58,10 +57,10 @@ export function PassengerDropdown(props: PassengerDropdownProps) {
       aria-label="Passenger counts">
       <PassengerCounter field="paxAdult" label="Adults" minimum={1}
         value={props.form.paxAdult} update={props.update} />
-      {props.priceFlags.senior && <PassengerCounter field="paxSenior" label="Seniors" minimum={0}
-        value={props.form.paxSenior} update={props.update} />}
-      {props.priceFlags.child && <PassengerCounter field="paxChild" label="Children" minimum={0}
-        value={props.form.paxChild} update={props.update} />}
+      <PassengerCounter field="paxSenior" label="Seniors" minimum={0}
+        value={props.form.paxSenior} update={props.update} />
+      <PassengerCounter field="paxChild" label="Children" minimum={0}
+        value={props.form.paxChild} update={props.update} />
     </div>}
     <FieldError id="paxAdult-error" message={props.error} />
   </div>;

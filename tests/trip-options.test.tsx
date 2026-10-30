@@ -58,6 +58,19 @@ function CounterHarness() {
 
 beforeEach(() => document.body.replaceChildren());
 
+describe("taxi responsive field groups", () => {
+  it("groups taxi date/time and party controls in responsive ordered rows", () => {
+    const root = mount({ show_service_dropdown: true }, [SERVICES[2]!]);
+    expect([...root.querySelectorAll(".pickup-datetime-fields > .field")]
+      .map((field) => field.getAttribute("data-trip-field")))
+      .toEqual(["pickupDate", "pickupTime"]);
+    expect([...root.querySelectorAll(".party-fields > .field")]
+      .map((field) => field.getAttribute("data-trip-field")))
+      .toEqual(["passengers", "largeBags", "smallBags"]);
+    expect(root.querySelector(".party-fields .bag-icon")).not.toBeNull();
+  });
+});
+
 describe("business form toggles", () => {
   it("renders non-focusable decorative map pins beside taxi addresses", () => {
     const root = mount({ show_service_dropdown: true }, [SERVICES[2]!]);

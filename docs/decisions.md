@@ -191,3 +191,9 @@ Date: 2026-10-26 · Status: accepted (supersedes ED-006; scopes an exception to 
 Decision: offer Cash / Card only when public `payments.card_available` is true, select Square's exact sandbox or production SDK from public `payments.environment`, and project one empty light-DOM container through a named Shadow DOM slot for Square's managed card iframe.
 Why: the backend now publishes an explicit, fail-closed capability and environment, while Square's Web Payments SDK must attach its iframe to a document-visible element. Inferring readiness or environment from an identifier risks sending real cards to the wrong system.
 Consequences: Cash and manual quote behavior remain unchanged and load no Square script. Card re-prices with `"online"`, tokenizes only on valid Book, sends the one-time token in one booking POST, never stores or logs it, and fingerprints the token-free cart so a retry uses the same idempotency key with a new token. The Square script and empty slotted container are the only additional Shadow DOM exceptions; the client site's CSP must allow Square's documented environment-specific origins.
+
+## ED-031 — Configured methods and usable capability jointly gate payment
+Date: 2026-10-30 · Status: accepted (extends ED-030)
+Decision: offer Cash only when public `settings.payment_methods` contains `"cash"`, and Card only when it contains `"online"` and `payments.card_available` is true.
+Why: a configured method is not necessarily usable, and a usable Square account does not mean the company offered Card. The customer must see the actual payment method before booking.
+Consequences: two usable methods show the Cash / Card choice; one shows plain `Payment: Cash` or `Payment: Card`; no usable method blocks submission with the standard contact-company message. Cash remains the default when both are offered. Manual quote paths remain cash-only and fail closed if Cash is not offered.
