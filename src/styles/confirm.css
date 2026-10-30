@@ -384,6 +384,30 @@
   margin-top: 6px;
 }
 
+.confirmation-reference {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 18px;
+  gap: 5px;
+}
+
+.confirmation-reference button {
+  background: #ffffff;
+  border: 1px solid currentcolor;
+  border-radius: 3px;
+  color: #2f5f2f;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 5px;
+  padding: 5px 10px;
+}
+
+.copy-status {
+  font-size: 14px;
+  width: 100%;
+}
+
 .visually-hidden {
   clip: rect(0 0 0 0);
   clip-path: inset(50%);

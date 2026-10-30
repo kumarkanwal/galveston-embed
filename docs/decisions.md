@@ -197,3 +197,9 @@ Date: 2026-10-30 · Status: accepted (extends ED-030)
 Decision: offer Cash only when public `settings.payment_methods` contains `"cash"`, and Card only when it contains `"online"` and `payments.card_available` is true.
 Why: a configured method is not necessarily usable, and a usable Square account does not mean the company offered Card. The customer must see the actual payment method before booking.
 Consequences: two usable methods show the Cash / Card choice; one shows plain `Payment: Cash` or `Payment: Card`; no usable method blocks submission with the standard contact-company message. Cash remains the default when both are offered. Manual quote paths remain cash-only and fail closed if Cash is not offered.
+
+## ED-032 — A booking response is final for the widget
+Date: 2026-10-30 · Status: accepted (supersedes the email-wording part of ED-023)
+Decision: every successful taxi or shuttle booking response immediately shows the booking reference and requested-booking wording; Card adds only that payment was submitted.
+Why: a successful public booking response is the widget's final state. The widget has no public status endpoint to poll, and the public business config has no email-enabled capability flag.
+Consequences: never show `Payment processing` after success and never poll. Never promise an email from `confirmation_email_sent`; add that sentence only if a future public business capability explicitly enables it.

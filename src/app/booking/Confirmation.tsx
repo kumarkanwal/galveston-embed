@@ -5,7 +5,7 @@ import type {
 } from "../../api/client";
 import { formatMoney } from "../../money";
 import { ProgressSteps } from "../trip/ProgressSteps";
-import { useEffect, useRef } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 interface ConfirmationProps {
   autoFocusHeading?: boolean;
@@ -15,15 +15,26 @@ interface ConfirmationProps {
   response: TaxiBookingResponse | ShuttleBookingResponse;
   steps?: string[];
 }
-function isPendingPricedStatus(status: string): boolean {
-  return status === "requested" || status === "pending";
+
+async function copyReference(reference: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(reference);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function Confirmation(props: ConfirmationProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const [copyStatus, setCopyStatus] = useState("");
   useEffect(() => {
     if (props.autoFocusHeading) headingRef.current?.focus();
   }, [props.autoFocusHeading]);
+  async function handleCopy() {
+    const copied = await copyReference(props.response.order_number);
+    setCopyStatus(copied ? "Copied" : "Copy unavailable. Select the reference to copy it.");
+  }
   return <section class="widget confirmation">
     <ProgressSteps activeStep={3} complete
       {...(props.steps === undefined ? {} : { steps: props.steps })} />
@@ -31,23 +42,14 @@ export function Confirmation(props: ConfirmationProps) {
       <span class="confirmation-check" aria-hidden="true">✓</span> Confirmation
     </h1>
     <div class="confirmation-notice" role="status">
-      {props.paymentMethod === "online" && !props.requestQuote && <p>
-        Payment processing. You&apos;ll get a confirmation email.
-      </p>}
-      {props.paymentMethod !== "online" && props.requestQuote && <p>
-        Thank you! Your quote request was successfully submitted. Your pending reservation number is{" "}
-        <strong>{props.response.order_number}</strong>.
-      </p>}
-      {props.paymentMethod !== "online" && !props.requestQuote
-        && isPendingPricedStatus(props.response.status) && <p>
-        Thank you! Your booking request was submitted. Your reservation number is{" "}
-        <strong>{props.response.order_number}</strong>. The company will confirm your trip.
-      </p>}
-      {props.paymentMethod !== "online" && !props.requestQuote
-        && !isPendingPricedStatus(props.response.status) && <p>
-        Thank you! Your reservation was successfully submitted. Your reservation number is{" "}
-        <strong>{props.response.order_number}</strong>.
-      </p>}
+      <p>{props.paymentMethod === "online"
+        ? "Payment submitted. Your booking is requested. Our team will contact you to confirm."
+        : "Your booking is requested. Our team will contact you to confirm."}</p>
+      <p class="confirmation-reference">
+        <span>Booking reference:</span> <strong>{props.response.order_number}</strong>
+        <button type="button" onClick={() => { void handleCopy(); }}>Copy</button>
+        <span class="copy-status" aria-live="polite">{copyStatus}</span>
+      </p>
       {!props.requestQuote && <p class="confirmation-total">
         Total: <strong>{formatMoney(props.response.total, props.currency)}</strong>
       </p>}
