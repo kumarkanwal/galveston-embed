@@ -354,11 +354,11 @@ describe("booking error submission", () => {
 });
 
 describe("confirmation", () => {
-  it("shows response total and omits the email promise when no email was sent", () => {
+  it("shows the requested cash message, reference and response total", () => {
     const root = document.createElement("div");
     render(<Confirmation currency="USD" requestQuote={false} response={BOOKED} />, root);
     expect(root.textContent).toContain("HVT-2026-003211");
-    expect(root.textContent).toContain("reservation was successfully submitted");
+    expect(root.textContent).toContain("Your booking is requested. Our team will contact you to confirm.");
     expect(root.textContent).toContain("$92.70 USD");
     expect(root.textContent).not.toContain("receive an email");
     expect(root.querySelector(".back-button")).toBeNull();
@@ -377,23 +377,23 @@ describe("confirmation", () => {
     await vi.waitFor(() => expect(root.querySelector("h1")).toBe(document.activeElement));
   });
 
-  it.each(["requested", "pending"])("uses priced booking-request wording for %s", (status) => {
+  it.each(["requested", "pending"])("uses final requested wording for %s", (status) => {
     const root = document.createElement("div");
     render(<Confirmation currency="USD" requestQuote={false}
       response={{ ...BOOKED, status, confirmation_email_sent: true }} />, root);
-    expect(root.textContent).toContain("booking request was submitted");
-    expect(root.textContent).toContain("The company will confirm your trip.");
+    expect(root.textContent).toContain("Your booking is requested.");
+    expect(root.textContent).toContain("Our team will contact you to confirm.");
     expect(root.textContent).toContain("HVT-2026-003211");
     expect(root.textContent).not.toContain("receive an email");
   });
 
-  it("uses quote wording and never promises an email", () => {
+  it("uses requested wording for a manual quote and never promises an email", () => {
     const root = document.createElement("div");
     render(<Confirmation currency="USD" requestQuote
       response={{ ...BOOKED, status: "requested", total: "0.00", confirmation_email_sent: true }} />,
     root);
-    expect(root.textContent).toContain("quote request was successfully submitted");
-    expect(root.textContent).toContain("pending reservation number");
+    expect(root.textContent).toContain("Your booking is requested.");
+    expect(root.textContent).toContain("Booking reference:");
     expect(root.textContent).not.toContain("receive an email");
     expect(root.textContent).not.toContain("$0.00 USD");
   });

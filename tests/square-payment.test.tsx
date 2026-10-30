@@ -234,12 +234,16 @@ describe("shuttle card booking and confirmation", () => {
     expect(failure.message).not.toContain("provider-detail");
   });
 
-  it("uses the exact processing message and never claims confirmation", () => {
+  it("treats the card booking response as final", () => {
     const root = addRoot();
     render(<Confirmation currency="USD" paymentMethod="online" requestQuote={false}
       response={BOOKED} />, root);
-    expect(root.textContent).toContain("Payment processing. You'll get a confirmation email.");
-    expect(root.textContent).not.toContain("company will confirm");
-    expect(root.textContent).not.toContain("successfully submitted");
+    expect(root.textContent).toContain(
+      "Payment submitted. Your booking is requested. Our team will contact you to confirm.",
+    );
+    expect(root.querySelector(".confirmation-reference")?.textContent)
+      .toContain(`Booking reference: ${BOOKED.order_number}`);
+    expect(root.textContent).not.toContain("Payment processing");
+    expect(root.textContent?.toLowerCase()).not.toContain("email");
   });
 });

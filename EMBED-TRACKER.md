@@ -61,7 +61,8 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 16 | E-11 Shuttle live-test UI fixes | Widget | — | ✅ Complete — ready for review | — |
 | 17 | E-12 Shuttle separate addresses | Widget | — | ✅ Complete — ready for review | — |
 | 18 | E-13 Widget fixes from live testing | Widget | — | ✅ Complete — ready for review | — |
-| 19 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
+| 19 | E-14 Widget confirmation messages | Widget | — | ✅ Complete — ready for review | — |
+| 20 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
 | | **Total** | | **100%** | | **87%** |
 
 Weights are estimates. E-9 and E-9b were added after the 100% weighting was
@@ -135,7 +136,7 @@ dependencies: `AGENTS.md` section 3.
 
 | # | Item | Status | Notes |
 |---|---|---|---|
-| 4.1 | Confirmation screen | ✅ provisional | Uses the returned reservation number and total plus `/business` currency. Priced `requested`/`pending` responses say the company will confirm; `confirmed` keeps the submitted-reservation wording; Request a Quote keeps its pending-reservation wording. No status promises an email. Priced wording awaits a BRO screenshot |
+| 4.1 | Confirmation screen | ✅ | Taxi and shuttle show the returned booking reference prominently with a copy button. Cash says the booking is requested; Card says payment was submitted and the booking is requested. Both say the team will contact the customer to confirm. The successful response is final for the widget: no processing state, polling or email promise (ED-032). |
 | 4.2 | Error handling | ✅ | Offline, timeout, 5xx, 429, bad-key 401 and named 422 outcomes keep the form and never retry automatically; retryable unknown outcomes reuse the same idempotency key |
 | 4.3 | Booking appears in admin Runs | ✅ | E-5 was merged into `main` and verified live |
 
@@ -215,6 +216,8 @@ dependencies: `AGENTS.md` section 3.
 - **Backend gap — public Terms URL:** `GET /v1/public/business` has no `terms_url`. The widget cannot create an external Terms & Conditions link without inventing an API field, so it keeps the current literal plain-text terms behavior.
 - **Backend gap — public company phone:** `GET /v1/public/business` has no public company phone field, so an unavailable online-booking message cannot include a contact number.
 - **Backend gap — public payment requirement and configuration consistency:** `GET /v1/public/business` does not publish `require_payment`, and `settings.payment_methods` can contain only `"online"` while `payments.card_available` is false. The widget fails closed when the intersection of configured methods and usable capabilities is empty.
+- **Backend gap — public confirmation-email capability:** `GET /v1/public/business` has no email-enabled flag. The widget cannot promise a confirmation email from a booking-response outcome field; it will add the sentence only when public business config explicitly exposes the capability.
+- **Backend gap — public booking-status endpoint:** no public endpoint lets the widget poll a booking after submission. A successful booking response is therefore final for the widget, and it shows the returned reference immediately without polling.
 - **E-6 deployment:** enable Routes API on the referrer-restricted Maps browser-key project, finish BRO side-by-side verification, configure client-domain CORS, and deploy the reviewed bundle.
 
 ## Sources of truth
@@ -228,6 +231,7 @@ dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 30 Oct 2026 | E-14 complete for review: taxi and shuttle confirmations now show the returned booking reference prominently with a copy button, use exact Cash/Card requested-booking wording, and treat the successful response as final without an email promise, processing state or polling. Recorded missing public email-capability and booking-status endpoints as backend gaps; pricing, payment, Square, seats and booking logic are unchanged. |
 | 30 Oct 2026 | E-13 complete for review: made taxi pickup date/time and passenger/bag controls responsive rows, exposed Adults/Seniors/Children before shuttle search, gated Cash/Card by `payment_methods` plus card readiness with visible single-method text, blocked unusable payment configurations, and verified the existing accessible Terms dialog against public terms text. Recorded public phone and payment-consistency gaps; pricing, Square and booking behavior remain server-owned. |
 | 30 Oct 2026 | E-12 complete for review: refreshed and byte-verified B-45, used route-side flags for separate precise shuttle pickup/drop-off fields, moved addresses into each booking leg, added editable reversed round-trip defaults, kept quote bodies address-free, and refreshed Departures after stale route or schedule errors. Taxi behavior is unchanged. |
 | 29 Oct 2026 | E-11 complete for review: shuttle trip type is one Round trip checkbox, outbound and return choices share one page with server-refreshed valid returns, passenger categories live in one accessible dropdown without changing request counts, and required-location customer addresses reuse precise taxi Places selection through the single public `address` field. Recorded separate pickup/drop-off fields as backend gap B-45; taxi behavior is unchanged. |
