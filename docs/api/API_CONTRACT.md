@@ -5,11 +5,56 @@ Stack: FastAPI (Python) · PostgreSQL · Square payments
 Base URL: `https://api.<domain>.com/v1`
 Consumers: Booking-form embeds (taxi and shuttle)
 
-**Version 1.7** — generated from the implemented schemas, routers, services and
-`openapi.json` through B-45. This document covers the public surface and the
-B-45, B-43, B-42 and B-41 admin additions below; older admin endpoints remain defined by OpenAPI.
+**Version 1.9** — generated from the implemented schemas, routers, services and
+`openapi.json` through B-46. This document covers the public surface and the B-46,
+B-45, B-44, B-43, B-42 and B-41 admin additions below; older admin endpoints remain
+defined by OpenAPI.
 
 ---
+
+## B-46 business logos and booking-email readiness
+
+Changes: managed business-logo upload lifecycle and public booking-email delivery readiness.
+
+- Owners and managers may upload a logo with multipart field `file` at
+  `POST /admin/businesses/{id}/logo` and remove it with
+  `DELETE /admin/businesses/{id}/logo`. Uploads use the same image type, size,
+  decode, resize, metadata-stripping, generated-name, and managed-media rules as
+  vehicle images. Both mutations are audited and return the updated business;
+  `logo_url` remains the display field.
+- `GET /public/business` always returns `emails_enabled`. It is `true` only when
+  newly queued booking emails are eligible for the configured delivery worker;
+  it is `false` while booking email delivery is disabled.
+- Dashboard driver and vehicle run-count widgets count non-cancelled booking legs
+  whose pickup date falls in each business's local Monday-to-Sunday week. The two
+  assignment dimensions are grouped independently, and null assignments appear as
+  `Unassigned`.
+
+## B-44 business websites, payment methods, and public contact
+
+Changes: per-business exact website origins, unified cash/card selection with Square
+readiness, and public Company Info contact fields.
+
+- `PATCH /admin/businesses/{id}` accepts up to 20 `allowed_websites` values for owners
+  and managers. Values must be exact origins with no path, query, fragment, credentials,
+  or wildcard. HTTPS is required except for `localhost` and `*.local`. Successful edits
+  are audited and invalidate the dynamic CORS cache.
+- Browser CORS accepts the union of configured environment origins and active businesses'
+  allowed websites. Wildcards remain forbidden, credentialed CORS rules remain enabled,
+  and requests without `Origin` remain available to server-to-server clients. Public API
+  keys are not additionally bound to an origin.
+- `GET /admin/businesses/{id}/settings/payments` adds `payment_method_mode`
+  (`cash | card | both`), derived `payment_methods`, `card_ready`, and stable
+  `card_readiness_reasons`. Managers may read; only owners may PATCH the mode, card fee,
+  or Square location. Saving `card` while readiness is false returns
+  `400 VALIDATION_ERROR` on `payment_method_mode`.
+- The retired `require_payment` and `shuttle_prepay_required` fields are no longer admin
+  request/response fields or booking-policy inputs. Taxi and shuttle both use the selected
+  mode. Public card remains serialized as `online`, and is included only when the effective
+  Square account has a location, access token, application id, webhook signature key, and
+  webhook URL. Cash remains available whenever the mode includes cash.
+- `GET /public/business` adds nullable `phone` and `contact_email`. Its existing
+  `settings.terms_and_conditions` field is unchanged.
 
 ## B-45 shuttle zones, addresses, and named-stop display
 
