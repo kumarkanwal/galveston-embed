@@ -54,11 +54,9 @@ export function ShuttleTrip(props: ShuttleTripProps) {
         <PassengerDropdown error={props.errors.paxAdult} form={props.form}
           update={props.update} />
       </div>
-      <div class="trip-kind">
-        <label><input type="checkbox" checked={props.form.roundTrip}
-          onChange={(event) => props.update("roundTrip", event.currentTarget.checked)} />
-          Round trip</label>
-      </div>
+      <label class="trip-kind"><input type="checkbox" checked={props.form.roundTrip}
+        onChange={(event) => props.update("roundTrip", event.currentTarget.checked)} />
+        Round trip</label>
       {props.form.roundTrip && <div class="field-row date-time-grid shuttle-return-fields">
         <div class="field"><label for="returnDate">Return Date</label>
           <input id="returnDate" type="date" min={props.form.date} value={props.form.returnDate}

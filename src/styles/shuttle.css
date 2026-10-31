@@ -178,17 +178,19 @@
 }
 
 .trip-kind {
+  align-items: center;
+  cursor: pointer;
   display: flex;
+  gap: 8px;
   margin: 10px 0;
+  min-height: 38px;
   padding: 0 10px;
   border: 1px solid var(--border);
 }
 
-.trip-kind label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 38px;
+.trip-kind:focus-within {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
 }
 
 .trip-kind input {
@@ -197,6 +199,10 @@
   margin: 0;
   padding: 0;
   width: auto;
+}
+
+.trip-kind input:focus-visible {
+  outline: 0;
 }
 
 .shuttle-departures {

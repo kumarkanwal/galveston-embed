@@ -95,6 +95,8 @@ describe("shuttle trip fields", () => {
     expect(element.querySelector("#returnDate")).toBeNull();
     expect(element.querySelector(".shuttle-trip-fields")?.classList.contains("date-time-grid"))
       .toBe(true);
+    act(() => element.querySelector<HTMLLabelElement>(".trip-kind")?.click());
+    expect(checkbox?.checked).toBe(true);
   });
 
   it("sends false when Round trip is unchecked", () => {
@@ -105,7 +107,7 @@ describe("shuttle trip fields", () => {
       loadingLocations={false} minimumDate="2026-10-23" originGroups={LOCATION_GROUPS}
       submitting={false}
       timeZone="America/Chicago" onSubmit={() => undefined} update={update} />, element);
-    act(() => element.querySelector<HTMLInputElement>('.trip-kind input')?.click());
+    act(() => element.querySelector<HTMLLabelElement>('.trip-kind')?.click());
     expect(update).toHaveBeenCalledWith("roundTrip", false);
     expect(element.querySelector(".shuttle-return-fields")?.classList.contains("date-time-grid"))
       .toBe(true);
@@ -116,7 +118,8 @@ describe("shuttle trip compact styling", () => {
   it("fits the round-trip box to its checkbox row", () => {
     const css = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
     expect(css).toMatch(/\.trip-kind\s*\{[^}]*padding:\s*0 10px/s);
-    expect(css).toMatch(/\.trip-kind label\s*\{[^}]*min-height:\s*38px/s);
+    expect(css).toMatch(/\.trip-kind\s*\{[^}]*min-height:\s*38px/s);
+    expect(css).toMatch(/\.trip-kind:focus-within\s*\{[^}]*outline:/s);
   });
 });
 
