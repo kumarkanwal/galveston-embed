@@ -24,7 +24,6 @@
   border-radius: 3px;
   display: flex;
   height: 38px;
-  padding-left: 9px;
   width: 100%;
 }
 
@@ -47,7 +46,26 @@
 }
 
 .stop-control-chevron {
-  padding-right: 9px;
+  color: #555;
+  flex: 0 0 auto;
+  height: 16px;
+  margin-right: 9px;
+  transition: transform 150ms ease;
+  width: 16px;
+}
+
+.stop-control-chevron.open {
+  transform: rotate(180deg);
+}
+
+.stop-control-chevron path,
+.stop-chevron path,
+.stop-check path {
+  fill: none;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.75;
 }
 
 .stop-menu {
@@ -79,30 +97,47 @@
 }
 
 .stop-category {
-  gap: 8px;
   font-weight: 700;
 }
 
 .stop-chevron {
+  color: #555;
+  flex: 0 0 auto;
+  height: 16px;
   margin-left: auto;
+  transform: rotate(-90deg);
+  transition: transform 150ms ease;
+  width: 16px;
+}
+
+.stop-chevron.open {
+  transform: rotate(0deg);
 }
 
 .stop-option {
-  padding-left: 34px;
+  padding-left: 26px;
 }
 
 .stop-category:hover,
 .stop-option:hover,
+.stop-category:focus-visible,
+.stop-option:focus-visible,
 .stop-category.active,
 .stop-option.active {
   background: #eef3f6;
-  outline: 2px solid #336b8e;
-  outline-offset: -2px;
 }
 
 .stop-option.selected {
-  background: #dfeaf0;
+  background: #f3f7f9;
   font-weight: 700;
+}
+
+.stop-check {
+  color: #336b8e;
+  flex: 0 0 auto;
+  height: 16px;
+  margin-left: auto;
+  width: 16px;
 }
 
 .stop-empty {
@@ -158,7 +193,7 @@
 .trip-kind {
   display: flex;
   margin: 10px 0;
-  padding: 8px 10px;
+  padding: 0 10px;
   border: 1px solid var(--border);
 }
 

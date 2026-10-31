@@ -20,6 +20,16 @@ interface PickerItem {
   value: string;
 }
 
+function Chevron(props: { className: string }) {
+  return <svg class={props.className} viewBox="0 0 16 16" aria-hidden="true"
+    focusable="false"><path d="m4 6 4 4 4-4" /></svg>;
+}
+
+function Checkmark() {
+  return <svg class="stop-check" viewBox="0 0 16 16" aria-hidden="true"
+    focusable="false"><path d="m3.5 8 3 3 6-6" /></svg>;
+}
+
 function findLocation(groups: LocationGroup[], value: string) {
   for (const group of groups) {
     const location = group.locations.find((candidate) => candidate.id === value);
@@ -59,7 +69,8 @@ function LocationRow(props: {
     props.active ? " active" : ""}${props.selected ? " selected" : ""}`}
     type="button" role="option" aria-selected={props.selected}
     data-location-id={props.location.id} onClick={() => props.onChoose(props.location)}>
-    <span aria-hidden="true">↳</span> {props.location.name}
+    <span class="stop-option-label">{props.location.name}</span>
+    {props.selected && <Checkmark />}
   </button>;
 }
 
@@ -88,8 +99,8 @@ function PickerMenu(props: {
           type="button" role="option" aria-selected="false" aria-expanded={isExpanded}
           data-category-id={group.category_id}
           onClick={() => props.onCategory(group.category_id)}>
-          <span aria-hidden="true">🚌</span><span>{group.category}</span>
-          <span class="stop-chevron" aria-hidden="true">{isExpanded ? "⌄" : "›"}</span>
+          <span>{group.category}</span>
+          <Chevron className={`stop-chevron${isExpanded ? " open" : ""}`} />
         </button>
         {isExpanded && group.locations.map((location) => <LocationRow
           active={props.activeId === `location-${location.id}`} location={location}
@@ -121,6 +132,7 @@ function usePickerState(props: StopPickerProps) {
     if (props.disabled) return;
     setExpanded(selected?.group.category_id ?? null); setQuery(""); setOpen(true);
   };
+  const toggle = () => { if (open) close(); else show(); };
   const choose = (location: LocationOption) => { props.onChange(location.id); close(); };
   const toggleCategory = (id: string) => setExpanded((current) => current === id ? null : id);
   const activate = (offset: number) => {
@@ -137,15 +149,20 @@ function usePickerState(props: StopPickerProps) {
     }
   };
   const onKeyDown = (event: TargetedKeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+    const toggleKey = event.key === "Enter" || event.key === " "
+      || (event.altKey && event.key === "ArrowDown");
+    if (toggleKey) {
+      event.preventDefault();
+      if (open && activeId !== null && !event.altKey) enter();
+      else toggle();
+    } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault(); activate(event.key === "ArrowDown" ? 1 : -1);
-    } else if (event.key === "Enter" && open) { event.preventDefault(); enter(); }
-    else if (event.key === "Escape" && open) { event.preventDefault(); close(); }
+    } else if (event.key === "Escape" && open) { event.preventDefault(); close(); }
     else if (event.key === "Tab" && open) close();
   };
   const onInput = (value: string) => { setQuery(value); setOpen(true); setActiveId(null); };
   return { activeId, close, choose, expanded, filtered, filtering, onInput, onKeyDown,
-    open, query, selected, show, toggleCategory };
+    open, query, selected, toggle, toggleCategory };
 }
 
 function useOutsideClose(root: { current: HTMLDivElement | null }, close: () => void) {
@@ -160,21 +177,25 @@ function useOutsideClose(root: { current: HTMLDivElement | null }, close: () => 
 
 export function StopPicker(props: StopPickerProps) {
   const root = useRef<HTMLDivElement>(null);
+  const input = useRef<HTMLInputElement>(null);
   const state = usePickerState(props);
   const listboxId = `${props.id}-listbox`;
   useOutsideClose(root, state.close);
 
   return <div class="field stop-field" ref={root}>
     <label for={props.id}>{props.label}</label>
-    <div class="stop-control"><span aria-hidden="true">🚌</span>
-      <input id={props.id} role="combobox" type="text" autoComplete="off"
+    <div class="stop-control" onClick={() => {
+      if (props.disabled) return;
+      input.current?.focus(); state.toggle();
+    }}>
+      <input ref={input} id={props.id} role="combobox" type="text" autoComplete="off"
         aria-autocomplete="list" aria-controls={listboxId} aria-expanded={state.open}
         aria-activedescendant={state.activeId ?? undefined} aria-invalid={props.error !== undefined}
         disabled={props.disabled} placeholder={props.label}
         value={state.open ? state.query : state.selected?.location.name ?? ""}
-        onFocus={state.show} onClick={state.show} onKeyDown={state.onKeyDown}
+        onKeyDown={state.onKeyDown}
         onInput={(event) => state.onInput(event.currentTarget.value)} />
-      <span class="stop-control-chevron" aria-hidden="true">⌄</span>
+      <Chevron className={`stop-control-chevron${state.open ? " open" : ""}`} />
     </div>
     {state.open && <PickerMenu activeId={state.activeId} expanded={state.expanded}
       filtering={state.filtering} groups={state.filtered} listboxId={listboxId}

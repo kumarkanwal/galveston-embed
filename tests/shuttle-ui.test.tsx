@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { render } from "preact";
 import { act } from "preact/test-utils";
 import { useState } from "preact/hooks";
@@ -68,7 +70,7 @@ describe("shuttle trip fields", () => {
     const element = renderTrip();
     act(() => element.querySelector<HTMLInputElement>("#fromId")?.click());
     const groups = [...element.querySelectorAll(".stop-category")];
-    expect(groups.map((group) => group.textContent?.trim())).toEqual(["🚌Airports›", "🚌Galveston›"]);
+    expect(groups.map((group) => group.textContent?.trim())).toEqual(["Airports", "Galveston"]);
     expect(element.querySelector<HTMLInputElement>("#toId")?.disabled).toBe(true);
     expect(element.querySelector<HTMLInputElement>("#date")?.min).toBe("2026-10-23");
     expect(element.textContent).toContain("Dates and times use America/Chicago");
@@ -101,6 +103,14 @@ describe("shuttle trip fields", () => {
       timeZone="America/Chicago" onSubmit={() => undefined} update={update} />, element);
     act(() => element.querySelector<HTMLInputElement>('.trip-kind input')?.click());
     expect(update).toHaveBeenCalledWith("roundTrip", false);
+  });
+});
+
+describe("shuttle trip compact styling", () => {
+  it("fits the round-trip box to its checkbox row", () => {
+    const css = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
+    expect(css).toMatch(/\.trip-kind\s*\{[^}]*padding:\s*0 10px/s);
+    expect(css).toMatch(/\.trip-kind label\s*\{[^}]*min-height:\s*38px/s);
   });
 });
 

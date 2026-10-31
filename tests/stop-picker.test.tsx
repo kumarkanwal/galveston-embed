@@ -27,8 +27,14 @@ function input(root: HTMLElement) {
   return field;
 }
 
-function key(field: HTMLInputElement, value: string) {
-  act(() => { field.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, key: value })); });
+function key(field: HTMLInputElement, value: string, altKey = false) {
+  act(() => { field.dispatchEvent(new KeyboardEvent(
+    "keydown", { altKey, bubbles: true, key: value })); });
+}
+
+function clickArrow(root: HTMLElement) {
+  act(() => { root.querySelector(".stop-control-chevron")?.dispatchEvent(
+    new MouseEvent("click", { bubbles: true })); });
 }
 
 beforeEach(() => document.body.replaceChildren());
@@ -36,7 +42,7 @@ beforeEach(() => document.body.replaceChildren());
 describe("grouped accordion stop picker selection", () => {
   it("starts collapsed and keeps only one category open", () => {
     const root = mount();
-    act(() => input(root).focus());
+    act(() => input(root).click());
     expect(root.querySelectorAll(".stop-category")).toHaveLength(2);
     expect(root.querySelectorAll(".stop-option")).toHaveLength(0);
     const categories = root.querySelectorAll<HTMLButtonElement>(".stop-category");
@@ -49,7 +55,7 @@ describe("grouped accordion stop picker selection", () => {
 
   it("selects a location, closes, and reopens its highlighted category", () => {
     const root = mount();
-    act(() => input(root).focus());
+    act(() => input(root).click());
     act(() => root.querySelector<HTMLButtonElement>(".stop-category")?.click());
     act(() => root.querySelector<HTMLButtonElement>(
       `[data-location-id="${ORIGIN_LOCATION.id}"]`)?.click());
@@ -58,6 +64,7 @@ describe("grouped accordion stop picker selection", () => {
     act(() => input(root).click());
     expect(root.querySelector(".stop-category")?.getAttribute("aria-expanded")).toBe("true");
     expect(root.querySelector(".stop-option.selected")?.textContent).toContain("Hobby Airport");
+    expect(root.querySelector(".stop-option.selected .stop-check")).not.toBeNull();
   });
 
   it("filters locations, opens matches automatically, and reports no matches", () => {
@@ -73,14 +80,50 @@ describe("grouped accordion stop picker selection", () => {
       field.dispatchEvent(new Event("input", { bubbles: true })); });
     expect(root.textContent).toContain("No matches");
   });
-
 });
 
-describe("grouped accordion stop picker access", () => {
+describe("grouped accordion stop picker toggles", () => {
+  it("toggles from the whole field, including the arrow area", () => {
+    const root = mount();
+    const field = input(root);
+    act(() => field.click());
+    expect(field.getAttribute("aria-expanded")).toBe("true");
+    act(() => field.click());
+    expect(field.getAttribute("aria-expanded")).toBe("false");
+    clickArrow(root);
+    expect(field.getAttribute("aria-expanded")).toBe("true");
+    clickArrow(root);
+    expect(field.getAttribute("aria-expanded")).toBe("false");
+  });
+});
+
+describe("grouped accordion stop picker visuals", () => {
+  it("uses SVG chevrons without bus or text-arrow icons", () => {
+    const root = mount();
+    const field = input(root);
+    const chevron = root.querySelector(".stop-control-chevron");
+    expect(chevron?.tagName.toLowerCase()).toBe("svg");
+    expect(root.textContent).not.toMatch(/🚌|↳|›|⌄/u);
+    act(() => field.click());
+    expect(field.getAttribute("aria-expanded")).toBe("true");
+    expect(chevron?.classList.contains("open")).toBe(true);
+    expect(root.querySelectorAll(".stop-category .stop-chevron")).toHaveLength(2);
+    const category = root.querySelector<HTMLButtonElement>(".stop-category");
+    expect(category?.getAttribute("aria-expanded")).toBe("false");
+    act(() => category?.click());
+    expect(category?.getAttribute("aria-expanded")).toBe("true");
+    expect(category?.querySelector(".stop-chevron")?.classList.contains("open")).toBe(true);
+    expect(root.textContent).not.toMatch(/🚌|↳|›|⌄/u);
+    const css = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
+    expect(css).toMatch(/\.stop-control-chevron\.open\s*\{[^}]*rotate\(180deg\)/s);
+  });
+});
+
+describe("grouped accordion stop picker closing", () => {
   it("supports arrows, Enter, Escape, Tab, and outside click", () => {
     const root = mount();
     const field = input(root);
-    act(() => field.focus());
+    act(() => field.click());
     key(field, "ArrowDown");
     key(field, "Enter");
     key(field, "ArrowDown");
@@ -96,10 +139,29 @@ describe("grouped accordion stop picker access", () => {
     act(() => { document.body.dispatchEvent(new MouseEvent("mousedown", { bubbles: true })); });
     expect(field.getAttribute("aria-expanded")).toBe("false");
   });
+});
+
+describe("grouped accordion stop picker access", () => {
+  it("toggles with Enter, Space, and Alt+Down", () => {
+    const root = mount();
+    const field = input(root);
+    key(field, "Enter");
+    expect(field.getAttribute("aria-expanded")).toBe("true");
+    key(field, "Enter");
+    expect(field.getAttribute("aria-expanded")).toBe("false");
+    key(field, " ");
+    expect(field.getAttribute("aria-expanded")).toBe("true");
+    key(field, " ");
+    expect(field.getAttribute("aria-expanded")).toBe("false");
+    key(field, "ArrowDown", true);
+    expect(field.getAttribute("aria-expanded")).toBe("true");
+    key(field, "ArrowDown", true);
+    expect(field.getAttribute("aria-expanded")).toBe("false");
+  });
 
   it("uses combobox/listbox semantics and mobile-sized rows", () => {
     const root = mount();
-    act(() => input(root).focus());
+    act(() => input(root).click());
     expect(input(root).getAttribute("role")).toBe("combobox");
     expect(root.querySelector('[role="listbox"]')).not.toBeNull();
     const css = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
@@ -112,7 +174,7 @@ describe("grouped accordion stop picker access", () => {
     document.body.append(root);
     render(<StopPicker disabled={false} error={undefined} groups={[]}
       id="fromId" label="From" onChange={() => undefined} value="" />, root);
-    act(() => input(root).focus());
+    act(() => input(root).click());
     expect(root.textContent).toContain("No locations available");
   });
 });

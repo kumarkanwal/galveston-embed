@@ -1,6 +1,6 @@
 # Booking Widget (Embed) — Tracker
 
-**Repo:** `galveston-embed` (new, separate) · **Last updated:** 31 October 2026
+**Repo:** `galveston-embed` (new, separate) · **Last updated:** 1 November 2026
 **Talks to:** the hosted `galveston-backend` API on the VPS.
 **Replaces:** the client's live Book Rides Online (BRO) booking form.
 
@@ -65,7 +65,8 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 20 | E-15 Widget compact layout + mobile full width | Widget | — | ✅ Complete — ready for review | — |
 | 21 | E-16 Confirmation email message | Widget | — | ✅ Complete — ready for review | — |
 | 22 | E-17 Shuttle pricing, modes, minimums + compact widget | Widget | — | ✅ Complete — ready for review | — |
-| 23 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
+| 23 | E-18 Shuttle stop-picker polish | Widget | — | 🔄 Implementation complete — full-suite rerun pending | — |
+| 24 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
 | | **Total** | | **100%** | | **87%** |
 
 Weights are estimates. E-9 and E-9b were added after the 100% weighting was
@@ -234,6 +235,7 @@ dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 1 Nov 2026 | E-18 implementation complete: made the full shuttle From/To field toggle by mouse and keyboard, replaced field/category glyphs with rotating SVG chevrons, removed bus and stop-row text icons, added clean stop indentation plus selected highlighting/check mark, and compacted the Round trip box. Focused gates, full lint, build and dist checks pass; the one full-test run had 10 failures in two untouched airport test files that passed together in isolation, so a clean full-suite pass remains **UNVERIFIED**. |
 | 31 Oct 2026 | E-17 complete for review: compacted taxi and shuttle form spacing without shrinking controls below 38px; refreshed and byte-verified backend B-48; added shared/private shuttle labels, private any-time pickup, server-provided passenger-tier/fixed-vehicle price summaries and live totals, effective minimum and private-capacity checks, per-leg round-trip details, backend minimum-error handling, public business logos, and accessible searchable accordion stop pickers. Taxi pricing and flow remain unchanged. |
 | 31 Oct 2026 | E-16 complete for review: refreshed and byte-verified backend B-46, then added the customer-addressed confirmation-email sentence for taxi and shuttle Cash/Card bookings only when public `emails_enabled` is exactly true. False and missing values keep the E-14 confirmation unchanged. |
 | 30 Oct 2026 | E-15 complete for review: taxi and shuttle presentation now responds to the embed container rather than the page viewport, narrow widgets use a full-width undecorated shell without horizontal scrolling, and taxi pickup date/time plus passengers and compact bag counters stay on one row through 320px with a below-320px fallback. Shuttle passenger behavior and all pricing, booking, payment and validation logic are unchanged. |
