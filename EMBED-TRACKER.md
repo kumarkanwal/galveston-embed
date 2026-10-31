@@ -64,7 +64,8 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 19 | E-14 Widget confirmation messages | Widget | — | ✅ Complete — ready for review | — |
 | 20 | E-15 Widget compact layout + mobile full width | Widget | — | ✅ Complete — ready for review | — |
 | 21 | E-16 Confirmation email message | Widget | — | ✅ Complete — ready for review | — |
-| 22 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
+| 22 | E-17 Shuttle pricing, modes, minimums + compact widget | Widget | — | ✅ Complete — ready for review | — |
+| 23 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
 | | **Total** | | **100%** | | **87%** |
 
 Weights are estimates. E-9 and E-9b were added after the 100% weighting was
@@ -78,7 +79,7 @@ dependencies: `AGENTS.md` section 3.
 | S-1 | New repo `galveston-embed` | ✅ | Separate from `galveston-widgets` (old cancelled plugin; leave untouched) |
 | S-2 | **VPS runs the latest backend**, including the pricing migration `f1a2b3c4d5e6` | ✅ | Pricing migration and B-20 are deployed on the preview VPS |
 | S-3 | D-1 (contract v1.2) and B-20 pushed to `origin` | ✅ | B-20 is included in backend commit `7e15a04` |
-| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ | Refreshed from backend commit `98457f560b722463ca7297a6cc068a40db6e5a59` (including B-46) |
+| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ | Refreshed from backend commit `f693611a104dd52cf89d728add4c609a795c830c` (including B-48) |
 | S-5 | Demo company API key, named `embed` | ✅ Ready when needed | Runbook: `docs/runbooks/embed-keys.md` (backend) |
 | S-6 | Developer's local address (e.g. `http://localhost:5173`) added to `CORS_ORIGINS` on the VPS | ⛔ Not yet | Otherwise the browser cannot read API responses |
 | S-7 | **Google Maps browser key**, HTTP-referrer restricted to dev address now, client sites later | 🔍 Key available; enable Routes API and restrict it | Must be separate from the server key. Maps JavaScript API, Places API (New), and Routes API are required; never use the server key in the browser |
@@ -150,7 +151,7 @@ dependencies: `AGENTS.md` section 3.
 | A-2 | Promo code | ✅ | E-7a uses B-30 price-breakdown and booking support on Distance and Flat Rate rows. Request-a-Quote vehicles keep ED-009 and do not show the control. |
 | A-3 | Taxi round trip | ✅ | E-8 uses the backend round-trip quote, breakdown and booking fields; return-gap and vehicle availability decisions remain server-owned. |
 | A-4 | Taxi peak / blackout display | ✅ | E-7b displays server peak lines, quote blackouts and booking-time unavailability. |
-| A-5 | Shuttle mode | ✅ | E-9 uses B-38C. E-11 presents outbound and valid return departures on one page, uses one Round trip checkbox and one category-preserving passenger dropdown, and established precise Places suggestions for required addresses. E-12 moves those addresses to B-45's separate per-leg fields. Scheduled cards show time, seats, price, documented `service_label` and the B-38D vehicle name when present; on-request shows `vehicle_type_name`. |
+| A-5 | Shuttle mode | ✅ | E-9 uses B-38C. E-11 presents outbound and valid return departures on one page, uses one Round trip checkbox and one category-preserving passenger dropdown, and established precise Places suggestions for required addresses. E-12 moves those addresses to B-45's separate per-leg fields. E-17 uses B-48 for shared/private modes, server pricing summaries and effective minimums; private choices use any-time pickup and capacity checks. Its searchable accordion stop pickers retain route-filtered destinations and accessible keyboard behavior. Scheduled cards show time, seats, price, documented `service_label` and the B-38D vehicle name when present; on-request shows `vehicle_type_name`. |
 | A-6 | Scheduled shuttle car name | ✅ | E-9b shows public `Departure.vehicle_type.name` when present and hides the vehicle row when null, without repurposing `service_label`. |
 | A-7 | Shuttle live-test UI fixes | ✅ | E-11 keeps taxi behavior unchanged while fixing round-trip, same-page departure/return, passenger and required-address UI. |
 | A-8 | Shuttle separate pickup/drop-off addresses | ✅ | E-12 uses B-45 route-side flags, sends precise addresses per booking leg, reverses editable round-trip defaults, keeps quotes address-free, and refreshes Departures after stale availability. |
@@ -184,6 +185,7 @@ dependencies: `AGENTS.md` section 3.
 | `402 PAYMENT_FAILED` | "Your card could not be processed. Check the details or try another card."; preserve Card and never retry automatically |
 | `422 ADVANCE_BOOKING_VIOLATION`, `OUT_OF_SERVICE_AREA`, `VEHICLE_UNAVAILABLE`, `BELOW_MINIMUM_HOURS`, `PAYMENT_METHOD_NOT_OFFERED`, `AIRPORT_ADDRESS_MISSING` | The API's `message` |
 | `422 PROMO_INVALID` | The API's `message` under Promo code; Remove restores pricing and booking without the code |
+| `422 MIN_PASSENGERS_NOT_MET` | The API's `message`, or a generic minimum-passenger message when it is absent; preserve the shuttle inputs and do not retry |
 | `429 RATE_LIMITED` | "Too many requests, please wait a moment and try again." |
 | Other `5xx`, network failure | "We couldn't confirm your booking. Please try again — you will not be booked twice."; a customer retry reuses the same key |
 
@@ -223,8 +225,8 @@ dependencies: `AGENTS.md` section 3.
 
 ## Sources of truth
 
-- `galveston-backend/docs/API_CONTRACT.md` (commit `98457f560b722463ca7297a6cc068a40db6e5a59`)
-- `galveston-backend/openapi.json` (commit `98457f560b722463ca7297a6cc068a40db6e5a59`)
+- `galveston-backend/docs/API_CONTRACT.md` (commit `f693611a104dd52cf89d728add4c609a795c830c`)
+- `galveston-backend/openapi.json` (commit `f693611a104dd52cf89d728add4c609a795c830c`)
 - `galveston-backend/docs/PROJECT-TRACKER.md`
 - BRO screenshots in this repo
 
@@ -232,6 +234,7 @@ dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 31 Oct 2026 | E-17 complete for review: compacted taxi and shuttle form spacing without shrinking controls below 38px; refreshed and byte-verified backend B-48; added shared/private shuttle labels, private any-time pickup, server-provided passenger-tier/fixed-vehicle price summaries and live totals, effective minimum and private-capacity checks, per-leg round-trip details, backend minimum-error handling, public business logos, and accessible searchable accordion stop pickers. Taxi pricing and flow remain unchanged. |
 | 31 Oct 2026 | E-16 complete for review: refreshed and byte-verified backend B-46, then added the customer-addressed confirmation-email sentence for taxi and shuttle Cash/Card bookings only when public `emails_enabled` is exactly true. False and missing values keep the E-14 confirmation unchanged. |
 | 30 Oct 2026 | E-15 complete for review: taxi and shuttle presentation now responds to the embed container rather than the page viewport, narrow widgets use a full-width undecorated shell without horizontal scrolling, and taxi pickup date/time plus passengers and compact bag counters stay on one row through 320px with a below-320px fallback. Shuttle passenger behavior and all pricing, booking, payment and validation logic are unchanged. |
 | 30 Oct 2026 | E-14 complete for review: taxi and shuttle confirmations now show the returned booking reference prominently with a copy button, use exact Cash/Card requested-booking wording, and treat the successful response as final without an email promise, processing state or polling. Recorded missing public email-capability and booking-status endpoints as backend gaps; pricing, payment, Square, seats and booking logic are unchanged. |
