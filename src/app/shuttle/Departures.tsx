@@ -1,9 +1,10 @@
 import { useState } from "preact/hooks";
 
-import type { ShuttleDeparture, ShuttleRoute } from "../../api/client";
+import type { OnRequestAvailability, ShuttleDeparture, ShuttleRoute } from "../../api/client";
 import { formatMoney } from "../../money";
 import { FormError } from "../trip/FieldError";
 import { ProgressSteps } from "../trip/ProgressSteps";
+import { pricingText } from "./pricing";
 import type { DepartureViewData, OnRequestLeg, ScheduledLeg } from "./types";
 
 interface ShuttleDeparturesProps {
@@ -56,12 +57,13 @@ function DepartureCard(props: {
   </article>;
 }
 
-function OnRequestChoice(props: DepartureSectionProps) {
-  const option = props.data.result.on_request;
+function OnRequestChoice(props: DepartureSectionProps & { option: OnRequestAvailability }) {
+  const option = props.option;
   const [date, setDate] = useState(props.data.date);
   const [time, setTime] = useState("");
-  if (option == null) return null;
-  const privateService = option.service_mode === "private";
+  const serviceMode = option.service_mode ?? "shared";
+  const privateService = serviceMode === "private";
+  const inputId = `${props.data.direction}-${option.vehicle_type_id}`;
   const earliestDate = option.earliest_pickup_date;
   const beforeEarliestDate = earliestDate !== null && earliestDate !== undefined
     && date < earliestDate;
@@ -74,7 +76,7 @@ function OnRequestChoice(props: DepartureSectionProps) {
     date,
     routeId: option.route_id,
     route: props.data.result.route,
-    serviceMode: option.service_mode,
+    serviceMode,
     time,
     vehicleTypeId: option.vehicle_type_id,
     vehicleTypeName: option.vehicle_type_name,
@@ -87,13 +89,15 @@ function OnRequestChoice(props: DepartureSectionProps) {
     {privateService && <p>Private vehicle for your group</p>}
     <p>Vehicle: <strong>{option.vehicle_type_name}</strong></p>
     <p>{option.seat_capacity} seats available</p>
-    <div class="field"><label for={`${props.data.direction}-date`}>Pickup Date</label>
-      <input id={`${props.data.direction}-date`} type="date"
+    {pricingText(option, props.currency).map((line) => <p class="shuttle-price-rule">{line}</p>)}
+    <div class="field"><label for={`${inputId}-date`}>Pickup Date</label>
+      <input id={`${inputId}-date`} data-shuttle-date={props.data.direction} type="date"
         min={earliestDate ?? undefined} value={date}
         onInput={(event) => setDate(event.currentTarget.value)} />
     </div>
-    <div class="field"><label for={`${props.data.direction}-time`}>Pickup Time</label>
-      <input id={`${props.data.direction}-time`} type="time" min={minTime} value={time}
+    <div class="field"><label for={`${inputId}-time`}>Pickup Time</label>
+      <input id={`${inputId}-time`} data-shuttle-time={props.data.direction}
+        type="time" min={minTime} value={time}
         onInput={(event) => setTime(event.currentTarget.value)} />
     </div>
     <button class="check-pricing" type="button"
@@ -116,21 +120,24 @@ function emptyMessage(data: DepartureViewData): string {
 }
 
 function DepartureSection(props: DepartureSectionProps) {
-  const privateService = props.data.result.on_request?.service_mode === "private";
-  const departures = privateService ? [] : props.data.direction === "outbound"
+  const departures = props.data.direction === "outbound"
     ? props.data.result.departures.filter((departure) => departure.selectable)
     : props.data.result.departures;
+  const optionList = props.data.result.on_request_options ?? [];
+  const options = optionList.length > 0 ? optionList
+    : props.data.result.on_request == null ? [] : [props.data.result.on_request];
   const title = props.data.direction === "outbound" ? "Choose Departure" : "Choose Return";
   return <section class={`departure-section ${props.data.direction}`}>
     <h2 class="step-title">{title}</h2>
-    {departures.length === 0 && props.data.result.on_request == null &&
+    {departures.length === 0 && options.length === 0 &&
       <div class="empty-vehicles">{emptyMessage(props.data)}</div>}
     {departures.length > 0 && <div class="shuttle-departures">
       {departures.map((departure) => <DepartureCard key={departure.schedule_id}
         currency={props.currency} date={props.data.date} departure={departure}
         onChoose={props.onChoose} route={props.data.result.route} />)}
     </div>}
-    <OnRequestChoice {...props} />
+    {options.map((option) => <OnRequestChoice {...props} option={option}
+      key={option.vehicle_type_id} />)}
   </section>;
 }
 

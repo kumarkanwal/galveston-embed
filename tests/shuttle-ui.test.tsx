@@ -215,8 +215,9 @@ describe("on-request shuttle departures", () => {
     const element = renderDepartures(result);
     expect(element.textContent).toContain("Private Shuttle");
     expect(element.textContent).toContain("Private vehicle for your group");
-    expect(element.querySelector<HTMLInputElement>("#outbound-date")?.type).toBe("date");
-    expect(element.querySelector<HTMLInputElement>("#outbound-time")?.type).toBe("time");
-    expect(element.querySelector(".shuttle-departure")).toBeNull();
+    expect(element.querySelector<HTMLInputElement>('[data-shuttle-date="outbound"]')?.type)
+      .toBe("date");
+    expect(element.querySelector<HTMLInputElement>('[data-shuttle-time="outbound"]')?.type)
+      .toBe("time");
   });
 });

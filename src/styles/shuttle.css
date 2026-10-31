@@ -163,6 +163,15 @@
   background: #fff;
 }
 
+.on-request-choice + .on-request-choice {
+  margin-top: 12px;
+}
+
+.shuttle-price-rule {
+  color: #333333;
+  margin: 6px 0;
+}
+
 .shuttle-summary {
   padding: 12px 18px;
 }
