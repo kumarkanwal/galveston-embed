@@ -40,6 +40,7 @@ function DepartureCard(props: {
   const departure = props.departure;
   return <article class={`shuttle-departure${departure.selectable ? "" : " unavailable"}`}>
     <div><strong>{departureTime(departure)}</strong><span>{departure.service_label}</span>
+      <span class="shuttle-mode-badge">Shared Shuttle</span>
       {departure.vehicle_type !== null && <span>Vehicle: {departure.vehicle_type.name}</span>}
     </div>
     <div><span>{departure.seats_remaining} seats left</span>
@@ -57,28 +58,40 @@ function DepartureCard(props: {
 
 function OnRequestChoice(props: DepartureSectionProps) {
   const option = props.data.result.on_request;
+  const [date, setDate] = useState(props.data.date);
   const [time, setTime] = useState("");
   if (option == null) return null;
+  const privateService = option.service_mode === "private";
   const earliestDate = option.earliest_pickup_date;
   const beforeEarliestDate = earliestDate !== null && earliestDate !== undefined
-    && props.data.date < earliestDate;
-  const minTime = earliestDate === props.data.date
+    && date < earliestDate;
+  const minTime = earliestDate === date
     ? option.earliest_pickup_time?.slice(0, 5)
     : undefined;
   const beforeEarliestTime = minTime !== undefined && time !== "" && time < minTime;
   const choose = () => props.onChoose({
     kind: "on_request",
-    date: props.data.date,
+    date,
     routeId: option.route_id,
     route: props.data.result.route,
+    serviceMode: option.service_mode,
     time,
     vehicleTypeId: option.vehicle_type_id,
     vehicleTypeName: option.vehicle_type_name,
   });
   return <section class="on-request-choice">
     <h3>Choose your pickup time</h3>
+    <span class="shuttle-mode-badge">
+      {privateService ? "Private Shuttle" : "Shared Shuttle"}
+    </span>
+    {privateService && <p>Private vehicle for your group</p>}
     <p>Vehicle: <strong>{option.vehicle_type_name}</strong></p>
     <p>{option.seat_capacity} seats available</p>
+    <div class="field"><label for={`${props.data.direction}-date`}>Pickup Date</label>
+      <input id={`${props.data.direction}-date`} type="date"
+        min={earliestDate ?? undefined} value={date}
+        onInput={(event) => setDate(event.currentTarget.value)} />
+    </div>
     <div class="field"><label for={`${props.data.direction}-time`}>Pickup Time</label>
       <input id={`${props.data.direction}-time`} type="time" min={minTime} value={time}
         onInput={(event) => setTime(event.currentTarget.value)} />
@@ -103,7 +116,8 @@ function emptyMessage(data: DepartureViewData): string {
 }
 
 function DepartureSection(props: DepartureSectionProps) {
-  const departures = props.data.direction === "outbound"
+  const privateService = props.data.result.on_request?.service_mode === "private";
+  const departures = privateService ? [] : props.data.direction === "outbound"
     ? props.data.result.departures.filter((departure) => departure.selectable)
     : props.data.result.departures;
   const title = props.data.direction === "outbound" ? "Choose Departure" : "Choose Return";

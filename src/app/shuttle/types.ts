@@ -29,6 +29,7 @@ export interface ScheduledLeg {
 export interface OnRequestLeg {
   kind: "on_request";
   date: string;
+  serviceMode: "shared" | "private";
   time: string;
   routeId: string;
   route: ShuttleRoute;
