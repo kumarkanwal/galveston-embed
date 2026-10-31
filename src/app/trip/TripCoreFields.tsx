@@ -1,4 +1,5 @@
 import { businessDateTimeParts } from "../../time";
+import { SelectControl } from "../shell/FieldChevron";
 import { FieldError } from "./FieldError";
 import { LuggageCounters } from "./LuggageCounters";
 import type { PartyLimits } from "./limits";
@@ -90,12 +91,12 @@ function ServiceControl(props: Pick<
   if (props.showServiceDropdown) {
     return <div class="field full-field">
       <label for="service">Service Details</label>
-      <select id="service" value={props.form.service}
+      <SelectControl><select id="service" value={props.form.service}
         onChange={(event) => props.update(
           "service", event.currentTarget.value as TripFormState["service"],
         )}>
         {props.services.map((service) => <option value={service.code}>{service.name}</option>)}
-      </select>
+      </select></SelectControl>
     </div>;
   }
   const alternative = props.roundTripAlternative;
@@ -125,7 +126,7 @@ export function TripCoreFields({
       <legend class="visually-hidden">Passengers and luggage</legend>
       <div class="field" data-trip-field="passengers">
         <label for="passengers">Passengers</label>
-        <select id="passengers" value={form.passengers}
+        <SelectControl><select id="passengers" value={form.passengers}
           aria-invalid={errors.passengers !== undefined}
           aria-describedby={errors.passengers === undefined ? undefined : "passengers-error"}
           onBlur={() => onFieldBlur("passengers")}
@@ -133,7 +134,7 @@ export function TripCoreFields({
           {numericOptions(limits.passengers, 1).map((count) => <option value={count}>
             {count} {count === 1 ? "passenger" : "passengers"}
           </option>)}
-        </select>
+        </select></SelectControl>
         <FieldError id="passengers-error" message={errors.passengers} />
       </div>
       <LuggageCounters errors={errors} form={form} maximum={limits.bags}

@@ -33,7 +33,7 @@ function key(field: HTMLInputElement, value: string, altKey = false) {
 }
 
 function clickArrow(root: HTMLElement) {
-  act(() => { root.querySelector(".stop-control-chevron")?.dispatchEvent(
+  act(() => { root.querySelector(".stop-control .field-chevron")?.dispatchEvent(
     new MouseEvent("click", { bubbles: true })); });
 }
 
@@ -101,8 +101,8 @@ describe("grouped accordion stop picker visuals", () => {
   it("uses SVG chevrons without bus or text-arrow icons", () => {
     const root = mount();
     const field = input(root);
-    const chevron = root.querySelector(".stop-control-chevron");
-    expect(chevron?.tagName.toLowerCase()).toBe("svg");
+    const chevron = root.querySelector(".stop-control .field-chevron");
+    expect(chevron?.querySelector("svg")).not.toBeNull();
     expect(root.textContent).not.toMatch(/🚌|↳|›|⌄/u);
     act(() => field.click());
     expect(field.getAttribute("aria-expanded")).toBe("true");
@@ -114,8 +114,8 @@ describe("grouped accordion stop picker visuals", () => {
     expect(category?.getAttribute("aria-expanded")).toBe("true");
     expect(category?.querySelector(".stop-chevron")?.classList.contains("open")).toBe(true);
     expect(root.textContent).not.toMatch(/🚌|↳|›|⌄/u);
-    const css = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
-    expect(css).toMatch(/\.stop-control-chevron\.open\s*\{[^}]*rotate\(180deg\)/s);
+    const widgetCss = readFileSync(resolve("src/styles/widget.css"), "utf8");
+    expect(widgetCss).toMatch(/\.field-chevron\.open \.chevron-icon\s*\{[^}]*rotate\(180deg\)/s);
   });
 });
 

@@ -1,4 +1,5 @@
 import type { Airline, Airport } from "../../api/client";
+import { SelectControl } from "../shell/FieldChevron";
 import { AirlineCombobox } from "./AirlineCombobox";
 import { FieldError } from "./FieldError";
 import type { TripErrors, TripField, TripFormState } from "./types";
@@ -42,13 +43,14 @@ export function AirportFields(props: AirportFieldsProps) {
   return <>
     <div class="field full-field">
       <label for="airport">{pickup ? "Pickup Airport" : "Dropoff Airport"}</label>
-      <select id="airport" value={airportId} aria-invalid={airportError !== undefined}
+      <SelectControl><select id="airport" value={airportId}
+        aria-invalid={airportError !== undefined}
         aria-describedby={airportError === undefined ? undefined : "airport-error"}
         onBlur={() => props.onFieldBlur(airportKey)}
         onChange={(event) => chooseAirport(event.currentTarget.value)}>
         <option value="">Select an airport</option>
         {props.airports.map((airport) => <option value={airport.id}>{airport.name}</option>)}
-      </select>
+      </select></SelectControl>
       <FieldError id="airport-error" message={airportError} />
       <AirportLocationStatus status={locationStatus} />
     </div>

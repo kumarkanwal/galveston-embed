@@ -1,5 +1,6 @@
 import { useRef, useState } from "preact/hooks";
 
+import { FieldChevron } from "../shell/FieldChevron";
 import { FieldError } from "../trip/FieldError";
 import type { ShuttleTripForm } from "./types";
 
@@ -51,7 +52,7 @@ export function PassengerDropdown(props: PassengerDropdownProps) {
     <button id="passenger-trigger" class="passenger-trigger" type="button" ref={trigger}
       aria-haspopup="dialog" aria-expanded={open} aria-controls="passenger-menu"
       aria-invalid={props.error !== undefined} onClick={() => setOpen((current) => !current)}>
-      {passengerLabel(total)} <span aria-hidden="true">▾</span>
+      {passengerLabel(total)} <FieldChevron open={open} />
     </button>
     {open && <div id="passenger-menu" class="passenger-menu" role="dialog"
       aria-label="Passenger counts">

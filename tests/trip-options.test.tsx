@@ -128,6 +128,18 @@ describe("business form toggles", () => {
   });
 });
 
+describe("taxi select arrows", () => {
+  it("keeps native selects with the shared field chevron", () => {
+    const root = mount({ show_service_dropdown: true });
+    for (const id of ["service", "passengers"]) {
+      const select = root.querySelector<HTMLSelectElement>(`#${id}`);
+      expect(select?.tagName).toBe("SELECT");
+      expect(select?.closest(".select-control")
+        ?.querySelector(".field-chevron svg")).not.toBeNull();
+    }
+  });
+});
+
 describe("split luggage counters", () => {
   it("uses accessible counters, stops at the combined maximum, and never goes below zero", async () => {
     const root = document.createElement("div");

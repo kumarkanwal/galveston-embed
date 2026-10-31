@@ -82,6 +82,8 @@ describe("shuttle trip fields", () => {
     expect(unpriced.querySelector("#paxAdult")?.textContent).toBe("1");
     expect(unpriced.querySelector("#paxSenior")?.textContent).toBe("0");
     expect(unpriced.querySelector("#paxChild")?.textContent).toBe("0");
+    expect(unpriced.querySelector(".passenger-trigger .field-chevron svg")).not.toBeNull();
+    expect(unpriced.querySelector(".passenger-trigger")?.textContent).not.toContain("▾");
   });
 
   it("uses one unchecked Round trip checkbox and no trip-type radios", () => {

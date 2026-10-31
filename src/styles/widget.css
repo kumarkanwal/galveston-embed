@@ -263,6 +263,49 @@ select {
   width: 100%;
 }
 
+.select-control {
+  position: relative;
+}
+
+.select-control select {
+  appearance: none;
+  padding-right: 46px;
+}
+
+.field-chevron {
+  align-items: center;
+  background: #f5f5f5;
+  border-left: 1px solid var(--border);
+  border-radius: 0 2px 2px 0;
+  color: #555555;
+  display: flex;
+  height: 36px;
+  justify-content: center;
+  pointer-events: none;
+  position: absolute;
+  right: 1px;
+  top: 1px;
+  width: 37px;
+}
+
+.chevron-icon {
+  height: 16px;
+  transition: transform 150ms ease;
+  width: 16px;
+}
+
+.field-chevron.open .chevron-icon {
+  transform: rotate(180deg);
+}
+
+.chevron-icon path {
+  fill: none;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.75;
+}
+
 input:not([type="checkbox"]):not([type="radio"]):focus,
 select:focus {
   border-color: #66afe9;
