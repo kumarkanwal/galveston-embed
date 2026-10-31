@@ -11,7 +11,7 @@ import type { TripFormState } from "../src/app/trip/types";
 const BUSINESS = {
   id: "business-1", name: "Island Transit", type: "taxi", currency: "USD",
   timezone: "America/Chicago", distance_unit: "miles", emails_enabled: false,
-  max_passengers: 8, max_luggage: 8,
+  max_passengers: 10, max_luggage: 8,
   settings: { advance_booking_hours: 0, insurance_enabled: false, insurance_pct: "0.00",
     offer_car_seats: true, max_car_seats: 5, car_seat_price: "15.00",
     payment_methods: ["cash"], show_map: false, show_service_dropdown: true },
@@ -79,6 +79,50 @@ describe("taxi responsive field groups", () => {
   });
 });
 
+describe("taxi aligned field layout", () => {
+  it("uses the shared date/time grid for pickup and return rows", () => {
+    const root = mount({ show_service_dropdown: true });
+    expect(root.querySelector(".pickup-datetime-fields")?.classList.contains("date-time-grid"))
+      .toBe(true);
+    expect(root.querySelector(".return-fields")?.classList.contains("date-time-grid"))
+      .toBe(true);
+  });
+
+  it("keeps the complete ten-passenger label in the native select", () => {
+    const root = mount({ show_service_dropdown: true }, [SERVICES[2]!]);
+    expect(root.querySelector("#passengers option:last-child")?.textContent?.trim())
+      .toBe("10 passengers");
+  });
+});
+
+describe("native date and time pickers", () => {
+  it("opens date and time pickers from a click anywhere in the input", () => {
+    const root = mount({ show_service_dropdown: true }, [SERVICES[2]!]);
+    for (const id of ["pickup-date", "pickup-time"]) {
+      const input = root.querySelector<HTMLInputElement>(`#${id}`);
+      const showPicker = vi.fn();
+      if (input === null) throw new Error(`Missing ${id}`);
+      input.showPicker = showPicker;
+      act(() => input.click());
+      expect(showPicker).toHaveBeenCalledOnce();
+    }
+  });
+
+  it("focuses the input when showPicker throws and preserves keyboard input", () => {
+    const root = mount({ show_service_dropdown: true }, [SERVICES[2]!]);
+    const input = root.querySelector<HTMLInputElement>("#pickup-date");
+    if (input === null) throw new Error("Missing pickup date");
+    input.showPicker = () => { throw new DOMException("Not allowed"); };
+    act(() => input.click());
+    expect(document.activeElement).toBe(input);
+    act(() => {
+      input.value = "2026-11-05";
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    expect(input.value).toBe("2026-11-05");
+  });
+});
+
 describe("business form toggles", () => {
   it("renders non-focusable decorative map pins beside taxi addresses", () => {
     const root = mount({ show_service_dropdown: true }, [SERVICES[2]!]);
@@ -125,6 +169,18 @@ describe("business form toggles", () => {
     expect(mount({ show_map: false }).querySelector(mapSelector)).toBeNull();
     const shown = mount({ show_map: true });
     await vi.waitFor(() => expect(shown.querySelector(mapSelector)).not.toBeNull());
+  });
+});
+
+describe("taxi select arrows", () => {
+  it("keeps native selects with the shared field chevron", () => {
+    const root = mount({ show_service_dropdown: true });
+    for (const id of ["service", "passengers"]) {
+      const select = root.querySelector<HTMLSelectElement>(`#${id}`);
+      expect(select?.tagName).toBe("SELECT");
+      expect(select?.closest(".select-control")
+        ?.querySelector(".field-chevron svg")).not.toBeNull();
+    }
   });
 });
 

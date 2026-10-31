@@ -1,4 +1,5 @@
 import { formatMoney, formatMoneyAmount } from "../../money";
+import { SelectControl } from "../shell/FieldChevron";
 import { FieldError, FormError } from "../trip/FieldError";
 import { PromoCodeField } from "./PromoCodeField";
 import type { BreakdownState, PromoCodeState } from "./use-price-breakdown";
@@ -34,12 +35,13 @@ export function CarSeatsField(props: CarSeatsFieldProps) {
     <label for="carSeats">Car Seats {props.carSeatPrice !== undefined && <small>
       {formatMoneyAmount(props.carSeatPrice, props.currency)} each
     </small>}</label>
-    <select aria-describedby={props.carSeatError === undefined ? undefined : "carSeats-error"}
+    <SelectControl><select
+      aria-describedby={props.carSeatError === undefined ? undefined : "carSeats-error"}
       aria-invalid={props.carSeatError !== undefined} data-confirm-field="carSeats"
       id="carSeats" value={props.carSeats}
       onChange={(event) => props.onCarSeatsChange(Number(event.currentTarget.value))}>
       {options.map((count) => <option value={count}>{count} Car Seats</option>)}
-    </select>
+    </select></SelectControl>
     <FieldError id="carSeats-error" message={props.carSeatError} />
   </div>;
 }

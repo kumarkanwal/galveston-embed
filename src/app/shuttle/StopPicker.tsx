@@ -2,6 +2,7 @@ import type { TargetedKeyboardEvent } from "preact";
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 
 import type { LocationGroup, LocationOption } from "../../api/client";
+import { ChevronIcon, FieldChevron } from "../shell/FieldChevron";
 import { FieldError } from "../trip/FieldError";
 
 interface StopPickerProps {
@@ -18,11 +19,6 @@ interface PickerItem {
   id: string;
   kind: "category" | "location";
   value: string;
-}
-
-function Chevron(props: { className: string }) {
-  return <svg class={props.className} viewBox="0 0 16 16" aria-hidden="true"
-    focusable="false"><path d="m4 6 4 4 4-4" /></svg>;
 }
 
 function Checkmark() {
@@ -100,7 +96,7 @@ function PickerMenu(props: {
           data-category-id={group.category_id}
           onClick={() => props.onCategory(group.category_id)}>
           <span>{group.category}</span>
-          <Chevron className={`stop-chevron${isExpanded ? " open" : ""}`} />
+          <ChevronIcon className={`stop-chevron${isExpanded ? " open" : ""}`} />
         </button>
         {isExpanded && group.locations.map((location) => <LocationRow
           active={props.activeId === `location-${location.id}`} location={location}
@@ -195,7 +191,7 @@ export function StopPicker(props: StopPickerProps) {
         value={state.open ? state.query : state.selected?.location.name ?? ""}
         onKeyDown={state.onKeyDown}
         onInput={(event) => state.onInput(event.currentTarget.value)} />
-      <Chevron className={`stop-control-chevron${state.open ? " open" : ""}`} />
+      <FieldChevron open={state.open} />
     </div>
     {state.open && <PickerMenu activeId={state.activeId} expanded={state.expanded}
       filtering={state.filtering} groups={state.filtered} listboxId={listboxId}

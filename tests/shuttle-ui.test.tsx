@@ -82,6 +82,8 @@ describe("shuttle trip fields", () => {
     expect(unpriced.querySelector("#paxAdult")?.textContent).toBe("1");
     expect(unpriced.querySelector("#paxSenior")?.textContent).toBe("0");
     expect(unpriced.querySelector("#paxChild")?.textContent).toBe("0");
+    expect(unpriced.querySelector(".passenger-trigger .field-chevron svg")).not.toBeNull();
+    expect(unpriced.querySelector(".passenger-trigger")?.textContent).not.toContain("▾");
   });
 
   it("uses one unchecked Round trip checkbox and no trip-type radios", () => {
@@ -91,6 +93,10 @@ describe("shuttle trip fields", () => {
     expect(element.querySelectorAll('.trip-kind input[type="checkbox"]')).toHaveLength(1);
     expect(element.querySelector('.trip-kind input[type="radio"]')).toBeNull();
     expect(element.querySelector("#returnDate")).toBeNull();
+    expect(element.querySelector(".shuttle-trip-fields")?.classList.contains("date-time-grid"))
+      .toBe(true);
+    act(() => element.querySelector<HTMLLabelElement>(".trip-kind")?.click());
+    expect(checkbox?.checked).toBe(true);
   });
 
   it("sends false when Round trip is unchecked", () => {
@@ -101,8 +107,10 @@ describe("shuttle trip fields", () => {
       loadingLocations={false} minimumDate="2026-10-23" originGroups={LOCATION_GROUPS}
       submitting={false}
       timeZone="America/Chicago" onSubmit={() => undefined} update={update} />, element);
-    act(() => element.querySelector<HTMLInputElement>('.trip-kind input')?.click());
+    act(() => element.querySelector<HTMLLabelElement>('.trip-kind')?.click());
     expect(update).toHaveBeenCalledWith("roundTrip", false);
+    expect(element.querySelector(".shuttle-return-fields")?.classList.contains("date-time-grid"))
+      .toBe(true);
   });
 });
 
@@ -110,7 +118,8 @@ describe("shuttle trip compact styling", () => {
   it("fits the round-trip box to its checkbox row", () => {
     const css = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
     expect(css).toMatch(/\.trip-kind\s*\{[^}]*padding:\s*0 10px/s);
-    expect(css).toMatch(/\.trip-kind label\s*\{[^}]*min-height:\s*38px/s);
+    expect(css).toMatch(/\.trip-kind\s*\{[^}]*min-height:\s*38px/s);
+    expect(css).toMatch(/\.trip-kind:focus-within\s*\{[^}]*outline:/s);
   });
 });
 
@@ -231,5 +240,7 @@ describe("on-request shuttle departures", () => {
       .toBe("date");
     expect(element.querySelector<HTMLInputElement>('[data-shuttle-time="outbound"]')?.type)
       .toBe("time");
+    expect(element.querySelector(".shuttle-private-timing")?.classList.contains("date-time-grid"))
+      .toBe(true);
   });
 });

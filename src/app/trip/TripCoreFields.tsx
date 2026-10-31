@@ -1,4 +1,6 @@
 import { businessDateTimeParts } from "../../time";
+import { SelectControl } from "../shell/FieldChevron";
+import { openNativePicker } from "../shell/native-picker";
 import { FieldError } from "./FieldError";
 import { LuggageCounters } from "./LuggageCounters";
 import type { PartyLimits } from "./limits";
@@ -31,12 +33,13 @@ function DateTimeFields(props: Pick<
   "errors" | "form" | "onFieldBlur" | "timeZone" | "update"
 >) {
   const minimum = businessDateTimeParts(new Date(), props.timeZone);
-  return <div class="field-row compact-row pickup-datetime-fields">
+  return <div class="field-row compact-row date-time-grid pickup-datetime-fields">
     <div class="field" data-trip-field="pickupDate">
         <label for="pickup-date">Pickup Date</label>
         <input id="pickup-date" type="date" value={props.form.pickupDate}
           min={minimum.date} required aria-invalid={props.errors.pickupDate !== undefined}
           aria-describedby={props.errors.pickupDate === undefined ? undefined : "pickup-date-error"}
+          onClick={(event) => openNativePicker(event.currentTarget)}
           onBlur={() => props.onFieldBlur("pickupDate")}
           onInput={(event) => props.update("pickupDate", event.currentTarget.value)} />
         <FieldError id="pickup-date-error" message={props.errors.pickupDate} />
@@ -47,6 +50,7 @@ function DateTimeFields(props: Pick<
           min={props.form.pickupDate === minimum.date ? minimum.time : undefined}
           aria-invalid={props.errors.pickupTime !== undefined}
           aria-describedby={props.errors.pickupTime === undefined ? undefined : "pickup-time-error"}
+          onClick={(event) => openNativePicker(event.currentTarget)}
           onBlur={() => props.onFieldBlur("pickupTime")}
           onInput={(event) => props.update("pickupTime", event.currentTarget.value)} />
         <FieldError id="pickup-time-error" message={props.errors.pickupTime} />
@@ -59,13 +63,14 @@ function ReturnDateTimeFields(props: Pick<
   "errors" | "form" | "onFieldBlur" | "update"
 >) {
   if (props.form.service !== "round_trip") return null;
-  return <div class="field-row return-fields">
+  return <div class="field-row date-time-grid return-fields">
     <div class="field" data-trip-field="returnDate">
       <label for="return-date">Return Date</label>
       <input id="return-date" type="date" value={props.form.returnDate}
         min={props.form.pickupDate || undefined} required
         aria-invalid={props.errors.returnDate !== undefined}
         aria-describedby={props.errors.returnDate === undefined ? undefined : "return-date-error"}
+        onClick={(event) => openNativePicker(event.currentTarget)}
         onBlur={() => props.onFieldBlur("returnDate")}
         onInput={(event) => props.update("returnDate", event.currentTarget.value)} />
       <FieldError id="return-date-error" message={props.errors.returnDate} />
@@ -76,6 +81,7 @@ function ReturnDateTimeFields(props: Pick<
         min={props.form.returnDate === props.form.pickupDate ? props.form.pickupTime : undefined}
         aria-invalid={props.errors.returnTime !== undefined}
         aria-describedby={props.errors.returnTime === undefined ? undefined : "return-time-error"}
+        onClick={(event) => openNativePicker(event.currentTarget)}
         onBlur={() => props.onFieldBlur("returnTime")}
         onInput={(event) => props.update("returnTime", event.currentTarget.value)} />
       <FieldError id="return-time-error" message={props.errors.returnTime} />
@@ -90,12 +96,12 @@ function ServiceControl(props: Pick<
   if (props.showServiceDropdown) {
     return <div class="field full-field">
       <label for="service">Service Details</label>
-      <select id="service" value={props.form.service}
+      <SelectControl><select id="service" value={props.form.service}
         onChange={(event) => props.update(
           "service", event.currentTarget.value as TripFormState["service"],
         )}>
         {props.services.map((service) => <option value={service.code}>{service.name}</option>)}
-      </select>
+      </select></SelectControl>
     </div>;
   }
   const alternative = props.roundTripAlternative;
@@ -125,7 +131,7 @@ export function TripCoreFields({
       <legend class="visually-hidden">Passengers and luggage</legend>
       <div class="field" data-trip-field="passengers">
         <label for="passengers">Passengers</label>
-        <select id="passengers" value={form.passengers}
+        <SelectControl><select id="passengers" value={form.passengers}
           aria-invalid={errors.passengers !== undefined}
           aria-describedby={errors.passengers === undefined ? undefined : "passengers-error"}
           onBlur={() => onFieldBlur("passengers")}
@@ -133,7 +139,7 @@ export function TripCoreFields({
           {numericOptions(limits.passengers, 1).map((count) => <option value={count}>
             {count} {count === 1 ? "passenger" : "passengers"}
           </option>)}
-        </select>
+        </select></SelectControl>
         <FieldError id="passengers-error" message={errors.passengers} />
       </div>
       <LuggageCounters errors={errors} form={form} maximum={limits.bags}
