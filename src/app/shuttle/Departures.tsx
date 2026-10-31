@@ -4,14 +4,17 @@ import type { OnRequestAvailability, ShuttleDeparture, ShuttleRoute } from "../.
 import { formatMoney } from "../../money";
 import { FormError } from "../trip/FieldError";
 import { ProgressSteps } from "../trip/ProgressSteps";
+import { WidgetHeader } from "../shell/WidgetHeader";
 import { minimumMessage } from "./minimum";
 import { pricingText } from "./pricing";
 import type { DepartureViewData, OnRequestLeg, ScheduledLeg } from "./types";
 
 interface ShuttleDeparturesProps {
+  businessName?: string | undefined;
   currency: string;
   loadingOutbound: boolean;
   loadingReturn: boolean;
+  logoUrl?: string | null | undefined;
   notice: string | null;
   outboundData: DepartureViewData | null;
   passengerCount: number;
@@ -179,7 +182,8 @@ function DepartureSection(props: DepartureSectionProps) {
 
 export function ShuttleDepartures(props: ShuttleDeparturesProps) {
   return <section class="widget">
-    <header class="widget-heading"><h1>Reservations</h1><p>Choose your shuttle departure.</p></header>
+    <WidgetHeader businessName={props.businessName} logoUrl={props.logoUrl}
+      subtitle="Choose your shuttle departure." />
     <ProgressSteps activeStep={2} steps={["Trip", "Departures", "Confirm"]} />
     {props.notice !== null && <div class="service-area-note" role="alert">{props.notice}</div>}
     {props.loadingOutbound && <p class="return-loading" role="status">Refreshing departures…</p>}

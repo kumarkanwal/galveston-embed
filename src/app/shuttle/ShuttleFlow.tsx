@@ -19,6 +19,7 @@ export function ShuttleFlow(props: ShuttleFlowProps) {
   const minimumDate = businessDateTimeParts(new Date(), props.business.timezone).date;
   if (state.step === "done" && state.confirmation !== null) {
     return <Confirmation currency={props.business.currency} requestQuote={false}
+      businessName={props.business.name} logoUrl={props.business.logo_url}
       customerEmail={state.confirmation.customerEmail}
       emailsEnabled={props.business.emails_enabled}
       paymentMethod={state.confirmation.paymentMethod}
@@ -31,7 +32,8 @@ export function ShuttleFlow(props: ShuttleFlowProps) {
       onBooked={flow.complete} onUnavailable={(message) => { void flow.unavailable(message); }} />;
   }
   if (state.step === "outbound") {
-    return <ShuttleDepartures currency={props.business.currency} notice={state.notice}
+    return <ShuttleDepartures businessName={props.business.name}
+      currency={props.business.currency} logoUrl={props.business.logo_url} notice={state.notice}
       loadingOutbound={state.outboundResult === null && state.submitting}
       outboundData={state.outboundResult === null ? null
         : { result: state.outboundResult, date: state.form.date, direction: "outbound" }}
@@ -45,9 +47,11 @@ export function ShuttleFlow(props: ShuttleFlowProps) {
       onChooseReturn={(leg) => { void flow.chooseReturn(leg); }}
       onDateChange={(direction, date) => { void flow.refreshDate(direction, date); }} />;
   }
-  return <ShuttleTrip destinationGroups={state.destinationGroups} errors={state.errors}
+  return <ShuttleTrip businessName={props.business.name}
+    destinationGroups={state.destinationGroups} errors={state.errors}
     form={state.form} formError={state.formError} loadingDestinations={state.loadingDestinations}
-    loadingLocations={state.loadingLocations} minimumDate={minimumDate}
+    loadingLocations={state.loadingLocations} logoUrl={props.business.logo_url}
+    minimumDate={minimumDate}
     originGroups={state.originGroups}
     submitting={state.submitting} timeZone={props.business.timezone}
     onSubmit={(event) => { void flow.submitTrip(event); }}

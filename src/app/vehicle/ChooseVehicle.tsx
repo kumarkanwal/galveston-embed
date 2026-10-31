@@ -2,6 +2,7 @@ import type { Business, QuotedVehicle, TaxiQuoteResponse } from "../../api/clien
 import { useEffect, useRef } from "preact/hooks";
 import { ProgressSteps } from "../trip/ProgressSteps";
 import { VehicleRow } from "./VehicleRow";
+import { WidgetHeader } from "../shell/WidgetHeader";
 
 interface ChooseVehicleProps {
   autoFocusHeading?: boolean;
@@ -18,10 +19,8 @@ export function ChooseVehicle(props: ChooseVehicleProps) {
     if (props.autoFocusHeading) headingRef.current?.focus();
   }, [props.autoFocusHeading]);
   return <section class="widget">
-    <header class="widget-heading">
-      <h1>Reservations</h1>
-      <p>Book a trip or request a quote by filling out the form below.</p>
-    </header>
+    <WidgetHeader businessName={props.business.name} logoUrl={props.business.logo_url}
+      subtitle="Book a trip or request a quote by filling out the form below." />
     <ProgressSteps activeStep={2} />
     <h2 class="step-title" ref={headingRef} tabIndex={-1}>Choose Your Vehicle Type</h2>
     {props.notice !== null && <div class="service-area-note" role="alert">

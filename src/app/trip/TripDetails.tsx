@@ -16,9 +16,11 @@ import type {
   TripFormState,
 } from "./types";
 import { useAirportData } from "./use-airport-data";
+import { WidgetHeader } from "../shell/WidgetHeader";
 
 interface TripDetailsProps {
   autoFocusHeading?: boolean;
+  businessName?: string | undefined;
   client: ApiClient;
   errors: TripErrors;
   errorFocusField?: TripField | null;
@@ -27,6 +29,7 @@ interface TripDetailsProps {
   formError: string | null;
   isSubmitting: boolean;
   limits: PartyLimits;
+  logoUrl?: string | null | undefined;
   mapsKey: string;
   onFieldBlur: (field: TripField) => void;
   onSubmit: (event: SubmitEvent) => void | Promise<void>;
@@ -127,10 +130,9 @@ export function TripDetails(props: TripDetailsProps) {
     mapsKey={props.mapsKey} update={props.update} /> : null;
   const points = tripMapPoints(props.form);
   return <section class="widget">
-    <header class="widget-heading">
-      <h1 ref={headingRef} tabIndex={-1}>Reservations</h1>
-      <p>Book a trip or request a quote by filling out the form below.</p>
-    </header>
+    <WidgetHeader businessName={props.businessName} headingRef={headingRef}
+      logoUrl={props.logoUrl}
+      subtitle="Book a trip or request a quote by filling out the form below." />
     <ProgressSteps />
     <div class={`trip-layout${props.showMap ? "" : " no-map"}`}>
       <form class="trip-form" ref={formRef} noValidate onSubmit={props.onSubmit}>

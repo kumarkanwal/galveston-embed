@@ -2,18 +2,21 @@ import type { LocationGroup } from "../../api/client";
 import { FieldError, FormError } from "../trip/FieldError";
 import { ProgressSteps } from "../trip/ProgressSteps";
 import { PassengerDropdown } from "./PassengerDropdown";
+import { WidgetHeader } from "../shell/WidgetHeader";
 import type {
   ShuttleTripErrors,
   ShuttleTripForm,
 } from "./types";
 
 interface ShuttleTripProps {
+  businessName?: string | undefined;
   destinationGroups: LocationGroup[];
   errors: ShuttleTripErrors;
   form: ShuttleTripForm;
   formError: string | null;
   loadingDestinations: boolean;
   loadingLocations: boolean;
+  logoUrl?: string | null | undefined;
   minimumDate: string;
   originGroups: LocationGroup[];
   submitting: boolean;
@@ -54,7 +57,8 @@ function LocationField(props: {
 export function ShuttleTrip(props: ShuttleTripProps) {
   const steps = ["Trip", "Departures", "Confirm"];
   return <section class="widget">
-    <header class="widget-heading"><h1>Reservations</h1><p>Book your shuttle trip below.</p></header>
+    <WidgetHeader businessName={props.businessName} logoUrl={props.logoUrl}
+      subtitle="Book your shuttle trip below." />
     <ProgressSteps steps={steps} />
     <form class="shuttle-trip" noValidate onSubmit={props.onSubmit}>
       <div class="field-row">

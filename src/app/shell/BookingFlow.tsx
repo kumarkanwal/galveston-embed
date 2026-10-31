@@ -51,6 +51,7 @@ function BookingFlowReady(props: Omit<BookingFlowProps, "services"> & {
   useEffect(() => { previousView.current = view; }, [view]);
   if (flow.state.confirmation !== null) {
     return <Confirmation autoFocusHeading={autoFocusHeading} currency={props.business.currency}
+      businessName={props.business.name} logoUrl={props.business.logo_url}
       customerEmail={flow.state.confirmation.customerEmail}
       emailsEnabled={props.business.emails_enabled}
       requestQuote={flow.state.confirmation.requestQuote}
@@ -72,7 +73,8 @@ function BookingFlowReady(props: Omit<BookingFlowProps, "services"> & {
       onVehicleUnavailable={flow.vehicleUnavailable}
       serviceName={service.name} vehicle={vehicle} />;
   }
-  return <TripDetails client={props.client} errors={flow.state.errors} form={flow.state.form}
+  return <TripDetails businessName={props.business.name} client={props.client}
+    errors={flow.state.errors} form={flow.state.form} logoUrl={props.business.logo_url}
     autoFocusHeading={autoFocusHeading} errorFocusField={flow.state.errorFocusField}
     errorFocusVersion={flow.state.errorFocusVersion}
     formError={flow.state.formError} isSubmitting={flow.state.isSubmitting}

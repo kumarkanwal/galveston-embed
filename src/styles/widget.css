@@ -45,6 +45,25 @@
   margin: 0;
 }
 
+.widget-heading {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.widget-heading > div {
+  min-width: 0;
+}
+
+.business-logo {
+  display: block;
+  flex: 0 0 auto;
+  height: auto;
+  max-height: 40px;
+  max-width: 180px;
+  object-fit: contain;
+}
+
 .widget-heading p {
   font-size: 13px;
   font-style: italic;

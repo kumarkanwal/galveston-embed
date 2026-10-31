@@ -1,4 +1,4 @@
-import { useEffect } from "preact/hooks";
+import { useLayoutEffect } from "preact/hooks";
 import type { ComponentChildren } from "preact";
 
 import type { BookingFailure } from "../booking/booking-error";
@@ -24,7 +24,7 @@ export function ConfirmForm(props: ConfirmFormProps) {
   const errors = props.failure?.field === null || props.failure === null
     ? state.errors
     : { ...state.errors, [props.failure.field]: props.failure.message };
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (props.failure?.field == null) return;
     state.formRef.current
       ?.querySelector<HTMLElement>(`[data-confirm-field="${props.failure.field}"]`)?.focus();

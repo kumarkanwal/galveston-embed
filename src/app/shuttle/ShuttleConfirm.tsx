@@ -21,6 +21,7 @@ import { SquareCardField } from "../confirm/SquareCardField";
 import { useSquareCard } from "../confirm/use-square-card";
 import { FormError } from "../trip/FieldError";
 import { ProgressSteps } from "../trip/ProgressSteps";
+import { WidgetHeader } from "../shell/WidgetHeader";
 import {
   initialShuttleAddresses,
   addressesAfterRouteChange,
@@ -216,8 +217,8 @@ function useShuttleConfirm(props: ShuttleConfirmProps) {
 
 export function ShuttleConfirm(props: ShuttleConfirmProps) {
   const view = useShuttleConfirm(props);
-  return <section class="widget"><header class="widget-heading">
-    <h1>Reservations</h1><p>Review and confirm your shuttle trip.</p></header>
+  return <section class="widget"><WidgetHeader businessName={props.business.name}
+    logoUrl={props.business.logo_url} subtitle="Review and confirm your shuttle trip." />
     <ProgressSteps activeStep={3} steps={["Trip", "Departures", "Confirm"]} />
     <div class="confirm-layout"><div>
       <ShuttleSummary quote={view.quote} selection={props.selection} />

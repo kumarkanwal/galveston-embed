@@ -195,7 +195,7 @@ describe("booking field errors", () => {
     root.querySelector<HTMLButtonElement>(".create-trip")?.click();
     await vi.waitFor(() => expect(root.querySelector("#email-error")?.textContent)
       .toContain("That email cannot be used."));
-    expect(root.querySelector("#email")).toBe(document.activeElement);
+    await vi.waitFor(() => expect(root.querySelector("#email")).toBe(document.activeElement));
     expect(root.querySelector("#email")?.getAttribute("aria-describedby")).toBe("email-error");
     expect(root.querySelector<HTMLInputElement>("#firstName")?.value).toBe("Ada");
     expect(root.querySelector<HTMLInputElement>("#comments")?.value).toBe("Call on arrival");

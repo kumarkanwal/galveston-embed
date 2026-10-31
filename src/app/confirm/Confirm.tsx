@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useLayoutEffect, useRef, useState } from "preact/hooks";
 import type { RefObject } from "preact";
 
 import type {
@@ -22,6 +22,7 @@ import { SquareCardField } from "./SquareCardField";
 import { TripSummary } from "./TripSummary";
 import { usePriceBreakdown, type BreakdownState } from "./use-price-breakdown";
 import { useSquareCard } from "./use-square-card";
+import { WidgetHeader } from "../shell/WidgetHeader";
 
 interface ConfirmProps {
   autoFocusHeading?: boolean;
@@ -68,15 +69,15 @@ function useConfirmFocus(
   carSeatError: string | undefined,
   promoError: string | undefined,
 ) {
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (autoFocusHeading) sectionRef.current?.querySelector<HTMLElement>(".trip-summary h2")?.focus();
   }, [autoFocusHeading, sectionRef]);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (carSeatError !== undefined) {
       sectionRef.current?.querySelector<HTMLElement>('[data-confirm-field="carSeats"]')?.focus();
     }
   }, [carSeatError, sectionRef]);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (promoError !== undefined) {
       sectionRef.current?.querySelector<HTMLElement>('[data-confirm-field="promoCode"]')?.focus();
     }
@@ -133,10 +134,8 @@ function useConfirmController(props: ConfirmProps) {
 export function Confirm(props: ConfirmProps) {
   const view = useConfirmController(props);
   return <section class="widget" ref={view.sectionRef}>
-    <header class="widget-heading">
-      <h1>Reservations</h1>
-      <p>Book a trip or request a quote by filling out the form below.</p>
-    </header>
+    <WidgetHeader businessName={props.business.name} logoUrl={props.business.logo_url}
+      subtitle="Book a trip or request a quote by filling out the form below." />
     <ProgressSteps activeStep={3} />
     <div class="confirm-layout">
       <div>
