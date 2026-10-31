@@ -50,18 +50,18 @@ describe("responsive accessibility styles", () => {
   const confirmCss = readFileSync(resolve("src/styles/confirm.css"), "utf8");
   const vehicleCss = readFileSync(resolve("src/styles/vehicle.css"), "utf8");
 
-  it("uses 44px targets, 16px controls, and a visible focus ring", () => {
+  it("uses 38px targets, 16px controls, and a visible focus ring", () => {
     const compactRules = widgetCss.slice(widgetCss.indexOf(":is(.layout-medium"));
     expect(compactRules).toContain("font-size: 16px");
-    expect(compactRules).toContain("height: 44px");
-    expect(compactRules).toContain("min-height: 44px");
+    expect(compactRules).toContain("height: 38px");
+    expect(compactRules).toContain("min-height: 38px");
     expect(compactRules).toContain(".check-pricing");
     expect(compactRules).toContain(".vehicle-choose");
     expect(compactRules).toContain(".create-trip");
-    expect(confirmCss).toContain("min-width: 44px");
+    expect(confirmCss).toContain("min-width: 38px");
     expect(widgetCss).toContain(".widget :where(input, select, button, [tabindex]):focus-visible");
     expect(widgetCss).toContain("outline: 3px solid var(--blue)");
-    expect(confirmCss).toMatch(/\.layout-micro\) \.create-trip \{\s*min-height:\s*44px;/);
+    expect(confirmCss).toMatch(/\.layout-micro\) \.create-trip \{\s*min-height:\s*38px;/);
   });
 
   it.each(["#2f7d32", "#256528", "#b52b27", "#6b6b6b", "#337ab7"])(
@@ -69,14 +69,14 @@ describe("responsive accessibility styles", () => {
     (color) => expect(contrast(color, "#ffffff")).toBeGreaterThanOrEqual(4.5),
   );
 
-  it("reserves photo space and keeps 320px vehicle cards with 44px actions", () => {
+  it("reserves photo space and keeps 320px vehicle cards with 38px actions", () => {
     const phoneRules = vehicleCss.slice(vehicleCss.indexOf(":is(.layout-narrow"));
     expect(vehicleCss).toMatch(/\.vehicle-photo-frame[\s\S]*height:\s*70px;[\s\S]*width:\s*110px;/);
     expect(vehicleCss).toMatch(/\.vehicle-photo\s*\{[\s\S]*object-fit:\s*contain;/);
     expect(phoneRules).toContain("grid-template-columns: 72px minmax(0, 1fr)");
     expect(phoneRules).toContain("height: 50px");
     expect(phoneRules).toContain("width: 66px");
-    expect(widgetCss).toMatch(/\.vehicle-choose[\s\S]*min-height:\s*44px;/);
+    expect(widgetCss).toMatch(/\.vehicle-choose[\s\S]*min-height:\s*38px;/);
   });
 });
 

@@ -48,14 +48,14 @@
 .widget-heading p {
   font-size: 13px;
   font-style: italic;
-  margin: 2px 0 14px;
+  margin: 2px 0 8px;
 }
 
 .progress {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   list-style: none;
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   padding: 0;
 }
 
@@ -63,7 +63,7 @@
   border-top: 4px solid #eeeeee;
   color: var(--muted);
   font-size: 11px;
-  padding-top: 17px;
+  padding-top: 14px;
   position: relative;
   text-align: center;
 }
@@ -93,8 +93,9 @@
 
 .trip-layout {
   display: grid;
-  gap: 22px;
+  column-gap: 22px;
   grid-template-columns: minmax(0, 1fr) minmax(360px, 1fr);
+  row-gap: 10px;
 }
 
 .trip-layout.no-map {
@@ -108,19 +109,20 @@
 
 .field,
 .full-field {
-  margin-bottom: 9px;
+  margin-bottom: 10px;
   min-width: 0;
   position: relative;
 }
 
 .field-row {
   display: grid;
-  gap: 22px;
+  column-gap: 22px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  row-gap: 10px;
 }
 
 .pickup-datetime-fields {
-  gap: 8px;
+  column-gap: 8px;
   grid-template-columns: minmax(150px, 1.35fr) minmax(110px, 0.85fr);
 }
 
@@ -128,7 +130,7 @@
   display: grid;
   gap: 0;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .trip-kind-toggle button {
@@ -136,7 +138,7 @@
   border: 1px solid var(--border);
   color: #333333;
   cursor: pointer;
-  min-height: 36px;
+  min-height: 38px;
 }
 
 .trip-kind-toggle button:first-child {
@@ -156,11 +158,12 @@
 .party-fields {
   border: 0;
   display: grid;
-  gap: 6px;
+  column-gap: 6px;
   grid-template-columns: minmax(88px, 0.8fr) repeat(2, minmax(100px, 1fr));
-  margin: 2px 0 9px;
+  margin: 0 0 10px;
   min-width: 0;
   padding: 0;
+  row-gap: 10px;
 }
 
 .bag-label {
@@ -182,9 +185,9 @@
   border: 1px solid var(--border);
   border-radius: 3px;
   display: grid;
-  grid-template-columns: 34px minmax(28px, 1fr) 34px;
-  height: 40px;
-  min-height: 40px;
+  grid-template-columns: 38px minmax(28px, 1fr) 38px;
+  height: 38px;
+  min-height: 38px;
 }
 
 .counter-controls[aria-invalid="true"] {
@@ -200,7 +203,7 @@
 }
 
 .party-fields select {
-  height: 40px;
+  height: 38px;
 }
 
 .counter-controls button:disabled {
@@ -235,8 +238,9 @@ select {
   border: 1px solid var(--border);
   border-radius: 3px;
   color: #333333;
-  height: 32px;
-  padding: 5px 9px;
+  font-size: 16px;
+  height: 38px;
+  padding: 4px 9px;
   width: 100%;
 }
 
@@ -326,6 +330,7 @@ select[aria-invalid="true"] {
 
 .options li {
   cursor: pointer;
+  min-height: 38px;
   padding: 6px 10px;
 }
 
@@ -397,7 +402,7 @@ select[aria-invalid="true"] {
   border-radius: 3px;
   color: #ffffff;
   cursor: pointer;
-  min-height: 34px;
+  min-height: 38px;
   width: 100%;
 }
 
@@ -414,7 +419,7 @@ select[aria-invalid="true"] {
 
 .step-title {
   font-size: 24px;
-  margin: 28px 0 18px;
+  margin: 18px 0 12px;
 }
 
 .confirm-placeholder {
@@ -482,29 +487,29 @@ select[aria-invalid="true"] {
 :is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
   :is(input:not([type="checkbox"]):not([type="radio"]), select) {
   font-size: 16px;
-  height: 44px;
+  height: 38px;
 }
 
 :is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
   :is(button, .options li) {
-  min-height: 44px;
+  min-height: 38px;
 }
 
 :is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
   :is(.check-pricing, .vehicle-choose, .back-button, .create-trip, .terms-close) {
-  min-height: 44px;
+  min-height: 38px;
 }
 
 :is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
   .input-with-icon {
-  grid-template-columns: minmax(0, 1fr) 44px;
+  grid-template-columns: minmax(0, 1fr) 38px;
 }
 
 :is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
   .counter-controls {
-  grid-template-columns: 36px minmax(28px, 1fr) 36px;
-  height: 44px;
-  min-height: 44px;
+  grid-template-columns: 38px minmax(28px, 1fr) 38px;
+  height: 38px;
+  min-height: 38px;
 }
 
 :is(.layout-narrow, .layout-micro) .field-row:not(.pickup-datetime-fields) {
