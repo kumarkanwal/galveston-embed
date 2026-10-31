@@ -140,9 +140,9 @@
   row-gap: 10px;
 }
 
-.pickup-datetime-fields {
+.date-time-grid {
   column-gap: 8px;
-  grid-template-columns: minmax(150px, 1.35fr) minmax(110px, 0.85fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .trip-kind-toggle {
@@ -178,7 +178,7 @@
   border: 0;
   display: grid;
   column-gap: 6px;
-  grid-template-columns: minmax(88px, 0.8fr) repeat(2, minmax(100px, 1fr));
+  grid-template-columns: minmax(154px, 1.6fr) repeat(2, minmax(89px, 1fr));
   margin: 0 0 10px;
   min-width: 0;
   padding: 0;
@@ -223,6 +223,16 @@
 
 .party-fields select {
   height: 38px;
+}
+
+.party-fields > .field,
+.date-time-grid > .field {
+  min-width: 0;
+}
+
+.party-fields .field-error,
+.date-time-grid .field-error {
+  overflow-wrap: anywhere;
 }
 
 .counter-controls button:disabled {
@@ -574,7 +584,7 @@ select[aria-invalid="true"] {
   min-height: 38px;
 }
 
-:is(.layout-narrow, .layout-micro) .field-row:not(.pickup-datetime-fields) {
+:is(.layout-narrow, .layout-micro) .field-row:not(.date-time-grid) {
   gap: 0;
   grid-template-columns: 1fr;
 }
@@ -583,7 +593,7 @@ select[aria-invalid="true"] {
   font-size: 23px;
 }
 
-.layout-micro :is(.pickup-datetime-fields, .party-fields) {
+.layout-micro :is(.date-time-grid, .party-fields) {
   gap: 6px;
   grid-template-columns: 1fr;
 }
@@ -594,4 +604,8 @@ select[aria-invalid="true"] {
 
 .layout-micro .party-fields > [data-trip-field="passengers"] {
   grid-column: 1 / -1;
+}
+
+:is(.layout-narrow) .party-fields .counter-controls {
+  grid-template-columns: 28px minmax(24px, 1fr) 28px;
 }

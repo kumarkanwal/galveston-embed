@@ -45,7 +45,7 @@ interface TimingProps {
 }
 
 function OnRequestTiming(props: TimingProps) {
-  return <>
+  return <div class="field-row date-time-grid shuttle-private-timing">
     <div class="field"><label for={`${props.inputId}-date`}>Pickup Date</label>
       <input id={`${props.inputId}-date`} data-shuttle-date={props.direction} type="date"
         min={props.minimumDate ?? undefined} value={props.date}
@@ -56,7 +56,7 @@ function OnRequestTiming(props: TimingProps) {
         type="time" min={props.minimumTime} value={props.time}
         onInput={(event) => props.onTime(event.currentTarget.value)} />
     </div>
-  </>;
+  </div>;
 }
 
 function departureTime(departure: ShuttleDeparture): string {

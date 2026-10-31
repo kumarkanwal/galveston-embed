@@ -11,7 +11,7 @@ import type { TripFormState } from "../src/app/trip/types";
 const BUSINESS = {
   id: "business-1", name: "Island Transit", type: "taxi", currency: "USD",
   timezone: "America/Chicago", distance_unit: "miles", emails_enabled: false,
-  max_passengers: 8, max_luggage: 8,
+  max_passengers: 10, max_luggage: 8,
   settings: { advance_booking_hours: 0, insurance_enabled: false, insurance_pct: "0.00",
     offer_car_seats: true, max_car_seats: 5, car_seat_price: "15.00",
     payment_methods: ["cash"], show_map: false, show_service_dropdown: true },
@@ -76,6 +76,22 @@ describe("taxi responsive field groups", () => {
     expect(root.querySelector("#largeBags")?.getAttribute("aria-label"))
       .toBe("Check-in / trunk bags");
     expect(root.querySelector(".party-fields .bag-icon")).not.toBeNull();
+  });
+});
+
+describe("taxi aligned field layout", () => {
+  it("uses the shared date/time grid for pickup and return rows", () => {
+    const root = mount({ show_service_dropdown: true });
+    expect(root.querySelector(".pickup-datetime-fields")?.classList.contains("date-time-grid"))
+      .toBe(true);
+    expect(root.querySelector(".return-fields")?.classList.contains("date-time-grid"))
+      .toBe(true);
+  });
+
+  it("keeps the complete ten-passenger label in the native select", () => {
+    const root = mount({ show_service_dropdown: true }, [SERVICES[2]!]);
+    expect(root.querySelector("#passengers option:last-child")?.textContent?.trim())
+      .toBe("10 passengers");
   });
 });
 

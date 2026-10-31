@@ -61,10 +61,10 @@ describe("compact layout CSS", () => {
   });
 
   it("keeps the compact rows single-line through 320px and stacks below it", () => {
-    expect(css).toContain(".pickup-datetime-fields {");
-    expect(css).toContain("grid-template-columns: minmax(150px, 1.35fr) minmax(110px, 0.85fr)");
-    expect(css).toContain("grid-template-columns: minmax(88px, 0.8fr) repeat(2, minmax(100px, 1fr))");
-    expect(css).toContain(".layout-micro :is(.pickup-datetime-fields, .party-fields)");
+    expect(css).toContain(".date-time-grid {");
+    expect(css).toContain("grid-template-columns: repeat(2, minmax(0, 1fr))");
+    expect(css).toContain("grid-template-columns: minmax(154px, 1.6fr) repeat(2, minmax(89px, 1fr))");
+    expect(css).toContain(".layout-micro :is(.date-time-grid, .party-fields)");
     expect(css).toContain(".layout-micro .party-fields > [data-trip-field=\"passengers\"]");
   });
 
@@ -88,7 +88,7 @@ describe("compact layout CSS", () => {
 
   it("keeps passengers, Bags and Carry-on on one line at 360px", () => {
     const narrowRules = css.slice(css.indexOf(":is(.layout-narrow"));
-    expect(css).toContain("grid-template-columns: minmax(88px, 0.8fr) repeat(2, minmax(100px, 1fr))");
+    expect(css).toContain("grid-template-columns: minmax(154px, 1.6fr) repeat(2, minmax(89px, 1fr))");
     expect(narrowRules).not.toMatch(/\.party-fields\s*\{[\s\S]*grid-template-columns:\s*1fr;/);
   });
 });

@@ -93,6 +93,8 @@ describe("shuttle trip fields", () => {
     expect(element.querySelectorAll('.trip-kind input[type="checkbox"]')).toHaveLength(1);
     expect(element.querySelector('.trip-kind input[type="radio"]')).toBeNull();
     expect(element.querySelector("#returnDate")).toBeNull();
+    expect(element.querySelector(".shuttle-trip-fields")?.classList.contains("date-time-grid"))
+      .toBe(true);
   });
 
   it("sends false when Round trip is unchecked", () => {
@@ -105,6 +107,8 @@ describe("shuttle trip fields", () => {
       timeZone="America/Chicago" onSubmit={() => undefined} update={update} />, element);
     act(() => element.querySelector<HTMLInputElement>('.trip-kind input')?.click());
     expect(update).toHaveBeenCalledWith("roundTrip", false);
+    expect(element.querySelector(".shuttle-return-fields")?.classList.contains("date-time-grid"))
+      .toBe(true);
   });
 });
 
@@ -233,5 +237,7 @@ describe("on-request shuttle departures", () => {
       .toBe("date");
     expect(element.querySelector<HTMLInputElement>('[data-shuttle-time="outbound"]')?.type)
       .toBe("time");
+    expect(element.querySelector(".shuttle-private-timing")?.classList.contains("date-time-grid"))
+      .toBe(true);
   });
 });

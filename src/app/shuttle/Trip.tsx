@@ -42,7 +42,7 @@ export function ShuttleTrip(props: ShuttleTripProps) {
           value={props.form.toId} error={props.errors.toId}
           onChange={(value) => props.update("toId", value)} />
       </div>
-      <div class="field-row">
+      <div class="field-row date-time-grid shuttle-trip-fields">
         <div class="field"><label for="date">Departure Date</label>
           <input id="date" type="date" min={props.minimumDate} value={props.form.date}
             aria-invalid={props.errors.date !== undefined}
@@ -57,11 +57,13 @@ export function ShuttleTrip(props: ShuttleTripProps) {
           onChange={(event) => props.update("roundTrip", event.currentTarget.checked)} />
           Round trip</label>
       </div>
-      {props.form.roundTrip && <div class="field"><label for="returnDate">Return Date</label>
-        <input id="returnDate" type="date" min={props.form.date} value={props.form.returnDate}
-          aria-invalid={props.errors.returnDate !== undefined}
-          onInput={(event) => props.update("returnDate", event.currentTarget.value)} />
-        <FieldError id="returnDate-error" message={props.errors.returnDate} />
+      {props.form.roundTrip && <div class="field-row date-time-grid shuttle-return-fields">
+        <div class="field"><label for="returnDate">Return Date</label>
+          <input id="returnDate" type="date" min={props.form.date} value={props.form.returnDate}
+            aria-invalid={props.errors.returnDate !== undefined}
+            onInput={(event) => props.update("returnDate", event.currentTarget.value)} />
+          <FieldError id="returnDate-error" message={props.errors.returnDate} />
+        </div>
       </div>}
       <p class="field-note">Dates and times use {props.timeZone}.</p>
       {props.formError !== null && <FormError>{props.formError}</FormError>}

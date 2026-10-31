@@ -32,7 +32,7 @@ function DateTimeFields(props: Pick<
   "errors" | "form" | "onFieldBlur" | "timeZone" | "update"
 >) {
   const minimum = businessDateTimeParts(new Date(), props.timeZone);
-  return <div class="field-row compact-row pickup-datetime-fields">
+  return <div class="field-row compact-row date-time-grid pickup-datetime-fields">
     <div class="field" data-trip-field="pickupDate">
         <label for="pickup-date">Pickup Date</label>
         <input id="pickup-date" type="date" value={props.form.pickupDate}
@@ -60,7 +60,7 @@ function ReturnDateTimeFields(props: Pick<
   "errors" | "form" | "onFieldBlur" | "update"
 >) {
   if (props.form.service !== "round_trip") return null;
-  return <div class="field-row return-fields">
+  return <div class="field-row date-time-grid return-fields">
     <div class="field" data-trip-field="returnDate">
       <label for="return-date">Return Date</label>
       <input id="return-date" type="date" value={props.form.returnDate}
