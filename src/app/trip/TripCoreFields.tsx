@@ -1,5 +1,6 @@
 import { businessDateTimeParts } from "../../time";
 import { SelectControl } from "../shell/FieldChevron";
+import { openNativePicker } from "../shell/native-picker";
 import { FieldError } from "./FieldError";
 import { LuggageCounters } from "./LuggageCounters";
 import type { PartyLimits } from "./limits";
@@ -38,6 +39,7 @@ function DateTimeFields(props: Pick<
         <input id="pickup-date" type="date" value={props.form.pickupDate}
           min={minimum.date} required aria-invalid={props.errors.pickupDate !== undefined}
           aria-describedby={props.errors.pickupDate === undefined ? undefined : "pickup-date-error"}
+          onClick={(event) => openNativePicker(event.currentTarget)}
           onBlur={() => props.onFieldBlur("pickupDate")}
           onInput={(event) => props.update("pickupDate", event.currentTarget.value)} />
         <FieldError id="pickup-date-error" message={props.errors.pickupDate} />
@@ -48,6 +50,7 @@ function DateTimeFields(props: Pick<
           min={props.form.pickupDate === minimum.date ? minimum.time : undefined}
           aria-invalid={props.errors.pickupTime !== undefined}
           aria-describedby={props.errors.pickupTime === undefined ? undefined : "pickup-time-error"}
+          onClick={(event) => openNativePicker(event.currentTarget)}
           onBlur={() => props.onFieldBlur("pickupTime")}
           onInput={(event) => props.update("pickupTime", event.currentTarget.value)} />
         <FieldError id="pickup-time-error" message={props.errors.pickupTime} />
@@ -67,6 +70,7 @@ function ReturnDateTimeFields(props: Pick<
         min={props.form.pickupDate || undefined} required
         aria-invalid={props.errors.returnDate !== undefined}
         aria-describedby={props.errors.returnDate === undefined ? undefined : "return-date-error"}
+        onClick={(event) => openNativePicker(event.currentTarget)}
         onBlur={() => props.onFieldBlur("returnDate")}
         onInput={(event) => props.update("returnDate", event.currentTarget.value)} />
       <FieldError id="return-date-error" message={props.errors.returnDate} />
@@ -77,6 +81,7 @@ function ReturnDateTimeFields(props: Pick<
         min={props.form.returnDate === props.form.pickupDate ? props.form.pickupTime : undefined}
         aria-invalid={props.errors.returnTime !== undefined}
         aria-describedby={props.errors.returnTime === undefined ? undefined : "return-time-error"}
+        onClick={(event) => openNativePicker(event.currentTarget)}
         onBlur={() => props.onFieldBlur("returnTime")}
         onInput={(event) => props.update("returnTime", event.currentTarget.value)} />
       <FieldError id="return-time-error" message={props.errors.returnTime} />

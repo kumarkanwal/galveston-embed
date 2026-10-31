@@ -95,6 +95,34 @@ describe("taxi aligned field layout", () => {
   });
 });
 
+describe("native date and time pickers", () => {
+  it("opens date and time pickers from a click anywhere in the input", () => {
+    const root = mount({ show_service_dropdown: true }, [SERVICES[2]!]);
+    for (const id of ["pickup-date", "pickup-time"]) {
+      const input = root.querySelector<HTMLInputElement>(`#${id}`);
+      const showPicker = vi.fn();
+      if (input === null) throw new Error(`Missing ${id}`);
+      input.showPicker = showPicker;
+      act(() => input.click());
+      expect(showPicker).toHaveBeenCalledOnce();
+    }
+  });
+
+  it("focuses the input when showPicker throws and preserves keyboard input", () => {
+    const root = mount({ show_service_dropdown: true }, [SERVICES[2]!]);
+    const input = root.querySelector<HTMLInputElement>("#pickup-date");
+    if (input === null) throw new Error("Missing pickup date");
+    input.showPicker = () => { throw new DOMException("Not allowed"); };
+    act(() => input.click());
+    expect(document.activeElement).toBe(input);
+    act(() => {
+      input.value = "2026-11-05";
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    expect(input.value).toBe("2026-11-05");
+  });
+});
+
 describe("business form toggles", () => {
   it("renders non-focusable decorative map pins beside taxi addresses", () => {
     const root = mount({ show_service_dropdown: true }, [SERVICES[2]!]);

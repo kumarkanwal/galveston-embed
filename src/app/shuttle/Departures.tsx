@@ -2,6 +2,7 @@ import { useState } from "preact/hooks";
 
 import type { OnRequestAvailability, ShuttleDeparture, ShuttleRoute } from "../../api/client";
 import { formatMoney } from "../../money";
+import { openNativePicker } from "../shell/native-picker";
 import { FormError } from "../trip/FieldError";
 import { ProgressSteps } from "../trip/ProgressSteps";
 import { WidgetHeader } from "../shell/WidgetHeader";
@@ -49,11 +50,13 @@ function OnRequestTiming(props: TimingProps) {
     <div class="field"><label for={`${props.inputId}-date`}>Pickup Date</label>
       <input id={`${props.inputId}-date`} data-shuttle-date={props.direction} type="date"
         min={props.minimumDate ?? undefined} value={props.date}
+        onClick={(event) => openNativePicker(event.currentTarget)}
         onInput={(event) => props.onDate(event.currentTarget.value)} />
     </div>
     <div class="field"><label for={`${props.inputId}-time`}>Pickup Time</label>
       <input id={`${props.inputId}-time`} data-shuttle-time={props.direction}
         type="time" min={props.minimumTime} value={props.time}
+        onClick={(event) => openNativePicker(event.currentTarget)}
         onInput={(event) => props.onTime(event.currentTarget.value)} />
     </div>
   </div>;

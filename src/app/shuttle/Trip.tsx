@@ -1,4 +1,5 @@
 import type { LocationGroup } from "../../api/client";
+import { openNativePicker } from "../shell/native-picker";
 import { FieldError, FormError } from "../trip/FieldError";
 import { ProgressSteps } from "../trip/ProgressSteps";
 import { PassengerDropdown } from "./PassengerDropdown";
@@ -46,6 +47,7 @@ export function ShuttleTrip(props: ShuttleTripProps) {
         <div class="field"><label for="date">Departure Date</label>
           <input id="date" type="date" min={props.minimumDate} value={props.form.date}
             aria-invalid={props.errors.date !== undefined}
+            onClick={(event) => openNativePicker(event.currentTarget)}
             onInput={(event) => props.update("date", event.currentTarget.value)} />
           <FieldError id="date-error" message={props.errors.date} />
         </div>
@@ -61,6 +63,7 @@ export function ShuttleTrip(props: ShuttleTripProps) {
         <div class="field"><label for="returnDate">Return Date</label>
           <input id="returnDate" type="date" min={props.form.date} value={props.form.returnDate}
             aria-invalid={props.errors.returnDate !== undefined}
+            onClick={(event) => openNativePicker(event.currentTarget)}
             onInput={(event) => props.update("returnDate", event.currentTarget.value)} />
           <FieldError id="returnDate-error" message={props.errors.returnDate} />
         </div>
