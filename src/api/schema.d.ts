@@ -415,10 +415,10 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * Deactivate Airport
-         * @description Deactivate and disclose affected future bookings.
+         * Delete Airport
+         * @description Hard-delete one unused shared airport.
          */
-        delete: operations["deactivate_airport_v1_admin_airports__airport_id__delete"];
+        delete: operations["delete_airport_v1_admin_airports__airport_id__delete"];
         options?: never;
         head?: never;
         /**
@@ -426,6 +426,66 @@ export interface paths {
          * @description Edit one shared airport as a platform catalog administrator.
          */
         patch: operations["update_airport_v1_admin_airports__airport_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/airports/{airport_id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deactivate Airport
+         * @description Deactivate and disclose affected future bookings.
+         */
+        post: operations["deactivate_airport_v1_admin_airports__airport_id__deactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/airports/{airport_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reactivate Airport
+         * @description Reactivate one shared airport.
+         */
+        post: operations["reactivate_airport_v1_admin_airports__airport_id__reactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/airports/{airport_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Airport Usage
+         * @description Return airport booking reference counts.
+         */
+        get: operations["airport_usage_v1_admin_airports__airport_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/admin/airlines": {
@@ -467,10 +527,10 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * Deactivate Airline
-         * @description Deactivate one airline without changing booking snapshots.
+         * Delete Airline
+         * @description Hard-delete one unused shared airline.
          */
-        delete: operations["deactivate_airline_v1_admin_airlines__airline_id__delete"];
+        delete: operations["delete_airline_v1_admin_airlines__airline_id__delete"];
         options?: never;
         head?: never;
         /**
@@ -478,6 +538,66 @@ export interface paths {
          * @description Edit one shared airline as a platform catalog administrator.
          */
         patch: operations["update_airline_v1_admin_airlines__airline_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/airlines/{airline_id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deactivate Airline
+         * @description Deactivate one airline without changing booking snapshots.
+         */
+        post: operations["deactivate_airline_v1_admin_airlines__airline_id__deactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/airlines/{airline_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reactivate Airline
+         * @description Reactivate one shared airline.
+         */
+        post: operations["reactivate_airline_v1_admin_airlines__airline_id__reactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/airlines/{airline_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Airline Usage
+         * @description Return airline booking snapshot counts.
+         */
+        get: operations["airline_usage_v1_admin_airlines__airline_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/admin/auth/login": {
@@ -1031,10 +1151,10 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * Deactivate Vehicle
-         * @description Deactivate a physical vehicle and return affected future runs.
+         * Delete Vehicle
+         * @description Hard-delete an unused physical vehicle.
          */
-        delete: operations["deactivate_vehicle_v1_admin_vehicles__vehicle_id__delete"];
+        delete: operations["delete_vehicle_v1_admin_vehicles__vehicle_id__delete"];
         options?: never;
         head?: never;
         /**
@@ -1042,6 +1162,66 @@ export interface paths {
          * @description Edit one tenant-owned physical vehicle.
          */
         patch: operations["update_vehicle_v1_admin_vehicles__vehicle_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/vehicles/{vehicle_id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deactivate Vehicle
+         * @description Deactivate a physical vehicle and return affected future runs.
+         */
+        post: operations["deactivate_vehicle_v1_admin_vehicles__vehicle_id__deactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/vehicles/{vehicle_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reactivate Vehicle
+         * @description Reactivate a physical vehicle.
+         */
+        post: operations["reactivate_vehicle_v1_admin_vehicles__vehicle_id__reactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/vehicles/{vehicle_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Vehicle Usage
+         * @description Report whether historical assignments block hard deletion.
+         */
+        get: operations["vehicle_usage_v1_admin_vehicles__vehicle_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/admin/settings/global": {
@@ -1351,11 +1531,7 @@ export interface paths {
         get: operations["get_charge_v1_admin_charges__charge_id__get"];
         put?: never;
         post?: never;
-        /**
-         * Deactivate Charge
-         * @description Deactivate rather than deleting a historically referenced charge.
-         */
-        delete: operations["deactivate_charge_v1_admin_charges__charge_id__delete"];
+        delete?: never;
         options?: never;
         head?: never;
         /**
@@ -1363,6 +1539,26 @@ export interface paths {
          * @description Edit amount and application semantics without repricing old bookings.
          */
         patch: operations["update_charge_v1_admin_charges__charge_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/charges/{charge_id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deactivate Charge
+         * @description Deactivate rather than deleting a historically referenced charge.
+         */
+        post: operations["deactivate_charge_v1_admin_charges__charge_id__deactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/admin/surcharges": {
@@ -1403,11 +1599,7 @@ export interface paths {
         get: operations["get_surcharge_v1_admin_surcharges__surcharge_id__get"];
         put?: never;
         post?: never;
-        /**
-         * Deactivate Surcharge
-         * @description Soft-deactivate a surcharge so historical references remain valid.
-         */
-        delete: operations["deactivate_surcharge_v1_admin_surcharges__surcharge_id__delete"];
+        delete?: never;
         options?: never;
         head?: never;
         /**
@@ -1415,6 +1607,26 @@ export interface paths {
          * @description Edit a current percentage without touching historical totals.
          */
         patch: operations["update_surcharge_v1_admin_surcharges__surcharge_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/surcharges/{surcharge_id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deactivate Surcharge
+         * @description Soft-deactivate a surcharge so historical references remain valid.
+         */
+        post: operations["deactivate_surcharge_v1_admin_surcharges__surcharge_id__deactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/admin/peak-rules": {
@@ -1475,11 +1687,7 @@ export interface paths {
         get: operations["get_peak_rule_v1_admin_peak_rules__rule_id__get"];
         put?: never;
         post?: never;
-        /**
-         * Deactivate Peak Rule
-         * @description Deactivate a rule without deleting its auditable configuration.
-         */
-        delete: operations["deactivate_peak_rule_v1_admin_peak_rules__rule_id__delete"];
+        delete?: never;
         options?: never;
         head?: never;
         /**
@@ -1487,6 +1695,26 @@ export interface paths {
          * @description Edit a rule and disclose active peak overlaps without stacking them.
          */
         patch: operations["update_peak_rule_v1_admin_peak_rules__rule_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/peak-rules/{rule_id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deactivate Peak Rule
+         * @description Deactivate a rule without deleting its auditable configuration.
+         */
+        post: operations["deactivate_peak_rule_v1_admin_peak_rules__rule_id__deactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/admin/promo-codes": {
@@ -1522,9 +1750,29 @@ export interface paths {
         };
         /**
          * Promo Code Usage
-         * @description List immutable order discounts attributed to one tenant-owned code.
+         * @description Return order counts that decide whether this promo is removable.
          */
         get: operations["promo_code_usage_v1_admin_promo_codes__promo_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/promo-codes/{promo_id}/redemptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Promo Code Redemptions
+         * @description List immutable order discounts attributed to one tenant-owned code.
+         */
+        get: operations["promo_code_redemptions_v1_admin_promo_codes__promo_id__redemptions_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1548,10 +1796,10 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * Deactivate Promo Code
-         * @description Deactivate rather than delete a historically referenced code.
+         * Delete Promo Code
+         * @description Hard-delete an unused tenant-owned promo code.
          */
-        delete: operations["deactivate_promo_code_v1_admin_promo_codes__promo_id__delete"];
+        delete: operations["delete_promo_code_v1_admin_promo_codes__promo_id__delete"];
         options?: never;
         head?: never;
         /**
@@ -1559,6 +1807,46 @@ export interface paths {
          * @description Edit future redemptions without changing historical order discounts.
          */
         patch: operations["update_promo_code_v1_admin_promo_codes__promo_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/promo-codes/{promo_id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deactivate Promo Code
+         * @description Deactivate rather than delete a historically referenced code.
+         */
+        post: operations["deactivate_promo_code_v1_admin_promo_codes__promo_id__deactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/promo-codes/{promo_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reactivate Promo Code
+         * @description Reactivate a tenant-owned promo code.
+         */
+        post: operations["reactivate_promo_code_v1_admin_promo_codes__promo_id__reactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/admin/service-areas": {
@@ -1639,11 +1927,7 @@ export interface paths {
         get: operations["get_service_area_v1_admin_service_areas__area_id__get"];
         put?: never;
         post?: never;
-        /**
-         * Deactivate Service Area
-         * @description Soft-deactivate a rule and immediately refresh coverage behavior.
-         */
-        delete: operations["deactivate_service_area_v1_admin_service_areas__area_id__delete"];
+        delete?: never;
         options?: never;
         head?: never;
         /**
@@ -1651,6 +1935,26 @@ export interface paths {
          * @description Edit one current coverage rule.
          */
         patch: operations["update_service_area_v1_admin_service_areas__area_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/service-areas/{area_id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deactivate Service Area
+         * @description Soft-deactivate a rule and immediately refresh coverage behavior.
+         */
+        post: operations["deactivate_service_area_v1_admin_service_areas__area_id__deactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/admin/pricing-rows": {
@@ -1691,11 +1995,7 @@ export interface paths {
         get: operations["get_pricing_row_v1_admin_pricing_rows__row_id__get"];
         put?: never;
         post?: never;
-        /**
-         * Deactivate Pricing Row
-         * @description Soft-deactivate a supported or retained legacy pricing row.
-         */
-        delete: operations["deactivate_pricing_row_v1_admin_pricing_rows__row_id__delete"];
+        delete?: never;
         options?: never;
         head?: never;
         /**
@@ -1703,6 +2003,26 @@ export interface paths {
          * @description Edit a supported row or explicitly convert a retained legacy row.
          */
         patch: operations["update_pricing_row_v1_admin_pricing_rows__row_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/pricing-rows/{row_id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deactivate Pricing Row
+         * @description Soft-deactivate a supported or retained legacy pricing row.
+         */
+        post: operations["deactivate_pricing_row_v1_admin_pricing_rows__row_id__deactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/admin/reservations": {
@@ -2175,11 +2495,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /**
-         * Deactivate Schedule
-         * @description Deactivate without unassigning bookings; booked departures need confirmation.
-         */
-        delete: operations["deactivate_schedule_v1_admin_schedules__schedule_id__delete"];
+        delete?: never;
         options?: never;
         head?: never;
         /**
@@ -2187,6 +2503,26 @@ export interface paths {
          * @description Edit a departure under lock, with explicit booked-customer confirmation.
          */
         patch: operations["update_schedule_v1_admin_schedules__schedule_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/schedules/{schedule_id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deactivate Schedule
+         * @description Deactivate without unassigning bookings; booked departures need confirmation.
+         */
+        post: operations["deactivate_schedule_v1_admin_schedules__schedule_id__deactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/admin/service-types": {
@@ -2850,10 +3186,10 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * Deactivate Route
-         * @description Deactivate without cascading and disclose affected future inventory.
+         * Delete Route
+         * @description Hard-delete an unused shuttle route.
          */
-        delete: operations["deactivate_route_v1_admin_routes__route_id__delete"];
+        delete: operations["delete_route_v1_admin_routes__route_id__delete"];
         options?: never;
         head?: never;
         /**
@@ -2861,6 +3197,66 @@ export interface paths {
          * @description Edit route endpoints, duration, or customer-facing service label.
          */
         patch: operations["update_route_v1_admin_routes__route_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/routes/{route_id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deactivate Route
+         * @description Deactivate without cascading and disclose affected future inventory.
+         */
+        post: operations["deactivate_route_v1_admin_routes__route_id__deactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/routes/{route_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reactivate Route
+         * @description Reactivate an inactive shuttle route.
+         */
+        post: operations["reactivate_route_v1_admin_routes__route_id__reactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/routes/{route_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Route Usage
+         * @description Return references that block route deletion.
+         */
+        get: operations["route_usage_v1_admin_routes__route_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/admin/routes/{route_id}/prices": {
@@ -2942,10 +3338,10 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * Deactivate Team Member
-         * @description Deactivate a team member without removing historical assignments.
+         * Delete Team Member
+         * @description Hard-delete an unused staff account.
          */
-        delete: operations["deactivate_team_member_v1_admin_team__admin_id__delete"];
+        delete: operations["delete_team_member_v1_admin_team__admin_id__delete"];
         options?: never;
         head?: never;
         /**
@@ -2953,6 +3349,66 @@ export interface paths {
          * @description Edit one team member while preserving owner invariants.
          */
         patch: operations["update_team_member_v1_admin_team__admin_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/team/{admin_id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deactivate Team Member
+         * @description Deactivate a team member without removing historical assignments.
+         */
+        post: operations["deactivate_team_member_v1_admin_team__admin_id__deactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/team/{admin_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reactivate Team Member
+         * @description Reactivate an inactive staff account.
+         */
+        post: operations["reactivate_team_member_v1_admin_team__admin_id__reactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/team/{admin_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Team Member Usage
+         * @description Return historical references that block hard deletion.
+         */
+        get: operations["team_member_usage_v1_admin_team__admin_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/admin/team/{admin_id}/businesses": {
@@ -3054,10 +3510,10 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * Deactivate Vehicle Type
-         * @description Deactivate globally and return affected available businesses.
+         * Delete Vehicle Type
+         * @description Hard-delete an unused global vehicle type.
          */
-        delete: operations["deactivate_vehicle_type_v1_admin_vehicle_types__vehicle_type_id__delete"];
+        delete: operations["delete_vehicle_type_v1_admin_vehicle_types__vehicle_type_id__delete"];
         options?: never;
         head?: never;
         /**
@@ -3086,6 +3542,66 @@ export interface paths {
          * @description Remove a global image as a platform administrator.
          */
         delete: operations["remove_vehicle_type_image_v1_admin_vehicle_types__vehicle_type_id__image_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/vehicle-types/{vehicle_type_id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deactivate Vehicle Type
+         * @description Deactivate globally and return affected available businesses.
+         */
+        post: operations["deactivate_vehicle_type_v1_admin_vehicle_types__vehicle_type_id__deactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/vehicle-types/{vehicle_type_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reactivate Vehicle Type
+         * @description Reactivate a global vehicle type.
+         */
+        post: operations["reactivate_vehicle_type_v1_admin_vehicle_types__vehicle_type_id__reactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/vehicle-types/{vehicle_type_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Vehicle Type Usage
+         * @description Return global references that block vehicle-type deletion.
+         */
+        get: operations["vehicle_type_usage_v1_admin_vehicle_types__vehicle_type_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -3169,11 +3685,7 @@ export interface paths {
         get: operations["get_anchor_v1_admin_pricing_anchors__anchor_id__get"];
         put?: never;
         post?: never;
-        /**
-         * Deactivate Anchor
-         * @description Soft-deactivate and explain which fares are hidden, not cascaded away.
-         */
-        delete: operations["deactivate_anchor_v1_admin_pricing_anchors__anchor_id__delete"];
+        delete?: never;
         options?: never;
         head?: never;
         /**
@@ -3181,6 +3693,26 @@ export interface paths {
          * @description Edit an anchor; retained fares return on reactivation.
          */
         patch: operations["update_anchor_v1_admin_pricing_anchors__anchor_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/pricing-anchors/{anchor_id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deactivate Anchor
+         * @description Soft-deactivate and explain which fares are hidden, not cascaded away.
+         */
+        post: operations["deactivate_anchor_v1_admin_pricing_anchors__anchor_id__deactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/admin/zone-prices": {
@@ -3281,11 +3813,7 @@ export interface paths {
         get: operations["get_zone_price_v1_admin_zone_prices__zone_id__get"];
         put?: never;
         post?: never;
-        /**
-         * Deactivate Zone Price
-         * @description Retire a fare without deleting auditable configuration.
-         */
-        delete: operations["deactivate_zone_price_v1_admin_zone_prices__zone_id__delete"];
+        delete?: never;
         options?: never;
         head?: never;
         /**
@@ -3293,6 +3821,434 @@ export interface paths {
          * @description Edit the current fare without repricing existing bookings.
          */
         patch: operations["update_zone_price_v1_admin_zone_prices__zone_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/zone-prices/{zone_id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deactivate Zone Price
+         * @description Retire a fare without deleting auditable configuration.
+         */
+        post: operations["deactivate_zone_price_v1_admin_zone_prices__zone_id__deactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/charges/{entity_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reactivate Charge */
+        post: operations["reactivate_charge_v1_admin_charges__entity_id__reactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/charges/{entity_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Charge Usage */
+        get: operations["get_charge_usage_v1_admin_charges__entity_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/charges/{entity_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Charge */
+        delete: operations["delete_charge_v1_admin_charges__entity_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/surcharges/{entity_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reactivate Surcharge */
+        post: operations["reactivate_surcharge_v1_admin_surcharges__entity_id__reactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/surcharges/{entity_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Surcharge Usage */
+        get: operations["get_surcharge_usage_v1_admin_surcharges__entity_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/surcharges/{entity_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Surcharge */
+        delete: operations["delete_surcharge_v1_admin_surcharges__entity_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/peak-rules/{entity_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reactivate Peak Rule */
+        post: operations["reactivate_peak_rule_v1_admin_peak_rules__entity_id__reactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/peak-rules/{entity_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Peak Rule Usage */
+        get: operations["get_peak_rule_usage_v1_admin_peak_rules__entity_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/peak-rules/{entity_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Peak Rule */
+        delete: operations["delete_peak_rule_v1_admin_peak_rules__entity_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/pricing-rows/{entity_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reactivate Pricing Row */
+        post: operations["reactivate_pricing_row_v1_admin_pricing_rows__entity_id__reactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/pricing-rows/{entity_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Pricing Row Usage */
+        get: operations["get_pricing_row_usage_v1_admin_pricing_rows__entity_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/pricing-rows/{entity_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Pricing Row */
+        delete: operations["delete_pricing_row_v1_admin_pricing_rows__entity_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/service-areas/{entity_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reactivate Service Area */
+        post: operations["reactivate_service_area_v1_admin_service_areas__entity_id__reactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/service-areas/{entity_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Service Area Usage */
+        get: operations["get_service_area_usage_v1_admin_service_areas__entity_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/service-areas/{entity_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Service Area */
+        delete: operations["delete_service_area_v1_admin_service_areas__entity_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/pricing-anchors/{entity_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reactivate Anchor */
+        post: operations["reactivate_anchor_v1_admin_pricing_anchors__entity_id__reactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/pricing-anchors/{entity_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Anchor Usage */
+        get: operations["get_anchor_usage_v1_admin_pricing_anchors__entity_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/pricing-anchors/{entity_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Anchor */
+        delete: operations["delete_anchor_v1_admin_pricing_anchors__entity_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/zone-prices/{entity_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reactivate Zone Price */
+        post: operations["reactivate_zone_price_v1_admin_zone_prices__entity_id__reactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/zone-prices/{entity_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Zone Price Usage */
+        get: operations["get_zone_price_usage_v1_admin_zone_prices__entity_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/zone-prices/{entity_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Zone Price */
+        delete: operations["delete_zone_price_v1_admin_zone_prices__entity_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/schedules/{entity_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reactivate Schedule */
+        post: operations["reactivate_schedule_v1_admin_schedules__entity_id__reactivate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/schedules/{entity_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Schedule Usage */
+        get: operations["get_schedule_usage_v1_admin_schedules__entity_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/schedules/{entity_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Schedule */
+        delete: operations["delete_schedule_v1_admin_schedules__entity_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/webhooks/square": {
@@ -3496,6 +4452,34 @@ export interface components {
             to_location_name: string;
             /** Service Label */
             service_label: string;
+        };
+        /**
+         * AirTravelDeleteResult
+         * @description Confirmation that an unused shared catalog row was removed.
+         */
+        AirTravelDeleteResult: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Deleted
+             * @default true
+             */
+            deleted: boolean;
+        };
+        /**
+         * AirTravelUsage
+         * @description Booking references that decide whether a catalog row is removable.
+         */
+        AirTravelUsage: {
+            /** Can Delete */
+            can_delete: boolean;
+            /** Bookings */
+            bookings: number;
+            /** Hint */
+            hint?: string | null;
         };
         /**
          * AirlineCreate
@@ -4005,7 +4989,7 @@ export interface components {
         Body_upload_business_logo_v1_admin_businesses__business_uuid__logo_post: {
             /**
              * File
-             * @description JPEG, PNG, or WebP; maximum 5 MB
+             * @description JPEG, PNG, or WebP; maximum 2 MB
              */
             file: string;
         };
@@ -5743,6 +6727,11 @@ export interface components {
             total_for_selection: string;
             /** Seats Remaining */
             seats_remaining: number;
+            /**
+             * Effective Min Passengers
+             * @default 1
+             */
+            effective_min_passengers: number;
             /** Low Seat Warning */
             low_seat_warning?: string | null;
             /** Selectable */
@@ -6240,6 +7229,49 @@ export interface components {
             /** Reason */
             reason: "regenerate_required" | null;
         };
+        /**
+         * EntityDeleteResult
+         * @description Stable confirmation that an unused configuration identity was removed.
+         */
+        EntityDeleteResult: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Deleted
+             * @default true
+             */
+            deleted: boolean;
+        };
+        /**
+         * EntityState
+         * @description Minimal stable result for an explicit soft lifecycle transition.
+         */
+        EntityState: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+        };
+        /**
+         * EntityUsage
+         * @description Named dependency counts returned before a hard-delete attempt.
+         */
+        EntityUsage: {
+            /** Can Delete */
+            can_delete: boolean;
+            /** Counts */
+            counts: {
+                [key: string]: number;
+            };
+            /** Hint */
+            hint?: string | null;
+        };
         /** Envelope[AccountHolderResult] */
         Envelope_AccountHolderResult_: {
             data: components["schemas"]["AccountHolderResult"];
@@ -6251,6 +7283,14 @@ export interface components {
         /** Envelope[AdminChargeResult] */
         Envelope_AdminChargeResult_: {
             data: components["schemas"]["AdminChargeResult"];
+        };
+        /** Envelope[AirTravelDeleteResult] */
+        Envelope_AirTravelDeleteResult_: {
+            data: components["schemas"]["AirTravelDeleteResult"];
+        };
+        /** Envelope[AirTravelUsage] */
+        Envelope_AirTravelUsage_: {
+            data: components["schemas"]["AirTravelUsage"];
         };
         /** Envelope[AirlineResult] */
         Envelope_AirlineResult_: {
@@ -6396,6 +7436,18 @@ export interface components {
         Envelope_EmbedKeyRevealResult_: {
             data: components["schemas"]["EmbedKeyRevealResult"];
         };
+        /** Envelope[EntityDeleteResult] */
+        Envelope_EntityDeleteResult_: {
+            data: components["schemas"]["EntityDeleteResult"];
+        };
+        /** Envelope[EntityState] */
+        Envelope_EntityState_: {
+            data: components["schemas"]["EntityState"];
+        };
+        /** Envelope[EntityUsage] */
+        Envelope_EntityUsage_: {
+            data: components["schemas"]["EntityUsage"];
+        };
         /** Envelope[GlobalSettingsResult] */
         Envelope_GlobalSettingsResult_: {
             data: components["schemas"]["GlobalSettingsResult"];
@@ -6476,6 +7528,10 @@ export interface components {
         Envelope_PricingRowResult_: {
             data: components["schemas"]["PricingRowResult"];
         };
+        /** Envelope[PromoDeleteResult] */
+        Envelope_PromoDeleteResult_: {
+            data: components["schemas"]["PromoDeleteResult"];
+        };
         /** Envelope[PromoMutationResult] */
         Envelope_PromoMutationResult_: {
             data: components["schemas"]["PromoMutationResult"];
@@ -6483,6 +7539,10 @@ export interface components {
         /** Envelope[PromoResult] */
         Envelope_PromoResult_: {
             data: components["schemas"]["PromoResult"];
+        };
+        /** Envelope[PromoUsageSummary] */
+        Envelope_PromoUsageSummary_: {
+            data: components["schemas"]["PromoUsageSummary"];
         };
         /** Envelope[PromoValidateResponse] */
         Envelope_PromoValidateResponse_: {
@@ -6596,9 +7656,17 @@ export interface components {
         Envelope_TeamCreateResult_: {
             data: components["schemas"]["TeamCreateResult"];
         };
+        /** Envelope[TeamDeleteResult] */
+        Envelope_TeamDeleteResult_: {
+            data: components["schemas"]["TeamDeleteResult"];
+        };
         /** Envelope[TeamResult] */
         Envelope_TeamResult_: {
             data: components["schemas"]["TeamResult"];
+        };
+        /** Envelope[TeamUsage] */
+        Envelope_TeamUsage_: {
+            data: components["schemas"]["TeamUsage"];
         };
         /** Envelope[TestEmailResult] */
         Envelope_TestEmailResult_: {
@@ -6612,6 +7680,10 @@ export interface components {
         Envelope_VehicleDeactivationResult_: {
             data: components["schemas"]["VehicleDeactivationResult"];
         };
+        /** Envelope[VehicleDeleteResult] */
+        Envelope_VehicleDeleteResult_: {
+            data: components["schemas"]["VehicleDeleteResult"];
+        };
         /** Envelope[VehicleResult] */
         Envelope_VehicleResult_: {
             data: components["schemas"]["VehicleResult"];
@@ -6623,6 +7695,10 @@ export interface components {
         /** Envelope[VehicleTypeResult] */
         Envelope_VehicleTypeResult_: {
             data: components["schemas"]["VehicleTypeResult"];
+        };
+        /** Envelope[VehicleUsage] */
+        Envelope_VehicleUsage_: {
+            data: components["schemas"]["VehicleUsage"];
         };
         /** Envelope[WebhookReceipt] */
         Envelope_WebhookReceipt_: {
@@ -7743,6 +8819,16 @@ export interface components {
             vehicle_type_name: string;
             /** Seat Capacity */
             seat_capacity: number;
+            /** From Price */
+            from_price: string;
+            /**
+             * Effective Min Passengers
+             * @default 1
+             */
+            effective_min_passengers: number;
+            /** @default shared */
+            service_mode: components["schemas"]["ShuttleServiceMode"];
+            pricing?: components["schemas"]["ShuttlePricingSummary"];
             /** Earliest Pickup Date */
             earliest_pickup_date?: string | null;
             /** Earliest Pickup Time */
@@ -7980,6 +9066,8 @@ export interface components {
             time_start?: string | null;
             /** Time End */
             time_end?: string | null;
+            /** Min Passengers */
+            min_passengers?: number | null;
             /**
              * Is Active
              * @default true
@@ -8020,6 +9108,8 @@ export interface components {
             time_start: string | null;
             /** Time End */
             time_end: string | null;
+            /** Min Passengers */
+            min_passengers: number | null;
             /** Is Active */
             is_active: boolean;
             /**
@@ -8065,6 +9155,8 @@ export interface components {
             applied_rule_ids: string[];
             /** Is Blackout */
             is_blackout: boolean;
+            /** Effective Min Passengers */
+            effective_min_passengers?: number | null;
         };
         /**
          * PeakRuleResult
@@ -8100,6 +9192,8 @@ export interface components {
             time_start: string | null;
             /** Time End */
             time_end: string | null;
+            /** Min Passengers */
+            min_passengers: number | null;
             /** Is Active */
             is_active: boolean;
             /**
@@ -8143,6 +9237,8 @@ export interface components {
             time_start?: string | null;
             /** Time End */
             time_end?: string | null;
+            /** Min Passengers */
+            min_passengers?: number | null;
             /** Is Active */
             is_active?: boolean | null;
         };
@@ -8568,6 +9664,22 @@ export interface components {
             is_active: boolean;
         };
         /**
+         * PromoDeleteResult
+         * @description Confirmation that an unused promo identity was removed.
+         */
+        PromoDeleteResult: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Deleted
+             * @default true
+             */
+            deleted: boolean;
+        };
+        /**
          * PromoMutationResult
          * @description A changed promo plus operational warnings.
          */
@@ -8694,6 +9806,18 @@ export interface components {
             discount_amount: string;
         };
         /**
+         * PromoUsageSummary
+         * @description Order references that decide whether a promo may be hard-deleted.
+         */
+        PromoUsageSummary: {
+            /** Can Delete */
+            can_delete: boolean;
+            /** Orders */
+            orders: number;
+            /** Hint */
+            hint?: string | null;
+        };
+        /**
          * PromoValidateRequest
          * @description A code and the cart total it would apply to.
          *
@@ -8737,6 +9861,19 @@ export interface components {
         PromoWarning: {
             /** Message */
             message: string;
+        };
+        /**
+         * PublicPriceTier
+         * @description One customer-visible passenger band and its amount meaning.
+         */
+        PublicPriceTier: {
+            /** Min Passengers */
+            min_passengers: number;
+            /** Max Passengers */
+            max_passengers: number | null;
+            price_type: components["schemas"]["ShuttleTierPriceType"];
+            /** Amount */
+            amount: string;
         };
         /**
          * QueuedEmailResult
@@ -8805,6 +9942,14 @@ export interface components {
             pax_summary: string;
             /** Leg Price */
             leg_price: string;
+            /** @default shared */
+            service_mode: components["schemas"]["ShuttleServiceMode"];
+            pricing?: components["schemas"]["ShuttlePricingSummary"];
+            /**
+             * Effective Min Passengers
+             * @default 1
+             */
+            effective_min_passengers: number;
         };
         /**
          * QuoteLegRequest
@@ -9283,6 +10428,11 @@ export interface components {
             /** @default fixed */
             departure_mode: components["schemas"]["ShuttleDepartureMode"];
             /**
+             * Min Passengers
+             * @default 1
+             */
+            min_passengers: number;
+            /**
              * Is Active
              * @default true
              */
@@ -9326,6 +10476,8 @@ export interface components {
             /** Service Label */
             service_label: string;
             departure_mode: components["schemas"]["ShuttleDepartureMode"];
+            /** Min Passengers */
+            min_passengers: number;
             /** Is Active */
             is_active: boolean;
             /** Prices */
@@ -9437,6 +10589,8 @@ export interface components {
             /** Service Label */
             service_label: string;
             departure_mode: components["schemas"]["ShuttleDepartureMode"];
+            /** Min Passengers */
+            min_passengers: number;
             /** Is Active */
             is_active: boolean;
             /** Prices */
@@ -9506,6 +10660,8 @@ export interface components {
             /** Service Label */
             service_label?: string | null;
             departure_mode?: components["schemas"]["ShuttleDepartureMode"] | null;
+            /** Min Passengers */
+            min_passengers?: number | null;
             /** Is Active */
             is_active?: boolean | null;
         };
@@ -9532,6 +10688,12 @@ export interface components {
             seat_capacity_override: number | null;
             /** Effective Seat Capacity */
             effective_seat_capacity: number;
+            service_mode: components["schemas"]["ShuttleServiceMode"];
+            pricing_mode: components["schemas"]["ShuttlePricingMode"];
+            /** Fixed Vehicle Price */
+            fixed_vehicle_price: string | null;
+            /** Tiers */
+            tiers: components["schemas"]["ShuttlePriceTierResult"][];
             /** Is Active */
             is_active: boolean;
         };
@@ -9547,6 +10709,14 @@ export interface components {
             vehicle_type_id: string;
             /** Seat Capacity Override */
             seat_capacity_override?: number | null;
+            /** @default shared */
+            service_mode: components["schemas"]["ShuttleServiceMode"];
+            /** @default per_seat */
+            pricing_mode: components["schemas"]["ShuttlePricingMode"];
+            /** Fixed Vehicle Price */
+            fixed_vehicle_price?: string | null;
+            /** Tiers */
+            tiers?: components["schemas"]["ShuttlePriceTierWrite"][];
             /**
              * Is Active
              * @default true
@@ -9963,6 +11133,8 @@ export interface components {
             departures: components["schemas"]["Departure"][];
             filtered_summary?: components["schemas"]["FilteredSummary"] | null;
             on_request?: components["schemas"]["OnRequestAvailability"] | null;
+            /** On Request Options */
+            on_request_options?: components["schemas"]["OnRequestAvailability"][];
         };
         /**
          * SelectedCharge
@@ -10293,6 +11465,66 @@ export interface components {
             /** Address */
             address: string | null;
         };
+        /**
+         * ShuttlePriceTierResult
+         * @description Stored passenger-count band returned in pricing order.
+         */
+        ShuttlePriceTierResult: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Min Passengers */
+            min_passengers: number;
+            /** Max Passengers */
+            max_passengers: number | null;
+            price_type: components["schemas"]["ShuttleTierPriceType"];
+            /** Amount */
+            amount: string;
+        };
+        /**
+         * ShuttlePriceTierWrite
+         * @description One contiguous passenger-count band with an unambiguous amount meaning.
+         */
+        ShuttlePriceTierWrite: {
+            /** Min Passengers */
+            min_passengers: number;
+            /** Max Passengers */
+            max_passengers?: number | null;
+            price_type: components["schemas"]["ShuttleTierPriceType"];
+            /** Amount */
+            amount: string;
+        };
+        /**
+         * ShuttlePricingMode
+         * @description How one route vehicle derives its fare before cart adjustments.
+         * @enum {string}
+         */
+        ShuttlePricingMode: "per_seat" | "tiered" | "fixed_vehicle";
+        /**
+         * ShuttlePricingSummary
+         * @description Enough configuration for the widget to explain the computed price.
+         */
+        ShuttlePricingSummary: {
+            mode: components["schemas"]["ShuttlePricingMode"];
+            /** Tiers */
+            tiers?: components["schemas"]["PublicPriceTier"][];
+            /** Fixed Price */
+            fixed_price?: string | null;
+        };
+        /**
+         * ShuttleServiceMode
+         * @description Whether one route vehicle is sold by seat or as a whole vehicle.
+         * @enum {string}
+         */
+        ShuttleServiceMode: "shared" | "private";
+        /**
+         * ShuttleTierPriceType
+         * @description Whether a passenger tier amount is a unit or complete leg total.
+         * @enum {string}
+         */
+        ShuttleTierPriceType: "per_person" | "total";
         /**
          * StaffTripSheet
          * @description Full operational sheet available to office staff.
@@ -10844,6 +12076,22 @@ export interface components {
             password_notice: string | null;
         };
         /**
+         * TeamDeleteResult
+         * @description Confirmation that an unused staff identity was removed.
+         */
+        TeamDeleteResult: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Deleted
+             * @default true
+             */
+            deleted: boolean;
+        };
+        /**
          * TeamPassword
          * @description Choose a generated password or provide a sufficiently strong custom one.
          */
@@ -10922,6 +12170,26 @@ export interface components {
             client_phone_visible?: boolean | null;
             /** Is Active */
             is_active?: boolean | null;
+        };
+        /**
+         * TeamUsage
+         * @description Historical references that decide whether a staff account is removable.
+         */
+        TeamUsage: {
+            /** Can Delete */
+            can_delete: boolean;
+            /** Bookings */
+            bookings: number;
+            /** Orders */
+            orders: number;
+            /** Refunds */
+            refunds: number;
+            /** Api Keys */
+            api_keys: number;
+            /** Audit Logs */
+            audit_logs: number;
+            /** Hint */
+            hint?: string | null;
         };
         /**
          * TermsSettingsUpdate
@@ -11185,6 +12453,22 @@ export interface components {
             updated_at: string;
             /** Affected Upcoming Bookings */
             affected_upcoming_bookings: components["schemas"]["VehicleBookingWarning"][];
+        };
+        /**
+         * VehicleDeleteResult
+         * @description Confirmation that an unused physical vehicle identity was removed.
+         */
+        VehicleDeleteResult: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Deleted
+             * @default true
+             */
+            deleted: boolean;
         };
         /**
          * VehicleRateAssignment
@@ -11501,6 +12785,18 @@ export interface components {
             inspection_expiry?: string | null;
             /** Is Active */
             is_active?: boolean | null;
+        };
+        /**
+         * VehicleUsage
+         * @description Counts that decide whether a physical vehicle may be hard-deleted.
+         */
+        VehicleUsage: {
+            /** Can Delete */
+            can_delete: boolean;
+            /** Bookings */
+            bookings: number;
+            /** Hint */
+            hint?: string | null;
         };
         /**
          * WebhookReceipt
@@ -12376,7 +13672,7 @@ export interface operations {
             };
         };
     };
-    deactivate_airport_v1_admin_airports__airport_id__delete: {
+    delete_airport_v1_admin_airports__airport_id__delete: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -12397,7 +13693,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_AirportDeactivationResult_"];
+                    "application/json": components["schemas"]["Envelope_AirTravelDeleteResult_"];
                 };
             };
             /** @description Validation Error */
@@ -12437,6 +13733,111 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_AirportResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_airport_v1_admin_airports__airport_id__deactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                airport_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AirportDeactivationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactivate_airport_v1_admin_airports__airport_id__reactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                airport_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AirportResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    airport_usage_v1_admin_airports__airport_id__usage_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                airport_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AirTravelUsage_"];
                 };
             };
             /** @description Validation Error */
@@ -12564,7 +13965,7 @@ export interface operations {
             };
         };
     };
-    deactivate_airline_v1_admin_airlines__airline_id__delete: {
+    delete_airline_v1_admin_airlines__airline_id__delete: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -12585,7 +13986,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_AirlineResult_"];
+                    "application/json": components["schemas"]["Envelope_AirTravelDeleteResult_"];
                 };
             };
             /** @description Validation Error */
@@ -12625,6 +14026,111 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_AirlineResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_airline_v1_admin_airlines__airline_id__deactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                airline_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AirlineResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactivate_airline_v1_admin_airlines__airline_id__reactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                airline_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AirlineResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    airline_usage_v1_admin_airlines__airline_id__usage_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                airline_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AirTravelUsage_"];
                 };
             };
             /** @description Validation Error */
@@ -13939,7 +15445,7 @@ export interface operations {
             };
         };
     };
-    deactivate_vehicle_v1_admin_vehicles__vehicle_id__delete: {
+    delete_vehicle_v1_admin_vehicles__vehicle_id__delete: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -13960,7 +15466,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_VehicleDeactivationResult_"];
+                    "application/json": components["schemas"]["Envelope_VehicleDeleteResult_"];
                 };
             };
             /** @description Validation Error */
@@ -14000,6 +15506,111 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_VehicleResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_vehicle_v1_admin_vehicles__vehicle_id__deactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                vehicle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_VehicleDeactivationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactivate_vehicle_v1_admin_vehicles__vehicle_id__reactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                vehicle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_VehicleResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    vehicle_usage_v1_admin_vehicles__vehicle_id__usage_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                vehicle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_VehicleUsage_"];
                 };
             };
             /** @description Validation Error */
@@ -14693,7 +16304,7 @@ export interface operations {
             };
         };
     };
-    deactivate_charge_v1_admin_charges__charge_id__delete: {
+    update_charge_v1_admin_charges__charge_id__patch: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -14706,7 +16317,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChargeUpdate"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -14728,7 +16343,7 @@ export interface operations {
             };
         };
     };
-    update_charge_v1_admin_charges__charge_id__patch: {
+    deactivate_charge_v1_admin_charges__charge_id__deactivate_post: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -14741,11 +16356,7 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ChargeUpdate"];
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {
@@ -14880,7 +16491,7 @@ export interface operations {
             };
         };
     };
-    deactivate_surcharge_v1_admin_surcharges__surcharge_id__delete: {
+    update_surcharge_v1_admin_surcharges__surcharge_id__patch: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -14893,7 +16504,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SurchargeUpdate"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -14915,7 +16530,7 @@ export interface operations {
             };
         };
     };
-    update_surcharge_v1_admin_surcharges__surcharge_id__patch: {
+    deactivate_surcharge_v1_admin_surcharges__surcharge_id__deactivate_post: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -14928,11 +16543,7 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SurchargeUpdate"];
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {
@@ -15104,41 +16715,6 @@ export interface operations {
             };
         };
     };
-    deactivate_peak_rule_v1_admin_peak_rules__rule_id__delete: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                rule_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_PeakRuleResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
     update_peak_rule_v1_admin_peak_rules__rule_id__patch: {
         parameters: {
             query?: {
@@ -15165,6 +16741,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_PeakRuleMutationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_peak_rule_v1_admin_peak_rules__rule_id__deactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                rule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_PeakRuleResult_"];
                 };
             };
             /** @description Validation Error */
@@ -15260,6 +16871,41 @@ export interface operations {
         parameters: {
             query?: {
                 business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                promo_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_PromoUsageSummary_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    promo_code_redemptions_v1_admin_promo_codes__promo_id__redemptions_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
                 /** @description 1-based page number. */
                 page?: number;
                 /** @description Items per page. */
@@ -15334,7 +16980,7 @@ export interface operations {
             };
         };
     };
-    deactivate_promo_code_v1_admin_promo_codes__promo_id__delete: {
+    delete_promo_code_v1_admin_promo_codes__promo_id__delete: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -15355,7 +17001,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_PromoResult_"];
+                    "application/json": components["schemas"]["Envelope_PromoDeleteResult_"];
                 };
             };
             /** @description Validation Error */
@@ -15395,6 +17041,76 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_PromoMutationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_promo_code_v1_admin_promo_codes__promo_id__deactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                promo_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_PromoResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactivate_promo_code_v1_admin_promo_codes__promo_id__reactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                promo_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_PromoResult_"];
                 };
             };
             /** @description Validation Error */
@@ -15613,7 +17329,46 @@ export interface operations {
             };
         };
     };
-    deactivate_service_area_v1_admin_service_areas__area_id__delete: {
+    update_service_area_v1_admin_service_areas__area_id__patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                area_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ServiceAreaUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ServiceAreaResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_service_area_v1_admin_service_areas__area_id__deactivate_post: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -15652,45 +17407,6 @@ export interface operations {
                      *     }
                      */
                     "application/json": components["schemas"]["ErrorEnvelope"];
-                };
-            };
-        };
-    };
-    update_service_area_v1_admin_service_areas__area_id__patch: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                area_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ServiceAreaUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_ServiceAreaResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -15826,7 +17542,7 @@ export interface operations {
             };
         };
     };
-    deactivate_pricing_row_v1_admin_pricing_rows__row_id__delete: {
+    update_pricing_row_v1_admin_pricing_rows__row_id__patch: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -15839,7 +17555,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PricingRowUpdate"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -15861,7 +17581,7 @@ export interface operations {
             };
         };
     };
-    update_pricing_row_v1_admin_pricing_rows__row_id__patch: {
+    deactivate_pricing_row_v1_admin_pricing_rows__row_id__deactivate_post: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -15874,11 +17594,7 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PricingRowUpdate"];
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {
@@ -16925,45 +18641,6 @@ export interface operations {
             };
         };
     };
-    deactivate_schedule_v1_admin_schedules__schedule_id__delete: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                schedule_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["ScheduleDeactivateRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_ScheduleDeactivationResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
     update_schedule_v1_admin_schedules__schedule_id__patch: {
         parameters: {
             query?: {
@@ -16990,6 +18667,45 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_ScheduleResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_schedule_v1_admin_schedules__schedule_id__deactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                schedule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ScheduleDeactivateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ScheduleDeactivationResult_"];
                 };
             };
             /** @description Validation Error */
@@ -18559,7 +20275,7 @@ export interface operations {
             };
         };
     };
-    deactivate_route_v1_admin_routes__route_id__delete: {
+    delete_route_v1_admin_routes__route_id__delete: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -18580,7 +20296,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_RouteDeactivationResult_"];
+                    "application/json": components["schemas"]["Envelope_EntityDeleteResult_"];
                 };
             };
             /** @description Validation Error */
@@ -18620,6 +20336,111 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_RouteResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_route_v1_admin_routes__route_id__deactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                route_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_RouteDeactivationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactivate_route_v1_admin_routes__route_id__reactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                route_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_RouteResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    route_usage_v1_admin_routes__route_id__usage_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                route_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityUsage_"];
                 };
             };
             /** @description Validation Error */
@@ -18826,7 +20647,7 @@ export interface operations {
             };
         };
     };
-    deactivate_team_member_v1_admin_team__admin_id__delete: {
+    delete_team_member_v1_admin_team__admin_id__delete: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -18847,7 +20668,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_TeamResult_"];
+                    "application/json": components["schemas"]["Envelope_TeamDeleteResult_"];
                 };
             };
             /** @description Validation Error */
@@ -18887,6 +20708,111 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_TeamResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_team_member_v1_admin_team__admin_id__deactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                admin_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_TeamResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactivate_team_member_v1_admin_team__admin_id__reactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                admin_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_TeamResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    team_member_usage_v1_admin_team__admin_id__usage_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                admin_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_TeamUsage_"];
                 };
             };
             /** @description Validation Error */
@@ -19124,7 +21050,7 @@ export interface operations {
             };
         };
     };
-    deactivate_vehicle_type_v1_admin_vehicle_types__vehicle_type_id__delete: {
+    delete_vehicle_type_v1_admin_vehicle_types__vehicle_type_id__delete: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -19145,7 +21071,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_VehicleTypeDeactivationResult_"];
+                    "application/json": components["schemas"]["Envelope_EntityDeleteResult_"];
                 };
             };
             /** @description Validation Error */
@@ -19259,6 +21185,111 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_VehicleTypeResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_vehicle_type_v1_admin_vehicle_types__vehicle_type_id__deactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                vehicle_type_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_VehicleTypeDeactivationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactivate_vehicle_type_v1_admin_vehicle_types__vehicle_type_id__reactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                vehicle_type_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_VehicleTypeResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    vehicle_type_usage_v1_admin_vehicle_types__vehicle_type_id__usage_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                vehicle_type_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityUsage_"];
                 };
             };
             /** @description Validation Error */
@@ -19463,41 +21494,6 @@ export interface operations {
             };
         };
     };
-    deactivate_anchor_v1_admin_pricing_anchors__anchor_id__delete: {
-        parameters: {
-            query?: {
-                business_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                anchor_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Envelope_AnchorDeactivationResult_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
     update_anchor_v1_admin_pricing_anchors__anchor_id__patch: {
         parameters: {
             query?: {
@@ -19524,6 +21520,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_AnchorResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_anchor_v1_admin_pricing_anchors__anchor_id__deactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                anchor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AnchorDeactivationResult_"];
                 };
             };
             /** @description Validation Error */
@@ -19753,7 +21784,46 @@ export interface operations {
             };
         };
     };
-    deactivate_zone_price_v1_admin_zone_prices__zone_id__delete: {
+    update_zone_price_v1_admin_zone_prices__zone_id__patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                zone_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ZonePriceUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ZonePriceResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deactivate_zone_price_v1_admin_zone_prices__zone_id__deactivate_post: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -19788,7 +21858,7 @@ export interface operations {
             };
         };
     };
-    update_zone_price_v1_admin_zone_prices__zone_id__patch: {
+    reactivate_charge_v1_admin_charges__entity_id__reactivate_post: {
         parameters: {
             query?: {
                 business_id?: string | null;
@@ -19797,15 +21867,11 @@ export interface operations {
                 authorization?: string | null;
             };
             path: {
-                zone_id: string;
+                entity_id: string;
             };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ZonePriceUpdate"];
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {
@@ -19813,7 +21879,812 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_ZonePriceResult_"];
+                    "application/json": components["schemas"]["Envelope_EntityState_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_charge_usage_v1_admin_charges__entity_id__usage_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityUsage_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_charge_v1_admin_charges__entity_id__delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityDeleteResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactivate_surcharge_v1_admin_surcharges__entity_id__reactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityState_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_surcharge_usage_v1_admin_surcharges__entity_id__usage_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityUsage_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_surcharge_v1_admin_surcharges__entity_id__delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityDeleteResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactivate_peak_rule_v1_admin_peak_rules__entity_id__reactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityState_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_peak_rule_usage_v1_admin_peak_rules__entity_id__usage_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityUsage_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_peak_rule_v1_admin_peak_rules__entity_id__delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityDeleteResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactivate_pricing_row_v1_admin_pricing_rows__entity_id__reactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityState_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_pricing_row_usage_v1_admin_pricing_rows__entity_id__usage_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityUsage_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_pricing_row_v1_admin_pricing_rows__entity_id__delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityDeleteResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactivate_service_area_v1_admin_service_areas__entity_id__reactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityState_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_service_area_usage_v1_admin_service_areas__entity_id__usage_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityUsage_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_service_area_v1_admin_service_areas__entity_id__delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityDeleteResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactivate_anchor_v1_admin_pricing_anchors__entity_id__reactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityState_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_anchor_usage_v1_admin_pricing_anchors__entity_id__usage_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityUsage_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_anchor_v1_admin_pricing_anchors__entity_id__delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityDeleteResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactivate_zone_price_v1_admin_zone_prices__entity_id__reactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityState_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_zone_price_usage_v1_admin_zone_prices__entity_id__usage_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityUsage_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_zone_price_v1_admin_zone_prices__entity_id__delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityDeleteResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactivate_schedule_v1_admin_schedules__entity_id__reactivate_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityState_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_schedule_usage_v1_admin_schedules__entity_id__usage_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityUsage_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_schedule_v1_admin_schedules__entity_id__delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntityDeleteResult_"];
                 };
             };
             /** @description Validation Error */

@@ -5,12 +5,39 @@ Stack: FastAPI (Python) · PostgreSQL · Square payments
 Base URL: `https://api.<domain>.com/v1`
 Consumers: Booking-form embeds (taxi and shuttle)
 
-**Version 1.9** — generated from the implemented schemas, routers, services and
-`openapi.json` through B-46. This document covers the public surface and the B-46,
-B-45, B-44, B-43, B-42 and B-41 admin additions below; older admin endpoints remain
-defined by OpenAPI.
+**Version 1.10** — generated from the implemented schemas, routers, services and
+`openapi.json` through B-48. This document covers the public surface and the B-48,
+B-46, B-45, B-44, B-43, B-42 and B-41 admin additions below; older admin endpoints
+remain defined by OpenAPI.
 
 ---
+
+## B-48 shuttle modes, passenger pricing, minimums, and admin lifecycle
+
+Changes: shared/private shuttle service, per-seat/tiered/fixed-vehicle pricing,
+date-sensitive passenger minimums, explicit configuration lifecycle operations,
+and a stricter business-logo upload boundary.
+
+- Route vehicle types expose `service_mode` (`shared | private`) and `pricing_mode`
+  (`per_seat | tiered | fixed_vehicle`). Tier rows expose contiguous
+  `min_passengers`, nullable `max_passengers`, `price_type` (`per_person | total`),
+  and two-decimal-string `amount`; fixed-vehicle pricing is private-only.
+- Public on-request search and quote legs expose `service_mode`, a `pricing` summary,
+  and `effective_min_passengers`. Private service requires a customer-selected local
+  date and time, is always on request, books one whole vehicle, and does not read or
+  mutate shared schedule seat inventory.
+- `routes.min_passengers` defaults to one. A matching blackout rule may raise the
+  minimum without blocking the date; the effective value is the maximum of the route
+  and every matching active rule. Quote and public/admin booking recalculate and
+  enforce it per leg.
+- Configuration resources use explicit `POST .../{id}/deactivate`,
+  `POST .../{id}/reactivate`, `GET .../{id}/usage`, and unused-only
+  `DELETE .../{id}` operations. A referenced row returns `409 ENTITY_IN_USE` with
+  named counts and the hint `deactivate instead`. See
+  `docs/phases/b-48-progress.md` for the complete before/after audit.
+- Business logos accept real PNG, JPEG, or WebP content only, with a bounded 2 MB
+  read. SVG and spoofed extensions are rejected; replacement removes the previous
+  managed file and DELETE remains idempotent.
 
 ## B-46 business logos and booking-email readiness
 
@@ -18,10 +45,10 @@ Changes: managed business-logo upload lifecycle and public booking-email deliver
 
 - Owners and managers may upload a logo with multipart field `file` at
   `POST /admin/businesses/{id}/logo` and remove it with
-  `DELETE /admin/businesses/{id}/logo`. Uploads use the same image type, size,
-  decode, resize, metadata-stripping, generated-name, and managed-media rules as
-  vehicle images. Both mutations are audited and return the updated business;
-  `logo_url` remains the display field.
+  `DELETE /admin/businesses/{id}/logo`. Uploads share the vehicle-image decode,
+  resize, metadata-stripping, generated-name, and managed-media implementation;
+  business logos have a stricter 2 MB limit. Both mutations are audited and return
+  the updated business; `logo_url` remains the display field.
 - `GET /public/business` always returns `emails_enabled`. It is `true` only when
   newly queued booking emails are eligible for the configured delivery worker;
   it is `false` while booking email delivery is disabled.

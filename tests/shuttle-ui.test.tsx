@@ -180,6 +180,9 @@ describe("on-request shuttle departures", () => {
       vehicle_type_id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
       vehicle_type_name: "Executive Van",
       seat_capacity: 8,
+      from_price: "38.50",
+      effective_min_passengers: 1,
+      service_mode: "shared" as const,
       earliest_pickup_date: "2026-10-30",
       earliest_pickup_time: "11:00",
     } };
