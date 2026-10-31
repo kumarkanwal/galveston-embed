@@ -32,6 +32,11 @@ function key(field: HTMLInputElement, value: string, altKey = false) {
     "keydown", { altKey, bubbles: true, key: value })); });
 }
 
+function clickArrow(root: HTMLElement) {
+  act(() => { root.querySelector(".stop-control-chevron")?.dispatchEvent(
+    new MouseEvent("click", { bubbles: true })); });
+}
+
 beforeEach(() => document.body.replaceChildren());
 
 describe("grouped accordion stop picker selection", () => {
@@ -59,6 +64,7 @@ describe("grouped accordion stop picker selection", () => {
     act(() => input(root).click());
     expect(root.querySelector(".stop-category")?.getAttribute("aria-expanded")).toBe("true");
     expect(root.querySelector(".stop-option.selected")?.textContent).toContain("Hobby Airport");
+    expect(root.querySelector(".stop-option.selected .stop-check")).not.toBeNull();
   });
 
   it("filters locations, opens matches automatically, and reports no matches", () => {
@@ -84,12 +90,36 @@ describe("grouped accordion stop picker toggles", () => {
     expect(field.getAttribute("aria-expanded")).toBe("true");
     act(() => field.click());
     expect(field.getAttribute("aria-expanded")).toBe("false");
-    act(() => root.querySelector<HTMLElement>(".stop-control-chevron")?.click());
+    clickArrow(root);
     expect(field.getAttribute("aria-expanded")).toBe("true");
-    act(() => root.querySelector<HTMLElement>(".stop-control-chevron")?.click());
+    clickArrow(root);
     expect(field.getAttribute("aria-expanded")).toBe("false");
   });
+});
 
+describe("grouped accordion stop picker visuals", () => {
+  it("uses SVG chevrons without bus or text-arrow icons", () => {
+    const root = mount();
+    const field = input(root);
+    const chevron = root.querySelector(".stop-control-chevron");
+    expect(chevron?.tagName.toLowerCase()).toBe("svg");
+    expect(root.textContent).not.toMatch(/🚌|↳|›|⌄/u);
+    act(() => field.click());
+    expect(field.getAttribute("aria-expanded")).toBe("true");
+    expect(chevron?.classList.contains("open")).toBe(true);
+    expect(root.querySelectorAll(".stop-category .stop-chevron")).toHaveLength(2);
+    const category = root.querySelector<HTMLButtonElement>(".stop-category");
+    expect(category?.getAttribute("aria-expanded")).toBe("false");
+    act(() => category?.click());
+    expect(category?.getAttribute("aria-expanded")).toBe("true");
+    expect(category?.querySelector(".stop-chevron")?.classList.contains("open")).toBe(true);
+    expect(root.textContent).not.toMatch(/🚌|↳|›|⌄/u);
+    const css = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
+    expect(css).toMatch(/\.stop-control-chevron\.open\s*\{[^}]*rotate\(180deg\)/s);
+  });
+});
+
+describe("grouped accordion stop picker closing", () => {
   it("supports arrows, Enter, Escape, Tab, and outside click", () => {
     const root = mount();
     const field = input(root);

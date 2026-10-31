@@ -20,6 +20,16 @@ interface PickerItem {
   value: string;
 }
 
+function Chevron(props: { className: string }) {
+  return <svg class={props.className} viewBox="0 0 16 16" aria-hidden="true"
+    focusable="false"><path d="m4 6 4 4 4-4" /></svg>;
+}
+
+function Checkmark() {
+  return <svg class="stop-check" viewBox="0 0 16 16" aria-hidden="true"
+    focusable="false"><path d="m3.5 8 3 3 6-6" /></svg>;
+}
+
 function findLocation(groups: LocationGroup[], value: string) {
   for (const group of groups) {
     const location = group.locations.find((candidate) => candidate.id === value);
@@ -59,7 +69,8 @@ function LocationRow(props: {
     props.active ? " active" : ""}${props.selected ? " selected" : ""}`}
     type="button" role="option" aria-selected={props.selected}
     data-location-id={props.location.id} onClick={() => props.onChoose(props.location)}>
-    <span aria-hidden="true">↳</span> {props.location.name}
+    <span class="stop-option-label">{props.location.name}</span>
+    {props.selected && <Checkmark />}
   </button>;
 }
 
@@ -88,8 +99,8 @@ function PickerMenu(props: {
           type="button" role="option" aria-selected="false" aria-expanded={isExpanded}
           data-category-id={group.category_id}
           onClick={() => props.onCategory(group.category_id)}>
-          <span aria-hidden="true">🚌</span><span>{group.category}</span>
-          <span class="stop-chevron" aria-hidden="true">{isExpanded ? "⌄" : "›"}</span>
+          <span>{group.category}</span>
+          <Chevron className={`stop-chevron${isExpanded ? " open" : ""}`} />
         </button>
         {isExpanded && group.locations.map((location) => <LocationRow
           active={props.activeId === `location-${location.id}`} location={location}
@@ -176,7 +187,7 @@ export function StopPicker(props: StopPickerProps) {
     <div class="stop-control" onClick={() => {
       if (props.disabled) return;
       input.current?.focus(); state.toggle();
-    }}><span aria-hidden="true">🚌</span>
+    }}>
       <input ref={input} id={props.id} role="combobox" type="text" autoComplete="off"
         aria-autocomplete="list" aria-controls={listboxId} aria-expanded={state.open}
         aria-activedescendant={state.activeId ?? undefined} aria-invalid={props.error !== undefined}
@@ -184,7 +195,7 @@ export function StopPicker(props: StopPickerProps) {
         value={state.open ? state.query : state.selected?.location.name ?? ""}
         onKeyDown={state.onKeyDown}
         onInput={(event) => state.onInput(event.currentTarget.value)} />
-      <span class="stop-control-chevron" aria-hidden="true">⌄</span>
+      <Chevron className={`stop-control-chevron${state.open ? " open" : ""}`} />
     </div>
     {state.open && <PickerMenu activeId={state.activeId} expanded={state.expanded}
       filtering={state.filtering} groups={state.filtered} listboxId={listboxId}
