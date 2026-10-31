@@ -91,6 +91,25 @@ function fill(root: HTMLElement) {
 
 beforeEach(() => document.body.replaceChildren());
 
+describe("round-trip shuttle summary", () => {
+  it("shows each round-trip leg mode, server price and effective minimum", () => {
+    const quote = { ...SHUTTLE_QUOTE, legs: [
+      { ...SHUTTLE_QUOTE.legs[0]!, service_mode: "shared" as const,
+        leg_price: "50.00", effective_min_passengers: 1 },
+      { ...SHUTTLE_QUOTE.legs[0]!, service_mode: "private" as const,
+        leg_price: "150.00", effective_min_passengers: 3 },
+    ] };
+    const root = document.createElement("div");
+    render(<ShuttleConfirm business={SHUTTLE_BUSINESS} client={clientWith()}
+      mapsKey="maps-key" quote={quote} selection={SELECTION} onBack={() => undefined}
+      onBooked={() => undefined} onUnavailable={() => undefined} />, root);
+    expect(root.textContent).toContain("Outbound: Shared Shuttle · $50.00 USD");
+    expect(root.textContent).toContain(
+      "Return: Private Shuttle · $150.00 USD · Minimum 3 passengers",
+    );
+  });
+});
+
 describe("shuttle confirmation pricing", () => {
   it("preserves server line order, labels and amounts while re-quoting promo changes", async () => {
     const discounted = { ...SHUTTLE_QUOTE,

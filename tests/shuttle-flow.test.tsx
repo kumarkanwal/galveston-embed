@@ -46,10 +46,24 @@ function change(element: HTMLInputElement | HTMLSelectElement, value: string) {
 }
 
 async function fillTrip(root: HTMLElement, roundTrip: boolean) {
-  await vi.waitFor(() => expect(root.querySelectorAll("#fromId option").length).toBeGreaterThan(1));
-  change(root.querySelector<HTMLSelectElement>("#fromId")!, ORIGIN_LOCATION.id);
-  await vi.waitFor(() => expect(root.querySelectorAll("#toId option").length).toBeGreaterThan(1));
-  change(root.querySelector<HTMLSelectElement>("#toId")!, DESTINATION_LOCATION.id);
+  await vi.waitFor(() => expect(root.querySelector<HTMLInputElement>("#fromId")?.disabled)
+    .toBe(false));
+  const from = root.querySelector<HTMLInputElement>("#fromId")!;
+  act(() => { from.focus(); from.value = ORIGIN_LOCATION.name;
+    from.dispatchEvent(new Event("input", { bubbles: true })); });
+  await vi.waitFor(() => expect(root.querySelector(
+    `[data-location-id="${ORIGIN_LOCATION.id}"]`)).not.toBeNull());
+  act(() => root.querySelector<HTMLButtonElement>(
+    `[data-location-id="${ORIGIN_LOCATION.id}"]`)?.click());
+  await vi.waitFor(() => expect(root.querySelector<HTMLInputElement>("#toId")?.disabled)
+    .toBe(false));
+  const to = root.querySelector<HTMLInputElement>("#toId")!;
+  act(() => { to.focus(); to.value = DESTINATION_LOCATION.name;
+    to.dispatchEvent(new Event("input", { bubbles: true })); });
+  await vi.waitFor(() => expect(root.querySelector(
+    `[data-location-id="${DESTINATION_LOCATION.id}"]`)).not.toBeNull());
+  act(() => root.querySelector<HTMLButtonElement>(
+    `[data-location-id="${DESTINATION_LOCATION.id}"]`)?.click());
   if (roundTrip) {
     act(() => root.querySelector<HTMLInputElement>('.trip-kind input')?.click());
     const date = root.querySelector<HTMLInputElement>("#date")?.value ?? "";
@@ -114,5 +128,43 @@ describe("same-page shuttle departures", () => {
     await vi.waitFor(() => expect(root.textContent).toContain(SHUTTLE_UNAVAILABLE_MESSAGE));
     expect(root.textContent).toContain("Choose Departure");
     expect(root.textContent).not.toContain("Trip Summary");
+  });
+
+});
+
+describe("minimum and private date refresh", () => {
+  it("keeps inputs and shows the server minimum error without retrying", async () => {
+    const { client } = clientWith();
+    client.quoteShuttle = vi.fn(async () => {
+      throw new ApiError(422, { code: "MIN_PASSENGERS_NOT_MET",
+        message: "At least 3 passengers are required for this trip." });
+    });
+    const root = mount(client);
+    await fillTrip(root, false);
+    act(() => root.querySelector<HTMLButtonElement>(".departure-section.outbound button")?.click());
+    await vi.waitFor(() => expect(root.textContent)
+      .toContain("At least 3 passengers are required for this trip."));
+    expect(root.textContent).toContain("Choose Departure");
+    expect(client.quoteShuttle).toHaveBeenCalledOnce();
+  });
+
+  it("rechecks private availability when its pickup date changes", async () => {
+    const { client } = clientWith([]);
+    const option = {
+      departure_type: "on_request" as const, route_id: SEARCH_RESULT.route.id,
+      vehicle_type_id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      vehicle_type_name: "Private Van", seat_capacity: 6, from_price: "150.00",
+      effective_min_passengers: 2, service_mode: "private" as const,
+      pricing: { mode: "fixed_vehicle" as const, tiers: [], fixed_price: "150.00" },
+    };
+    client.searchShuttle = vi.fn(async () => ({ ...SEARCH_RESULT, departures: [],
+      on_request: null, on_request_options: [option] }));
+    const root = mount(client);
+    await fillTrip(root, false);
+    change(root.querySelector<HTMLInputElement>('[data-shuttle-date="outbound"]')!, "2026-11-03");
+    await vi.waitFor(() => expect(client.searchShuttle).toHaveBeenCalledTimes(2));
+    expect(client.searchShuttle).toHaveBeenLastCalledWith(expect.objectContaining({
+      date: "2026-11-03",
+    }));
   });
 });

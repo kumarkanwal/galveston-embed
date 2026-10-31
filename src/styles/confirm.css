@@ -1,14 +1,15 @@
 .confirm-layout {
   display: grid;
-  gap: 24px;
+  column-gap: 24px;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  padding-top: 24px;
+  padding-top: 14px;
+  row-gap: 14px;
 }
 
 .confirm-layout h2 {
   font-size: 25px;
   line-height: 1.15;
-  margin: 0 0 24px;
+  margin: 0 0 16px;
 }
 
 .summary-content {
@@ -140,6 +141,7 @@
   border-radius: 3px 0 0 3px;
   color: #ffffff;
   cursor: pointer;
+  min-height: 38px;
   min-width: 72px;
   padding: 6px 12px;
 }
@@ -180,7 +182,8 @@
 }
 
 .confirm-form .field-row {
-  gap: 22px;
+  column-gap: 22px;
+  row-gap: 10px;
 }
 
 .payment-method {
@@ -210,8 +213,8 @@
   display: flex;
   gap: 8px;
   margin: 0;
-  min-height: 44px;
-  padding: 8px 10px;
+  min-height: 38px;
+  padding: 5px 10px;
 }
 
 .payment-options input {
@@ -232,11 +235,11 @@
 }
 
 .square-card-frame {
-  min-height: 44px;
+  min-height: 38px;
 }
 
 ::slotted([slot="galveston-square-card"]) {
-  min-height: 44px;
+  min-height: 38px;
   width: 100%;
 }
 
@@ -278,6 +281,8 @@
   flex: 0 0 auto;
   justify-content: center;
   margin: 0;
+  min-height: 38px;
+  min-width: 38px;
 }
 
 .terms-link {
@@ -328,6 +333,7 @@
   color: #ffffff;
   cursor: pointer;
   margin-top: 14px;
+  min-height: 38px;
   padding: 6px 18px;
 }
 
@@ -338,8 +344,8 @@
   color: #ffffff;
   cursor: pointer;
   float: right;
-  margin-top: 88px;
-  min-height: 32px;
+  margin-top: 24px;
+  min-height: 38px;
   width: 50%;
 }
 
@@ -424,18 +430,18 @@
 
 :is(.layout-full, .layout-compact, .layout-narrow, .layout-micro) .create-trip {
   float: none;
-  margin-top: 24px;
+  margin-top: 16px;
   width: 100%;
 }
 
 :is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
   :is(.checkbox-target, .terms-copy label, .terms-link) {
-  min-height: 44px;
+  min-height: 38px;
 }
 
 :is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
   .checkbox-target {
-  min-width: 44px;
+  min-width: 38px;
 }
 
 :is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
@@ -451,12 +457,12 @@
 }
 
 :is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro) .create-trip {
-  min-height: 44px;
+  min-height: 38px;
 }
 
 :is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
   :is(.promo-code button, .promo-code input) {
-  min-height: 44px;
+  min-height: 38px;
 }
 
 :is(.layout-narrow, .layout-micro) .summary-content {

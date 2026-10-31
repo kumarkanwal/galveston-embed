@@ -50,6 +50,9 @@ describe("container-width layout", () => {
 
 describe("compact layout CSS", () => {
   const css = readFileSync(resolve("src/styles/widget.css"), "utf8");
+  const confirmCss = readFileSync(resolve("src/styles/confirm.css"), "utf8");
+  const shuttleCss = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
+  const vehicleCss = readFileSync(resolve("src/styles/vehicle.css"), "utf8");
 
   it("makes every narrow-mode widget full width without outer decoration", () => {
     expect(css).toContain(":is(.layout-compact, .layout-narrow, .layout-micro) .widget");
@@ -69,5 +72,23 @@ describe("compact layout CSS", () => {
     expect(css.match(/overflow-x: clip;/g)).toHaveLength(2);
     expect(css).toMatch(/:host \{[\s\S]*max-width: 100%;[\s\S]*width: 100%;/);
     expect(css).toMatch(/\.widget-root \{[\s\S]*min-width: 0;[\s\S]*width: 100%;/);
+  });
+
+  it("uses compact 38px controls and ten-pixel vertical form rhythm", () => {
+    const responsiveRules = css.slice(css.indexOf(":is(.layout-medium"));
+    expect(responsiveRules).toContain("font-size: 16px");
+    expect(responsiveRules).toContain("height: 38px");
+    expect(responsiveRules).toContain("min-height: 38px");
+    expect(css).toMatch(/\.field-row \{[\s\S]*column-gap: 22px;[\s\S]*row-gap: 10px;/);
+    expect(css).toMatch(/label \{[\s\S]*margin-bottom: 4px;/);
+    expect(shuttleCss).toMatch(/\.passenger-trigger \{[\s\S]*height: 38px;/);
+    expect(confirmCss).toContain("row-gap: 10px");
+    expect(vehicleCss).toMatch(/\.vehicle-choose,[\s\S]*min-height: 38px;/);
+  });
+
+  it("keeps passengers, Bags and Carry-on on one line at 360px", () => {
+    const narrowRules = css.slice(css.indexOf(":is(.layout-narrow"));
+    expect(css).toContain("grid-template-columns: minmax(88px, 0.8fr) repeat(2, minmax(100px, 1fr))");
+    expect(narrowRules).not.toMatch(/\.party-fields\s*\{[\s\S]*grid-template-columns:\s*1fr;/);
   });
 });

@@ -21,6 +21,7 @@ import { SquareCardField } from "../confirm/SquareCardField";
 import { useSquareCard } from "../confirm/use-square-card";
 import { FormError } from "../trip/FieldError";
 import { ProgressSteps } from "../trip/ProgressSteps";
+import { WidgetHeader } from "../shell/WidgetHeader";
 import {
   initialShuttleAddresses,
   addressesAfterRouteChange,
@@ -30,6 +31,7 @@ import {
   type ShuttleAddressField,
 } from "./address";
 import { isShuttleAvailabilityError, SHUTTLE_UNAVAILABLE_MESSAGE } from "./availability";
+import { minimumPassengerError } from "./minimum";
 import { buildShuttleBooking, buildShuttleQuote } from "./requests";
 import { ShuttleAddressFields } from "./ShuttleAddressFields";
 import type { SelectedShuttleLeg, ShuttleSelection } from "./types";
@@ -61,7 +63,8 @@ function legLabel(leg: SelectedShuttleLeg): string {
   return `${leg.date} at ${leg.time} — ${leg.vehicleTypeName}`;
 }
 
-function ShuttleSummary({ selection }: { selection: ShuttleSelection }) {
+function ShuttleSummary(props: { quote: ShuttleQuoteResponse; selection: ShuttleSelection }) {
+  const selection = props.selection;
   return <section class="trip-summary"><h2 tabIndex={-1}>Trip Summary</h2>
     <div class="shuttle-summary">
       <h3>{selection.from.name} → {selection.to.name}</h3>
@@ -70,6 +73,12 @@ function ShuttleSummary({ selection }: { selection: ShuttleSelection }) {
       <p>{selection.trip.paxAdult} adults
         {selection.trip.paxSenior > 0 ? `, ${selection.trip.paxSenior} seniors` : ""}
         {selection.trip.paxChild > 0 ? `, ${selection.trip.paxChild} children` : ""}</p>
+      {props.quote.legs.map((leg, index) => <p class="shuttle-leg-info" key={index}>
+        {index === 0 ? "Outbound" : "Return"}: {leg.service_mode === "private"
+          ? "Private Shuttle" : "Shared Shuttle"} · {formatMoney(leg.leg_price, props.quote.currency)}
+        {leg.effective_min_passengers > 1
+          ? ` · Minimum ${leg.effective_min_passengers} passengers` : ""}
+      </p>)}
     </div>
   </section>;
 }
@@ -114,7 +123,9 @@ function useShuttlePromo(props: ShuttleConfirmProps, paymentMethod: PaymentMetho
     }
     catch (error: unknown) {
       if (latestRequest.current !== requestId) return false;
-      if (isShuttleAvailabilityError(error)) {
+      const minimum = minimumPassengerError(error);
+      if (minimum !== null) setQuoteError(minimum);
+      else if (isShuttleAvailabilityError(error)) {
         props.onUnavailable(SHUTTLE_UNAVAILABLE_MESSAGE);
       } else if (error instanceof ApiError && error.code === "PROMO_INVALID") {
         setPromo((current) => ({ ...current, error: error.message, status: "idle" }));
@@ -156,12 +167,11 @@ function useShuttlePayment(business: Business) {
 function useShuttleConfirm(props: ShuttleConfirmProps) {
   const { card, payment, paymentMethod, setPaymentMethod } = useShuttlePayment(props.business);
   const pricing = useShuttlePromo(props, paymentMethod);
-  const [failure, setFailure] = useState<BookingFailure | null>(null);
-  const [addressError, setAddressError] = useState<ShuttleAddressField | null>(null);
-  const [addresses, setAddresses] = useState(initialShuttleAddresses);
-  const [submitting, setSubmitting] = useState(false);
-  const manager = useRef(new IdempotencyKeyManager()), inFlight = useRef(false);
-  const route = useRef(shuttleAddressRouteKey(props.selection));
+  const [failure, setFailure] = useState<BookingFailure | null>(null),
+    [addressError, setAddressError] = useState<ShuttleAddressField | null>(null);
+  const [addresses, setAddresses] = useState(initialShuttleAddresses), [submitting, setSubmitting] = useState(false);
+  const manager = useRef(new IdempotencyKeyManager()), inFlight = useRef(false),
+    route = useRef(shuttleAddressRouteKey(props.selection));
   const submit = async (form: ConfirmFormState) => {
     if (inFlight.current || payment.defaultMethod === null) return;
     const missing = requiredShuttleAddresses(props.selection)
@@ -182,7 +192,10 @@ function useShuttleConfirm(props: ShuttleConfirmProps) {
         console.error("Galveston booking widget configuration was rejected.");
       }
       if (isShuttleAvailabilityError(error)) props.onUnavailable(SHUTTLE_UNAVAILABLE_MESSAGE);
-      else setFailure(bookingFailure(error));
+      else {
+        const minimum = minimumPassengerError(error);
+        setFailure(minimum === null ? bookingFailure(error) : { field: null, message: minimum });
+      }
     } finally { inFlight.current = false; setSubmitting(false); }
   };
   useEffect(() => {
@@ -204,11 +217,11 @@ function useShuttleConfirm(props: ShuttleConfirmProps) {
 
 export function ShuttleConfirm(props: ShuttleConfirmProps) {
   const view = useShuttleConfirm(props);
-  return <section class="widget"><header class="widget-heading">
-    <h1>Reservations</h1><p>Review and confirm your shuttle trip.</p></header>
+  return <section class="widget"><WidgetHeader businessName={props.business.name}
+    logoUrl={props.business.logo_url} subtitle="Review and confirm your shuttle trip." />
     <ProgressSteps activeStep={3} steps={["Trip", "Departures", "Confirm"]} />
     <div class="confirm-layout"><div>
-      <ShuttleSummary selection={props.selection} />
+      <ShuttleSummary quote={view.quote} selection={props.selection} />
       <ShuttleCharges currency={props.business.currency} quote={view.quote}
         promo={view.promo} error={view.quoteError} onApply={() => { void view.apply(); }}
         onInput={(value) => view.setPromo((current) => current.status === "idle"

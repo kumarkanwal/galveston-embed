@@ -16,6 +16,7 @@ import { businessDateTimeParts } from "../../time";
 import { paymentAvailability } from "../confirm/payment";
 import { buildReturnQuery, buildShuttleQuote, buildShuttleSearchQuery } from "./requests";
 import { isShuttleAvailabilityError, SHUTTLE_UNAVAILABLE_MESSAGE } from "./availability";
+import { minimumPassengerError } from "./minimum";
 import type {
   SelectedShuttleLeg,
   ShuttleTripErrors,
@@ -176,7 +177,10 @@ async function chooseOutbound(context: FlowContext, leg: SelectedShuttleLeg) {
         step: "confirm", submitting: false }));
     }
   } catch (error: unknown) {
-    if (isShuttleAvailabilityError(error)) {
+    const minimum = minimumPassengerError(error);
+    if (minimum !== null) {
+      context.setState((current) => ({ ...current, notice: minimum, submitting: false }));
+    } else if (isShuttleAvailabilityError(error)) {
       await returnToDepartures(context, SHUTTLE_UNAVAILABLE_MESSAGE);
     } else {
       context.setState((current) => ({ ...current, notice: errorMessage(error), submitting: false }));
@@ -200,7 +204,10 @@ async function chooseReturn(context: FlowContext, leg: SelectedShuttleLeg) {
     context.setState((current) => ({ ...current, quote, returnLeg: leg,
       step: "confirm", submitting: false }));
   } catch (error: unknown) {
-    if (isShuttleAvailabilityError(error)) {
+    const minimum = minimumPassengerError(error);
+    if (minimum !== null) {
+      context.setState((current) => ({ ...current, notice: minimum, submitting: false }));
+    } else if (isShuttleAvailabilityError(error)) {
       await returnToDepartures(context, SHUTTLE_UNAVAILABLE_MESSAGE);
     } else {
       context.setState((current) => ({ ...current, notice: errorMessage(error), submitting: false }));
@@ -219,6 +226,33 @@ async function returnToDepartures(context: FlowContext, message: string) {
     context.setState((current) => ({ ...current, notice:
       `${message} Go back and choose the locations again.`, submitting: false }));
   }
+}
+
+async function refreshDepartureDate(
+  context: FlowContext,
+  direction: "outbound" | "return",
+  date: string,
+) {
+  if (context.requestInFlight.current || date === "") return;
+  context.requestInFlight.current = true;
+  context.setState((current) => ({ ...current, notice: null, submitting: true }));
+  try {
+    if (direction === "outbound") {
+      const form = { ...context.state.form, date };
+      const result = await context.client.searchShuttle(buildShuttleSearchQuery(form));
+      context.setState((current) => ({ ...current, form, outbound: null,
+        outboundResult: result, returnLeg: null, returnResult: null, submitting: false }));
+    } else if (context.state.outbound !== null) {
+      const form = { ...context.state.form, returnDate: date };
+      const result = await context.client.searchShuttleReturn(
+        buildReturnQuery(form, context.state.outbound),
+      );
+      context.setState((current) => ({ ...current, form, returnLeg: null,
+        returnResult: result, submitting: false }));
+    }
+  } catch (error: unknown) {
+    context.setState((current) => ({ ...current, notice: errorMessage(error), submitting: false }));
+  } finally { context.requestInFlight.current = false; }
 }
 
 export function useShuttleFlow(client: ShuttleApiClient, business: Business) {
@@ -243,6 +277,8 @@ export function useShuttleFlow(client: ShuttleApiClient, business: Business) {
     { ...current, confirmation: { customerEmail, paymentMethod, response }, step: "done" }));
   return { back, chooseOutbound: (leg: SelectedShuttleLeg) => chooseOutbound(context, leg),
     chooseReturn: (leg: SelectedShuttleLeg) => chooseReturn(context, leg), complete, selection, state,
+    refreshDate: (direction: "outbound" | "return", date: string) =>
+      refreshDepartureDate(context, direction, date),
     submitTrip: (event: SubmitEvent) => submitTrip(context, event),
     unavailable: (message: string) => returnToDepartures(context, message), update };
 }

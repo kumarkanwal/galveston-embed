@@ -26,6 +26,7 @@ const SCHEDULED = { kind: "scheduled", date: TRIP.date, departure: DEPARTURE,
   route: SEARCH_RESULT.route } as const;
 const ON_REQUEST = {
   kind: "on_request", date: TRIP.date, time: "14:15",
+  serviceMode: "shared",
   routeId: "77777777-7777-7777-7777-777777777777",
   route: SEARCH_RESULT.route,
   vehicleTypeId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",

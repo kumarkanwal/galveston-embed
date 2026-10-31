@@ -37,8 +37,9 @@ function renderDepartures(result: ShuttleSearchResult, direction: "outbound" | "
     outboundData={{ result: direction === "outbound" ? result
       : { ...SEARCH_RESULT, departures: [] }, date: "2026-10-30", direction: "outbound" }}
     returnData={direction === "return" ? { result, date: "2026-10-30", direction } : null}
-    loadingReturn={false} onBack={() => undefined}
-    onChooseOutbound={() => undefined} onChooseReturn={() => undefined} />, element);
+    loadingReturn={false} passengerCount={1} onBack={() => undefined}
+    onChooseOutbound={() => undefined} onChooseReturn={() => undefined}
+    onDateChange={() => undefined} />, element);
   return element;
 }
 
@@ -65,9 +66,10 @@ beforeEach(() => document.body.replaceChildren());
 describe("shuttle trip fields", () => {
   it("renders grouped reachable locations and the business timezone date guard", () => {
     const element = renderTrip();
-    const groups = [...element.querySelectorAll("#fromId optgroup")];
-    expect(groups.map((group) => group.getAttribute("label"))).toEqual(["Airports", "Galveston"]);
-    expect(element.querySelectorAll("#toId option")).toHaveLength(2);
+    act(() => element.querySelector<HTMLInputElement>("#fromId")?.click());
+    const groups = [...element.querySelectorAll(".stop-category")];
+    expect(groups.map((group) => group.textContent?.trim())).toEqual(["🚌Airports›", "🚌Galveston›"]);
+    expect(element.querySelector<HTMLInputElement>("#toId")?.disabled).toBe(true);
     expect(element.querySelector<HTMLInputElement>("#date")?.min).toBe("2026-10-23");
     expect(element.textContent).toContain("Dates and times use America/Chicago");
   });
@@ -146,6 +148,7 @@ describe("shuttle departures", () => {
     expect(element.textContent).toContain("Vehicle: Executive Van");
     expect(element.textContent).toContain("4 seats left");
     expect(element.textContent).toContain("$70.50 USD");
+    expect(element.textContent).toContain("Shared Shuttle");
     expect(element.textContent).not.toContain("Return must leave later");
     expect(element.querySelectorAll(".shuttle-departure")).toHaveLength(1);
   });
@@ -180,6 +183,9 @@ describe("on-request shuttle departures", () => {
       vehicle_type_id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
       vehicle_type_name: "Executive Van",
       seat_capacity: 8,
+      from_price: "38.50",
+      effective_min_passengers: 1,
+      service_mode: "shared" as const,
       earliest_pickup_date: "2026-10-30",
       earliest_pickup_time: "11:00",
     } };
@@ -193,5 +199,27 @@ describe("on-request shuttle departures", () => {
     });
     expect(element.textContent).toContain("Choose a time at or after 11:00");
     expect(element.querySelector<HTMLButtonElement>(".on-request-choice button")?.disabled).toBe(true);
+  });
+
+  it("labels private service and shows date and time without scheduled departures", () => {
+    const result = { ...SEARCH_RESULT, departures: [DEPARTURE], on_request: {
+      departure_type: "on_request" as const,
+      route_id: SEARCH_RESULT.route.id,
+      vehicle_type_id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      vehicle_type_name: "Private Van",
+      seat_capacity: 8,
+      from_price: "150.00",
+      effective_min_passengers: 1,
+      service_mode: "private" as const,
+      earliest_pickup_date: "2026-10-30",
+      earliest_pickup_time: "11:00",
+    } };
+    const element = renderDepartures(result);
+    expect(element.textContent).toContain("Private Shuttle");
+    expect(element.textContent).toContain("Private vehicle for your group");
+    expect(element.querySelector<HTMLInputElement>('[data-shuttle-date="outbound"]')?.type)
+      .toBe("date");
+    expect(element.querySelector<HTMLInputElement>('[data-shuttle-time="outbound"]')?.type)
+      .toBe("time");
   });
 });

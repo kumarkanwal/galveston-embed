@@ -5,13 +5,15 @@ import type {
 } from "../../api/client";
 import { formatMoney } from "../../money";
 import { ProgressSteps } from "../trip/ProgressSteps";
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useLayoutEffect, useRef, useState } from "preact/hooks";
 
 interface ConfirmationProps {
   autoFocusHeading?: boolean;
+  businessName?: string | undefined;
   currency: string;
   customerEmail: string;
   emailsEnabled?: boolean;
+  logoUrl?: string | null | undefined;
   paymentMethod?: PaymentMethod;
   requestQuote: boolean;
   response: TaxiBookingResponse | ShuttleBookingResponse;
@@ -30,7 +32,7 @@ async function copyReference(reference: string): Promise<boolean> {
 export function Confirmation(props: ConfirmationProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const [copyStatus, setCopyStatus] = useState("");
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (props.autoFocusHeading) headingRef.current?.focus();
   }, [props.autoFocusHeading]);
   async function handleCopy() {
@@ -38,6 +40,8 @@ export function Confirmation(props: ConfirmationProps) {
     setCopyStatus(copied ? "Copied" : "Copy unavailable. Select the reference to copy it.");
   }
   return <section class="widget confirmation">
+    {props.logoUrl != null && props.logoUrl !== "" && <img class="business-logo"
+      src={props.logoUrl} alt={props.businessName ?? "Business"} />}
     <ProgressSteps activeStep={3} complete
       {...(props.steps === undefined ? {} : { steps: props.steps })} />
     <h1 ref={headingRef} tabIndex={-1}>

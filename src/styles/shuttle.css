@@ -2,7 +2,7 @@
   max-width: 760px;
   min-width: 0;
   margin: 0 auto;
-  padding: 24px;
+  padding: 16px;
   border: 1px solid var(--border);
   border-radius: 4px;
   background: #fff;
@@ -13,6 +13,105 @@
   align-items: start;
 }
 
+.stop-field {
+  position: relative;
+}
+
+.stop-control {
+  align-items: center;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  display: flex;
+  height: 38px;
+  padding-left: 9px;
+  width: 100%;
+}
+
+.stop-control:focus-within {
+  border-color: #336b8e;
+  box-shadow: 0 0 0 2px rgb(51 107 142 / 25%);
+}
+
+.stop-control input {
+  border: 0;
+  box-shadow: none;
+  height: 36px;
+  min-width: 0;
+  padding: 5px 7px;
+}
+
+.stop-control input:focus {
+  box-shadow: none;
+  outline: 0;
+}
+
+.stop-control-chevron {
+  padding-right: 9px;
+}
+
+.stop-menu {
+  background: #fff;
+  border: 1px solid var(--border);
+  box-shadow: 0 5px 10px rgb(0 0 0 / 20%);
+  left: 0;
+  max-height: 350px;
+  overflow-y: auto;
+  position: absolute;
+  right: 0;
+  top: 62px;
+  z-index: 30;
+}
+
+.stop-category,
+.stop-option {
+  align-items: center;
+  background: #fff;
+  border: 0;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  min-height: 38px;
+  padding: 6px 10px;
+  text-align: left;
+  width: 100%;
+}
+
+.stop-category {
+  gap: 8px;
+  font-weight: 700;
+}
+
+.stop-chevron {
+  margin-left: auto;
+}
+
+.stop-option {
+  padding-left: 34px;
+}
+
+.stop-category:hover,
+.stop-option:hover,
+.stop-category.active,
+.stop-option.active {
+  background: #eef3f6;
+  outline: 2px solid #336b8e;
+  outline-offset: -2px;
+}
+
+.stop-option.selected {
+  background: #dfeaf0;
+  font-weight: 700;
+}
+
+.stop-empty {
+  color: var(--muted);
+  margin: 0;
+  min-height: 38px;
+  padding: 10px;
+}
+
 .passenger-trigger {
   align-items: center;
   background: #fff;
@@ -21,7 +120,7 @@
   color: #333;
   cursor: pointer;
   display: flex;
-  height: 32px;
+  height: 38px;
   justify-content: space-between;
   padding: 5px 9px;
   width: 100%;
@@ -58,8 +157,8 @@
 
 .trip-kind {
   display: flex;
-  margin: 20px 0;
-  padding: 16px;
+  margin: 10px 0;
+  padding: 8px 10px;
   border: 1px solid var(--border);
 }
 
@@ -67,6 +166,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  min-height: 38px;
 }
 
 .trip-kind input {
@@ -80,7 +180,7 @@
 .shuttle-departures {
   display: grid;
   gap: 12px;
-  margin: 20px 0;
+  margin: 12px 0;
 }
 
 .departure-section.return {
@@ -99,7 +199,7 @@
   grid-template-columns: minmax(150px, 1.4fr) minmax(130px, 1fr) auto auto;
   align-items: center;
   gap: 20px;
-  padding: 18px;
+  padding: 12px 18px;
   border: 1px solid var(--border);
   border-radius: 4px;
   background: #fff;
@@ -115,8 +215,20 @@
   color: var(--error);
 }
 
+.shuttle-mode-badge {
+  background: #eef3f6;
+  border: 1px solid #b8c8d5;
+  border-radius: 999px;
+  color: #334b5f;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  width: fit-content;
+}
+
 .shuttle-departure button {
-  min-height: 44px;
+  min-height: 38px;
   padding: 0 20px;
   border: 0;
   border-radius: 3px;
@@ -143,15 +255,24 @@
 
 .on-request-choice {
   max-width: 520px;
-  margin: 20px auto;
-  padding: 24px;
+  margin: 12px auto;
+  padding: 16px 24px;
   border: 1px solid var(--border);
   border-radius: 4px;
   background: #fff;
 }
 
+.on-request-choice + .on-request-choice {
+  margin-top: 12px;
+}
+
+.shuttle-price-rule {
+  color: #333333;
+  margin: 6px 0;
+}
+
 .shuttle-summary {
-  padding: 18px;
+  padding: 12px 18px;
 }
 
 .shuttle-summary h3,
@@ -162,8 +283,8 @@
 .shuttle-addresses {
   border: 0;
   display: grid;
-  gap: 12px;
-  margin: 24px 0 0;
+  gap: 10px;
+  margin: 16px 0 0;
   padding: 0;
 }
 
@@ -174,7 +295,7 @@
 }
 
 :is(.layout-compact, .layout-narrow, .layout-micro) .shuttle-trip {
-  padding: 16px;
+  padding: 12px;
 }
 
 :is(.layout-compact, .layout-narrow, .layout-micro) .shuttle-departure {
@@ -183,9 +304,13 @@
 }
 
 :is(.layout-compact, .layout-narrow, .layout-micro) .shuttle-departure button {
-  min-height: 44px;
+  min-height: 38px;
 }
 
 :is(.layout-compact, .layout-narrow, .layout-micro) .passenger-trigger {
-  height: 44px;
+  height: 38px;
+}
+
+.shuttle-trip .field-note {
+  margin: 4px 0 8px;
 }

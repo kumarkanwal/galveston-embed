@@ -64,6 +64,7 @@ export const DEPARTURE = {
   prices: { adult: "38.50", senior: "32.00", child: null },
   total_for_selection: "70.50",
   seats_remaining: 4,
+  effective_min_passengers: 1,
   selectable: true,
   unselectable_reason: null,
   low_seat_warning: "Only 4 seats left",
@@ -94,6 +95,7 @@ export const SHUTTLE_QUOTE = {
     from: "Hobby Airport", to: "Cruise Terminal", date: "2026-10-30",
     time: "09:30", duration_minutes: 60, pax_summary: "2 adults, 1 senior",
     leg_price: "70.50", schedule_id: DEPARTURE.schedule_id,
+    service_mode: "shared", effective_min_passengers: 1,
   }],
   line_items: [
     { label: "Adult fare", amount: "38.50", kind: "fare", quantity: 1 },
