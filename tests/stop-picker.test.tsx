@@ -27,8 +27,9 @@ function input(root: HTMLElement) {
   return field;
 }
 
-function key(field: HTMLInputElement, value: string) {
-  act(() => { field.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, key: value })); });
+function key(field: HTMLInputElement, value: string, altKey = false) {
+  act(() => { field.dispatchEvent(new KeyboardEvent(
+    "keydown", { altKey, bubbles: true, key: value })); });
 }
 
 beforeEach(() => document.body.replaceChildren());
@@ -36,7 +37,7 @@ beforeEach(() => document.body.replaceChildren());
 describe("grouped accordion stop picker selection", () => {
   it("starts collapsed and keeps only one category open", () => {
     const root = mount();
-    act(() => input(root).focus());
+    act(() => input(root).click());
     expect(root.querySelectorAll(".stop-category")).toHaveLength(2);
     expect(root.querySelectorAll(".stop-option")).toHaveLength(0);
     const categories = root.querySelectorAll<HTMLButtonElement>(".stop-category");
@@ -49,7 +50,7 @@ describe("grouped accordion stop picker selection", () => {
 
   it("selects a location, closes, and reopens its highlighted category", () => {
     const root = mount();
-    act(() => input(root).focus());
+    act(() => input(root).click());
     act(() => root.querySelector<HTMLButtonElement>(".stop-category")?.click());
     act(() => root.querySelector<HTMLButtonElement>(
       `[data-location-id="${ORIGIN_LOCATION.id}"]`)?.click());
@@ -73,14 +74,26 @@ describe("grouped accordion stop picker selection", () => {
       field.dispatchEvent(new Event("input", { bubbles: true })); });
     expect(root.textContent).toContain("No matches");
   });
-
 });
 
-describe("grouped accordion stop picker access", () => {
+describe("grouped accordion stop picker toggles", () => {
+  it("toggles from the whole field, including the arrow area", () => {
+    const root = mount();
+    const field = input(root);
+    act(() => field.click());
+    expect(field.getAttribute("aria-expanded")).toBe("true");
+    act(() => field.click());
+    expect(field.getAttribute("aria-expanded")).toBe("false");
+    act(() => root.querySelector<HTMLElement>(".stop-control-chevron")?.click());
+    expect(field.getAttribute("aria-expanded")).toBe("true");
+    act(() => root.querySelector<HTMLElement>(".stop-control-chevron")?.click());
+    expect(field.getAttribute("aria-expanded")).toBe("false");
+  });
+
   it("supports arrows, Enter, Escape, Tab, and outside click", () => {
     const root = mount();
     const field = input(root);
-    act(() => field.focus());
+    act(() => field.click());
     key(field, "ArrowDown");
     key(field, "Enter");
     key(field, "ArrowDown");
@@ -96,10 +109,29 @@ describe("grouped accordion stop picker access", () => {
     act(() => { document.body.dispatchEvent(new MouseEvent("mousedown", { bubbles: true })); });
     expect(field.getAttribute("aria-expanded")).toBe("false");
   });
+});
+
+describe("grouped accordion stop picker access", () => {
+  it("toggles with Enter, Space, and Alt+Down", () => {
+    const root = mount();
+    const field = input(root);
+    key(field, "Enter");
+    expect(field.getAttribute("aria-expanded")).toBe("true");
+    key(field, "Enter");
+    expect(field.getAttribute("aria-expanded")).toBe("false");
+    key(field, " ");
+    expect(field.getAttribute("aria-expanded")).toBe("true");
+    key(field, " ");
+    expect(field.getAttribute("aria-expanded")).toBe("false");
+    key(field, "ArrowDown", true);
+    expect(field.getAttribute("aria-expanded")).toBe("true");
+    key(field, "ArrowDown", true);
+    expect(field.getAttribute("aria-expanded")).toBe("false");
+  });
 
   it("uses combobox/listbox semantics and mobile-sized rows", () => {
     const root = mount();
-    act(() => input(root).focus());
+    act(() => input(root).click());
     expect(input(root).getAttribute("role")).toBe("combobox");
     expect(root.querySelector('[role="listbox"]')).not.toBeNull();
     const css = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
@@ -112,7 +144,7 @@ describe("grouped accordion stop picker access", () => {
     document.body.append(root);
     render(<StopPicker disabled={false} error={undefined} groups={[]}
       id="fromId" label="From" onChange={() => undefined} value="" />, root);
-    act(() => input(root).focus());
+    act(() => input(root).click());
     expect(root.textContent).toContain("No locations available");
   });
 });
