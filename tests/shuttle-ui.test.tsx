@@ -37,8 +37,9 @@ function renderDepartures(result: ShuttleSearchResult, direction: "outbound" | "
     outboundData={{ result: direction === "outbound" ? result
       : { ...SEARCH_RESULT, departures: [] }, date: "2026-10-30", direction: "outbound" }}
     returnData={direction === "return" ? { result, date: "2026-10-30", direction } : null}
-    loadingReturn={false} onBack={() => undefined}
-    onChooseOutbound={() => undefined} onChooseReturn={() => undefined} />, element);
+    loadingReturn={false} passengerCount={1} onBack={() => undefined}
+    onChooseOutbound={() => undefined} onChooseReturn={() => undefined}
+    onDateChange={() => undefined} />, element);
   return element;
 }
 

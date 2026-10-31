@@ -5,6 +5,7 @@ import { ShuttleConfirm } from "./ShuttleConfirm";
 import { ShuttleDepartures } from "./Departures";
 import { ShuttleTrip } from "./Trip";
 import { useShuttleFlow } from "./use-shuttle-flow";
+import { passengerTotal } from "./minimum";
 
 interface ShuttleFlowProps {
   business: Business;
@@ -39,8 +40,10 @@ export function ShuttleFlow(props: ShuttleFlowProps) {
         : null}
       loadingReturn={state.outboundResult !== null && state.form.roundTrip
         && state.outbound !== null && state.submitting}
+      passengerCount={passengerTotal(state.form)}
       onBack={flow.back} onChooseOutbound={(leg) => { void flow.chooseOutbound(leg); }}
-      onChooseReturn={(leg) => { void flow.chooseReturn(leg); }} />;
+      onChooseReturn={(leg) => { void flow.chooseReturn(leg); }}
+      onDateChange={(direction, date) => { void flow.refreshDate(direction, date); }} />;
   }
   return <ShuttleTrip destinationGroups={state.destinationGroups} errors={state.errors}
     form={state.form} formError={state.formError} loadingDestinations={state.loadingDestinations}

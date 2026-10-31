@@ -4,6 +4,7 @@ import type { OnRequestAvailability, ShuttleDeparture, ShuttleRoute } from "../.
 import { formatMoney } from "../../money";
 import { FormError } from "../trip/FieldError";
 import { ProgressSteps } from "../trip/ProgressSteps";
+import { minimumMessage } from "./minimum";
 import { pricingText } from "./pricing";
 import type { DepartureViewData, OnRequestLeg, ScheduledLeg } from "./types";
 
@@ -13,16 +14,46 @@ interface ShuttleDeparturesProps {
   loadingReturn: boolean;
   notice: string | null;
   outboundData: DepartureViewData | null;
+  passengerCount: number;
   returnData: DepartureViewData | null;
   onBack: () => void;
   onChooseOutbound: (leg: ScheduledLeg | OnRequestLeg) => void;
   onChooseReturn: (leg: ScheduledLeg | OnRequestLeg) => void;
+  onDateChange: (direction: "outbound" | "return", date: string) => void;
 }
 
 interface DepartureSectionProps {
   currency: string;
   data: DepartureViewData;
+  passengerCount: number;
   onChoose: (leg: ScheduledLeg | OnRequestLeg) => void;
+  onDateChange: ShuttleDeparturesProps["onDateChange"];
+}
+
+interface TimingProps {
+  date: string;
+  direction: "outbound" | "return";
+  inputId: string;
+  minimumDate: string | null | undefined;
+  minimumTime: string | undefined;
+  time: string;
+  onDate: (value: string) => void;
+  onTime: (value: string) => void;
+}
+
+function OnRequestTiming(props: TimingProps) {
+  return <>
+    <div class="field"><label for={`${props.inputId}-date`}>Pickup Date</label>
+      <input id={`${props.inputId}-date`} data-shuttle-date={props.direction} type="date"
+        min={props.minimumDate ?? undefined} value={props.date}
+        onInput={(event) => props.onDate(event.currentTarget.value)} />
+    </div>
+    <div class="field"><label for={`${props.inputId}-time`}>Pickup Time</label>
+      <input id={`${props.inputId}-time`} data-shuttle-time={props.direction}
+        type="time" min={props.minimumTime} value={props.time}
+        onInput={(event) => props.onTime(event.currentTarget.value)} />
+    </div>
+  </>;
 }
 
 function departureTime(departure: ShuttleDeparture): string {
@@ -36,9 +67,12 @@ function DepartureCard(props: {
   date: string;
   departure: ShuttleDeparture;
   onChoose: DepartureSectionProps["onChoose"];
+  passengerCount: number;
   route: ShuttleRoute;
 }) {
   const departure = props.departure;
+  const minimum = departure.effective_min_passengers;
+  const minimumBlocked = props.passengerCount < minimum;
   return <article class={`shuttle-departure${departure.selectable ? "" : " unavailable"}`}>
     <div><strong>{departureTime(departure)}</strong><span>{departure.service_label}</span>
       <span class="shuttle-mode-badge">Shared Shuttle</span>
@@ -47,22 +81,25 @@ function DepartureCard(props: {
     <div><span>{departure.seats_remaining} seats left</span>
       {departure.low_seat_warning !== null && <small>{departure.low_seat_warning}</small>}</div>
     <strong>{formatMoney(departure.total_for_selection, props.currency)}</strong>
-    <button type="button" disabled={!departure.selectable}
+    <button type="button" disabled={!departure.selectable || minimumBlocked}
       onClick={() => props.onChoose({ kind: "scheduled", date: props.date, departure,
         route: props.route })}>
       {departure.selectable ? "Choose" : "Unavailable"}
     </button>
     {!departure.selectable && departure.unselectable_reason !== null &&
       <p class="departure-reason">{departure.unselectable_reason}</p>}
+    {minimumBlocked && <p class="departure-reason">{minimumMessage(minimum)}</p>}
   </article>;
 }
 
 function OnRequestChoice(props: DepartureSectionProps & { option: OnRequestAvailability }) {
   const option = props.option;
-  const [date, setDate] = useState(props.data.date);
-  const [time, setTime] = useState("");
+  const [date, setDate] = useState(props.data.date), [time, setTime] = useState("");
   const serviceMode = option.service_mode ?? "shared";
   const privateService = serviceMode === "private";
+  const minimum = option.effective_min_passengers ?? 1;
+  const minimumBlocked = props.passengerCount < minimum;
+  const capacityBlocked = privateService && props.passengerCount > option.seat_capacity;
   const inputId = `${props.data.direction}-${option.vehicle_type_id}`;
   const earliestDate = option.earliest_pickup_date;
   const beforeEarliestDate = earliestDate !== null && earliestDate !== undefined
@@ -71,6 +108,9 @@ function OnRequestChoice(props: DepartureSectionProps & { option: OnRequestAvail
     ? option.earliest_pickup_time?.slice(0, 5)
     : undefined;
   const beforeEarliestTime = minTime !== undefined && time !== "" && time < minTime;
+  const changeDate = (value: string) => {
+    setDate(value); setTime(""); props.onDateChange(props.data.direction, value);
+  };
   const choose = () => props.onChoose({
     kind: "on_request",
     date,
@@ -78,8 +118,7 @@ function OnRequestChoice(props: DepartureSectionProps & { option: OnRequestAvail
     route: props.data.result.route,
     serviceMode,
     time,
-    vehicleTypeId: option.vehicle_type_id,
-    vehicleTypeName: option.vehicle_type_name,
+    vehicleTypeId: option.vehicle_type_id, vehicleTypeName: option.vehicle_type_name,
   });
   return <section class="on-request-choice">
     <h3>Choose your pickup time</h3>
@@ -90,19 +129,15 @@ function OnRequestChoice(props: DepartureSectionProps & { option: OnRequestAvail
     <p>Vehicle: <strong>{option.vehicle_type_name}</strong></p>
     <p>{option.seat_capacity} seats available</p>
     {pricingText(option, props.currency).map((line) => <p class="shuttle-price-rule">{line}</p>)}
-    <div class="field"><label for={`${inputId}-date`}>Pickup Date</label>
-      <input id={`${inputId}-date`} data-shuttle-date={props.data.direction} type="date"
-        min={earliestDate ?? undefined} value={date}
-        onInput={(event) => setDate(event.currentTarget.value)} />
-    </div>
-    <div class="field"><label for={`${inputId}-time`}>Pickup Time</label>
-      <input id={`${inputId}-time`} data-shuttle-time={props.data.direction}
-        type="time" min={minTime} value={time}
-        onInput={(event) => setTime(event.currentTarget.value)} />
-    </div>
+    <OnRequestTiming date={date} direction={props.data.direction} inputId={inputId}
+      minimumDate={earliestDate} minimumTime={minTime} time={time}
+      onDate={changeDate} onTime={setTime} />
     <button class="check-pricing" type="button"
-      disabled={time === "" || beforeEarliestDate || beforeEarliestTime}
+      disabled={time === "" || beforeEarliestDate || beforeEarliestTime
+        || minimumBlocked || capacityBlocked}
       onClick={choose}>Choose Time</button>
+    {minimumBlocked && <FormError>{minimumMessage(minimum)}</FormError>}
+    {capacityBlocked && <FormError>This vehicle allows up to {option.seat_capacity} passengers.</FormError>}
     {beforeEarliestDate && <FormError>This date is earlier than the first available date.</FormError>}
     {beforeEarliestTime && <FormError>Choose a time at or after {minTime}.</FormError>}
   </section>;
@@ -134,7 +169,8 @@ function DepartureSection(props: DepartureSectionProps) {
     {departures.length > 0 && <div class="shuttle-departures">
       {departures.map((departure) => <DepartureCard key={departure.schedule_id}
         currency={props.currency} date={props.data.date} departure={departure}
-        onChoose={props.onChoose} route={props.data.result.route} />)}
+        onChoose={props.onChoose} passengerCount={props.passengerCount}
+        route={props.data.result.route} />)}
     </div>}
     {options.map((option) => <OnRequestChoice {...props} option={option}
       key={option.vehicle_type_id} />)}
@@ -151,10 +187,12 @@ export function ShuttleDepartures(props: ShuttleDeparturesProps) {
       No departures are available for the remembered route. Go back and search again.
     </div>}
     {props.outboundData !== null && <DepartureSection currency={props.currency}
-      data={props.outboundData} onChoose={props.onChooseOutbound} />}
+      data={props.outboundData} passengerCount={props.passengerCount}
+      onChoose={props.onChooseOutbound} onDateChange={props.onDateChange} />}
     {props.loadingReturn && <p class="return-loading" role="status">Finding return departures…</p>}
     {props.returnData !== null && <DepartureSection currency={props.currency}
-      data={props.returnData} onChoose={props.onChooseReturn} />}
+      data={props.returnData} passengerCount={props.passengerCount}
+      onChoose={props.onChooseReturn} onDateChange={props.onDateChange} />}
     <button class="back-button" type="button" onClick={props.onBack}>↶ Back</button>
   </section>;
 }

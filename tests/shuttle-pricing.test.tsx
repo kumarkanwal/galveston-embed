@@ -30,8 +30,9 @@ function renderOption(value: OnRequestAvailability): HTMLElement {
     on_request_options: [value] };
   render(<ShuttleDepartures currency="USD" notice={null} loadingOutbound={false}
     outboundData={{ result, date: "2026-10-30", direction: "outbound" }} returnData={null}
-    loadingReturn={false} onBack={() => undefined} onChooseOutbound={() => undefined}
-    onChooseReturn={() => undefined} />, element);
+    loadingReturn={false} passengerCount={1} onBack={() => undefined}
+    onChooseOutbound={() => undefined} onChooseReturn={() => undefined}
+    onDateChange={() => undefined} />, element);
   return element;
 }
 
