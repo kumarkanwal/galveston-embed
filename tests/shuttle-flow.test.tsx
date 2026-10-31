@@ -46,10 +46,24 @@ function change(element: HTMLInputElement | HTMLSelectElement, value: string) {
 }
 
 async function fillTrip(root: HTMLElement, roundTrip: boolean) {
-  await vi.waitFor(() => expect(root.querySelectorAll("#fromId option").length).toBeGreaterThan(1));
-  change(root.querySelector<HTMLSelectElement>("#fromId")!, ORIGIN_LOCATION.id);
-  await vi.waitFor(() => expect(root.querySelectorAll("#toId option").length).toBeGreaterThan(1));
-  change(root.querySelector<HTMLSelectElement>("#toId")!, DESTINATION_LOCATION.id);
+  await vi.waitFor(() => expect(root.querySelector<HTMLInputElement>("#fromId")?.disabled)
+    .toBe(false));
+  const from = root.querySelector<HTMLInputElement>("#fromId")!;
+  act(() => { from.focus(); from.value = ORIGIN_LOCATION.name;
+    from.dispatchEvent(new Event("input", { bubbles: true })); });
+  await vi.waitFor(() => expect(root.querySelector(
+    `[data-location-id="${ORIGIN_LOCATION.id}"]`)).not.toBeNull());
+  act(() => root.querySelector<HTMLButtonElement>(
+    `[data-location-id="${ORIGIN_LOCATION.id}"]`)?.click());
+  await vi.waitFor(() => expect(root.querySelector<HTMLInputElement>("#toId")?.disabled)
+    .toBe(false));
+  const to = root.querySelector<HTMLInputElement>("#toId")!;
+  act(() => { to.focus(); to.value = DESTINATION_LOCATION.name;
+    to.dispatchEvent(new Event("input", { bubbles: true })); });
+  await vi.waitFor(() => expect(root.querySelector(
+    `[data-location-id="${DESTINATION_LOCATION.id}"]`)).not.toBeNull());
+  act(() => root.querySelector<HTMLButtonElement>(
+    `[data-location-id="${DESTINATION_LOCATION.id}"]`)?.click());
   if (roundTrip) {
     act(() => root.querySelector<HTMLInputElement>('.trip-kind input')?.click());
     const date = root.querySelector<HTMLInputElement>("#date")?.value ?? "";

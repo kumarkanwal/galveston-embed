@@ -66,9 +66,10 @@ beforeEach(() => document.body.replaceChildren());
 describe("shuttle trip fields", () => {
   it("renders grouped reachable locations and the business timezone date guard", () => {
     const element = renderTrip();
-    const groups = [...element.querySelectorAll("#fromId optgroup")];
-    expect(groups.map((group) => group.getAttribute("label"))).toEqual(["Airports", "Galveston"]);
-    expect(element.querySelectorAll("#toId option")).toHaveLength(2);
+    act(() => element.querySelector<HTMLInputElement>("#fromId")?.click());
+    const groups = [...element.querySelectorAll(".stop-category")];
+    expect(groups.map((group) => group.textContent?.trim())).toEqual(["🚌Airports›", "🚌Galveston›"]);
+    expect(element.querySelector<HTMLInputElement>("#toId")?.disabled).toBe(true);
     expect(element.querySelector<HTMLInputElement>("#date")?.min).toBe("2026-10-23");
     expect(element.textContent).toContain("Dates and times use America/Chicago");
   });

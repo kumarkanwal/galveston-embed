@@ -2,6 +2,7 @@ import type { LocationGroup } from "../../api/client";
 import { FieldError, FormError } from "../trip/FieldError";
 import { ProgressSteps } from "../trip/ProgressSteps";
 import { PassengerDropdown } from "./PassengerDropdown";
+import { StopPicker } from "./StopPicker";
 import { WidgetHeader } from "../shell/WidgetHeader";
 import type {
   ShuttleTripErrors,
@@ -25,35 +26,6 @@ interface ShuttleTripProps {
   update: <Key extends keyof ShuttleTripForm>(key: Key, value: ShuttleTripForm[Key]) => void;
 }
 
-function GroupedOptions({ groups }: { groups: LocationGroup[] }) {
-  return <>{groups.map((group) => <optgroup label={group.category} key={group.category_id}>
-    {group.locations.map((location) => <option value={location.id} key={location.id}>
-      {location.name}
-    </option>)}
-  </optgroup>)}</>;
-}
-
-function LocationField(props: {
-  disabled: boolean;
-  error: string | undefined;
-  groups: LocationGroup[];
-  id: "fromId" | "toId";
-  label: string;
-  value: string;
-  update: ShuttleTripProps["update"];
-}) {
-  return <div class="field">
-    <label for={props.id}>{props.label}</label>
-    <select id={props.id} disabled={props.disabled} value={props.value}
-      aria-invalid={props.error !== undefined}
-      onChange={(event) => props.update(props.id, event.currentTarget.value)}>
-      <option value="">Select {props.label.toLowerCase()}</option>
-      <GroupedOptions groups={props.groups} />
-    </select>
-    <FieldError id={`${props.id}-error`} message={props.error} />
-  </div>;
-}
-
 export function ShuttleTrip(props: ShuttleTripProps) {
   const steps = ["Trip", "Departures", "Confirm"];
   return <section class="widget">
@@ -62,12 +34,13 @@ export function ShuttleTrip(props: ShuttleTripProps) {
     <ProgressSteps steps={steps} />
     <form class="shuttle-trip" noValidate onSubmit={props.onSubmit}>
       <div class="field-row">
-        <LocationField id="fromId" label="From" groups={props.originGroups}
+        <StopPicker id="fromId" label="From" groups={props.originGroups}
           disabled={props.loadingLocations} value={props.form.fromId}
-          error={props.errors.fromId} update={props.update} />
-        <LocationField id="toId" label="To" groups={props.destinationGroups}
+          error={props.errors.fromId} onChange={(value) => props.update("fromId", value)} />
+        <StopPicker id="toId" label="To" groups={props.destinationGroups}
           disabled={props.form.fromId === "" || props.loadingDestinations}
-          value={props.form.toId} error={props.errors.toId} update={props.update} />
+          value={props.form.toId} error={props.errors.toId}
+          onChange={(value) => props.update("toId", value)} />
       </div>
       <div class="field-row">
         <div class="field"><label for="date">Departure Date</label>
