@@ -123,7 +123,18 @@ describe("shuttle trip compact styling", () => {
   });
 });
 
-describe("shuttle passenger dropdown", () => {
+describe("shuttle passenger dropdown interactions", () => {
+  it("toggles open and closed from the trigger", () => {
+    const element = renderPassengers();
+    const trigger = element.querySelector<HTMLButtonElement>(".passenger-trigger");
+    act(() => trigger?.click());
+    expect(trigger?.getAttribute("aria-expanded")).toBe("false");
+    expect(element.querySelector(".passenger-menu")).toBeNull();
+    act(() => trigger?.click());
+    expect(trigger?.getAttribute("aria-expanded")).toBe("true");
+    expect(element.querySelector(".passenger-menu")).not.toBeNull();
+  });
+
   it("defaults to one adult and updates the closed-state total", () => {
     const element = renderPassengers();
     expect(element.querySelector("#paxAdult")?.textContent).toBe("1");
@@ -134,6 +145,17 @@ describe("shuttle passenger dropdown", () => {
     expect(element.querySelector(".passenger-trigger")?.textContent).toContain("3 passengers");
   });
 
+  it("closes on an outside pointer press", () => {
+    const element = renderPassengers();
+    act(() => {
+      document.body.dispatchEvent(new Event("pointerdown", { bubbles: true, composed: true }));
+    });
+    expect(element.querySelector(".passenger-menu")).toBeNull();
+    expect(element.querySelector(".passenger-trigger")?.getAttribute("aria-expanded")).toBe("false");
+  });
+});
+
+describe("shuttle passenger dropdown limits", () => {
   it("keeps category counters within their schema limits", () => {
     const element = renderPassengers({ form: { ...TRIP, paxAdult: 99 } });
     expect(element.querySelector<HTMLButtonElement>('[aria-label="Increase Adults"]')?.disabled)

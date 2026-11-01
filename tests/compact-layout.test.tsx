@@ -24,7 +24,24 @@ describe("container-width layout", () => {
     expect(containerLayout(319)).toBe("micro");
     expect(containerLayout(320)).not.toBe("micro");
   });
+});
 
+describe("passenger container widths", () => {
+  it.each([
+    [280, true],
+    [320, true],
+    [360, true],
+    [375, true],
+    [414, true],
+    [552, false],
+    [768, false],
+  ] as const)("selects contained passenger geometry at %i px", (width, stacked) => {
+    const layout = containerLayout(width);
+    expect(["micro", "narrow"].includes(layout)).toBe(stacked);
+  });
+});
+
+describe("container resize observation", () => {
   it("updates the rendered class from ResizeObserver rather than viewport width", () => {
     type ObserverCallback = (entries: Array<{ contentRect: { width: number } }>) => void;
     let callback: ObserverCallback = () => undefined;
@@ -90,5 +107,16 @@ describe("compact layout CSS", () => {
     const narrowRules = css.slice(css.indexOf(":is(.layout-narrow"));
     expect(css).toContain("grid-template-columns: minmax(154px, 1.6fr) repeat(2, minmax(89px, 1fr))");
     expect(narrowRules).not.toMatch(/\.party-fields\s*\{[\s\S]*grid-template-columns:\s*1fr;/);
+  });
+});
+
+describe("passenger panel CSS", () => {
+  it("keeps the passenger panel inside its form row with usable steppers", () => {
+    const shuttleCss = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
+    expect(shuttleCss).toMatch(/\.passenger-menu\s*\{[^}]*max-width:\s*calc\(200% \+ 8px\)/s);
+    expect(shuttleCss).toMatch(/\.passenger-menu\s*\{[^}]*right:\s*0;[^}]*width:\s*max-content/s);
+    expect(shuttleCss).toMatch(/\.layout-narrow,[^}]*\.passenger-menu\s*\{[^}]*max-width:\s*100%/s);
+    expect(shuttleCss).toMatch(/\.shuttle-trip-fields,[^}]*\.shuttle-return-fields[^}]*\{\s*grid-template-columns:\s*1fr/s);
+    expect(shuttleCss).toMatch(/\.passenger-row \.counter-controls\s*\{[^}]*40px[^}]*min-height:\s*40px/s);
   });
 });
