@@ -158,23 +158,34 @@
   box-shadow: 0 5px 10px rgb(0 0 0 / 20%);
   display: grid;
   gap: 12px;
-  left: 0;
+  left: auto;
+  max-width: calc(200% + 8px);
+  min-width: 100%;
   padding: 14px;
   position: absolute;
   right: 0;
   top: 58px;
+  width: max-content;
   z-index: 20;
 }
 
 .passenger-row {
   align-items: center;
   display: grid;
-  gap: 12px;
-  grid-template-columns: minmax(80px, 1fr) minmax(130px, 1fr);
+  gap: 8px;
+  grid-template-columns: minmax(64px, 1fr) minmax(120px, 132px);
 }
 
 .passenger-row .counter-controls {
-  min-height: 36px;
+  grid-template-columns: 40px minmax(40px, 1fr) 40px;
+  height: 40px;
+  min-height: 40px;
+  min-width: 120px;
+}
+
+.passenger-row .counter-controls button,
+.passenger-row .counter-controls output {
+  min-width: 40px;
 }
 
 .trip-kind {
@@ -337,6 +348,11 @@
 
 :is(.layout-compact, .layout-narrow, .layout-micro) .passenger-trigger {
   height: 38px;
+}
+
+.layout-micro .passenger-menu {
+  max-width: 100%;
+  width: 100%;
 }
 
 .shuttle-trip .field-note {
