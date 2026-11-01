@@ -1,4 +1,4 @@
-import { useRef, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 import { FieldChevron } from "../shell/FieldChevron";
 import { FieldError } from "../trip/FieldError";
@@ -40,6 +40,7 @@ function passengerLabel(total: number): string {
 
 export function PassengerDropdown(props: PassengerDropdownProps) {
   const [open, setOpen] = useState(false);
+  const dropdown = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const total = props.form.paxAdult + props.form.paxSenior + props.form.paxChild;
   const close = () => { setOpen(false); trigger.current?.focus(); };
@@ -47,7 +48,16 @@ export function PassengerDropdown(props: PassengerDropdownProps) {
     if (event.key !== "Escape" || !open) return;
     event.preventDefault(); close();
   };
-  return <div class="field passenger-dropdown" onKeyDown={keyDown}>
+  useEffect(() => {
+    if (!open) return;
+    const outside = (event: PointerEvent) => {
+      const current = dropdown.current;
+      if (current !== null && !event.composedPath().includes(current)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", outside);
+    return () => document.removeEventListener("pointerdown", outside);
+  }, [open]);
+  return <div class="field passenger-dropdown" onKeyDown={keyDown} ref={dropdown}>
     <label for="passenger-trigger">Passengers</label>
     <button id="passenger-trigger" class="passenger-trigger" type="button" ref={trigger}
       aria-haspopup="dialog" aria-expanded={open} aria-controls="passenger-menu"
