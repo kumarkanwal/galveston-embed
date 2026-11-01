@@ -1,5 +1,6 @@
 # E-20 — Fix passenger picker overflow on narrow screens
 
+**Status:** Implementation complete — browser screenshots unverified
 **Scope:** Widget only.
 
 ## Setup
@@ -91,3 +92,56 @@ Report:
    BRO differences, backend gaps, decisions, and everything unverified.
 
 Then stop.
+
+## Results
+
+### Root cause confirmed before editing
+
+- `src/styles/shuttle.css:155-167` positioned `.passenger-menu` with `left: 0`
+  and `right: 0`, constraining it to the half-width Passengers field.
+- `src/styles/shuttle.css:169-174` required at least 222px of row content before
+  the menu's 28px horizontal padding, wider than that narrow half-column.
+- `src/styles/widget.css:1-16` and `src/styles/widget.css:35-40` clipped horizontal
+  overflow at both the Shadow host and `.widget-root`, cutting off the excess.
+- `src/styles/widget.css:611-614` stacked date grids only in the below-320px
+  micro layout, leaving a roughly 355px widget in the failing two-column layout.
+
+### Implementation
+
+- The passenger panel is right-aligned, never wider than its form row, and uses
+  the full row width in measured `layout-narrow` and `layout-micro` modes.
+- Shuttle Departure Date / Passengers and the round-trip return row stack at the
+  existing measured-container narrow breakpoint (`<440px`, approximately the
+  requested 420px), without viewport media queries.
+- Each passenger stepper reserves 40px for minus, count, and plus. Labels and
+  controls shrink safely without truncating the count.
+- Existing trigger, Escape/focus-return, labels, totals, limits, and E-17
+  minimum behavior are unchanged. Outside pointer presses now close the panel.
+
+## Verification results
+
+- Per implementation commit: focused Vitest, TypeScript, and touched-file ESLint
+  passed.
+- Final focused regression run: 41/41 tests passed across passenger UI,
+  container widths, shuttle minimums, and shuttle validation. Width coverage is
+  280, 320, 360, 375, 414, 552, and 768px.
+- Final full TypeScript and ESLint passed.
+- The full Vitest run passed 35/37 files and 369/379 tests. The 10 failures were
+  the known timing flake in untouched `airport-marker.test.tsx` and
+  `airport-location.test.ts`; both files then passed 13/13 together in
+  isolation. **UNVERIFIED:** a clean single-run full suite without this known
+  flake.
+- Production build and `test:dist` passed. `dist/` contains only `embed.js` and
+  `embed.js.map`.
+- Bundle: 143,216 bytes raw and 41,075 bytes gzip, versus `origin/main` at
+  142,579 bytes raw and 40,939 bytes gzip: +637 raw and +136 gzip. SHA-256:
+  `bef11cc801f3e576308d7ac0de1a1cab31519e25a84d259a4a3744e3c7d60cc9`.
+- **UNVERIFIED:** before/after browser screenshots at 360px and 552px. The
+  in-app browser could not reach the host localhost server, and access to the
+  installed browser was unavailable. No screenshot files were created.
+
+## Comparison, gaps, and decisions
+
+E-20 fixes an embed-width defect without changing the BRO-derived flow, field
+order, labels, passenger rules, pricing, or booking behavior. No dependency,
+backend gap, or architectural decision was introduced.
