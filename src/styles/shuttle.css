@@ -350,7 +350,11 @@
   height: 38px;
 }
 
-.layout-micro .passenger-menu {
+:is(.layout-narrow, .layout-micro) :is(.shuttle-trip-fields, .shuttle-return-fields) {
+  grid-template-columns: 1fr;
+}
+
+:is(.layout-narrow, .layout-micro) .passenger-menu {
   max-width: 100%;
   width: 100%;
 }
