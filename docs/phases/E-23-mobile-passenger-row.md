@@ -1,6 +1,6 @@
 # E-23 — Mobile passenger/luggage layout and passenger popup
 
-**Status:** Spec ready
+**Status:** Implementation complete — browser verification unverified
 **Scope:** Widget only; taxi and shuttle.
 
 ## Setup
@@ -49,3 +49,43 @@ and `test:dist` once.
 Report `git log -6 --oneline`, clean `git status --short`, the push command
 without pushing, and `dist/embed.js` raw/gzip sizes plus SHA-256. Mark browser
 verification **UNVERIFIED** when it was not performed, then stop.
+
+## Results
+
+### Implementation
+
+- Taxi and shuttle now share the same party-field breakpoint: below 480px,
+  Passengers spans a full row and Bags plus Carry-on occupy two equal columns;
+  at 480px and wider, all three controls remain on one line.
+- Passenger trigger text is constrained to one line with ellipsis only when its
+  available width is exhausted.
+- The shuttle passenger popup has an explicit opaque-white class, retained
+  border and shadow, a higher stacking order, and phone sizing constrained to
+  the full trigger width. Its three steppers remain contained at 360px.
+- Existing outside-click, Escape, keyboard, focus, 38px control height, icons,
+  and compact spacing behavior remains unchanged.
+
+### Verification
+
+- Layout commit gate: 43/43 focused tests passed; typecheck and touched-file
+  lint passed.
+- Popup commit gate: 44/44 focused tests passed; typecheck and touched-file
+  lint passed.
+- Final full lint passed. The one full Vitest run passed 35/37 files and
+  384/394 tests; its 10 failures were the documented timing flake in untouched
+  `airport-marker.test.tsx` and `airport-location.test.ts`. Those two files then
+  passed 13/13 together in isolation. **UNVERIFIED:** a clean single-run full
+  suite without the known airport flake.
+- The single production build and `test:dist` passed. `dist/` contains only
+  `embed.js` and `embed.js.map`.
+- Bundle: 145,273 bytes raw and 41,491 bytes gzip. SHA-256:
+  `17b34703dcb25accdf3ca219e41449b498f28d5f79837cb49f43c861186bdaf3`.
+
+### Comparison, gaps, and decisions
+
+- Automated taxi and shuttle DOM/CSS coverage verifies the requested 479px,
+  480px, and 360px behavior. A live phone/browser comparison is
+  **UNVERIFIED**.
+- No backend gap was found; this phase changes presentation only.
+- No decision outside the specification was required, and no dependency was
+  added.
