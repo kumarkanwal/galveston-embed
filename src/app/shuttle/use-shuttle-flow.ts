@@ -228,33 +228,6 @@ async function returnToDepartures(context: FlowContext, message: string) {
   }
 }
 
-async function refreshDepartureDate(
-  context: FlowContext,
-  direction: "outbound" | "return",
-  date: string,
-) {
-  if (context.requestInFlight.current || date === "") return;
-  context.requestInFlight.current = true;
-  context.setState((current) => ({ ...current, notice: null, submitting: true }));
-  try {
-    if (direction === "outbound") {
-      const form = { ...context.state.form, date };
-      const result = await context.client.searchShuttle(buildShuttleSearchQuery(form));
-      context.setState((current) => ({ ...current, form, outbound: null,
-        outboundResult: result, returnLeg: null, returnResult: null, submitting: false }));
-    } else if (context.state.outbound !== null) {
-      const form = { ...context.state.form, returnDate: date };
-      const result = await context.client.searchShuttleReturn(
-        buildReturnQuery(form, context.state.outbound),
-      );
-      context.setState((current) => ({ ...current, form, returnLeg: null,
-        returnResult: result, submitting: false }));
-    }
-  } catch (error: unknown) {
-    context.setState((current) => ({ ...current, notice: errorMessage(error), submitting: false }));
-  } finally { context.requestInFlight.current = false; }
-}
-
 export function useShuttleFlow(client: ShuttleApiClient, business: Business) {
   const [state, setState] = useState(() => initialState(business));
   const requestInFlight = useRef(false);
@@ -277,8 +250,6 @@ export function useShuttleFlow(client: ShuttleApiClient, business: Business) {
     { ...current, confirmation: { customerEmail, paymentMethod, response }, step: "done" }));
   return { back, chooseOutbound: (leg: SelectedShuttleLeg) => chooseOutbound(context, leg),
     chooseReturn: (leg: SelectedShuttleLeg) => chooseReturn(context, leg), complete, selection, state,
-    refreshDate: (direction: "outbound" | "return", date: string) =>
-      refreshDepartureDate(context, direction, date),
     submitTrip: (event: SubmitEvent) => submitTrip(context, event),
     unavailable: (message: string) => returnToDepartures(context, message), update };
 }

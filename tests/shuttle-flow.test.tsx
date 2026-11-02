@@ -45,7 +45,7 @@ function change(element: HTMLInputElement | HTMLSelectElement, value: string) {
   });
 }
 
-async function fillTrip(root: HTMLElement, roundTrip: boolean) {
+async function fillTrip(root: HTMLElement, roundTrip: boolean, returnDate?: string) {
   await vi.waitFor(() => expect(root.querySelector<HTMLInputElement>("#fromId")?.disabled)
     .toBe(false));
   const from = root.querySelector<HTMLInputElement>("#fromId")!;
@@ -64,16 +64,17 @@ async function fillTrip(root: HTMLElement, roundTrip: boolean) {
     `[data-location-id="${DESTINATION_LOCATION.id}"]`)).not.toBeNull());
   act(() => root.querySelector<HTMLButtonElement>(
     `[data-location-id="${DESTINATION_LOCATION.id}"]`)?.click());
+  const tripDate = root.querySelector<HTMLInputElement>("#date")?.value ?? "";
   if (roundTrip) {
     act(() => root.querySelector<HTMLInputElement>('.trip-kind input')?.click());
-    const date = root.querySelector<HTMLInputElement>("#date")?.value ?? "";
-    change(root.querySelector<HTMLInputElement>("#returnDate")!, date);
+    change(root.querySelector<HTMLInputElement>("#returnDate")!, returnDate ?? tripDate);
   }
   act(() => {
     root.querySelector<HTMLFormElement>(".shuttle-trip")
       ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
   });
   await vi.waitFor(() => expect(root.textContent).toContain("Choose Departure"));
+  return tripDate;
 }
 
 function mount(client: ShuttleApiClient) {
@@ -132,7 +133,7 @@ describe("same-page shuttle departures", () => {
 
 });
 
-describe("minimum and private date refresh", () => {
+describe("shuttle minimum handling", () => {
   it("keeps inputs and shows the server minimum error without retrying", async () => {
     const { client } = clientWith();
     client.quoteShuttle = vi.fn(async () => {
@@ -148,23 +149,67 @@ describe("minimum and private date refresh", () => {
     expect(client.quoteShuttle).toHaveBeenCalledOnce();
   });
 
-  it("rechecks private availability when its pickup date changes", async () => {
+});
+
+describe("one-way any-time selection", () => {
+  it("submits the Trip-step date with the leg-level pickup time", async () => {
     const { client } = clientWith([]);
     const option = {
       departure_type: "on_request" as const, route_id: SEARCH_RESULT.route.id,
       vehicle_type_id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
       vehicle_type_name: "Private Van", seat_capacity: 6, from_price: "150.00",
-      effective_min_passengers: 2, service_mode: "private" as const,
+      effective_min_passengers: 1, service_mode: "private" as const,
       pricing: { mode: "fixed_vehicle" as const, tiers: [], fixed_price: "150.00" },
     };
     client.searchShuttle = vi.fn(async () => ({ ...SEARCH_RESULT, departures: [],
       on_request: null, on_request_options: [option] }));
     const root = mount(client);
-    await fillTrip(root, false);
-    change(root.querySelector<HTMLInputElement>('[data-shuttle-date="outbound"]')!, "2026-11-03");
-    await vi.waitFor(() => expect(client.searchShuttle).toHaveBeenCalledTimes(2));
-    expect(client.searchShuttle).toHaveBeenLastCalledWith(expect.objectContaining({
-      date: "2026-11-03",
+    const tripDate = await fillTrip(root, false);
+    expect(root.querySelector('input[type="date"]')).toBeNull();
+    change(root.querySelector<HTMLInputElement>('[data-shuttle-time="outbound"]')!, "12:15");
+    act(() => root.querySelector<HTMLButtonElement>(".any-time-departure button")?.click());
+    await vi.waitFor(() => expect(client.quoteShuttle).toHaveBeenCalledOnce());
+    expect(client.quoteShuttle).toHaveBeenCalledWith(expect.objectContaining({
+      legs: [expect.objectContaining({
+        departure_type: "on_request", pickup_date: tripDate, pickup_time: "12:15",
+        vehicle_type_id: option.vehicle_type_id,
+      })],
     }));
+  });
+});
+
+describe("round-trip any-time selection", () => {
+  it("keeps independent dates, times, and cars for both any-time legs", async () => {
+    const { client } = clientWith([]);
+    const outboundOption = {
+      departure_type: "on_request" as const, route_id: SEARCH_RESULT.route.id,
+      vehicle_type_id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      vehicle_type_name: "Outbound Van", seat_capacity: 6, from_price: "150.00",
+      effective_min_passengers: 1, service_mode: "private" as const,
+    };
+    const returnOption = { ...outboundOption,
+      route_id: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      vehicle_type_id: "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      vehicle_type_name: "Return Van", from_price: "175.00" };
+    client.searchShuttle = vi.fn(async () => ({ ...SEARCH_RESULT, departures: [],
+      on_request: null, on_request_options: [outboundOption] }));
+    client.searchShuttleReturn = vi.fn(async () => ({ ...SEARCH_RESULT,
+      route: { ...SEARCH_RESULT.route, id: returnOption.route_id }, departures: [],
+      on_request: null, on_request_options: [returnOption] }));
+    const root = mount(client);
+    const tripDate = await fillTrip(root, true, "2099-12-31");
+    change(root.querySelector<HTMLInputElement>('[data-shuttle-time="outbound"]')!, "12:15");
+    act(() => root.querySelector<HTMLButtonElement>(".any-time-departure button")?.click());
+    await vi.waitFor(() => expect(root.textContent).toContain("Return Van"));
+    change(root.querySelector<HTMLInputElement>('[data-shuttle-time="return"]')!, "16:45");
+    act(() => root.querySelector<HTMLButtonElement>(
+      ".departure-section.return .any-time-departure button")?.click());
+    await vi.waitFor(() => expect(client.quoteShuttle).toHaveBeenCalledOnce());
+    expect(client.quoteShuttle).toHaveBeenCalledWith(expect.objectContaining({ legs: [
+      expect.objectContaining({ pickup_date: tripDate, pickup_time: "12:15",
+        vehicle_type_id: outboundOption.vehicle_type_id }),
+      expect.objectContaining({ pickup_date: "2099-12-31", pickup_time: "16:45",
+        vehicle_type_id: returnOption.vehicle_type_id }),
+    ] }));
   });
 });

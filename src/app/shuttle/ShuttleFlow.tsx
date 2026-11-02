@@ -43,9 +43,9 @@ export function ShuttleFlow(props: ShuttleFlowProps) {
       loadingReturn={state.outboundResult !== null && state.form.roundTrip
         && state.outbound !== null && state.submitting}
       passengerCount={passengerTotal(state.form)}
+      selectedOutbound={state.outbound} selectedReturn={state.returnLeg}
       onBack={flow.back} onChooseOutbound={(leg) => { void flow.chooseOutbound(leg); }}
-      onChooseReturn={(leg) => { void flow.chooseReturn(leg); }}
-      onDateChange={(direction, date) => { void flow.refreshDate(direction, date); }} />;
+      onChooseReturn={(leg) => { void flow.chooseReturn(leg); }} />;
   }
   return <ShuttleTrip businessName={props.business.name}
     destinationGroups={state.destinationGroups} errors={state.errors}

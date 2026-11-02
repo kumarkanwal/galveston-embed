@@ -2,6 +2,7 @@ export {
   businessDateTimeParts,
   compareWithBusinessNow,
   formatBusinessDateTime,
+  formatBusinessLocalDate,
   formatBusinessLocalDateTime,
   meetsAdvanceBookingRequirement,
 } from "./business-time";

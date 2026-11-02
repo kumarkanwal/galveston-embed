@@ -1,6 +1,6 @@
 # Booking Widget (Embed) — Tracker
 
-**Repo:** `galveston-embed` (new, separate) · **Last updated:** 1 November 2026
+**Repo:** `galveston-embed` (new, separate) · **Last updated:** 2 November 2026
 **Talks to:** the hosted `galveston-backend` API on the VPS.
 **Replaces:** the client's live Book Rides Online (BRO) booking form.
 
@@ -68,7 +68,8 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 23 | E-18 Shuttle stop-picker polish | Widget | — | 🔄 Implementation complete — full-suite rerun pending | — |
 | 24 | E-19 Field click and alignment polish | Widget | — | 🔄 Implementation complete — known airport flake documented | — |
 | 25 | E-20 Passenger picker overflow | Widget | — | 🔄 Implementation complete — browser screenshots unverified | — |
-| 26 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
+| 26 | E-21 Any-time shuttle leg selection | Widget | — | 🔄 Implementation complete — browser verification unverified | — |
+| 27 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
 | | **Total** | | **100%** | | **87%** |
 
 Weights are estimates. E-9 and E-9b were added after the 100% weighting was
@@ -237,6 +238,7 @@ dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 2 Nov 2026 | E-21 implementation complete: removed repeated date controls from shuttle Departures, placed each immutable Trip-step date in its leg title, consolidated one pickup-time picker per any-time leg, rendered server-priced any-time cars as compact full-width Shared/Private rows after fixed departures, and added selected-row, mixed-leg, round-trip, accessibility, and 360px-container coverage. Focused gates, full lint, build, and dist tests pass; the known full-suite airport flake repeated and its two untouched files passed 13/13 alone. Live browser verification is **UNVERIFIED**. |
 | 1 Nov 2026 | E-20 implementation complete: kept the shuttle passenger panel inside the form at 280px and wider, right-aligned it when space is constrained, gave every stepper control a 40px target, stacked departure/passenger and return rows from measured container width below 440px, and restored outside-click closing without changing totals, limits, labels, or E-17 minimums. Focused gates, typecheck, lint, build, and dist tests pass; the known full-suite airport flake repeated and its two untouched files passed 13/13 alone. Browser screenshots are **UNVERIFIED**. |
 | 1 Nov 2026 | E-19 implementation complete: unified native-select and shuttle Passengers arrows with the From/To SVG/divider treatment, added safe whole-field date/time picker clicks, aligned taxi and shuttle date/time grids, widened the taxi passenger column while keeping equal bag controls on one 360px row, contained validation text within grid cells, and made the full shuttle Round trip box toggle with visible focus. Focused gates, full lint, build, and dist tests pass; the known full-suite airport flake repeated and its two untouched files passed 13/13 alone. |
 | 1 Nov 2026 | E-18 implementation complete: made the full shuttle From/To field toggle by mouse and keyboard, replaced field/category glyphs with rotating SVG chevrons, removed bus and stop-row text icons, added clean stop indentation plus selected highlighting/check mark, and compacted the Round trip box. Focused gates, full lint, build and dist checks pass; the one full-test run had 10 failures in two untouched airport test files that passed together in isolation, so a clean full-suite pass remains **UNVERIFIED**. |
