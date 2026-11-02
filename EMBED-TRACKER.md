@@ -69,7 +69,8 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 24 | E-19 Field click and alignment polish | Widget | — | 🔄 Implementation complete — known airport flake documented | — |
 | 25 | E-20 Passenger picker overflow | Widget | — | 🔄 Implementation complete — browser screenshots unverified | — |
 | 26 | E-21 Any-time shuttle leg selection | Widget | — | 🔄 Implementation complete — browser verification unverified | — |
-| 27 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
+| 27 | E-22 Shuttle luggage, zero adults, Trip layout, route labels | Widget | — | 🔄 Implementation complete — browser verification unverified | — |
+| 28 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
 | | **Total** | | **100%** | | **87%** |
 
 Weights are estimates. E-9 and E-9b were added after the 100% weighting was
@@ -83,7 +84,7 @@ dependencies: `AGENTS.md` section 3.
 | S-1 | New repo `galveston-embed` | ✅ | Separate from `galveston-widgets` (old cancelled plugin; leave untouched) |
 | S-2 | **VPS runs the latest backend**, including the pricing migration `f1a2b3c4d5e6` | ✅ | Pricing migration and B-20 are deployed on the preview VPS |
 | S-3 | D-1 (contract v1.2) and B-20 pushed to `origin` | ✅ | B-20 is included in backend commit `7e15a04` |
-| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ | Refreshed from backend commit `f693611a104dd52cf89d728add4c609a795c830c` (including B-48) |
+| S-4 | `openapi.json` and `API_CONTRACT.md` copied byte-for-byte from pushed backend `main` | ✅ with backend docs gap | Refreshed from backend commit `5761a81fa0cf549182cbc54c95b4e641c2ce299d`; OpenAPI includes B-50, but the backend contract prose is still marked through B-49 |
 | S-5 | Demo company API key, named `embed` | ✅ Ready when needed | Runbook: `docs/runbooks/embed-keys.md` (backend) |
 | S-6 | Developer's local address (e.g. `http://localhost:5173`) added to `CORS_ORIGINS` on the VPS | ⛔ Not yet | Otherwise the browser cannot read API responses |
 | S-7 | **Google Maps browser key**, HTTP-referrer restricted to dev address now, client sites later | 🔍 Key available; enable Routes API and restrict it | Must be separate from the server key. Maps JavaScript API, Places API (New), and Routes API are required; never use the server key in the browser |
@@ -155,13 +156,14 @@ dependencies: `AGENTS.md` section 3.
 | A-2 | Promo code | ✅ | E-7a uses B-30 price-breakdown and booking support on Distance and Flat Rate rows. Request-a-Quote vehicles keep ED-009 and do not show the control. |
 | A-3 | Taxi round trip | ✅ | E-8 uses the backend round-trip quote, breakdown and booking fields; return-gap and vehicle availability decisions remain server-owned. |
 | A-4 | Taxi peak / blackout display | ✅ | E-7b displays server peak lines, quote blackouts and booking-time unavailability. |
-| A-5 | Shuttle mode | ✅ | E-9 uses B-38C. E-11 presents outbound and valid return departures on one page, uses one Round trip checkbox and one category-preserving passenger dropdown, and established precise Places suggestions for required addresses. E-12 moves those addresses to B-45's separate per-leg fields. E-17 uses B-48 for shared/private modes, server pricing summaries and effective minimums; private choices use any-time pickup and capacity checks. Its searchable accordion stop pickers retain route-filtered destinations and accessible keyboard behavior. Scheduled cards show time, seats, price, documented `service_label` and the B-38D vehicle name when present; on-request shows `vehicle_type_name`. |
+| A-5 | Shuttle mode | ✅ | E-9 uses B-38C. E-11 presents outbound and valid return departures on one page, uses one Round trip checkbox and one category-preserving passenger dropdown, and established precise Places suggestions for required addresses. E-12 moves those addresses to B-45's separate per-leg fields. E-17 uses B-48 for shared/private modes, server pricing summaries and effective minimums; private choices use any-time pickup and capacity checks. Its searchable accordion stop pickers retain route-filtered destinations and accessible keyboard behavior. E-22 hides internal `service_label` values while retaining server durations and B-38D vehicle names; on-request shows `vehicle_type_name`. |
 | A-6 | Scheduled shuttle car name | ✅ | E-9b shows public `Departure.vehicle_type.name` when present and hides the vehicle row when null, without repurposing `service_label`. |
 | A-7 | Shuttle live-test UI fixes | ✅ | E-11 keeps taxi behavior unchanged while fixing round-trip, same-page departure/return, passenger and required-address UI. |
 | A-8 | Shuttle separate pickup/drop-off addresses | ✅ | E-12 uses B-45 route-side flags, sends precise addresses per booking leg, reverses editable round-trip defaults, keeps quotes address-free, and refreshes Departures after stale availability. |
 | A-9 | Live-test layout, passenger and payment fixes | ✅ | E-13 groups taxi pickup and party controls responsively, always exposes all shuttle passenger categories, and gates Cash/Card by both public method settings and card readiness. |
 | A-10 | Per-pricing-row airport filter | ⏸ | `pricing_row_airports` exists but nothing uses it |
 | A-11 | Production hosting of `embed.js` on the VPS | ⏸ | Behind Caddy. Config only, no host-specific code |
+| A-12 | Shuttle luggage and Trip-step alignment | ✅ | E-22 tracks large and small bags through quote/booking, allows valid zero-adult parties, aligns Trip fields, and hides internal route names while retaining durations. |
 
 ---
 
@@ -225,12 +227,13 @@ dependencies: `AGENTS.md` section 3.
 - **Backend gap — public company phone:** `GET /v1/public/business` has no public company phone field, so an unavailable online-booking message cannot include a contact number.
 - **Backend gap — public payment requirement and configuration consistency:** `GET /v1/public/business` does not publish `require_payment`, and `settings.payment_methods` can contain only `"online"` while `payments.card_available` is false. The widget fails closed when the intersection of configured methods and usable capabilities is empty.
 - **Backend gap — public booking-status endpoint:** no public endpoint lets the widget poll a booking after submission. A successful booking response is therefore final for the widget, and it shows the returned reference immediately without polling.
+- **Backend documentation gap — B-50 shuttle luggage:** backend and deployed `openapi.json` publish `large_bags` / `small_bags` for shuttle quote and booking, but backend `docs/API_CONTRACT.md` is still Version 1.11 through B-49 and does not document those fields.
 - **E-6 deployment:** enable Routes API on the referrer-restricted Maps browser-key project, finish BRO side-by-side verification, configure client-domain CORS, and deploy the reviewed bundle.
 
 ## Sources of truth
 
-- `galveston-backend/docs/API_CONTRACT.md` (commit `f693611a104dd52cf89d728add4c609a795c830c`)
-- `galveston-backend/openapi.json` (commit `f693611a104dd52cf89d728add4c609a795c830c`)
+- `galveston-backend/docs/API_CONTRACT.md` (commit `5761a81fa0cf549182cbc54c95b4e641c2ce299d`)
+- `galveston-backend/openapi.json` (commit `5761a81fa0cf549182cbc54c95b4e641c2ce299d`)
 - `galveston-backend/docs/PROJECT-TRACKER.md`
 - BRO screenshots in this repo
 
@@ -238,6 +241,7 @@ dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 2 Nov 2026 | E-22 implementation complete: refreshed and byte-verified backend B-50, added shuttle Bags/Carry-on through Trip, quote, booking, Confirm, and confirmation, allowed zero adults when another passenger category is non-zero, aligned the Trip rows with a persistent disabled Return Date, and hid internal route names while retaining server durations. Focused gates, full lint, build, and dist tests pass; the known full-suite airport flake repeated and its two untouched files passed 13/13 alone. Recorded that backend contract prose remains at B-49 despite B-50 OpenAPI. Live browser/reference verification is **UNVERIFIED**. |
 | 2 Nov 2026 | E-21 implementation complete: removed repeated date controls from shuttle Departures, placed each immutable Trip-step date in its leg title, consolidated one pickup-time picker per any-time leg, rendered server-priced any-time cars as compact full-width Shared/Private rows after fixed departures, and added selected-row, mixed-leg, round-trip, accessibility, and 360px-container coverage. Focused gates, full lint, build, and dist tests pass; the known full-suite airport flake repeated and its two untouched files passed 13/13 alone. Live browser verification is **UNVERIFIED**. |
 | 1 Nov 2026 | E-20 implementation complete: kept the shuttle passenger panel inside the form at 280px and wider, right-aligned it when space is constrained, gave every stepper control a 40px target, stacked departure/passenger and return rows from measured container width below 440px, and restored outside-click closing without changing totals, limits, labels, or E-17 minimums. Focused gates, typecheck, lint, build, and dist tests pass; the known full-suite airport flake repeated and its two untouched files passed 13/13 alone. Browser screenshots are **UNVERIFIED**. |
 | 1 Nov 2026 | E-19 implementation complete: unified native-select and shuttle Passengers arrows with the From/To SVG/divider treatment, added safe whole-field date/time picker clicks, aligned taxi and shuttle date/time grids, widened the taxi passenger column while keeping equal bag controls on one 360px row, contained validation text within grid cells, and made the full shuttle Round trip box toggle with visible focus. Focused gates, full lint, build, and dist tests pass; the known full-suite airport flake repeated and its two untouched files passed 13/13 alone. |

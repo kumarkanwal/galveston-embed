@@ -1,6 +1,6 @@
 # E-22 — Shuttle luggage, zero adults, trip layout, and departure labels
 
-**Status:** Spec ready
+**Status:** Implementation complete — browser verification unverified
 **Scope:** Widget only.
 
 ## Setup
@@ -124,3 +124,65 @@ Report:
 9. everything unverified, marked **UNVERIFIED**.
 
 Then stop.
+
+## Results
+
+### Implementation
+
+- Refreshed the API contract and generated types byte-for-byte from merged
+  backend B-50 at `5761a81fa0cf549182cbc54c95b4e641c2ce299d`. The fetched and
+  deployed OpenAPI documents both confirm `large_bags` and `small_bags` on
+  shuttle quote and booking requests (`0..99`, default `0`) and responses.
+- Shuttle Trip now reuses the taxi bag icons and steppers, enforces the
+  generated per-field limits plus the public business combined limit, and
+  sends the chosen values in quote and booking requests.
+- Confirm renders the quote-returned bag counts; the final shuttle confirmation
+  renders the booking-returned counts. Taxi confirmation remains unchanged.
+- Adults can reach zero while combined Adults, Seniors, and Children must still
+  total at least one. A zero-adult senior party is retained in search, quote,
+  and booking state.
+- Trip renders From/To, paired Departure/Return dates, one
+  Passengers/Bags/Carry-on row, Round trip, the timezone note, and Find
+  Departures in that order. Return Date remains visible but disabled and grey
+  until Round trip is selected, then becomes required with the existing
+  on-or-after-departure validation.
+- Departures no longer renders the internal `service_label`; fixed and any-time
+  rows retain the server duration, vehicle, seats, mode, and server price.
+
+### Verification
+
+- API refresh gate: 28/28 focused tests passed; typecheck and touched-file lint
+  passed after the generated required fields were added with zero compatibility
+  defaults.
+- Luggage gate: 53/53 focused tests passed; typecheck and touched-file lint
+  passed.
+- Zero-adult gate: 30/30 focused tests passed; typecheck and touched-file lint
+  passed.
+- Layout gate: 46/46 focused tests passed; typecheck and touched-file lint
+  passed.
+- Departure-label gate: 28/28 focused tests passed; typecheck and touched-file
+  lint passed.
+- Final full lint passed. Final full Vitest passed 35/37 files and 382/392
+  tests. The 10 failures were the documented timing flake in untouched
+  `airport-marker.test.tsx` and `airport-location.test.ts`; those two files then
+  passed 13/13 together in isolation. **UNVERIFIED:** a clean single-run full
+  suite without the known airport flake.
+- The single production build and `test:dist` passed. `dist/` contains only
+  `embed.js` and `embed.js.map`.
+- Bundle: 145,217 bytes raw and 41,150 bytes gzip. SHA-256:
+  `d8eed9b2a4912688e342f10b42ff1cce1864ccbef2d1512b857c9541a249a4d6`.
+
+### Comparison, gaps, and decisions
+
+- The repository has no shuttle BRO screenshots. Automated DOM, behavior, CSS,
+  accessibility, and 360px-container regressions pass, but the requested live
+  reference and browser comparison is **UNVERIFIED**.
+- Backend documentation gap: B-50 is present in backend `origin/main`
+  `openapi.json` and the deployed OpenAPI document, but the copied
+  `docs/API_CONTRACT.md` still identifies itself as Version 1.11 through B-49
+  and does not document the shuttle luggage fields. Generated types remain
+  authoritative for this implementation; the backend contract prose needs a
+  follow-up refresh.
+- ED-033 records this specification's explicit override of ED-029's earlier
+  scheduled-card label consequence. No decision outside this specification was
+  required, and no dependency was added.
