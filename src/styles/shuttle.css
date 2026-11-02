@@ -222,6 +222,11 @@
   margin: 12px 0;
 }
 
+.departure-section {
+  min-width: 0;
+  width: 100%;
+}
+
 .departure-section.return {
   border-top: 1px solid var(--border);
   margin-top: 28px;
@@ -282,9 +287,19 @@
   background: #f4f4f4;
 }
 
+.shuttle-departure.selected {
+  background: #f3f7f9;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 1px var(--blue);
+}
+
 .shuttle-departure button:disabled {
   background: var(--muted);
   cursor: not-allowed;
+}
+
+.shuttle-departure button[aria-pressed="true"] {
+  background: var(--blue);
 }
 
 .departure-reason {
@@ -292,22 +307,32 @@
   margin: 0;
 }
 
-.on-request-choice {
-  max-width: 520px;
-  margin: 12px auto;
-  padding: 16px 24px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: #fff;
+.on-request-section {
+  border-top: 1px solid var(--border);
+  margin-top: 16px;
+  min-width: 0;
+  padding-top: 14px;
+  width: 100%;
 }
 
-.on-request-choice + .on-request-choice {
-  margin-top: 12px;
+.on-request-section > h3 {
+  font-size: 17px;
+  margin: 0 0 10px;
 }
 
-.shuttle-price-rule {
-  color: #333333;
-  margin: 6px 0;
+.shuttle-pickup-time {
+  margin: 0 0 12px;
+  max-width: 280px;
+}
+
+.any-time-departures {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+.any-time-departure .form-error {
+  grid-column: 1 / -1;
+  margin: 0;
 }
 
 .shuttle-summary {
@@ -357,6 +382,15 @@
 :is(.layout-narrow, .layout-micro) .passenger-menu {
   max-width: 100%;
   width: 100%;
+}
+
+:is(.layout-narrow, .layout-micro) .shuttle-pickup-time {
+  max-width: none;
+}
+
+:is(.layout-narrow, .layout-micro) .shuttle-departure {
+  gap: 8px;
+  padding: 10px;
 }
 
 .shuttle-trip .field-note {

@@ -135,7 +135,9 @@ function OnRequestTimeField(props: {
 }) {
   const inputId = `${props.direction}-pickup-time`;
   const hintId = `${inputId}-hint`, errorId = `${inputId}-error`;
-  const describedBy = props.error === undefined ? hintId : errorId;
+  const describedBy = props.error === undefined
+    ? props.time === "" ? hintId : undefined
+    : errorId;
   return <div class="field shuttle-pickup-time">
     <label for={inputId}>Pickup time</label>
     <input id={inputId} data-shuttle-time={props.direction} type="time"

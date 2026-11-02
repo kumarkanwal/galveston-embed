@@ -150,6 +150,15 @@ describe("shuttle trip compact styling", () => {
     expect(css).toMatch(/\.trip-kind\s*\{[^}]*min-height:\s*38px/s);
     expect(css).toMatch(/\.trip-kind:focus-within\s*\{[^}]*outline:/s);
   });
+
+  it("keeps fixed and any-time rows full-width in the 360px container layout", () => {
+    const css = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
+    expect(css).toMatch(/\.departure-section\s*\{[^}]*width:\s*100%/s);
+    expect(css).toMatch(/\.on-request-section\s*\{[^}]*width:\s*100%/s);
+    expect(css).toMatch(/\.shuttle-departure\.selected\s*\{[^}]*border-color:\s*var\(--blue\)/s);
+    expect(css).toMatch(/:is\(\.layout-narrow, \.layout-micro\) \.shuttle-departure\s*\{/s);
+    expect(css).not.toContain(".on-request-choice");
+  });
 });
 
 describe("shuttle passenger dropdown interactions", () => {
@@ -296,7 +305,9 @@ describe("on-request shuttle selection", () => {
     const result = { ...SEARCH_RESULT, departures: [], on_request: null,
       on_request_options: [SHARED_OPTION, PRIVATE_OPTION] };
     const element = renderDepartures(result, "outbound", choose, selected);
-    change(element.querySelector<HTMLInputElement>('[data-shuttle-time="outbound"]')!, "12:15");
+    const picker = element.querySelector<HTMLInputElement>('[data-shuttle-time="outbound"]')!;
+    change(picker, "12:15");
+    expect(picker.hasAttribute("aria-describedby")).toBe(false);
     const rows = element.querySelectorAll<HTMLElement>(".any-time-departure");
     expect(rows[1]?.classList.contains("selected")).toBe(true);
     expect(rows[1]?.querySelector("button")?.textContent).toBe("Selected");
