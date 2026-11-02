@@ -25,7 +25,7 @@ import {
 const REQUIRED_SELECTION = {
   trip: { fromId: ORIGIN_LOCATION.id, toId: DESTINATION_LOCATION.id,
     date: "2026-10-30", returnDate: "", roundTrip: false,
-    paxAdult: 1, paxSenior: 0, paxChild: 0 },
+    largeBags: 0, smallBags: 0, paxAdult: 1, paxSenior: 0, paxChild: 0 },
   from: ORIGIN_LOCATION, to: DESTINATION_LOCATION,
   outbound: { kind: "scheduled", date: "2026-10-30", departure: DEPARTURE,
     route: SEARCH_RESULT.route },

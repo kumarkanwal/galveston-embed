@@ -18,6 +18,8 @@ const TRIP: ShuttleTripForm = {
   date: "2026-10-30",
   returnDate: "2026-11-01",
   roundTrip: true,
+  largeBags: 2,
+  smallBags: 1,
   paxAdult: 2,
   paxSenior: 1,
   paxChild: 0,
@@ -74,7 +76,7 @@ describe("shuttle request builders", () => {
         departure_type: "scheduled", schedule_id: DEPARTURE.schedule_id,
         pax_adult: 2, pax_senior: 1, pax_child: 0,
       }],
-      large_bags: 0, small_bags: 0,
+      large_bags: 2, small_bags: 1,
       insurance_selected: false, payment_method: "cash", promo_code: "SAVE10",
     });
     for (const leg of buildShuttleQuote(selection, null).legs) {
@@ -102,7 +104,7 @@ describe("shuttle booking request builder", () => {
     }, null);
     expect(body).toMatchObject({
       payment: { method: "cash" }, insurance_selected: false,
-      large_bags: 0, small_bags: 0,
+      large_bags: 2, small_bags: 1,
       customer: { first_name: "Ada", last_name: "Lovelace",
         email: "ada@example.com", phone: "555-0100" },
       comments: "Dock 2", accepted_terms: true,

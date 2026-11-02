@@ -57,7 +57,8 @@ export function PassengerDropdown(props: PassengerDropdownProps) {
     document.addEventListener("pointerdown", outside);
     return () => document.removeEventListener("pointerdown", outside);
   }, [open]);
-  return <div class="field passenger-dropdown" onKeyDown={keyDown} ref={dropdown}>
+  return <div class="field passenger-dropdown" data-trip-field="passengers"
+    onKeyDown={keyDown} ref={dropdown}>
     <label for="passenger-trigger">Passengers</label>
     <button id="passenger-trigger" class="passenger-trigger" type="button" ref={trigger}
       aria-haspopup="dialog" aria-expanded={open} aria-controls="passenger-menu"

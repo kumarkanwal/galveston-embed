@@ -14,7 +14,8 @@ import { DEPARTURE, LOCATION_GROUPS, SEARCH_RESULT } from "./shuttle-fixtures";
 
 const TRIP: ShuttleTripForm = {
   fromId: "", toId: "", date: "2026-10-30", returnDate: "2026-11-01",
-  roundTrip: false, paxAdult: 1, paxSenior: 0, paxChild: 0,
+  roundTrip: false, largeBags: 0, smallBags: 0,
+  paxAdult: 1, paxSenior: 0, paxChild: 0,
 };
 
 const SHARED_OPTION = {
@@ -48,7 +49,7 @@ function renderTrip() {
   const element = root();
   render(<ShuttleTrip destinationGroups={LOCATION_GROUPS.slice(1)} errors={{}}
     form={TRIP} formError={null} loadingDestinations={false} loadingLocations={false}
-    minimumDate="2026-10-23" originGroups={LOCATION_GROUPS}
+    maximumBags={12} minimumDate="2026-10-23" originGroups={LOCATION_GROUPS}
     submitting={false} timeZone="America/Chicago" onSubmit={() => undefined}
     update={() => undefined} />, element);
   return element;
@@ -133,13 +134,27 @@ describe("shuttle trip fields", () => {
     const element = root();
     render(<ShuttleTrip destinationGroups={LOCATION_GROUPS.slice(1)} errors={{}}
       form={{ ...TRIP, roundTrip: true }} formError={null} loadingDestinations={false}
-      loadingLocations={false} minimumDate="2026-10-23" originGroups={LOCATION_GROUPS}
+      loadingLocations={false} maximumBags={12} minimumDate="2026-10-23"
+      originGroups={LOCATION_GROUPS}
       submitting={false}
       timeZone="America/Chicago" onSubmit={() => undefined} update={update} />, element);
     act(() => element.querySelector<HTMLLabelElement>('.trip-kind')?.click());
     expect(update).toHaveBeenCalledWith("roundTrip", false);
     expect(element.querySelector(".shuttle-return-fields")?.classList.contains("date-time-grid"))
       .toBe(true);
+  });
+});
+
+describe("shuttle luggage fields", () => {
+  it("renders Bags and Carry-on with the taxi stepper controls and icons", () => {
+    const element = renderTrip();
+    const labels = [...element.querySelectorAll(".bag-label")]
+      .map((label) => label.textContent?.trim());
+    expect(labels).toEqual(["Bags", "Carry-on"]);
+    expect(element.querySelectorAll(".bag-icon")).toHaveLength(2);
+    expect(element.querySelectorAll(".bag-counter .counter-controls")).toHaveLength(2);
+    expect(element.querySelector("#largeBags output")?.textContent).toBe("0");
+    expect(element.querySelector("#smallBags output")?.textContent).toBe("0");
   });
 });
 

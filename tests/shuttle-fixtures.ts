@@ -97,8 +97,8 @@ export const SHUTTLE_QUOTE = {
     leg_price: "70.50", schedule_id: DEPARTURE.schedule_id,
     service_mode: "shared", effective_min_passengers: 1,
   }],
-  large_bags: 0,
-  small_bags: 0,
+  large_bags: 2,
+  small_bags: 1,
   line_items: [
     { label: "Adult fare", amount: "38.50", kind: "fare", quantity: 1 },
     { label: "Senior fare", amount: "32.00", kind: "fare", quantity: 1 },
@@ -116,8 +116,8 @@ export const SHUTTLE_BOOKED = {
   status: "confirmed",
   total: "70.50",
   amount_paid: "0.00",
-  large_bags: 0,
-  small_bags: 0,
+  large_bags: 2,
+  small_bags: 1,
   legs: [{ booking_id: "99999999-9999-9999-9999-999999999999", seats_confirmed: 2 }],
   confirmation_email_sent: true,
 } satisfies ShuttleBookingResponse;

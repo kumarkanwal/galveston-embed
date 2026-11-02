@@ -2,11 +2,24 @@ import { FieldError } from "./FieldError";
 import { BAG_COUNT_SCHEMA_LIMIT } from "./limits";
 import type { TripErrors, TripFormState } from "./types";
 
+interface BagCounts {
+  largeBags: number;
+  smallBags: number;
+}
+
+interface BagCountersProps {
+  counts: BagCounts;
+  errors: Partial<Record<keyof BagCounts, string>>;
+  maximum: number;
+  onFieldBlur: (field: keyof BagCounts) => void;
+  onChange: (field: keyof BagCounts, value: number) => void;
+}
+
 interface LuggageCountersProps {
   errors: TripErrors;
   form: TripFormState;
   maximum: number;
-  onFieldBlur: (field: "largeBags" | "smallBags") => void;
+  onFieldBlur: BagCountersProps["onFieldBlur"];
   update: <Key extends keyof TripFormState>(key: Key, value: TripFormState[Key]) => void;
 }
 
@@ -51,19 +64,25 @@ function BagCounter(props: CounterProps) {
   </div>;
 }
 
-export function LuggageCounters(props: LuggageCountersProps) {
-  const total = props.form.largeBags + props.form.smallBags;
+export function BagCounters(props: BagCountersProps) {
+  const total = props.counts.largeBags + props.counts.smallBags;
   const disabledUp = total >= props.maximum;
   return <>
-    <BagCounter accessibleLabel="Check-in / trunk" count={props.form.largeBags}
-      disabledUp={disabledUp || props.form.largeBags >= BAG_COUNT_SCHEMA_LIMIT}
+    <BagCounter accessibleLabel="Check-in / trunk" count={props.counts.largeBags}
+      disabledUp={disabledUp || props.counts.largeBags >= BAG_COUNT_SCHEMA_LIMIT}
       error={props.errors.largeBags} field="largeBags" label="Bags"
       smallIcon={false} onBlur={() => props.onFieldBlur("largeBags")}
-      onChange={(value) => props.update("largeBags", value)} />
-    <BagCounter accessibleLabel="Carry-on" count={props.form.smallBags}
-      disabledUp={disabledUp || props.form.smallBags >= BAG_COUNT_SCHEMA_LIMIT}
+      onChange={(value) => props.onChange("largeBags", value)} />
+    <BagCounter accessibleLabel="Carry-on" count={props.counts.smallBags}
+      disabledUp={disabledUp || props.counts.smallBags >= BAG_COUNT_SCHEMA_LIMIT}
       error={props.errors.smallBags} field="smallBags" label="Carry-on"
       smallIcon onBlur={() => props.onFieldBlur("smallBags")}
-      onChange={(value) => props.update("smallBags", value)} />
+      onChange={(value) => props.onChange("smallBags", value)} />
   </>;
+}
+
+export function LuggageCounters(props: LuggageCountersProps) {
+  return <BagCounters counts={props.form} errors={props.errors} maximum={props.maximum}
+    onFieldBlur={props.onFieldBlur}
+    onChange={(field, value) => props.update(field, value)} />;
 }

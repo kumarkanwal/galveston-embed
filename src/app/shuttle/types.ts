@@ -11,6 +11,8 @@ export interface ShuttleTripForm {
   date: string;
   returnDate: string;
   roundTrip: boolean;
+  largeBags: number;
+  smallBags: number;
   paxAdult: number;
   paxSenior: number;
   paxChild: number;

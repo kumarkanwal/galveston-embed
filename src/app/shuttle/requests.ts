@@ -77,8 +77,8 @@ export function buildShuttleQuote(
   if (selection.returnLeg !== null) legs.push(buildShuttleLeg(selection.returnLeg, selection.trip));
   return {
     legs,
-    large_bags: 0,
-    small_bags: 0,
+    large_bags: selection.trip.largeBags,
+    small_bags: selection.trip.smallBags,
     insurance_selected: false,
     payment_method: paymentMethod,
     ...(promoCode === null ? {} : { promo_code: promoCode }),
@@ -105,8 +105,8 @@ export function buildShuttleBooking(
   });
   return {
     legs,
-    large_bags: 0,
-    small_bags: 0,
+    large_bags: selection.trip.largeBags,
+    small_bags: selection.trip.smallBags,
     insurance_selected: false,
     customer: {
       first_name: form.firstName.trim(), last_name: form.lastName.trim(),

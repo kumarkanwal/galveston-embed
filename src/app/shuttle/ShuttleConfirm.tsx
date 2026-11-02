@@ -73,6 +73,8 @@ function ShuttleSummary(props: { quote: ShuttleQuoteResponse; selection: Shuttle
       <p>{selection.trip.paxAdult} adults
         {selection.trip.paxSenior > 0 ? `, ${selection.trip.paxSenior} seniors` : ""}
         {selection.trip.paxChild > 0 ? `, ${selection.trip.paxChild} children` : ""}</p>
+      <p><span aria-hidden="true">▣ </span>{props.quote.large_bags} check-in
+        <span aria-hidden="true"> · ▫ </span>{props.quote.small_bags} carry-on</p>
       {props.quote.legs.map((leg, index) => <p class="shuttle-leg-info" key={index}>
         {index === 0 ? "Outbound" : "Return"}: {leg.service_mode === "private"
           ? "Private Shuttle" : "Shared Shuttle"} · {formatMoney(leg.leg_price, props.quote.currency)}
