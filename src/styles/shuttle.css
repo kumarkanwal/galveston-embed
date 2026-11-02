@@ -155,12 +155,18 @@
   width: 100%;
 }
 
+.passenger-trigger-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .passenger-trigger[aria-invalid="true"] {
   border-color: var(--error);
 }
 
 .passenger-menu {
-  background: #fff;
   border: 1px solid var(--border);
   box-shadow: 0 5px 10px rgb(0 0 0 / 20%);
   display: grid;
@@ -173,7 +179,11 @@
   right: 0;
   top: 58px;
   width: max-content;
-  z-index: 20;
+  z-index: 1000;
+}
+
+.passenger-menu-solid {
+  background: #fff;
 }
 
 .passenger-row {
@@ -387,7 +397,9 @@
 }
 
 :is(.layout-narrow, .layout-micro) .passenger-menu {
+  left: 0;
   max-width: 100%;
+  right: auto;
   width: 100%;
 }
 

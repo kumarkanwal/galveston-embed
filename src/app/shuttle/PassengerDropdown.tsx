@@ -63,9 +63,10 @@ export function PassengerDropdown(props: PassengerDropdownProps) {
     <button id="passenger-trigger" class="passenger-trigger" type="button" ref={trigger}
       aria-haspopup="dialog" aria-expanded={open} aria-controls="passenger-menu"
       aria-invalid={props.error !== undefined} onClick={() => setOpen((current) => !current)}>
-      {passengerLabel(total)} <FieldChevron open={open} />
+      <span class="passenger-trigger-text">{passengerLabel(total)}</span>
+      <FieldChevron open={open} />
     </button>
-    {open && <div id="passenger-menu" class="passenger-menu" role="dialog"
+    {open && <div id="passenger-menu" class="passenger-menu passenger-menu-solid" role="dialog"
       aria-label="Passenger counts">
       <PassengerCounter field="paxAdult" label="Adults" minimum={0}
         value={props.form.paxAdult} update={props.update} />

@@ -119,11 +119,14 @@ describe("compact layout CSS", () => {
 });
 
 describe("passenger panel CSS", () => {
-  it("keeps the passenger panel inside its form row with usable steppers", () => {
+  it("keeps passenger text on one line and the popup opaque and contained", () => {
     const shuttleCss = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
+    expect(shuttleCss).toMatch(/\.passenger-trigger-text\s*\{[^}]*text-overflow:\s*ellipsis;[^}]*white-space:\s*nowrap/s);
+    expect(shuttleCss).toMatch(/\.passenger-menu-solid\s*\{[^}]*background:\s*#fff/s);
+    expect(shuttleCss).toMatch(/\.passenger-menu\s*\{[^}]*min-width:\s*100%;[^}]*z-index:\s*1000/s);
     expect(shuttleCss).toMatch(/\.passenger-menu\s*\{[^}]*max-width:\s*calc\(200% \+ 8px\)/s);
     expect(shuttleCss).toMatch(/\.passenger-menu\s*\{[^}]*right:\s*0;[^}]*width:\s*max-content/s);
-    expect(shuttleCss).toMatch(/\.layout-narrow,[^}]*\.passenger-menu\s*\{[^}]*max-width:\s*100%/s);
+    expect(shuttleCss).toMatch(/\.layout-narrow,[^}]*\.passenger-menu\s*\{[^}]*left:\s*0;[^}]*max-width:\s*100%;[^}]*width:\s*100%/s);
     expect(shuttleCss).toMatch(/\.shuttle-trip-fields\s*\{\s*grid-template-columns:\s*repeat\(2,/s);
     expect(shuttleCss).toMatch(/\.passenger-row \.counter-controls\s*\{[^}]*40px[^}]*min-height:\s*40px/s);
   });

@@ -216,6 +216,18 @@ describe("shuttle passenger dropdown interactions", () => {
     expect(element.querySelector(".passenger-menu")).not.toBeNull();
   });
 
+  it("keeps all three steppers inside the solid popup", () => {
+    const element = renderPassengers();
+    const popup = element.querySelector(".passenger-menu-solid");
+    expect(popup).not.toBeNull();
+    const steppers = popup?.querySelectorAll(".counter-controls") ?? [];
+    expect(steppers).toHaveLength(3);
+    for (const stepper of steppers) {
+      expect(stepper.querySelectorAll("button")).toHaveLength(2);
+      expect(stepper.querySelector("output")).not.toBeNull();
+    }
+  });
+
   it("allows Adults to reach zero and updates the closed-state total", () => {
     const element = renderPassengers();
     expect(element.querySelector("#paxAdult")?.textContent).toBe("1");
