@@ -1,6 +1,6 @@
 # E-21 — Simplify any-time shuttle leg selection
 
-**Status:** Planned
+**Status:** Implementation complete — browser verification unverified
 **Scope:** Widget only.
 
 ## Setup
@@ -99,3 +99,50 @@ Report:
 9. everything unverified, marked **UNVERIFIED**.
 
 Then stop.
+
+## Results
+
+### Implementation
+
+- Departures now shows the immutable Trip-step date in each leg title and has no
+  date input or date-refresh path.
+- Each any-time leg owns one whole-field pickup-time control. Every vehicle row
+  uses that time while retaining its server-provided earliest-time, minimum-
+  passenger, and private-capacity checks.
+- Fixed departures render before an `Or pick your own time` subsection when
+  both result types exist. Any-time vehicles use the same full-width row layout,
+  selected treatment, button label, and server-formatted price presentation as
+  fixed departures.
+- Outbound and return legs keep separate pickup times, vehicle selections, and
+  the dates chosen on Trip. Quote and return-search requests continue to use the
+  generated API shapes without new fields.
+- Narrow container layouts keep the time field and rows full-width with compact
+  spacing at the existing 360px layout class.
+
+### Verification
+
+- Feature commit: 39/39 focused tests passed across shuttle UI, flow, pricing,
+  minimums, and business-local time formatting; TypeScript and touched-file
+  ESLint passed.
+- Style commit: 19/19 focused UI tests passed; TypeScript and touched-file
+  ESLint passed.
+- Final full ESLint passed.
+- Final full Vitest passed 35/37 files and 373/383 tests. The 10 failures were
+  the documented timing flake in untouched `airport-marker.test.tsx` and
+  `airport-location.test.ts`; those two files then passed 13/13 together in
+  isolation. **UNVERIFIED:** a clean single-run full suite without the known
+  airport flake.
+- The single production build and `test:dist` passed. `dist/` contains only
+  `embed.js` and `embed.js.map`.
+- Bundle: 143,433 bytes raw and 40,758 bytes gzip. SHA-256:
+  `a3186b49bd17ac05970e8346739651c40dbaf8e590a2e80d6c0359afc9cd5fd4`.
+- **UNVERIFIED:** live browser and physical 360px-device verification. Automated
+  behavior and narrow-container CSS regression coverage passed.
+
+### Comparison, gaps, and decisions
+
+BRO screenshots do not cover the newer shuttle any-time/private result model.
+E-21 intentionally replaces the repetitive production cards with the compact
+fixed-row pattern while leaving server prices, result order, passenger rules,
+and request bodies authoritative. No dependency, backend gap, or architectural
+decision was introduced.
