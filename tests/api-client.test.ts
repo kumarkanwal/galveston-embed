@@ -80,12 +80,16 @@ const BOOKED: TaxiBookingResponse = {
 const SHUTTLE_QUOTE: ShuttleQuoteRequest = {
   legs: [{ departure_type: "scheduled", schedule_id: "schedule-1",
     pax_adult: 1, pax_senior: 0, pax_child: 0 }],
+  large_bags: 0,
+  small_bags: 0,
   insurance_selected: false,
   payment_method: "cash",
 };
 
 const SHUTTLE_BOOKING: ShuttleBookingRequest = {
   legs: SHUTTLE_QUOTE.legs,
+  large_bags: 0,
+  small_bags: 0,
   insurance_selected: false,
   customer: { first_name: "Ada", last_name: "Lovelace", email: "ada@example.com" },
   payment: { method: "cash" },

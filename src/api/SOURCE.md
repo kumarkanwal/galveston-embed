@@ -4,11 +4,11 @@
 | Field | Value |
 |---|---|
 | Copied from | `galveston-backend/openapi.json` |
-| Backend commit | `f693611a104dd52cf89d728add4c609a795c830c` |
-| Copied on | `2026-10-31` |
+| Backend commit | `5761a81fa0cf549182cbc54c95b4e641c2ce299d` |
+| Copied on | `2026-11-02` |
 
 Refresh only after a complete backend change is committed and pushed.
 
-This source includes B-48 shuttle service modes, passenger-tier and fixed-vehicle
-pricing summaries, effective minimum passengers, and business logos.
+This source includes B-50 shuttle large-bag and small-bag tracking on quote and
+booking, plus zero-adult passenger support.
 The copied blob was verified byte-for-byte against backend `origin/main`.
