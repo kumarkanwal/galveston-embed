@@ -4,6 +4,7 @@ import {
   businessDateTimeParts,
   compareWithBusinessNow,
   formatBusinessDateTime,
+  formatBusinessLocalDate,
   formatBusinessLocalDateTime,
   meetsAdvanceBookingRequirement,
 } from "../src/time";
@@ -27,6 +28,7 @@ describe("business timezone helpers", () => {
   });
 
   it("formats a stored business-local selection without the visitor timezone", () => {
+    expect(formatBusinessLocalDate("2026-11-04")).toBe("Wed, Nov 4");
     expect(formatBusinessLocalDateTime("2026-10-12", "00:44"))
       .toBe("Monday, October 12, 2026 at 12:44 AM");
   });

@@ -11,9 +11,10 @@ function renderResult(result: ShuttleSearchResult, passengers: number): HTMLElem
   const element = document.createElement("div");
   render(<ShuttleDepartures currency="USD" notice={null} loadingOutbound={false}
     outboundData={{ result, date: "2026-10-30", direction: "outbound" }} returnData={null}
-    loadingReturn={false} passengerCount={passengers} onBack={() => undefined}
+    loadingReturn={false} passengerCount={passengers}
+    selectedOutbound={null} selectedReturn={null} onBack={() => undefined}
     onChooseOutbound={() => undefined} onChooseReturn={() => undefined}
-    onDateChange={() => undefined} />, element);
+  />, element);
   return element;
 }
 
@@ -37,7 +38,7 @@ describe("shuttle passenger limits", () => {
     const element = renderResult({ ...SEARCH_RESULT, departures: [], on_request: null,
       on_request_options: [option] }, 5);
     expect(element.textContent).toContain("This vehicle allows up to 4 passengers.");
-    expect(element.querySelector<HTMLButtonElement>(".on-request-choice button")?.disabled)
+    expect(element.querySelector<HTMLButtonElement>(".any-time-departure button")?.disabled)
       .toBe(true);
   });
 

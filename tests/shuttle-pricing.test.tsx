@@ -30,9 +30,10 @@ function renderOption(value: OnRequestAvailability): HTMLElement {
     on_request_options: [value] };
   render(<ShuttleDepartures currency="USD" notice={null} loadingOutbound={false}
     outboundData={{ result, date: "2026-10-30", direction: "outbound" }} returnData={null}
-    loadingReturn={false} passengerCount={1} onBack={() => undefined}
+    loadingReturn={false} passengerCount={1}
+    selectedOutbound={null} selectedReturn={null} onBack={() => undefined}
     onChooseOutbound={() => undefined} onChooseReturn={() => undefined}
-    onDateChange={() => undefined} />, element);
+  />, element);
   return element;
 }
 
@@ -44,18 +45,18 @@ describe("shuttle pricing presentation", () => {
   });
 
   it.each([[1, "50.00"], [2, "50.00"], [3, "75.00"], [4, "100.00"]])(
-    "shows the server live tier total for %i passengers",
+    "shows the server selection total for %i passengers without a From label",
     (_passengers, total) => {
       const element = renderOption(option(total));
-      expect(element.textContent).toContain("1 passenger $50.00 USD total");
-      expect(element.textContent).toContain("2+ passengers $25.00 USD each");
-      expect(element.textContent).toContain(`Live total: $${total} USD`);
+      expect(element.textContent).toContain(`$${total} USD`);
+      expect(element.textContent).not.toContain("From $");
     },
   );
 
-  it("shows a fixed price per vehicle with capacity", () => {
+  it("shows a fixed server price with capacity in its own column", () => {
     expect(renderOption(option("150.00", true)).textContent)
-      .toContain("$150.00 USD per vehicle (up to 6 passengers)");
+      .toContain("$150.00 USD");
+    expect(renderOption(option("150.00", true)).textContent).toContain("6 seats");
   });
 
   it("uses the server live total without client money arithmetic", () => {
