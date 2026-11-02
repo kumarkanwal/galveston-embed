@@ -54,6 +54,12 @@ describe("shuttle request builders", () => {
     });
   });
 
+  it("keeps a zero-adult senior party in the search request", () => {
+    expect(buildShuttleSearchQuery({ ...TRIP, paxAdult: 0, paxSenior: 1 })).toMatchObject({
+      pax_adult: 0, pax_senior: 1, pax_child: 0,
+    });
+  });
+
   it("identifies scheduled and on-request outbound legs for return search", () => {
     expect(buildReturnQuery(TRIP, SCHEDULED)).toMatchObject({
       date: TRIP.returnDate, outbound_schedule_id: DEPARTURE.schedule_id,

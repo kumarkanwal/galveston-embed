@@ -67,7 +67,7 @@ export function PassengerDropdown(props: PassengerDropdownProps) {
     </button>
     {open && <div id="passenger-menu" class="passenger-menu" role="dialog"
       aria-label="Passenger counts">
-      <PassengerCounter field="paxAdult" label="Adults" minimum={1}
+      <PassengerCounter field="paxAdult" label="Adults" minimum={0}
         value={props.form.paxAdult} update={props.update} />
       <PassengerCounter field="paxSenior" label="Seniors" minimum={0}
         value={props.form.paxSenior} update={props.update} />

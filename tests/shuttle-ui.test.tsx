@@ -188,14 +188,16 @@ describe("shuttle passenger dropdown interactions", () => {
     expect(element.querySelector(".passenger-menu")).not.toBeNull();
   });
 
-  it("defaults to one adult and updates the closed-state total", () => {
+  it("allows Adults to reach zero and updates the closed-state total", () => {
     const element = renderPassengers();
     expect(element.querySelector("#paxAdult")?.textContent).toBe("1");
     expect(element.querySelector<HTMLButtonElement>('[aria-label="Decrease Adults"]')?.disabled)
-      .toBe(true);
+      .toBe(false);
+    act(() => element.querySelector<HTMLButtonElement>('[aria-label="Decrease Adults"]')?.click());
+    expect(element.querySelector("#paxAdult")?.textContent).toBe("0");
     act(() => element.querySelector<HTMLButtonElement>('[aria-label="Increase Adults"]')?.click());
     act(() => element.querySelector<HTMLButtonElement>('[aria-label="Increase Adults"]')?.click());
-    expect(element.querySelector(".passenger-trigger")?.textContent).toContain("3 passengers");
+    expect(element.querySelector(".passenger-trigger")?.textContent).toContain("2 passengers");
   });
 
   it("closes on an outside pointer press", () => {
