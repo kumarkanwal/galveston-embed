@@ -69,7 +69,8 @@ function DepartureRow(props: {
   const rowClass = `shuttle-departure${departure.selectable ? "" : " unavailable"}`
     + `${props.selected ? " selected" : ""}`;
   return <article class={rowClass}>
-    <div><strong>{departureTime(departure)}</strong><span>{departure.service_label}</span>
+    <div><strong>{departureTime(departure)}</strong>
+      <span>{departure.duration_minutes} min</span>
       <span class="shuttle-mode-badge">Shared</span>
       {departure.vehicle_type !== null && <span>Vehicle: {departure.vehicle_type.name}</span>}
     </div>
@@ -180,7 +181,7 @@ function OnRequestRow(props: DepartureSectionProps & {
     <div><strong>{option.vehicle_type_name}</strong>
       <span class="shuttle-mode-badge">{privateService ? "Private" : "Shared"}</span>
     </div>
-    <div><span>{option.seat_capacity} seats</span></div>
+    <div><span>{option.seat_capacity} seats · {props.data.result.route.duration_minutes} min</span></div>
     <strong>{formatMoney(option.from_price, props.currency)}</strong>
     <button type="button" aria-pressed={selected}
       title={props.time === "" ? "Pick a time first" : undefined}

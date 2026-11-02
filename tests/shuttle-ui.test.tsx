@@ -268,12 +268,13 @@ describe("shuttle passenger dropdown limits", () => {
 });
 
 describe("shuttle departures", () => {
-  it("shows time, service label, vehicle name, seats and server price", () => {
+  it("hides the internal route name and shows duration with the public details", () => {
     const hidden = { ...DEPARTURE, schedule_id: "hidden", selectable: false,
       unselectable_reason: "Return must leave later" };
     const element = renderDepartures({ ...SEARCH_RESULT, departures: [DEPARTURE, hidden] });
     expect(element.textContent).toContain("09:30 – 10:30");
-    expect(element.textContent).toContain("Island Express");
+    expect(element.textContent).not.toContain("Island Express");
+    expect(element.textContent).toContain("60 min");
     expect(element.textContent).toContain("Vehicle: Executive Van");
     expect(element.textContent).toContain("4 seats left");
     expect(element.textContent).toContain("$70.50 USD");
@@ -285,7 +286,8 @@ describe("shuttle departures", () => {
   it("hides the scheduled vehicle row when vehicle_type is null", () => {
     const departure = { ...DEPARTURE, vehicle_type: null };
     const element = renderDepartures({ ...SEARCH_RESULT, departures: [departure] });
-    expect(element.textContent).toContain("Island Express");
+    expect(element.textContent).not.toContain("Island Express");
+    expect(element.textContent).toContain("60 min");
     expect(element.textContent).not.toContain("Vehicle:");
   });
 
@@ -319,6 +321,7 @@ describe("on-request shuttle presentation", () => {
     expect(element.textContent).toContain("Private");
     expect(element.textContent).toContain("$38.50 USD");
     expect(element.textContent).toContain("$150.00 USD");
+    expect(element.textContent).toContain("6 seats · 60 min");
     expect(element.textContent).not.toContain("From $");
     for (const button of element.querySelectorAll<HTMLButtonElement>(".any-time-departure button")) {
       expect(button.disabled).toBe(true);
