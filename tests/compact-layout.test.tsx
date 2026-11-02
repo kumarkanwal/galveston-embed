@@ -15,6 +15,8 @@ describe("container-width layout", () => {
     [375, "narrow"],
     [380, "narrow"],
     [430, "narrow"],
+    [479, "narrow"],
+    [480, "compact"],
     [760, "full"],
   ] as const)("uses the %s px container width for the %s class", (width, expected) => {
     expect(containerLayout(width)).toBe(expected);
@@ -77,12 +79,15 @@ describe("compact layout CSS", () => {
     expect(css).toMatch(/\.layout-micro\) \.widget \{[\s\S]*box-shadow: none;[\s\S]*padding: 8px;/);
   });
 
-  it("keeps the compact rows single-line through 320px and stacks below it", () => {
+  it("uses a passenger row plus equal luggage columns below 480px", () => {
     expect(css).toContain(".date-time-grid {");
     expect(css).toContain("grid-template-columns: repeat(2, minmax(0, 1fr))");
     expect(css).toContain("grid-template-columns: minmax(154px, 1.6fr) repeat(2, minmax(89px, 1fr))");
     expect(css).toContain(".layout-micro :is(.date-time-grid, .party-fields)");
-    expect(css).toContain(".layout-micro .party-fields > [data-trip-field=\"passengers\"]");
+    expect(css).toContain(":is(.layout-narrow, .layout-micro) .party-fields");
+    expect(css).toContain(
+      ":is(.layout-narrow, .layout-micro) .party-fields > [data-trip-field=\"passengers\"]",
+    );
   });
 
   it("clips horizontal overflow at both the shadow host and layout root", () => {
@@ -103,10 +108,13 @@ describe("compact layout CSS", () => {
     expect(vehicleCss).toMatch(/\.vehicle-choose,[\s\S]*min-height: 38px;/);
   });
 
-  it("keeps passengers, Bags and Carry-on on one line at 360px", () => {
-    const narrowRules = css.slice(css.indexOf(":is(.layout-narrow"));
-    expect(css).toContain("grid-template-columns: minmax(154px, 1.6fr) repeat(2, minmax(89px, 1fr))");
-    expect(narrowRules).not.toMatch(/\.party-fields\s*\{[\s\S]*grid-template-columns:\s*1fr;/);
+  it("uses the shared party-fields layout for taxi and shuttle", () => {
+    const taxi = readFileSync(resolve("src/app/trip/TripCoreFields.tsx"), "utf8");
+    const shuttle = readFileSync(resolve("src/app/shuttle/Trip.tsx"), "utf8");
+    expect(taxi).toContain('class="compact-row party-fields"');
+    expect(shuttle).toContain('class="compact-row party-fields shuttle-party-fields"');
+    expect(css).toMatch(/:is\(\.layout-narrow, \.layout-micro\) \.party-fields\s*\{[^}]*repeat\(2,/s);
+    expect(css).toMatch(/\.party-fields > \[data-trip-field="passengers"\]\s*\{[^}]*grid-column:\s*1 \/ -1/s);
   });
 });
 

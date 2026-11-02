@@ -5,7 +5,7 @@ export type ContainerLayout = "compact" | "full" | "medium" | "micro" | "narrow"
 
 export function containerLayout(width: number): ContainerLayout {
   if (width < 320) return "micro";
-  if (width < 440) return "narrow";
+  if (width < 480) return "narrow";
   if (width < 740) return "compact";
   if (width <= 760) return "full";
   if (width <= 900) return "medium";

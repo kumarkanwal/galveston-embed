@@ -613,11 +613,11 @@ select[aria-invalid="true"] {
   grid-template-columns: 1fr;
 }
 
-.layout-micro .party-fields {
+:is(.layout-narrow, .layout-micro) .party-fields {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.layout-micro .party-fields > [data-trip-field="passengers"] {
+:is(.layout-narrow, .layout-micro) .party-fields > [data-trip-field="passengers"] {
   grid-column: 1 / -1;
 }
 

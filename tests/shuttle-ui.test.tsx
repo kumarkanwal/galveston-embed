@@ -202,11 +202,6 @@ describe("shuttle trip compact styling", () => {
     expect(css).not.toContain(".on-request-choice");
   });
 
-  it("keeps the shuttle passenger and bag controls on one narrow row", () => {
-    const css = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
-    expect(css).toMatch(/\.layout-narrow \.shuttle-party-fields\s*\{[^}]*repeat\(2,/s);
-    expect(css).toMatch(/\.layout-narrow \.shuttle-party-fields > \[data-trip-field="passengers"\][^{]*\{[^}]*grid-column:\s*auto/s);
-  });
 });
 
 describe("shuttle passenger dropdown interactions", () => {
