@@ -14,7 +14,8 @@ import { DEPARTURE, LOCATION_GROUPS, SEARCH_RESULT } from "./shuttle-fixtures";
 
 const TRIP: ShuttleTripForm = {
   fromId: "", toId: "", date: "2026-10-30", returnDate: "2026-11-01",
-  roundTrip: false, paxAdult: 1, paxSenior: 0, paxChild: 0,
+  roundTrip: false, largeBags: 0, smallBags: 0,
+  paxAdult: 1, paxSenior: 0, paxChild: 0,
 };
 
 const SHARED_OPTION = {
@@ -44,13 +45,21 @@ function change(input: HTMLInputElement, value: string) {
   });
 }
 
+function TripHarness() {
+  const [form, setForm] = useState(TRIP);
+  const update = <Key extends keyof ShuttleTripForm>(key: Key, value: ShuttleTripForm[Key]) => {
+    setForm((current) => ({ ...current, [key]: value }));
+  };
+  return <ShuttleTrip destinationGroups={LOCATION_GROUPS.slice(1)} errors={{}}
+    form={form} formError={null} loadingDestinations={false} loadingLocations={false}
+    maximumBags={12} minimumDate="2026-10-23" originGroups={LOCATION_GROUPS}
+    submitting={false} timeZone="America/Chicago" onSubmit={() => undefined}
+    update={update} />;
+}
+
 function renderTrip() {
   const element = root();
-  render(<ShuttleTrip destinationGroups={LOCATION_GROUPS.slice(1)} errors={{}}
-    form={TRIP} formError={null} loadingDestinations={false} loadingLocations={false}
-    minimumDate="2026-10-23" originGroups={LOCATION_GROUPS}
-    submitting={false} timeZone="America/Chicago" onSubmit={() => undefined}
-    update={() => undefined} />, element);
+  render(<TripHarness />, element);
   return element;
 }
 
@@ -114,18 +123,38 @@ describe("shuttle trip fields", () => {
     expect(unpriced.querySelector(".passenger-trigger .field-chevron svg")).not.toBeNull();
     expect(unpriced.querySelector(".passenger-trigger")?.textContent).not.toContain("▾");
   });
+});
 
-  it("uses one unchecked Round trip checkbox and no trip-type radios", () => {
+describe("shuttle trip layout", () => {
+  it("orders locations, dates, party controls, Round trip, note, and action", () => {
+    const form = renderTrip().querySelector<HTMLFormElement>(".shuttle-trip");
+    const children = [...(form?.children ?? [])];
+    expect(children[0]?.querySelector("#fromId")).not.toBeNull();
+    expect(children[0]?.querySelector("#toId")).not.toBeNull();
+    expect(children[1]?.querySelector("#date")).not.toBeNull();
+    expect(children[1]?.querySelector("#returnDate")).not.toBeNull();
+    expect(children[2]?.classList.contains("shuttle-party-fields")).toBe(true);
+    expect(children[3]?.classList.contains("trip-kind")).toBe(true);
+    expect(children[4]?.classList.contains("field-note")).toBe(true);
+    expect(children[5]?.textContent).toContain("Find Departures");
+  });
+
+  it("keeps Return Date disabled until Round trip is checked", () => {
     const element = renderTrip();
     const checkbox = element.querySelector<HTMLInputElement>('.trip-kind input[type="checkbox"]');
+    const returnDate = element.querySelector<HTMLInputElement>("#returnDate");
     expect(checkbox?.checked).toBe(false);
     expect(element.querySelectorAll('.trip-kind input[type="checkbox"]')).toHaveLength(1);
     expect(element.querySelector('.trip-kind input[type="radio"]')).toBeNull();
-    expect(element.querySelector("#returnDate")).toBeNull();
+    expect(returnDate?.disabled).toBe(true);
+    expect(returnDate?.required).toBe(false);
+    expect(returnDate?.min).toBe(TRIP.date);
     expect(element.querySelector(".shuttle-trip-fields")?.classList.contains("date-time-grid"))
       .toBe(true);
     act(() => element.querySelector<HTMLLabelElement>(".trip-kind")?.click());
     expect(checkbox?.checked).toBe(true);
+    expect(returnDate?.disabled).toBe(false);
+    expect(returnDate?.required).toBe(true);
   });
 
   it("sends false when Round trip is unchecked", () => {
@@ -133,13 +162,26 @@ describe("shuttle trip fields", () => {
     const element = root();
     render(<ShuttleTrip destinationGroups={LOCATION_GROUPS.slice(1)} errors={{}}
       form={{ ...TRIP, roundTrip: true }} formError={null} loadingDestinations={false}
-      loadingLocations={false} minimumDate="2026-10-23" originGroups={LOCATION_GROUPS}
+      loadingLocations={false} maximumBags={12} minimumDate="2026-10-23"
+      originGroups={LOCATION_GROUPS}
       submitting={false}
       timeZone="America/Chicago" onSubmit={() => undefined} update={update} />, element);
     act(() => element.querySelector<HTMLLabelElement>('.trip-kind')?.click());
     expect(update).toHaveBeenCalledWith("roundTrip", false);
-    expect(element.querySelector(".shuttle-return-fields")?.classList.contains("date-time-grid"))
-      .toBe(true);
+    expect(element.querySelector<HTMLInputElement>("#returnDate")?.disabled).toBe(false);
+  });
+});
+
+describe("shuttle luggage fields", () => {
+  it("renders Bags and Carry-on with the taxi stepper controls and icons", () => {
+    const element = renderTrip();
+    const labels = [...element.querySelectorAll(".bag-label")]
+      .map((label) => label.textContent?.trim());
+    expect(labels).toEqual(["Bags", "Carry-on"]);
+    expect(element.querySelectorAll(".bag-icon")).toHaveLength(2);
+    expect(element.querySelectorAll(".bag-counter .counter-controls")).toHaveLength(2);
+    expect(element.querySelector("#largeBags output")?.textContent).toBe("0");
+    expect(element.querySelector("#smallBags output")?.textContent).toBe("0");
   });
 });
 
@@ -159,6 +201,12 @@ describe("shuttle trip compact styling", () => {
     expect(css).toMatch(/:is\(\.layout-narrow, \.layout-micro\) \.shuttle-departure\s*\{/s);
     expect(css).not.toContain(".on-request-choice");
   });
+
+  it("keeps the shuttle passenger and bag controls on one narrow row", () => {
+    const css = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
+    expect(css).toMatch(/\.layout-narrow \.shuttle-party-fields\s*\{[^}]*repeat\(2,/s);
+    expect(css).toMatch(/\.layout-narrow \.shuttle-party-fields > \[data-trip-field="passengers"\][^{]*\{[^}]*grid-column:\s*auto/s);
+  });
 });
 
 describe("shuttle passenger dropdown interactions", () => {
@@ -173,14 +221,16 @@ describe("shuttle passenger dropdown interactions", () => {
     expect(element.querySelector(".passenger-menu")).not.toBeNull();
   });
 
-  it("defaults to one adult and updates the closed-state total", () => {
+  it("allows Adults to reach zero and updates the closed-state total", () => {
     const element = renderPassengers();
     expect(element.querySelector("#paxAdult")?.textContent).toBe("1");
     expect(element.querySelector<HTMLButtonElement>('[aria-label="Decrease Adults"]')?.disabled)
-      .toBe(true);
+      .toBe(false);
+    act(() => element.querySelector<HTMLButtonElement>('[aria-label="Decrease Adults"]')?.click());
+    expect(element.querySelector("#paxAdult")?.textContent).toBe("0");
     act(() => element.querySelector<HTMLButtonElement>('[aria-label="Increase Adults"]')?.click());
     act(() => element.querySelector<HTMLButtonElement>('[aria-label="Increase Adults"]')?.click());
-    expect(element.querySelector(".passenger-trigger")?.textContent).toContain("3 passengers");
+    expect(element.querySelector(".passenger-trigger")?.textContent).toContain("2 passengers");
   });
 
   it("closes on an outside pointer press", () => {
@@ -218,12 +268,13 @@ describe("shuttle passenger dropdown limits", () => {
 });
 
 describe("shuttle departures", () => {
-  it("shows time, service label, vehicle name, seats and server price", () => {
+  it("hides the internal route name and shows duration with the public details", () => {
     const hidden = { ...DEPARTURE, schedule_id: "hidden", selectable: false,
       unselectable_reason: "Return must leave later" };
     const element = renderDepartures({ ...SEARCH_RESULT, departures: [DEPARTURE, hidden] });
     expect(element.textContent).toContain("09:30 – 10:30");
-    expect(element.textContent).toContain("Island Express");
+    expect(element.textContent).not.toContain("Island Express");
+    expect(element.textContent).toContain("60 min");
     expect(element.textContent).toContain("Vehicle: Executive Van");
     expect(element.textContent).toContain("4 seats left");
     expect(element.textContent).toContain("$70.50 USD");
@@ -235,7 +286,8 @@ describe("shuttle departures", () => {
   it("hides the scheduled vehicle row when vehicle_type is null", () => {
     const departure = { ...DEPARTURE, vehicle_type: null };
     const element = renderDepartures({ ...SEARCH_RESULT, departures: [departure] });
-    expect(element.textContent).toContain("Island Express");
+    expect(element.textContent).not.toContain("Island Express");
+    expect(element.textContent).toContain("60 min");
     expect(element.textContent).not.toContain("Vehicle:");
   });
 
@@ -269,6 +321,7 @@ describe("on-request shuttle presentation", () => {
     expect(element.textContent).toContain("Private");
     expect(element.textContent).toContain("$38.50 USD");
     expect(element.textContent).toContain("$150.00 USD");
+    expect(element.textContent).toContain("6 seats · 60 min");
     expect(element.textContent).not.toContain("From $");
     for (const button of element.querySelectorAll<HTMLButtonElement>(".any-time-departure button")) {
       expect(button.disabled).toBe(true);

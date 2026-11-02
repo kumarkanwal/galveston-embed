@@ -5,12 +5,31 @@ Stack: FastAPI (Python) · PostgreSQL · Square payments
 Base URL: `https://api.<domain>.com/v1`
 Consumers: Booking-form embeds (taxi and shuttle)
 
-**Version 1.10** — generated from the implemented schemas, routers, services and
-`openapi.json` through B-48. This document covers the public surface and the B-48,
-B-46, B-45, B-44, B-43, B-42 and B-41 admin additions below; older admin endpoints
+**Version 1.11** — generated from the implemented schemas, routers, services and
+`openapi.json` through B-49. This document covers the public surface and the B-49,
+B-48, B-46, B-45, B-44, B-43, B-42 and B-41 admin additions below; older admin endpoints
 remain defined by OpenAPI.
 
 ---
+
+## B-49 shuttle readiness and admin booking contracts
+
+Changes: immediate weekly departure materialization, multi-car any-time service, admin-grant
+route sharing, explicit widget readiness, and server-priced F-46 reservation contracts.
+
+- `GET /admin/routes/{route_id}/readiness` and each admin route result expose
+  `visible_on_widget` plus stable configuration reason codes.
+- `GET /admin/schedules` accepts passenger-mix query parameters and returns `service_mode`,
+  `effective_min_passengers`, and an authoritative price summary.
+- `POST /admin/routes/{route_id}/vehicle-types/quote` accepts local pickup date/time and passenger
+  counts and returns authoritative per-car any-time prices and effective minimums.
+- Shuttle reservation detail exposes the snapshotted `journey.service_mode`; it is not inferred
+  from current route configuration.
+- Weekly templates are shared-car only and materialize 180 days immediately. Private cars remain
+  any-time. Any-time routes may offer multiple independently priced shared/private cars.
+
+See `docs/phases/B-49-diagnosis.md` for production root causes and
+`docs/phases/B-49-progress.md` for the verification and F-47 handoff.
 
 ## B-48 shuttle modes, passenger pricing, minimums, and admin lifecycle
 

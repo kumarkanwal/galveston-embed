@@ -101,9 +101,9 @@ contain BRO bugs and features we dropped. The phase spec says what to keep.
 
 Taxi and shuttle endpoint families never mix. Their request/state modules stay
 separate while contact fields, promo presentation, server-line rendering,
-errors and idempotency may be shared. Scheduled shuttle cards render
-`service_label` as documented service text and, when B-38D's nullable
-`vehicle_type` is present, render its `name` as the vehicle display text.
+errors and idempotency may be shared. Scheduled shuttle cards hide the internal
+`service_label`; when B-38D's nullable `vehicle_type` is present, they render its
+`name` as the vehicle display text and retain the server-provided duration.
 Shuttle passenger categories remain separate request counts inside one dropdown.
 Each search result's `route.from_requires_address` and
 `route.to_requires_address` flags control separate precise Places pickup and

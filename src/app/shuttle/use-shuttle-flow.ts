@@ -14,6 +14,7 @@ import type {
 import { ApiError } from "../../api/errors";
 import { businessDateTimeParts } from "../../time";
 import { paymentAvailability } from "../confirm/payment";
+import { BAG_COUNT_SCHEMA_LIMIT } from "../trip/limits";
 import { buildReturnQuery, buildShuttleQuote, buildShuttleSearchQuery } from "./requests";
 import { isShuttleAvailabilityError, SHUTTLE_UNAVAILABLE_MESSAGE } from "./availability";
 import { minimumPassengerError } from "./minimum";
@@ -52,8 +53,8 @@ interface ShuttleFlowState {
 function initialForm(business: Business): ShuttleTripForm {
   const date = businessDateTimeParts(new Date(), business.timezone).date;
   return {
-    date, fromId: "", paxAdult: 1, paxChild: 0, paxSenior: 0,
-    returnDate: "", roundTrip: false, toId: "",
+    date, fromId: "", largeBags: 0, paxAdult: 1, paxChild: 0, paxSenior: 0,
+    returnDate: "", roundTrip: false, smallBags: 0, toId: "",
   };
 }
 
@@ -90,6 +91,7 @@ function selectedTrip(state: ShuttleFlowState, returnLeg: SelectedShuttleLeg | n
 type SetFlowState = Dispatch<StateUpdater<ShuttleFlowState>>;
 interface FlowContext {
   client: ShuttleApiClient;
+  maximumBags: number;
   minimumDate: string;
   paymentMethod: PaymentMethod;
   requestInFlight: { current: boolean };
@@ -139,7 +141,9 @@ async function updateTrip<Key extends keyof ShuttleTripForm>(
 async function submitTrip(context: FlowContext, event: SubmitEvent) {
   event.preventDefault();
   if (context.requestInFlight.current) return;
-  const errors = validateShuttleTrip(context.state.form, context.minimumDate);
+  const errors = validateShuttleTrip(
+    context.state.form, context.minimumDate, context.maximumBags,
+  );
   if (hasShuttleTripErrors(errors)) {
     context.setState((current) => ({ ...current, errors })); return;
   }
@@ -234,7 +238,13 @@ export function useShuttleFlow(client: ShuttleApiClient, business: Business) {
   useLocations(client, setState);
   const minimumDate = businessDateTimeParts(new Date(), business.timezone).date;
   const paymentMethod = paymentAvailability(business).defaultMethod ?? "cash";
-  const context = { client, minimumDate, paymentMethod, requestInFlight, setState, state };
+  const maximumBags = Math.min(
+    business.max_luggage ?? BAG_COUNT_SCHEMA_LIMIT * 2,
+    BAG_COUNT_SCHEMA_LIMIT * 2,
+  );
+  const context = {
+    client, maximumBags, minimumDate, paymentMethod, requestInFlight, setState, state,
+  };
   const update = <Key extends keyof ShuttleTripForm>(
     key: Key,
     value: ShuttleTripForm[Key],
@@ -249,7 +259,8 @@ export function useShuttleFlow(client: ShuttleApiClient, business: Business) {
   ) => setState((current) => (
     { ...current, confirmation: { customerEmail, paymentMethod, response }, step: "done" }));
   return { back, chooseOutbound: (leg: SelectedShuttleLeg) => chooseOutbound(context, leg),
-    chooseReturn: (leg: SelectedShuttleLeg) => chooseReturn(context, leg), complete, selection, state,
+    chooseReturn: (leg: SelectedShuttleLeg) => chooseReturn(context, leg), complete, maximumBags,
+    selection, state,
     submitTrip: (event: SubmitEvent) => submitTrip(context, event),
     unavailable: (message: string) => returnToDepartures(context, message), update };
 }

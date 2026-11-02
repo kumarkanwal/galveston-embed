@@ -97,14 +97,18 @@ describe("same-page shuttle departures", () => {
     expect(root.querySelector(".departure-section.return")).toBeNull();
 
     act(() => root.querySelectorAll<HTMLButtonElement>(".departure-section.outbound button")[0]?.click());
-    await vi.waitFor(() => expect(root.textContent).toContain("Return for first"));
-    expect(root.querySelector(".departure-section.outbound")).not.toBeNull();
-    expect(root.querySelector(".departure-section.return")).not.toBeNull();
+    await vi.waitFor(() => expect(root.querySelector(".departure-section.return")).not.toBeNull());
+    expect(searchShuttleReturn).toHaveBeenLastCalledWith(expect.objectContaining(
+      { outbound_schedule_id: DEPARTURE.schedule_id },
+    ));
+    expect(root.textContent).not.toContain("Return for first");
 
     act(() => root.querySelectorAll<HTMLButtonElement>(".departure-section.outbound button")[1]?.click());
     await vi.waitFor(() => expect(searchShuttleReturn).toHaveBeenCalledTimes(2));
-    await vi.waitFor(() => expect(root.textContent).toContain("Return for second"));
-    expect(root.textContent).not.toContain("Return for first");
+    expect(searchShuttleReturn).toHaveBeenLastCalledWith(expect.objectContaining(
+      { outbound_schedule_id: second.schedule_id },
+    ));
+    expect(root.textContent).not.toContain("Return for second");
     expect(client.quoteShuttle).not.toHaveBeenCalled();
   });
 

@@ -57,7 +57,8 @@ export function PassengerDropdown(props: PassengerDropdownProps) {
     document.addEventListener("pointerdown", outside);
     return () => document.removeEventListener("pointerdown", outside);
   }, [open]);
-  return <div class="field passenger-dropdown" onKeyDown={keyDown} ref={dropdown}>
+  return <div class="field passenger-dropdown" data-trip-field="passengers"
+    onKeyDown={keyDown} ref={dropdown}>
     <label for="passenger-trigger">Passengers</label>
     <button id="passenger-trigger" class="passenger-trigger" type="button" ref={trigger}
       aria-haspopup="dialog" aria-expanded={open} aria-controls="passenger-menu"
@@ -66,7 +67,7 @@ export function PassengerDropdown(props: PassengerDropdownProps) {
     </button>
     {open && <div id="passenger-menu" class="passenger-menu" role="dialog"
       aria-label="Passenger counts">
-      <PassengerCounter field="paxAdult" label="Adults" minimum={1}
+      <PassengerCounter field="paxAdult" label="Adults" minimum={0}
         value={props.form.paxAdult} update={props.update} />
       <PassengerCounter field="paxSenior" label="Seniors" minimum={0}
         value={props.form.paxSenior} update={props.update} />

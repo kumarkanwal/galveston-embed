@@ -13,6 +13,13 @@
   align-items: start;
 }
 
+.shuttle-trip #returnDate:disabled {
+  background: #f3f3f3;
+  color: var(--muted);
+  cursor: not-allowed;
+  opacity: 1;
+}
+
 .stop-field {
   position: relative;
 }
@@ -375,8 +382,16 @@
   height: 38px;
 }
 
-:is(.layout-narrow, .layout-micro) :is(.shuttle-trip-fields, .shuttle-return-fields) {
-  grid-template-columns: 1fr;
+:is(.layout-narrow, .layout-micro) .shuttle-trip-fields {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.layout-narrow .shuttle-party-fields {
+  grid-template-columns: minmax(120px, 1.4fr) repeat(2, minmax(80px, 1fr));
+}
+
+.layout-narrow .shuttle-party-fields > [data-trip-field="passengers"] {
+  grid-column: auto;
 }
 
 :is(.layout-narrow, .layout-micro) .passenger-menu {

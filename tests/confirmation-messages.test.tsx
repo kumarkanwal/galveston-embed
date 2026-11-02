@@ -73,4 +73,14 @@ describe.each([
     act(() => root.querySelector<HTMLButtonElement>(".confirmation-reference button")?.click());
     await vi.waitFor(() => expect(writeText).toHaveBeenCalledWith(response.order_number));
   });
+
+  it("shows Bags and Carry-on only for shuttle responses", () => {
+    const root = mount(response, "cash", false);
+    if (_mode === "shuttle") {
+      expect(root.querySelector(".confirmation-luggage")?.textContent)
+        .toContain("2 check-in · ▫ 1 carry-on");
+    } else {
+      expect(root.querySelector(".confirmation-luggage")).toBeNull();
+    }
+  });
 });

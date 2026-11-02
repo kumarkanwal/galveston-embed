@@ -74,7 +74,8 @@ const BOOKED = { order_id: "order-1", order_number: "HVT-1", status: "requested"
 
 const SELECTION = { trip: { fromId: ORIGIN_LOCATION.id, toId: DESTINATION_LOCATION.id,
   date: "2026-10-30", returnDate: "2026-11-01", roundTrip: false,
-  paxAdult: 1, paxSenior: 1, paxChild: 0 }, from: ORIGIN_LOCATION,
+  largeBags: 0, smallBags: 0, paxAdult: 1, paxSenior: 1, paxChild: 0 },
+  from: ORIGIN_LOCATION,
   to: { ...DESTINATION_LOCATION, requires_address: false },
   outbound: { kind: "scheduled", date: "2026-10-30", departure: DEPARTURE,
     route: { ...SEARCH_RESULT.route, from_requires_address: false,

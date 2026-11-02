@@ -203,3 +203,9 @@ Date: 2026-10-30 · Status: accepted (supersedes the email-wording part of ED-02
 Decision: every successful taxi or shuttle booking response immediately shows the booking reference and requested-booking wording; Card adds only that payment was submitted.
 Why: a successful public booking response is the widget's final state. The widget has no public status endpoint to poll, and the public business config has no email-enabled capability flag.
 Consequences: never show `Payment processing` after success and never poll. Never promise an email from `confirmation_email_sent`; add that sentence only if a future public business capability explicitly enables it.
+
+## ED-033 — Shuttle departure cards hide internal route labels
+Date: 2026-11-02 · Status: accepted (supersedes the scheduled-card label consequence of ED-029)
+Decision: do not render `Departure.service_label` on the customer-facing Departures step; retain the server duration and public vehicle, mode, seat, and price details.
+Why: the value is an internal route label, not customer-facing trip information, and exposed internal naming made the departure rows diverge from the approved shuttle reference.
+Consequences: fixed and return rows never display `service_label`; on-request rows remain identified by `vehicle_type_name`. The widget does not rename or derive a replacement route label.

@@ -2817,6 +2817,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/routes/{route_id}/vehicle-types/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Quote Route Vehicle Types
+         * @description Price every active any-time car for a local date, time, and party.
+         */
+        post: operations["quote_route_vehicle_types_v1_admin_routes__route_id__vehicle_types_quote_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/routes/{route_id}/departure-templates": {
         parameters: {
             query?: never;
@@ -3156,7 +3176,7 @@ export interface paths {
         };
         /**
          * List Routes
-         * @description List scoped directed routes with their configured passenger fares.
+         * @description List scoped directed routes with prices and readiness.
          */
         get: operations["list_routes_v1_admin_routes_get"];
         put?: never;
@@ -3197,6 +3217,26 @@ export interface paths {
          * @description Edit route endpoints, duration, or customer-facing service label.
          */
         patch: operations["update_route_v1_admin_routes__route_id__patch"];
+        trace?: never;
+    };
+    "/v1/admin/routes/{route_id}/readiness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Route Readiness
+         * @description Explain why a configured route is or is not visible on public widgets.
+         */
+        get: operations["get_route_readiness_v1_admin_routes__route_id__readiness_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/admin/routes/{route_id}/deactivate": {
@@ -3290,7 +3330,7 @@ export interface paths {
         put?: never;
         /**
          * Reverse Route
-         * @description Create the mirror direction and optionally copy fares as a starting point.
+         * @description Create the mirror direction and optionally copy its fares.
          */
         post: operations["reverse_route_v1_admin_routes__route_id__reverse_post"];
         delete?: never;
@@ -4437,6 +4477,32 @@ export interface components {
          */
         AdminRole: "owner" | "manager" | "dispatcher" | "driver";
         /**
+         * AdminShuttlePriceSummary
+         * @description One server-owned leg price for an explicit passenger mix.
+         */
+        AdminShuttlePriceSummary: {
+            /** Pax Senior */
+            pax_senior: number;
+            /** Pax Adult */
+            pax_adult: number;
+            /** Pax Child */
+            pax_child: number;
+            /** Prices By Type */
+            prices_by_type: {
+                [key: string]: string;
+            };
+            /** From Price */
+            from_price: string;
+            /** Fare Total */
+            fare_total: string;
+            /** Peak Increase Pct */
+            peak_increase_pct: string;
+            /** Peak Increase Amount */
+            peak_increase_amount: string;
+            /** Total */
+            total: string;
+        };
+        /**
          * AffectedRoute
          * @description An active route hidden when its endpoint location is deactivated.
          */
@@ -5071,6 +5137,16 @@ export interface components {
         BookingRequest: {
             /** Legs */
             legs: components["schemas"]["BookingLegRequest"][];
+            /**
+             * Large Bags
+             * @default 0
+             */
+            large_bags: number;
+            /**
+             * Small Bags
+             * @default 0
+             */
+            small_bags: number;
             customer: components["schemas"]["CustomerDetails"];
             payment: components["schemas"]["PaymentDetails"];
             /**
@@ -5111,6 +5187,10 @@ export interface components {
             total: string;
             /** Amount Paid */
             amount_paid: string;
+            /** Large Bags */
+            large_bags: number;
+            /** Small Bags */
+            small_bags: number;
             /** Legs */
             legs: components["schemas"]["BookedLeg"][];
             /** Confirmation Email Sent */
@@ -7580,9 +7660,17 @@ export interface components {
         Envelope_RouteDeactivationResult_: {
             data: components["schemas"]["RouteDeactivationResult"];
         };
+        /** Envelope[RouteReadinessResult] */
+        Envelope_RouteReadinessResult_: {
+            data: components["schemas"]["RouteReadinessResult"];
+        };
         /** Envelope[RouteResult] */
         Envelope_RouteResult_: {
             data: components["schemas"]["RouteResult"];
+        };
+        /** Envelope[RouteVehicleQuoteResult] */
+        Envelope_RouteVehicleQuoteResult_: {
+            data: components["schemas"]["RouteVehicleQuoteResult"];
         };
         /** Envelope[RouteVehicleTypesResult] */
         Envelope_RouteVehicleTypesResult_: {
@@ -9999,6 +10087,16 @@ export interface components {
             /** Legs */
             legs: components["schemas"]["QuoteLegRequest"][];
             /**
+             * Large Bags
+             * @default 0
+             */
+            large_bags: number;
+            /**
+             * Small Bags
+             * @default 0
+             */
+            small_bags: number;
+            /**
              * Insurance Selected
              * @default false
              */
@@ -10015,6 +10113,10 @@ export interface components {
         QuoteResponse: {
             /** Legs */
             legs: components["schemas"]["QuoteLeg"][];
+            /** Large Bags */
+            large_bags: number;
+            /** Small Bags */
+            small_bags: number;
             /** Subtotal */
             subtotal: string;
             /** Discount Amount */
@@ -10482,6 +10584,7 @@ export interface components {
             is_active: boolean;
             /** Prices */
             prices: components["schemas"]["RoutePriceResult"][];
+            readiness: components["schemas"]["RouteReadinessResult"];
             /**
              * Created At
              * Format: date-time
@@ -10552,6 +10655,27 @@ export interface components {
             prices: components["schemas"]["RoutePriceWrite"][];
         };
         /**
+         * RouteReadinessReason
+         * @description Stable explanations for a shuttle route missing from a widget.
+         * @enum {string}
+         */
+        RouteReadinessReason: "no_active_car" | "car_without_price" | "no_departures_and_not_on_request" | "inactive_zone_or_route" | "not_linked_to_company" | "car_not_linked_to_company";
+        /**
+         * RouteReadinessResult
+         * @description Whether all server-side prerequisites expose the route on every linked widget.
+         */
+        RouteReadinessResult: {
+            /**
+             * Route Id
+             * Format: uuid
+             */
+            route_id: string;
+            /** Visible On Widget */
+            visible_on_widget: boolean;
+            /** Reasons */
+            reasons: components["schemas"]["RouteReadinessReason"][];
+        };
+        /**
          * RouteResult
          * @description One directed route with names and configured passenger fares.
          */
@@ -10595,6 +10719,7 @@ export interface components {
             is_active: boolean;
             /** Prices */
             prices: components["schemas"]["RoutePriceResult"][];
+            readiness: components["schemas"]["RouteReadinessResult"];
             /**
              * Created At
              * Format: date-time
@@ -10664,6 +10789,80 @@ export interface components {
             min_passengers?: number | null;
             /** Is Active */
             is_active?: boolean | null;
+        };
+        /**
+         * RouteVehicleQuote
+         * @description One active any-time car with its journey-specific authoritative fare.
+         */
+        RouteVehicleQuote: {
+            /**
+             * Vehicle Type Id
+             * Format: uuid
+             */
+            vehicle_type_id: string;
+            /** Vehicle Type Name */
+            vehicle_type_name: string;
+            service_mode: components["schemas"]["ShuttleServiceMode"];
+            pricing_mode: components["schemas"]["ShuttlePricingMode"];
+            /** Seat Capacity */
+            seat_capacity: number;
+            /** Effective Min Passengers */
+            effective_min_passengers: number;
+            price: components["schemas"]["AdminShuttlePriceSummary"];
+        };
+        /**
+         * RouteVehicleQuoteRequest
+         * @description Journey-specific inputs required to price every any-time route car.
+         */
+        RouteVehicleQuoteRequest: {
+            /**
+             * Pickup Date
+             * Format: date
+             */
+            pickup_date: string;
+            /**
+             * Pickup Time
+             * Format: time
+             */
+            pickup_time: string;
+            /**
+             * Pax Senior
+             * @default 0
+             */
+            pax_senior: number;
+            /**
+             * Pax Adult
+             * @default 1
+             */
+            pax_adult: number;
+            /**
+             * Pax Child
+             * @default 0
+             */
+            pax_child: number;
+        };
+        /**
+         * RouteVehicleQuoteResult
+         * @description All active any-time cars that can carry and price the requested party.
+         */
+        RouteVehicleQuoteResult: {
+            /**
+             * Route Id
+             * Format: uuid
+             */
+            route_id: string;
+            /**
+             * Pickup Date
+             * Format: date
+             */
+            pickup_date: string;
+            /**
+             * Pickup Time
+             * Format: time
+             */
+            pickup_time: string;
+            /** Quotes */
+            quotes: components["schemas"]["RouteVehicleQuote"][];
         };
         /**
          * RouteVehicleTypeResult
@@ -10759,6 +10958,10 @@ export interface components {
             passengers: number;
             /** Luggage */
             luggage: number;
+            /** Large Bags */
+            large_bags: number;
+            /** Small Bags */
+            small_bags: number;
         };
         /**
          * ScheduleBulkCapacityRequest
@@ -10973,6 +11176,10 @@ export interface components {
              */
             route_id: string;
             vehicle_type: components["schemas"]["VehicleTypeReference"] | null;
+            service_mode: components["schemas"]["ShuttleServiceMode"];
+            /** Effective Min Passengers */
+            effective_min_passengers: number;
+            price: components["schemas"]["AdminShuttlePriceSummary"] | null;
             source: components["schemas"]["ScheduleSource"];
             /** Departure Template Id */
             departure_template_id: string | null;
@@ -11050,6 +11257,10 @@ export interface components {
              */
             route_id: string;
             vehicle_type: components["schemas"]["VehicleTypeReference"] | null;
+            service_mode: components["schemas"]["ShuttleServiceMode"];
+            /** Effective Min Passengers */
+            effective_min_passengers: number;
+            price: components["schemas"]["AdminShuttlePriceSummary"] | null;
             source: components["schemas"]["ScheduleSource"];
             /** Departure Template Id */
             departure_template_id: string | null;
@@ -11434,11 +11645,9 @@ export interface components {
          * @description Shuttle-only journey and seat fields.
          */
         ShuttleJourneyDetail: {
-            /**
-             * Schedule Id
-             * Format: uuid
-             */
-            schedule_id: string;
+            /** Schedule Id */
+            schedule_id: string | null;
+            service_mode: components["schemas"]["ShuttleServiceMode"];
             /**
              * Pickup Date
              * Format: date
@@ -11456,6 +11665,12 @@ export interface components {
             pax_child: number;
             /** Seats */
             seats: number;
+            /** Luggage */
+            luggage: number;
+            /** Large Bags */
+            large_bags: number;
+            /** Small Bags */
+            small_bags: number;
             /** Insurance Selected */
             insurance_selected: boolean;
             /** Pickup Address */
@@ -18464,6 +18679,9 @@ export interface operations {
                 date_from?: string | null;
                 date_to?: string | null;
                 is_active?: boolean | null;
+                pax_senior?: number;
+                pax_adult?: number;
+                pax_child?: number;
             };
             header?: {
                 authorization?: string | null;
@@ -19345,6 +19563,45 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_RouteVehicleTypesResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quote_route_vehicle_types_v1_admin_routes__route_id__vehicle_types_quote_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                route_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RouteVehicleQuoteRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_RouteVehicleQuoteResult_"];
                 };
             };
             /** @description Validation Error */
@@ -20336,6 +20593,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_RouteResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_route_readiness_v1_admin_routes__route_id__readiness_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                route_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_RouteReadinessResult_"];
                 };
             };
             /** @description Validation Error */

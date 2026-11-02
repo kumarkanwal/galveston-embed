@@ -23,7 +23,7 @@ const SELECTION = {
     fromId: ORIGIN_LOCATION.id,
     toId: DESTINATION_LOCATION.id,
     date: "2026-10-30", returnDate: "2026-11-01", roundTrip: false,
-    paxAdult: 1, paxSenior: 1, paxChild: 0,
+    largeBags: 2, smallBags: 1, paxAdult: 1, paxSenior: 1, paxChild: 0,
   },
   from: ORIGIN_LOCATION,
   to: { ...DESTINATION_LOCATION, requires_address: false },
@@ -92,6 +92,12 @@ function fill(root: HTMLElement) {
 beforeEach(() => document.body.replaceChildren());
 
 describe("round-trip shuttle summary", () => {
+  it("shows the server-returned Bags and Carry-on counts", () => {
+    const { root } = mount(clientWith());
+    expect(root.querySelector(".shuttle-summary")?.textContent)
+      .toContain("2 check-in · ▫ 1 carry-on");
+  });
+
   it("shows each round-trip leg mode, server price and effective minimum", () => {
     const quote = { ...SHUTTLE_QUOTE, legs: [
       { ...SHUTTLE_QUOTE.legs[0]!, service_mode: "shared" as const,

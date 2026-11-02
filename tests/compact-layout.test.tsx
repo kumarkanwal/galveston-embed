@@ -116,7 +116,7 @@ describe("passenger panel CSS", () => {
     expect(shuttleCss).toMatch(/\.passenger-menu\s*\{[^}]*max-width:\s*calc\(200% \+ 8px\)/s);
     expect(shuttleCss).toMatch(/\.passenger-menu\s*\{[^}]*right:\s*0;[^}]*width:\s*max-content/s);
     expect(shuttleCss).toMatch(/\.layout-narrow,[^}]*\.passenger-menu\s*\{[^}]*max-width:\s*100%/s);
-    expect(shuttleCss).toMatch(/\.shuttle-trip-fields,[^}]*\.shuttle-return-fields[^}]*\{\s*grid-template-columns:\s*1fr/s);
+    expect(shuttleCss).toMatch(/\.shuttle-trip-fields\s*\{\s*grid-template-columns:\s*repeat\(2,/s);
     expect(shuttleCss).toMatch(/\.passenger-row \.counter-controls\s*\{[^}]*40px[^}]*min-height:\s*40px/s);
   });
 });

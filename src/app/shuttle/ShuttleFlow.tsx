@@ -51,6 +51,7 @@ export function ShuttleFlow(props: ShuttleFlowProps) {
     destinationGroups={state.destinationGroups} errors={state.errors}
     form={state.form} formError={state.formError} loadingDestinations={state.loadingDestinations}
     loadingLocations={state.loadingLocations} logoUrl={props.business.logo_url}
+    maximumBags={flow.maximumBags}
     minimumDate={minimumDate}
     originGroups={state.originGroups}
     submitting={state.submitting} timeZone={props.business.timezone}
