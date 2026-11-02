@@ -45,13 +45,21 @@ function change(input: HTMLInputElement, value: string) {
   });
 }
 
-function renderTrip() {
-  const element = root();
-  render(<ShuttleTrip destinationGroups={LOCATION_GROUPS.slice(1)} errors={{}}
-    form={TRIP} formError={null} loadingDestinations={false} loadingLocations={false}
+function TripHarness() {
+  const [form, setForm] = useState(TRIP);
+  const update = <Key extends keyof ShuttleTripForm>(key: Key, value: ShuttleTripForm[Key]) => {
+    setForm((current) => ({ ...current, [key]: value }));
+  };
+  return <ShuttleTrip destinationGroups={LOCATION_GROUPS.slice(1)} errors={{}}
+    form={form} formError={null} loadingDestinations={false} loadingLocations={false}
     maximumBags={12} minimumDate="2026-10-23" originGroups={LOCATION_GROUPS}
     submitting={false} timeZone="America/Chicago" onSubmit={() => undefined}
-    update={() => undefined} />, element);
+    update={update} />;
+}
+
+function renderTrip() {
+  const element = root();
+  render(<TripHarness />, element);
   return element;
 }
 
@@ -115,18 +123,38 @@ describe("shuttle trip fields", () => {
     expect(unpriced.querySelector(".passenger-trigger .field-chevron svg")).not.toBeNull();
     expect(unpriced.querySelector(".passenger-trigger")?.textContent).not.toContain("▾");
   });
+});
 
-  it("uses one unchecked Round trip checkbox and no trip-type radios", () => {
+describe("shuttle trip layout", () => {
+  it("orders locations, dates, party controls, Round trip, note, and action", () => {
+    const form = renderTrip().querySelector<HTMLFormElement>(".shuttle-trip");
+    const children = [...(form?.children ?? [])];
+    expect(children[0]?.querySelector("#fromId")).not.toBeNull();
+    expect(children[0]?.querySelector("#toId")).not.toBeNull();
+    expect(children[1]?.querySelector("#date")).not.toBeNull();
+    expect(children[1]?.querySelector("#returnDate")).not.toBeNull();
+    expect(children[2]?.classList.contains("shuttle-party-fields")).toBe(true);
+    expect(children[3]?.classList.contains("trip-kind")).toBe(true);
+    expect(children[4]?.classList.contains("field-note")).toBe(true);
+    expect(children[5]?.textContent).toContain("Find Departures");
+  });
+
+  it("keeps Return Date disabled until Round trip is checked", () => {
     const element = renderTrip();
     const checkbox = element.querySelector<HTMLInputElement>('.trip-kind input[type="checkbox"]');
+    const returnDate = element.querySelector<HTMLInputElement>("#returnDate");
     expect(checkbox?.checked).toBe(false);
     expect(element.querySelectorAll('.trip-kind input[type="checkbox"]')).toHaveLength(1);
     expect(element.querySelector('.trip-kind input[type="radio"]')).toBeNull();
-    expect(element.querySelector("#returnDate")).toBeNull();
+    expect(returnDate?.disabled).toBe(true);
+    expect(returnDate?.required).toBe(false);
+    expect(returnDate?.min).toBe(TRIP.date);
     expect(element.querySelector(".shuttle-trip-fields")?.classList.contains("date-time-grid"))
       .toBe(true);
     act(() => element.querySelector<HTMLLabelElement>(".trip-kind")?.click());
     expect(checkbox?.checked).toBe(true);
+    expect(returnDate?.disabled).toBe(false);
+    expect(returnDate?.required).toBe(true);
   });
 
   it("sends false when Round trip is unchecked", () => {
@@ -140,8 +168,7 @@ describe("shuttle trip fields", () => {
       timeZone="America/Chicago" onSubmit={() => undefined} update={update} />, element);
     act(() => element.querySelector<HTMLLabelElement>('.trip-kind')?.click());
     expect(update).toHaveBeenCalledWith("roundTrip", false);
-    expect(element.querySelector(".shuttle-return-fields")?.classList.contains("date-time-grid"))
-      .toBe(true);
+    expect(element.querySelector<HTMLInputElement>("#returnDate")?.disabled).toBe(false);
   });
 });
 
@@ -173,6 +200,12 @@ describe("shuttle trip compact styling", () => {
     expect(css).toMatch(/\.shuttle-departure\.selected\s*\{[^}]*border-color:\s*var\(--blue\)/s);
     expect(css).toMatch(/:is\(\.layout-narrow, \.layout-micro\) \.shuttle-departure\s*\{/s);
     expect(css).not.toContain(".on-request-choice");
+  });
+
+  it("keeps the shuttle passenger and bag controls on one narrow row", () => {
+    const css = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
+    expect(css).toMatch(/\.layout-narrow \.shuttle-party-fields\s*\{[^}]*repeat\(2,/s);
+    expect(css).toMatch(/\.layout-narrow \.shuttle-party-fields > \[data-trip-field="passengers"\][^{]*\{[^}]*grid-column:\s*auto/s);
   });
 });
 

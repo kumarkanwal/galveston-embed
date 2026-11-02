@@ -67,21 +67,20 @@ export function ShuttleTrip(props: ShuttleTripProps) {
             onInput={(event) => props.update("date", event.currentTarget.value)} />
           <FieldError id="date-error" message={props.errors.date} />
         </div>
+        <div class="field"><label for="returnDate">Return Date</label>
+          <input id="returnDate" type="date" min={props.form.date}
+            value={props.form.returnDate} disabled={!props.form.roundTrip}
+            required={props.form.roundTrip} aria-invalid={props.errors.returnDate !== undefined}
+            onClick={(event) => openNativePicker(event.currentTarget)}
+            onInput={(event) => props.update("returnDate", event.currentTarget.value)} />
+          <FieldError id="returnDate-error" message={props.errors.returnDate} />
+        </div>
       </div>
       <ShuttlePartyFields errors={props.errors} form={props.form}
         maximumBags={props.maximumBags} update={props.update} />
       <label class="trip-kind"><input type="checkbox" checked={props.form.roundTrip}
         onChange={(event) => props.update("roundTrip", event.currentTarget.checked)} />
         Round trip</label>
-      {props.form.roundTrip && <div class="field-row date-time-grid shuttle-return-fields">
-        <div class="field"><label for="returnDate">Return Date</label>
-          <input id="returnDate" type="date" min={props.form.date} value={props.form.returnDate}
-            aria-invalid={props.errors.returnDate !== undefined}
-            onClick={(event) => openNativePicker(event.currentTarget)}
-            onInput={(event) => props.update("returnDate", event.currentTarget.value)} />
-          <FieldError id="returnDate-error" message={props.errors.returnDate} />
-        </div>
-      </div>}
       <p class="field-note">Dates and times use {props.timeZone}.</p>
       {props.formError !== null && <FormError>{props.formError}</FormError>}
       <button class="check-pricing" type="submit" disabled={props.submitting}>
