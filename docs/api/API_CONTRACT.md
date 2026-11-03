@@ -5,28 +5,97 @@ Stack: FastAPI (Python) · PostgreSQL · Square payments
 Base URL: `https://api.<domain>.com/v1`
 Consumers: Booking-form embeds (taxi and shuttle)
 
-**Version 1.11** — generated from the implemented schemas, routers, services and
-`openapi.json` through B-49. This document covers the public surface and the B-49,
-B-48, B-46, B-45, B-44, B-43, B-42 and B-41 admin additions below; older admin endpoints
-remain defined by OpenAPI.
+**Version 1.12** — generated from the implemented schemas, routers, services and
+`openapi.json` through B-51. This document covers the public surface and the B-51
+admin additions below; older admin endpoints remain defined by OpenAPI.
 
 ---
 
+## B-51 fixed shuttle service, exact pricing, and route sharing
+
+- All routes sell shared seats through fixed departure times. Existing
+  `on_request` routes are migrated to `fixed`; their cars and prices remain, but
+  they sell no shared service until weekly departure times are configured.
+- Every active private route car is returned for every eligible booking date.
+  Its `service_mode` is `private`, `pickup_time` is null, and the request sends
+  route, car, and date only. The stored booking time remains null (`Time to be
+  arranged`) until staff agrees and sets it. Private bookings never read or
+  mutate shared seat inventory.
+- `trip_type=one_way|round_trip` on outbound search selects the correct fare for
+  the whole passenger mix. A row's `from_price` and `total_for_selection` are
+  the selected party total, never the cheapest single seat.
+- A route's `round_trip_price` is that route direction's fare. A return cart is
+  outbound-direction round-trip fares plus return-direction round-trip fares;
+  one-way carts use `price`. Peak and other leg charges are applied once per leg.
+- Quote and booking confirmation expose `passenger_lines` and each leg's
+  `charges`, plus signed cart `adjustments`. Passenger lines, leg charges, and
+  adjustments reconstruct `total` exactly; an included charge must not be added
+  a second time by the client.
+- Shuttle quote and booking request/response bodies include B-50's separate
+  `large_bags` and `small_bags` counts (0–99, default 0).
+- Route-sharing company choices contain enabled `shuttle` service offerings only.
+  `POST /admin/routes/{route_id}/businesses/preview` performs no writes and
+  groups missing active route cars by company. `PUT .../businesses` returns
+  `409 missing_vehicle_links` unless `link_missing_cars: true` explicitly
+  confirms creation. Confirmation creates exactly those fleet links, the route
+  shares, and an audit record in one transaction.
+- A partner company's `GET /admin/routes` includes active shared routes with
+  `owner_business` and `shared: true`. Shared configuration is readable but
+  mutations return 403; only the owner company may edit it.
+
+Route-sharing requests and responses use these shapes:
+
+```json
+// POST /admin/routes/{route_id}/businesses/preview — no writes
+{ "business_ids": ["owner-uuid", "partner-uuid"] }
+
+{ "data": { "route_id": "route-uuid", "missing_vehicle_links": [
+  { "business_id": "partner-uuid", "business_name": "Houston VIP Shuttle",
+    "cars": [
+      { "vehicle_type_id": "suv-uuid", "vehicle_type_name": "SUV" },
+      { "vehicle_type_id": "van-uuid", "vehicle_type_name": "Van" },
+      { "vehicle_type_id": "sprinter-uuid", "vehicle_type_name": "Sprinter" }
+    ] }
+] } }
+
+// PUT /admin/routes/{route_id}/businesses — explicit confirmation
+{ "business_ids": ["owner-uuid", "partner-uuid"],
+  "link_missing_cars": true }
+```
+
+Without the confirmation flag, the same missing list is returned and nothing is
+changed:
+
+```json
+{ "error": {
+  "code": "missing_vehicle_links",
+  "message": "Some selected companies are missing active route car links.",
+  "details": { "missing_vehicle_links": [
+    { "business_id": "partner-uuid", "business_name": "Houston VIP Shuttle",
+      "cars": [
+        { "vehicle_type_id": "suv-uuid", "vehicle_type_name": "SUV" },
+        { "vehicle_type_id": "van-uuid", "vehicle_type_name": "Van" },
+        { "vehicle_type_id": "sprinter-uuid", "vehicle_type_name": "Sprinter" }
+      ] }
+  ] }
+} }
+```
+
 ## B-49 shuttle readiness and admin booking contracts
 
-Changes: immediate weekly departure materialization, multi-car any-time service, admin-grant
+Changes: immediate weekly departure materialization, legacy multi-car custom-time service, admin-grant
 route sharing, explicit widget readiness, and server-priced F-46 reservation contracts.
 
 - `GET /admin/routes/{route_id}/readiness` and each admin route result expose
   `visible_on_widget` plus stable configuration reason codes.
 - `GET /admin/schedules` accepts passenger-mix query parameters and returns `service_mode`,
   `effective_min_passengers`, and an authoritative price summary.
-- `POST /admin/routes/{route_id}/vehicle-types/quote` accepts local pickup date/time and passenger
-  counts and returns authoritative per-car any-time prices and effective minimums.
+- `POST /admin/routes/{route_id}/vehicle-types/quote` remains for admin read
+  compatibility until F-48; public shared service no longer uses custom times.
 - Shuttle reservation detail exposes the snapshotted `journey.service_mode`; it is not inferred
   from current route configuration.
 - Weekly templates are shared-car only and materialize 180 days immediately. Private cars remain
-  any-time. Any-time routes may offer multiple independently priced shared/private cars.
+  date-only and may offer multiple independently priced cars.
 
 See `docs/phases/B-49-diagnosis.md` for production root causes and
 `docs/phases/B-49-progress.md` for the verification and F-47 handoff.
@@ -41,10 +110,10 @@ and a stricter business-logo upload boundary.
   (`per_seat | tiered | fixed_vehicle`). Tier rows expose contiguous
   `min_passengers`, nullable `max_passengers`, `price_type` (`per_person | total`),
   and two-decimal-string `amount`; fixed-vehicle pricing is private-only.
-- Public on-request search and quote legs expose `service_mode`, a `pricing` summary,
+- Public private-car search and quote legs expose `service_mode`, a `pricing` summary,
   and `effective_min_passengers`. Private service requires a customer-selected local
-  date and time, is always on request, books one whole vehicle, and does not read or
-  mutate shared schedule seat inventory.
+  date only, books one whole vehicle, and does not read or mutate shared schedule seat
+  inventory.
 - `routes.min_passengers` defaults to one. A matching blackout rule may raise the
   minimum without blocking the date; the effective value is the maximum of the route
   and every matching active rule. Quote and public/admin booking recalculate and
@@ -125,7 +194,7 @@ addresses, route address-requirement flags, and named-stop display fallbacks.
   `to_requires_address`. Admin shuttle reservation detail adds effective
   `pickup_address` and `dropoff_address`; legacy `journey.address` remains the
   effective pickup value.
-- Inactive categories, locations, and routes are excluded from fixed and on-request
+- Inactive categories, locations, and routes are excluded from fixed and private-car
   search, return search, quote, and booking even when a client retains old ids.
   Staff/driver trip sheets and all booking emails display named location labels when
   no street address is stored.
@@ -256,7 +325,9 @@ Read this section first if you have already built against v1.2.
   `cc_surcharge_pct` remains in this contract for now; P1 moves the card fee to
   the company setting.
 
-- **B-38C on-request shuttle departures:** search publishes a custom-time
+- **B-38C on-request shuttle departures (retired by B-51):** the legacy admin
+  read shape remains temporarily available, but public search, quote, and booking
+  no longer offer shared on-request service. The historical behavior was: search publishes a custom-time
   choice with its route, sole eligible vehicle type and capacity, without a
   fabricated `schedule_id`. Return search accepts the selected outbound route,
   vehicle, local date and local time as an alternative to
@@ -280,13 +351,14 @@ Read this section first if you have already built against v1.1.
   `docs/phases/p1-card-payment-and-b36.md` for the admin endpoints, refund
   ledger, account routing, surcharge migration, and deployment contract.
 
-- **B-38B shared fixed shuttle departures and return pricing:** an active
+- **B-38B shared fixed shuttle departures and return pricing (B-51 supersedes
+  its combined-fare rule):** an active
   company assignment exposes the route owner's locations, fixed departures and
   shared seat inventory through the assigned company's API key. A configured
-  passenger `round_trip_price` is the total for both legs and is allocated
-  proportionally across their one-way fares; a missing passenger-specific
-  return fare falls back to the adult return fare. Promo and insurance apply
-  once to the cart. Shuttle quote accepts `payment_method` (default `online`),
+  passenger `round_trip_price` is now the price for that route direction. The
+  outbound and return directions are added without proportional allocation.
+  Promo and insurance apply once to the cart. Shuttle quote accepts
+  `payment_method` (default `online`),
   and the configured card surcharge is added last only for `online`.
 - **B-37 taxi round trips, luggage and form controls:** replacement Distance
   and Flat Rate rows now price two real legs with no round-trip discount. The
@@ -689,7 +761,8 @@ Powers the From/To dropdowns, grouped by category.
 
 The core search.
 
-**Query:** `from_location_id`, `to_location_id`, `date`, `pax_senior`, `pax_adult`, `pax_child`
+**Query:** `from_location_id`, `to_location_id`, `date`, `pax_senior`,
+`pax_adult`, `pax_child`, `trip_type` (`one_way` by default or `round_trip`).
 
 ```json
 { "data": {
@@ -721,14 +794,18 @@ The core search.
 `low_seat_warning` is a **complete sentence or null**. Render it verbatim; do not apply your own threshold. The business configures the number.
 
 `date_strip` always has 7 entries: the requested date and the following six.
+Its price, each departure's `from_price`, and `total_for_selection` are computed
+for the complete requested passenger mix. `trip_type=round_trip` selects this
+route direction's round-trip fares; clients must not replace these values with
+the cheapest passenger-type entry from `prices`.
 
 No route between the two locations is a **404**, not an empty list.
 
-#### On-request search result
+#### Date-only private cars
 
-An `on_request` route has exactly one active eligible vehicle type. Search
-returns no invented schedule row; `departures` is empty and the customer-time
-choice is published separately:
+Every active private car is returned on every date inside the business's booking
+window and lead time. No schedule or time is invented; staff agrees the time by
+phone after the request:
 
 ```json
 { "data": {
@@ -739,20 +816,26 @@ choice is published separately:
   ],
   "departures": [],
   "filtered_summary": null,
-  "on_request": {
-    "departure_type": "on_request",
+  "private_cars": [{
+    "departure_type": "private",
     "route_id": "uuid",
     "vehicle_type_id": "uuid",
     "vehicle_type_name": "14 PAX Sprinter",
+    "service_date": "2026-08-13",
+    "pickup_time": null,
     "seat_capacity": 14,
-    "earliest_pickup_date": null,
-    "earliest_pickup_time": null
-  }
+    "total_for_selection": "145.00",
+    "effective_min_passengers": 1,
+    "service_mode": "private",
+    "pricing": { "mode": "fixed_vehicle", "tiers": [],
+                 "fixed_price": "145.00" }
+  }]
 }}
 ```
 
-The form collects a business-local `pickup_date` and `pickup_time`; it must not
-construct or retain a `schedule_id` for this choice. Capacity is server-owned.
+The form sends the returned business-local `service_date` and must not collect a
+time or construct a `schedule_id`. `total_for_selection` is authoritative for
+the requested passenger mix and `trip_type`; capacity is server-owned.
 
 #### `filtered_summary`
 
@@ -774,17 +857,10 @@ Deliberately coarse. There are no per-departure reasons and no schedule ids.
 
 ### `GET /v1/public/shuttle/search/return`
 
-The selected outbound is required in one of two mutually exclusive shapes:
-
-- Fixed departure: `outbound_schedule_id`.
-- On-request departure: all four of `outbound_route_id`,
-  `outbound_vehicle_type_id`, `outbound_pickup_date` and
-  `outbound_pickup_time`.
-
-Missing, incomplete, mixed, unknown or other-business selections return HTTP
-400 `VALIDATION_ERROR`. A fixed-selection error uses
-`field: "outbound_schedule_id"`; an on-request selection error names the
-relevant on-request field.
+The selected fixed outbound is supplied as `outbound_schedule_id`. Missing,
+unknown, or other-business selections return HTTP 400 `VALIDATION_ERROR` with
+`field: "outbound_schedule_id"`. Legacy custom-time query fields remain readable
+until the admin cleanup but are not emitted by public search.
 
 Otherwise identical to outbound search, with `from_location_id` and
 `to_location_id` still supplied in the outbound direction and reversed by the
@@ -815,10 +891,6 @@ the configured buffer.
 
 A missing reverse route returns 404 with a message you can show, not an empty list.
 
-For an on-request return route, the `on_request` search object includes
-`earliest_pickup_date` and `earliest_pickup_time`. Treat that pair as the
-server-computed lower bound for the customer's local return selection.
-
 ### `POST /v1/public/shuttle/quote`
 
 Prices a full cart. **Nothing is held and nothing is written.** Safe to call repeatedly as the customer toggles insurance or retypes a promo code.
@@ -828,31 +900,32 @@ arrival plus the configured minimum return gap. An impossible cart returns
 HTTP 400 `VALIDATION_ERROR`, `field: "legs.1.schedule_id"`, at both quote and
 booking time; clients cannot override the stored duration or gap.
 
-Each leg is either the unchanged fixed shape or this additive on-request shape:
+Each leg is either the fixed shape or this date-only private shape:
 
 ```json
-{ "departure_type": "on_request",
+{ "departure_type": "private",
   "route_id": "uuid",
   "vehicle_type_id": "uuid",
   "pickup_date": "2026-08-13",
-  "pickup_time": "09:30",
   "pax_senior": 0,
   "pax_adult": 2,
   "pax_child": 0 }
 ```
 
-Do not include `schedule_id` in an on-request leg. A fixed leg continues to send
+Do not include `schedule_id` or `pickup_time` in a private leg. A fixed leg continues to send
 only `schedule_id` and passenger counts; `departure_type` may be omitted and
 defaults to `scheduled`.
 
 ```json
 // request — 1 or 2 legs
 { "legs": [
-    { "schedule_id": "uuid", "pax_senior": 1, "pax_adult": 1, "pax_child": 1 }
+    { "schedule_id": "uuid", "pax_senior": 1, "pax_adult": 1, "pax_child": 0 }
   ],
-  "insurance_selected": true,
-  "promo_code": "KIYA",
-  "payment_method": "online" }
+  "large_bags": 1,
+  "small_bags": 1,
+  "insurance_selected": false,
+  "promo_code": null,
+  "payment_method": "cash" }
 
 // response
 { "data": {
@@ -861,14 +934,31 @@ defaults to `scheduled`.
       "from": "Galveston Cruise Terminal", "to": "AIRPORT: George Bush (IAH)",
       "date": "2026-08-13", "time": "16:00 - 18:00",
       "duration_minutes": 120,
-      "pax_summary": "1 Adults, 1 Children (10 & under)",
-      "leg_price": "82.50" }
+      "pax_summary": "1 Seniors, 1 Adults",
+      "passenger_lines": [
+        { "passenger_type": "senior", "count": 1,
+          "unit_price": "45.00", "line_total": "45.00" },
+        { "passenger_type": "adult", "count": 1,
+          "unit_price": "55.00", "line_total": "55.00" }
+      ],
+      "charges": [
+        { "label": "Peak Hours Increase", "amount": "20.00",
+          "kind": "surcharge", "included_in_total": true }
+      ],
+      "leg_price": "120.00",
+      "service_mode": "shared",
+      "pricing": { "mode": "per_seat", "tiers": [], "fixed_price": null },
+      "effective_min_passengers": 1 }
   ],
-  "subtotal": "165.00",
+  "large_bags": 1,
+  "small_bags": 1,
+  "subtotal": "120.00",
   "discount_amount": "0.00",
-  "insurance_amount": "24.75",
-  "total": "189.75",
-  "currency": "USD"
+  "insurance_amount": "0.00",
+  "total": "120.00",
+  "currency": "USD",
+  "adjustments": [],
+  "line_items": null
 }}
 ```
 
@@ -877,19 +967,18 @@ amount → online-card surcharge → total. Insurance covers what is actually pa
 so it is computed after any promo. The card surcharge is computed last and is
 zero for `cash`, `cheque`, and `bank_transfer`.
 
-For a two-leg return cart, a configured outbound `round_trip_price` is the
-combined fare for the passenger across both legs. The API allocates that total
-between the leg snapshots in proportion to their one-way fares before applying
-each leg's own peak increase. If the passenger type has no return fare, the
-adult return fare is used; if no return fare is configured, the two legacy
-one-way fares are added unchanged.
+For a two-leg return cart, each direction uses its own route's
+`round_trip_price`. For example, one adult with HOU→IAH at `18.00` and IAH→HOU
+at `40.00` has a pre-charge total of `58.00`. A one-way HOU→IAH cart uses that
+route's one-way `price`. Each leg's peak increase is then applied once and shown
+once in that leg's `charges`.
 
 A departure that has become unbookable since the search returns the appropriate error rather than a stale price.
 
-An on-request quote echoes `departure_type`, route, vehicle, pickup date and
-pickup time, and omits `schedule_id`. It does not create inventory. Peak and
-blackout evaluation, promo-once behavior, insurance and the card surcharge
-order are identical to fixed departures.
+A private quote echoes `departure_type: "private"`, route, vehicle and pickup
+date, returns `pickup_time` and `time` as null, and omits `schedule_id`. It does
+not create shared inventory. Peak and blackout evaluation, promo-once behavior,
+insurance and the card surcharge order are identical to fixed departures.
 
 ### `POST /v1/public/shuttle/booking`
 
@@ -902,6 +991,8 @@ Generate the key when the customer reaches the payment step and **reuse it acros
 ```json
 // request
 { "legs": [ { "schedule_id": "uuid", "pax_senior": 0, "pax_adult": 1, "pax_child": 1 } ],
+  "large_bags": 1,
+  "small_bags": 1,
   "insurance_selected": true,
   "promo_code": null,
   "customer": { "first_name": "Sarah", "last_name": "Gerrison",
@@ -917,8 +1008,25 @@ Generate the key when the customer reaches the payment step and **reuse it acros
   "order_number": "GS-2026-004821",
   "status": "requested",
   "total": "189.75",
+  "subtotal": "165.00",
+  "discount_amount": "0.00",
+  "insurance_amount": "24.75",
+  "currency": "USD",
+  "adjustments": [
+    { "label": "Travel Insurance", "amount": "24.75",
+      "kind": "insurance", "included_in_total": true }
+  ],
   "amount_paid": "0.00",
-  "legs": [ { "booking_id": "uuid", "seats_confirmed": 2 } ],
+  "large_bags": 1,
+  "small_bags": 1,
+  "legs": [ { "booking_id": "uuid", "seats_confirmed": 2,
+              "passenger_lines": [
+                { "passenger_type": "adult", "count": 1,
+                  "unit_price": "82.50", "line_total": "82.50" },
+                { "passenger_type": "child", "count": 1,
+                  "unit_price": "82.50", "line_total": "82.50" }
+              ],
+              "charges": [], "leg_total": "165.00" } ],
   "confirmation_email_sent": true
 }}
 ```
@@ -936,13 +1044,11 @@ webhooks settle payment attempts.
 
 `accepted_terms` must be `true`.
 
-Booking accepts the same fixed or on-request leg alternatives documented for
-quote. For an on-request leg the server atomically creates or reuses the exact
-`(route_id, pickup_date, pickup_time)` schedule and snapshots capacity in this
-order: matching departure-template override, route/vehicle override, then the
-vehicle type's capacity. All legs are resolved before schedule ids are sorted
-and locked. If any leg is unavailable, no leg is booked and payment is not
-attempted.
+Booking accepts the same fixed or date-only private alternatives documented for
+quote. A private leg stores `pickup_date` with `pickup_time: null`, books the
+whole selected car under its configured pricing mode, and never locks or changes
+shared seats. Fixed legs are resolved before schedule ids are sorted and locked.
+If any leg is unavailable, no leg is booked and payment is not attempted.
 
 **Seats are committed when the requested booking is stored, before any card
 charge.** Two customers racing for the last seat: one receives 201, the other
