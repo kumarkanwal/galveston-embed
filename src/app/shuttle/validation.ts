@@ -12,7 +12,7 @@ export function validateShuttleTrip(
   if (form.date === "") errors.date = "Select a departure date.";
   else if (form.date < minimumDate) errors.date = "Departure date cannot be in the past.";
   if (form.paxAdult + form.paxSenior + form.paxChild < 1) {
-    errors.paxAdult = "Select at least one passenger.";
+    errors.paxAdult = "Select at least 1 passenger";
   }
   if (form.largeBags < 0 || form.largeBags > BAG_COUNT_SCHEMA_LIMIT) {
     errors.largeBags = "Select a valid check-in bag count.";

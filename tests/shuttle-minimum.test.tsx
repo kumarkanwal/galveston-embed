@@ -27,21 +27,6 @@ describe("shuttle passenger limits", () => {
       .toBe(true);
   });
 
-  it("blocks a private group above vehicle capacity", () => {
-    const option = {
-      departure_type: "on_request" as const, route_id: SEARCH_RESULT.route.id,
-      vehicle_type_id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-      vehicle_type_name: "Private Van", seat_capacity: 4, from_price: "150.00",
-      effective_min_passengers: 1, service_mode: "private" as const,
-      pricing: { mode: "fixed_vehicle" as const, tiers: [], fixed_price: "150.00" },
-    };
-    const element = renderResult({ ...SEARCH_RESULT, departures: [], on_request: null,
-      on_request_options: [option] }, 5);
-    expect(element.textContent).toContain("This vehicle allows up to 4 passengers.");
-    expect(element.querySelector<HTMLButtonElement>(".any-time-departure button")?.disabled)
-      .toBe(true);
-  });
-
   it("uses the server minimum error message with a safe fallback", () => {
     expect(minimumPassengerError(new ApiError(422, {
       code: "MIN_PASSENGERS_NOT_MET", message: "At least 3 passengers are required.",

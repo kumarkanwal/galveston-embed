@@ -26,14 +26,6 @@ const TRIP: ShuttleTripForm = {
 };
 const SCHEDULED = { kind: "scheduled", date: TRIP.date, departure: DEPARTURE,
   route: SEARCH_RESULT.route } as const;
-const ON_REQUEST = {
-  kind: "on_request", date: TRIP.date, time: "14:15",
-  serviceMode: "shared",
-  routeId: "77777777-7777-7777-7777-777777777777",
-  route: SEARCH_RESULT.route,
-  vehicleTypeId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-  vehicleTypeName: "Executive Van",
-} as const;
 const BASE_SELECTION = {
   trip: TRIP,
   from: ORIGIN_LOCATION,
@@ -60,24 +52,20 @@ describe("shuttle request builders", () => {
     });
   });
 
-  it("identifies scheduled and on-request outbound legs for return search", () => {
-    expect(buildReturnQuery(TRIP, SCHEDULED)).toMatchObject({
+  it("identifies the fixed outbound schedule for return search", () => {
+    expect(buildReturnQuery(TRIP, SCHEDULED)).toEqual({
+      from_location_id: TRIP.fromId, to_location_id: TRIP.toId,
       date: TRIP.returnDate, outbound_schedule_id: DEPARTURE.schedule_id,
-    });
-    expect(buildReturnQuery(TRIP, ON_REQUEST)).toMatchObject({
-      date: TRIP.returnDate, outbound_route_id: ON_REQUEST.routeId,
-      outbound_vehicle_type_id: ON_REQUEST.vehicleTypeId,
-      outbound_pickup_date: ON_REQUEST.date, outbound_pickup_time: ON_REQUEST.time,
+      pax_adult: 2, pax_senior: 1, pax_child: 0,
     });
   });
 
-  it("builds cash-only scheduled and on-request quote legs", () => {
-    const selection = { ...BASE_SELECTION, outbound: ON_REQUEST, returnLeg: SCHEDULED };
+  it("builds scheduled-only quote legs without customer pickup times", () => {
+    const selection = { ...BASE_SELECTION, returnLeg: SCHEDULED };
     expect(buildShuttleQuote(selection, "SAVE10")).toEqual({
       legs: [{
-        departure_type: "on_request", route_id: ON_REQUEST.routeId,
-        vehicle_type_id: ON_REQUEST.vehicleTypeId, pickup_date: ON_REQUEST.date,
-        pickup_time: ON_REQUEST.time, pax_adult: 2, pax_senior: 1, pax_child: 0,
+        departure_type: "scheduled", schedule_id: DEPARTURE.schedule_id,
+        pax_adult: 2, pax_senior: 1, pax_child: 0,
       }, {
         departure_type: "scheduled", schedule_id: DEPARTURE.schedule_id,
         pax_adult: 2, pax_senior: 1, pax_child: 0,
@@ -86,6 +74,9 @@ describe("shuttle request builders", () => {
       insurance_selected: false, payment_method: "cash", promo_code: "SAVE10",
     });
     for (const leg of buildShuttleQuote(selection, null).legs) {
+      expect(leg.departure_type).toBe("scheduled");
+      expect(leg).not.toHaveProperty("pickup_time");
+      expect(leg).not.toHaveProperty("vehicle_type_id");
       expect(leg).not.toHaveProperty("pickup_address");
       expect(leg).not.toHaveProperty("dropoff_address");
     }

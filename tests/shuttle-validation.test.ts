@@ -19,7 +19,7 @@ describe("shuttle trip validation", () => {
     const errors = validateShuttleTrip({
       ...FORM, paxAdult: 0, returnDate: "2026-10-29",
     }, "2026-10-23");
-    expect(errors.paxAdult).toBe("Select at least one passenger.");
+    expect(errors.paxAdult).toBe("Select at least 1 passenger");
     expect(errors.returnDate).toBe("Return date must be on or after the departure date.");
   });
 
@@ -31,7 +31,7 @@ describe("shuttle trip validation", () => {
     const invalid = validateShuttleTrip({
       ...FORM, paxAdult: 0, paxSenior: 0, paxChild: 0,
     }, "2026-10-23");
-    expect(invalid.paxAdult).toBe("Select at least one passenger.");
+    expect(invalid.paxAdult).toBe("Select at least 1 passenger");
   });
 
   it("enforces schema and business bag limits", () => {

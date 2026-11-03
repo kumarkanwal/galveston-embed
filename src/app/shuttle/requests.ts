@@ -9,7 +9,7 @@ import type {
 } from "../../api/client";
 import type { ConfirmFormState } from "../confirm/types";
 import { requiredShuttleAddresses, type ShuttleAddressValues } from "./address";
-import type { SelectedShuttleLeg, ShuttleSelection, ShuttleTripForm } from "./types";
+import type { ScheduledLeg, ShuttleSelection, ShuttleTripForm } from "./types";
 
 function passengerCounts(trip: ShuttleTripForm) {
   return {
@@ -30,41 +30,25 @@ export function buildShuttleSearchQuery(trip: ShuttleTripForm): ShuttleSearchQue
 
 export function buildReturnQuery(
   trip: ShuttleTripForm,
-  outbound: SelectedShuttleLeg,
+  outbound: ScheduledLeg,
 ): ShuttleReturnQuery {
-  const base = {
+  return {
     from_location_id: trip.fromId,
     to_location_id: trip.toId,
     date: trip.returnDate,
+    outbound_schedule_id: outbound.departure.schedule_id,
     ...passengerCounts(trip),
-  };
-  if (outbound.kind === "scheduled") {
-    return { ...base, outbound_schedule_id: outbound.departure.schedule_id };
-  }
-  return {
-    ...base,
-    outbound_route_id: outbound.routeId,
-    outbound_vehicle_type_id: outbound.vehicleTypeId,
-    outbound_pickup_date: outbound.date,
-    outbound_pickup_time: outbound.time,
   };
 }
 
 export function buildShuttleLeg(
-  selected: SelectedShuttleLeg,
+  selected: ScheduledLeg,
   trip: ShuttleTripForm,
 ): ShuttleQuoteLeg {
-  const counts = passengerCounts(trip);
-  if (selected.kind === "scheduled") {
-    return { departure_type: "scheduled", schedule_id: selected.departure.schedule_id, ...counts };
-  }
   return {
-    departure_type: "on_request",
-    route_id: selected.routeId,
-    vehicle_type_id: selected.vehicleTypeId,
-    pickup_date: selected.date,
-    pickup_time: selected.time,
-    ...counts,
+    departure_type: "scheduled",
+    schedule_id: selected.departure.schedule_id,
+    ...passengerCounts(trip),
   };
 }
 

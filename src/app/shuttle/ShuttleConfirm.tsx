@@ -56,11 +56,8 @@ function initialPromo(): PromoCodeState {
 }
 
 function legLabel(leg: SelectedShuttleLeg): string {
-  if (leg.kind === "scheduled") {
-    const end = leg.departure.end_time == null ? "" : ` – ${leg.departure.end_time}`;
-    return `${leg.date} at ${leg.departure.start_time}${end}`;
-  }
-  return `${leg.date} at ${leg.time} — ${leg.vehicleTypeName}`;
+  const end = leg.departure.end_time == null ? "" : ` – ${leg.departure.end_time}`;
+  return `${leg.date} at ${leg.departure.start_time}${end}`;
 }
 
 function ShuttleSummary(props: { quote: ShuttleQuoteResponse; selection: ShuttleSelection }) {
