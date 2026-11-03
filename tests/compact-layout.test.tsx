@@ -130,4 +130,21 @@ describe("passenger panel CSS", () => {
     expect(shuttleCss).toMatch(/\.shuttle-trip-fields\s*\{\s*grid-template-columns:\s*repeat\(2,/s);
     expect(shuttleCss).toMatch(/\.passenger-row \.counter-controls\s*\{[^}]*40px[^}]*min-height:\s*40px/s);
   });
+
+  it("uses equal popup padding and border-box geometry without stepper overflow", () => {
+    const shuttleCss = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
+    expect(shuttleCss).toMatch(/\.passenger-menu\s*\{[^}]*box-sizing:\s*border-box;[^}]*padding:\s*14px/s);
+    expect(shuttleCss).toMatch(/\.passenger-row\s*\{[^}]*box-sizing:\s*border-box;[^}]*gap:\s*12px;[^}]*min-width:\s*0;[^}]*width:\s*100%/s);
+    expect(shuttleCss).toMatch(/\.passenger-row \.counter-controls\s*\{[^}]*box-sizing:\s*border-box;[^}]*max-width:\s*100%;[^}]*min-width:\s*0;[^}]*width:\s*132px/s);
+  });
+
+  it.each([320, 360])("keeps taxi and shuttle passenger fields in narrow layout at %ipx", (width) => {
+    expect(containerLayout(width)).toBe("narrow");
+    const taxi = readFileSync(resolve("src/app/trip/TripCoreFields.tsx"), "utf8");
+    const shuttle = readFileSync(resolve("src/app/shuttle/PassengerDropdown.tsx"), "utf8");
+    expect(taxi).toContain('data-trip-field="passengers"');
+    expect(shuttle).toContain('class="passenger-row passenger-popup-row"');
+    expect(shuttle).toContain("passenger-popup-stepper");
+    expect(shuttle).toContain("passenger-popup-box");
+  });
 });
