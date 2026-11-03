@@ -24,6 +24,7 @@ export function buildShuttleSearchQuery(trip: ShuttleTripForm): ShuttleSearchQue
     from_location_id: trip.fromId,
     to_location_id: trip.toId,
     date: trip.date,
+    trip_type: trip.roundTrip ? "round_trip" : "one_way",
     ...passengerCounts(trip),
   };
 }

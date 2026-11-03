@@ -44,13 +44,15 @@ describe("shuttle request builders", () => {
   it("builds the documented outbound search query", () => {
     expect(buildShuttleSearchQuery(TRIP)).toEqual({
       from_location_id: TRIP.fromId, to_location_id: TRIP.toId, date: TRIP.date,
+      trip_type: "round_trip",
       pax_adult: 2, pax_senior: 1, pax_child: 0,
     });
   });
 
   it("keeps a zero-adult senior party in the search request", () => {
-    expect(buildShuttleSearchQuery({ ...TRIP, paxAdult: 0, paxSenior: 1 })).toMatchObject({
-      pax_adult: 0, pax_senior: 1, pax_child: 0,
+    expect(buildShuttleSearchQuery({ ...TRIP, roundTrip: false,
+      paxAdult: 0, paxSenior: 1 })).toMatchObject({
+      pax_adult: 0, pax_senior: 1, pax_child: 0, trip_type: "one_way",
     });
   });
 

@@ -111,6 +111,9 @@ describe("same-page shuttle departures", () => {
     const { client, searchShuttleReturn } = clientWith([DEPARTURE, second]);
     const root = mount(client);
     await fillTrip(root, true);
+    expect(client.searchShuttle).toHaveBeenCalledWith(expect.objectContaining({
+      trip_type: "round_trip", pax_adult: 1, pax_senior: 0, pax_child: 0,
+    }));
     expect(root.querySelector(".departure-section.return")).toBeNull();
 
     act(() => root.querySelectorAll<HTMLButtonElement>(".departure-section.outbound button")[0]?.click());
@@ -133,11 +136,17 @@ describe("same-page shuttle departures", () => {
     const { client, searchShuttleReturn } = clientWith();
     const root = mount(client);
     await fillTrip(root, false);
+    expect(client.searchShuttle).toHaveBeenCalledWith(expect.objectContaining({
+      trip_type: "one_way",
+    }));
     expect(root.querySelector(".departure-section.return")).toBeNull();
     expect(root.textContent).not.toContain("Choose Return");
     expect(searchShuttleReturn).not.toHaveBeenCalled();
   });
 
+});
+
+describe("stale shuttle availability", () => {
   it("refreshes Departures and clears a remembered route after not found", async () => {
     const { client } = clientWith();
     client.quoteShuttle = vi.fn(async () => {
