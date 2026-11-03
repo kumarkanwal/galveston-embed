@@ -209,3 +209,9 @@ Date: 2026-11-02 · Status: accepted (supersedes the scheduled-card label conseq
 Decision: do not render `Departure.service_label` on the customer-facing Departures step; retain the server duration and public vehicle, mode, seat, and price details.
 Why: the value is an internal route label, not customer-facing trip information, and exposed internal naming made the departure rows diverge from the approved shuttle reference.
 Consequences: fixed and return rows never display `service_label`; on-request rows remain identified by `vehicle_type_name`. The widget does not rename or derive a replacement route label.
+
+## ED-034 — Shuttle exposes fixed schedules only
+Date: 2026-11-03 · Status: accepted (supersedes the on-request presentation consequences of ED-029 and ED-033)
+Decision: show and book only fixed scheduled shuttle departures; do not expose customer-selected pickup times, on-request options, or private any-time cars.
+Why: on-request and private cars require a customer pickup time, and that input has been removed from the shuttle booking flow.
+Consequences: Departures ignores `on_request` and `on_request_options` even when the public search response includes them. Return-search uses only `outbound_schedule_id`, and quote and booking legs use only `departure_type: "scheduled"` with `schedule_id`. Taxi pickup-time behavior is unchanged.

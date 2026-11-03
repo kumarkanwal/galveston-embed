@@ -1,6 +1,6 @@
 # E-24 — Remove shuttle pickup time and fix passenger popup overflow
 
-**Status:** Specified
+**Status:** Implementation complete — browser verified
 **Scope:** Widget only.
 
 ## Setup
@@ -81,3 +81,73 @@ Report `git log -6 --oneline`, clean `git status --short`, the push command
 without pushing, `dist/embed.js` raw and gzip sizes plus SHA-256, and the
 screenshot list. Include test results, BRO differences, backend gaps, decisions,
 and anything unverified, then stop.
+
+## Results
+
+### Implementation
+
+- Shuttle Departures renders only fixed scheduled rows. Both outbound and
+  return omit pickup-time inputs, "Or pick your own time", on-request options,
+  and private cars returned by the API.
+- Shuttle selection types and the return-search, quote, and booking builders
+  accept scheduled legs only. Generated API types remain unchanged, but widget
+  requests can no longer contain an on-request pickup date, time, route, or
+  vehicle id.
+- A date with no visible fixed departure shows exactly: "No scheduled
+  departures on this date. Please try another date."
+- A zero-total passenger party shows "Select at least 1 passenger" and does not
+  issue another departure search. Valid zero-adult parties with a senior or
+  child remain allowed.
+- Taxi pickup time is unchanged.
+- The popup clipping came from the more-specific narrow-layout bag-counter rule,
+  which changed every `.party-fields .counter-controls` grid to 28px outer
+  tracks while passenger buttons retained a 40px minimum. The `+` button
+  overflowed its track by 12px and ancestor clipping hid its border. The rule
+  now excludes `.passenger-popup-stepper`, preserving compact bag controls and
+  the popup's intended 40px tracks with equal 14px padding.
+
+### Verification
+
+- Scheduled-only commit gate: 6 focused files and 45 tests passed; TypeScript
+  and touched-file ESLint passed.
+- Overflow commit gate: 3 focused files and 52 tests passed; TypeScript,
+  touched-file ESLint, browser-script syntax, and the pre-commit real Chromium
+  geometry pass succeeded.
+- Final full lint passed.
+- The one full Vitest run passed 35/37 files and 383/393 tests. Its 10 failures
+  were the documented timing flake in untouched `airport-marker.test.tsx` and
+  `airport-location.test.ts`; the prescribed isolated rerun passed 13/13.
+  A clean single-run full suite without that known flake remains **UNVERIFIED**.
+- Exactly one production build passed, followed by `test:dist` (1/1). `dist/`
+  contains only `embed.js` and `embed.js.map`.
+- Playwright Chromium rendered the built widget at 320, 360, 375, 400, and
+  1024px for shuttle and taxi. All measured rows had no horizontal scroll;
+  every stepper right edge was inside its content boundary. Shuttle popup
+  padding was equal on both sides. Taxi retains its native passenger select, so
+  that control was activated and its two visible bag-stepper rows were measured.
+- Bundle: 141,344 bytes raw and 40,438 bytes gzip. SHA-256:
+  `3199eaa1ff8a3443d2e2055f323476bd048dee4d20420c287e952579cb72bb16`.
+
+### Browser screenshots
+
+- `docs/phases/E-24/shuttle-320.png`
+- `docs/phases/E-24/shuttle-360.png`
+- `docs/phases/E-24/shuttle-375.png`
+- `docs/phases/E-24/shuttle-400.png`
+- `docs/phases/E-24/shuttle-1024.png`
+- `docs/phases/E-24/taxi-320.png`
+- `docs/phases/E-24/taxi-360.png`
+- `docs/phases/E-24/taxi-375.png`
+- `docs/phases/E-24/taxi-400.png`
+- `docs/phases/E-24/taxi-1024.png`
+
+### Comparison, gaps, and decisions
+
+- E-24 intentionally removes the E-17/E-21 any-time and private shuttle paths;
+  fixed scheduled-row presentation remains unchanged. No matching BRO
+  any-time/private reference exists in the repository.
+- Taxi layout and pickup-time behavior are unchanged. The browser screenshots
+  verify its native passenger select and compact bag steppers without overflow.
+- No backend gap or dependency was introduced.
+- ED-034 records that the widget now exposes only fixed shuttle schedules and
+  ignores public on-request options.

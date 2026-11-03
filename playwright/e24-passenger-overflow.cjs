@@ -69,13 +69,15 @@ async function installBuiltWidget(page) {
   const bundle = readFileSync(bundlePath, "utf8");
   await page.route("http://e24-widget.test/", (route) => route.fulfill({
     contentType: "text/html",
-    body: `<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1">
+    body: `<!doctype html><meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
       <div id="galveston-booking"></div>
       <script src="/embed.js" data-api-base="http://e24-api.test"
         data-business-key="e24-browser"></script>`,
   }));
   await page.route("http://e24-widget.test/embed.js", (route) => route.fulfill({
-    contentType: "application/javascript", body: bundle,
+    headers: { "Content-Type": "application/javascript; charset=utf-8" },
+    body: bundle,
   }));
 }
 
