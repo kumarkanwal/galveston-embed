@@ -202,11 +202,6 @@ describe("shuttle trip compact styling", () => {
     expect(css).not.toContain(".on-request-choice");
   });
 
-  it("keeps the shuttle passenger and bag controls on one narrow row", () => {
-    const css = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
-    expect(css).toMatch(/\.layout-narrow \.shuttle-party-fields\s*\{[^}]*repeat\(2,/s);
-    expect(css).toMatch(/\.layout-narrow \.shuttle-party-fields > \[data-trip-field="passengers"\][^{]*\{[^}]*grid-column:\s*auto/s);
-  });
 });
 
 describe("shuttle passenger dropdown interactions", () => {
@@ -219,6 +214,18 @@ describe("shuttle passenger dropdown interactions", () => {
     act(() => trigger?.click());
     expect(trigger?.getAttribute("aria-expanded")).toBe("true");
     expect(element.querySelector(".passenger-menu")).not.toBeNull();
+  });
+
+  it("keeps all three steppers inside the solid popup", () => {
+    const element = renderPassengers();
+    const popup = element.querySelector(".passenger-menu-solid");
+    expect(popup).not.toBeNull();
+    const steppers = popup?.querySelectorAll(".counter-controls") ?? [];
+    expect(steppers).toHaveLength(3);
+    for (const stepper of steppers) {
+      expect(stepper.querySelectorAll("button")).toHaveLength(2);
+      expect(stepper.querySelector("output")).not.toBeNull();
+    }
   });
 
   it("allows Adults to reach zero and updates the closed-state total", () => {
