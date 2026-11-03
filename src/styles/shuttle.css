@@ -345,6 +345,25 @@
   margin: 0 0 10px;
 }
 
+.shuttle-price-lines,
+.shuttle-leg-price-lines {
+  display: grid;
+  gap: 8px;
+}
+
+.shuttle-price-lines {
+  margin-bottom: 12px;
+}
+
+.shuttle-passenger-line {
+  line-height: 1.5;
+}
+
+.shuttle-included-charge small {
+  color: var(--muted);
+  font-weight: 400;
+}
+
 .shuttle-addresses {
   border: 0;
   display: grid;

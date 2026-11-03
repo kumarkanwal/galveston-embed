@@ -34,6 +34,7 @@ import { isShuttleAvailabilityError, SHUTTLE_UNAVAILABLE_MESSAGE } from "./avail
 import { minimumPassengerError } from "./minimum";
 import { buildShuttleBooking, buildShuttleQuote } from "./requests";
 import { ShuttleAddressFields } from "./ShuttleAddressFields";
+import { ShuttlePriceLines } from "./ShuttlePriceLines";
 import type { SelectedShuttleLeg, ShuttleSelection } from "./types";
 
 interface ShuttleConfirmProps {
@@ -92,11 +93,9 @@ function ShuttleCharges(props: {
   onInput: (value: string) => void;
   onRemove: () => void;
 }) {
-  const lines = props.quote.line_items?.filter((line) => line.amount !== "0.00") ?? [];
   return <section class="charges"><h2>Charges</h2>
-    {lines.map((line, index) => <div class="charge-row" key={index}>
-      <span>{line.label}</span><span>{formatMoney(line.amount, props.quote.currency)}</span>
-    </div>)}
+    <ShuttlePriceLines adjustments={props.quote.adjustments} currency={props.quote.currency}
+      legs={props.quote.legs} />
     <PromoCodeField promo={props.promo} error={props.promo.error}
       onApply={props.onApply} onInput={props.onInput} onRemove={props.onRemove} />
     {props.error !== null && <FormError>{props.error}</FormError>}

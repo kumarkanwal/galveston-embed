@@ -133,27 +133,69 @@ describe("round-trip shuttle summary", () => {
 });
 
 describe("shuttle confirmation pricing", () => {
+  it("shows server passenger lines, included peak once, adjustments, and total", () => {
+    const quote = { ...SHUTTLE_QUOTE,
+      legs: [
+        { ...SHUTTLE_QUOTE.legs[0]!, passenger_lines: [
+          { passenger_type: "adult" as const, count: 1,
+            unit_price: "18.00", line_total: "18.00" },
+          { passenger_type: "senior" as const, count: 1,
+            unit_price: "22.00", line_total: "22.00" },
+        ], charges: [{ label: "Peak Hours Increase", amount: "5.00",
+          kind: "surcharge" as const, included_in_total: true as const }] },
+        { ...SHUTTLE_QUOTE.legs[0]!, passenger_lines: [
+          { passenger_type: "adult" as const, count: 1,
+            unit_price: "40.00", line_total: "40.00" },
+          { passenger_type: "senior" as const, count: 1,
+            unit_price: "38.00", line_total: "38.00" },
+        ], charges: [] },
+      ],
+      adjustments: [
+        { label: "Promo SAVE10", amount: "-8.00", kind: "discount" as const,
+          included_in_total: true as const },
+        { label: "Card Surcharge", amount: "4.00", kind: "surcharge" as const,
+          included_in_total: true as const },
+      ], total: "119.00",
+      line_items: [{ label: "Peak Hours Increase", amount: "5.00",
+        kind: "surcharge", quantity: 1 }],
+    } satisfies ShuttleQuoteResponse;
+    const { root } = mount(clientWith(), vi.fn(), SHUTTLE_BUSINESS, SELECTION, quote);
+    const passengerLines = [...root.querySelectorAll(".shuttle-passenger-line")]
+      .map((line) => line.textContent?.replace(/\s+/g, " ").trim());
+    expect(passengerLines).toEqual([
+      "Outbound: Adult × 1 $18.00 USD · Senior × 1 $22.00 USD",
+      "Return: Adult × 1 $40.00 USD · Senior × 1 $38.00 USD",
+    ]);
+    expect(root.querySelectorAll(".shuttle-included-charge")).toHaveLength(1);
+    expect(root.querySelector(".shuttle-included-charge")?.textContent)
+      .toContain("Outbound · Peak Hours Increase (included)");
+    expect([...root.querySelectorAll(".shuttle-adjustment span:first-child")]
+      .map((line) => line.textContent)).toEqual(["Promo SAVE10", "Card Surcharge"]);
+    expect(root.querySelector(".charges-total")?.textContent).toContain("$119.00 USD");
+  });
+
+});
+
+describe("shuttle promo and payment pricing", () => {
   it("preserves server line order, labels and amounts while re-quoting promo changes", async () => {
     const discounted = { ...SHUTTLE_QUOTE,
-      line_items: [
-        { label: "Promo SAVE10", amount: "-7.05", kind: "discount", quantity: 1 },
-        ...(SHUTTLE_QUOTE.line_items ?? []),
-      ], total: "63.45", discount_amount: "7.05",
+      adjustments: [{ label: "Promo SAVE10", amount: "-7.05", kind: "discount",
+        included_in_total: true }], total: "63.45", discount_amount: "7.05",
     } satisfies ShuttleQuoteResponse;
     const quote = vi.fn<ShuttleApiClient["quoteShuttle"]>(async () => discounted);
     const { root } = mount(clientWith(quote));
-    const labels = [...root.querySelectorAll(".charge-row span:first-child")]
+    const labels = [...root.querySelectorAll(".shuttle-adjustment span:first-child")]
       .map((element) => element.textContent);
-    expect(labels).toEqual(["Adult fare", "Senior fare"]);
+    expect(labels).toEqual([]);
     enter(root, "promoCode", "SAVE10");
     act(() => root.querySelector<HTMLButtonElement>(".promo-code button")?.click());
     await vi.waitFor(() => expect(root.textContent).toContain("$63.45 USD"));
     expect(quote).toHaveBeenCalledWith(expect.objectContaining({
       payment_method: "cash", promo_code: "SAVE10",
     }));
-    expect([...root.querySelectorAll(".charge-row span:first-child")]
+    expect([...root.querySelectorAll(".shuttle-adjustment span:first-child")]
       .map((element) => element.textContent))
-      .toEqual(["Promo SAVE10", "Adult fare", "Senior fare"]);
+      .toEqual(["Promo SAVE10"]);
     act(() => root.querySelector<HTMLButtonElement>(".promo-code button")?.click());
     await vi.waitFor(() => expect(quote).toHaveBeenCalledTimes(2));
     expect(quote.mock.calls[1]?.[0]).not.toHaveProperty("promo_code");

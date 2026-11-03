@@ -2,7 +2,7 @@ import { render } from "preact";
 import { act } from "preact/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { TaxiBookingResponse } from "../src/api/client";
+import type { ShuttleBookingResponse, TaxiBookingResponse } from "../src/api/client";
 import { Confirmation } from "../src/app/booking/Confirmation";
 import { SHUTTLE_BOOKED } from "./shuttle-fixtures";
 
@@ -20,7 +20,7 @@ let writeText = vi.fn(async (_text: string) => undefined);
 const CUSTOMER_EMAIL = "ada@example.com";
 
 function mount(
-  response: TaxiBookingResponse | typeof SHUTTLE_BOOKED,
+  response: TaxiBookingResponse | ShuttleBookingResponse,
   paymentMethod: "cash" | "online",
   emailsEnabled?: boolean,
   journeyLines?: string[],
@@ -94,5 +94,36 @@ describe("private shuttle confirmation", () => {
       ["Outbound: 2026-10-30 · Time: to be arranged"]);
     expect(root.querySelector(".confirmation-journey")?.textContent)
       .toBe("Outbound: 2026-10-30 · Time: to be arranged");
+  });
+
+  it("shows booking passenger lines, one included peak, adjustments, and total", () => {
+    const response = { ...SHUTTLE_BOOKED,
+      legs: [
+        { ...SHUTTLE_BOOKED.legs[0]!, passenger_lines: [
+          { passenger_type: "adult" as const, count: 1,
+            unit_price: "18.00", line_total: "18.00" },
+          { passenger_type: "senior" as const, count: 1,
+            unit_price: "22.00", line_total: "22.00" },
+        ], charges: [{ label: "Peak Hours Increase", amount: "5.00",
+          kind: "surcharge" as const, included_in_total: true as const }], leg_total: "45.00" },
+        { ...SHUTTLE_BOOKED.legs[0]!, booking_id: "return-booking", passenger_lines: [
+          { passenger_type: "adult" as const, count: 1,
+            unit_price: "40.00", line_total: "40.00" },
+          { passenger_type: "senior" as const, count: 1,
+            unit_price: "38.00", line_total: "38.00" },
+        ], charges: [], leg_total: "78.00" },
+      ], adjustments: [{ label: "Card Surcharge", amount: "4.00",
+        kind: "surcharge" as const, included_in_total: true as const }], total: "127.00",
+    } satisfies ShuttleBookingResponse;
+    const root = mount(response, "online", false);
+    expect([...root.querySelectorAll(".shuttle-passenger-line")]
+      .map((line) => line.textContent?.replace(/\s+/g, " ").trim())).toEqual([
+      "Outbound: Adult × 1 $18.00 USD · Senior × 1 $22.00 USD",
+      "Return: Adult × 1 $40.00 USD · Senior × 1 $38.00 USD",
+    ]);
+    expect(root.querySelectorAll(".shuttle-included-charge")).toHaveLength(1);
+    expect(root.querySelector(".shuttle-adjustment")?.textContent)
+      .toContain("Card Surcharge$4.00 USD");
+    expect(root.querySelector(".confirmation-total")?.textContent).toContain("$127.00 USD");
   });
 });
