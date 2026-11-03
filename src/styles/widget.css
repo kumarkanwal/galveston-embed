@@ -621,6 +621,6 @@ select[aria-invalid="true"] {
   grid-column: 1 / -1;
 }
 
-:is(.layout-narrow) .party-fields .counter-controls {
+:is(.layout-narrow) .party-fields .counter-controls:not(.passenger-popup-stepper) {
   grid-template-columns: 28px minmax(24px, 1fr) 28px;
 }
