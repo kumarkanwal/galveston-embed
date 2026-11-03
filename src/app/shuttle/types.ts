@@ -28,18 +28,7 @@ export interface ScheduledLeg {
   route: ShuttleRoute;
 }
 
-export interface OnRequestLeg {
-  kind: "on_request";
-  date: string;
-  serviceMode: "shared" | "private";
-  time: string;
-  routeId: string;
-  route: ShuttleRoute;
-  vehicleTypeId: string;
-  vehicleTypeName: string;
-}
-
-export type SelectedShuttleLeg = ScheduledLeg | OnRequestLeg;
+export type SelectedShuttleLeg = ScheduledLeg;
 
 export interface ShuttleSelection {
   trip: ShuttleTripForm;

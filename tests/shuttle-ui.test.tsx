@@ -5,7 +5,7 @@ import { act } from "preact/test-utils";
 import { useState } from "preact/hooks";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { OnRequestAvailability, ShuttleSearchResult } from "../src/api/client";
+import type { ShuttleSearchResult } from "../src/api/client";
 import { ShuttleDepartures } from "../src/app/shuttle/Departures";
 import { PassengerDropdown } from "../src/app/shuttle/PassengerDropdown";
 import { ShuttleTrip } from "../src/app/shuttle/Trip";
@@ -18,31 +18,10 @@ const TRIP: ShuttleTripForm = {
   paxAdult: 1, paxSenior: 0, paxChild: 0,
 };
 
-const SHARED_OPTION = {
-  departure_type: "on_request", route_id: SEARCH_RESULT.route.id,
-  vehicle_type_id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-  vehicle_type_name: "Executive Van", seat_capacity: 8, from_price: "38.50",
-  effective_min_passengers: 1, service_mode: "shared",
-  earliest_pickup_date: "2026-10-30", earliest_pickup_time: "11:00",
-} satisfies OnRequestAvailability;
-
-const PRIVATE_OPTION = {
-  ...SHARED_OPTION, vehicle_type_id: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
-  vehicle_type_name: "Private Van", seat_capacity: 6, from_price: "150.00",
-  service_mode: "private",
-} satisfies OnRequestAvailability;
-
 function root(): HTMLElement {
   const element = document.createElement("div");
   document.body.append(element);
   return element;
-}
-
-function change(input: HTMLInputElement, value: string) {
-  act(() => {
-    input.value = value;
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-  });
 }
 
 function TripHarness() {
@@ -193,13 +172,11 @@ describe("shuttle trip compact styling", () => {
     expect(css).toMatch(/\.trip-kind:focus-within\s*\{[^}]*outline:/s);
   });
 
-  it("keeps fixed and any-time rows full-width in the 360px container layout", () => {
+  it("keeps fixed rows full-width in the 360px container layout", () => {
     const css = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
     expect(css).toMatch(/\.departure-section\s*\{[^}]*width:\s*100%/s);
-    expect(css).toMatch(/\.on-request-section\s*\{[^}]*width:\s*100%/s);
     expect(css).toMatch(/\.shuttle-departure\.selected\s*\{[^}]*border-color:\s*var\(--blue\)/s);
     expect(css).toMatch(/:is\(\.layout-narrow, \.layout-micro\) \.shuttle-departure\s*\{/s);
-    expect(css).not.toContain(".on-request-choice");
   });
 
 });
@@ -301,90 +278,28 @@ describe("shuttle departures", () => {
     expect(element.textContent).toContain("60 min");
     expect(element.textContent).not.toContain("Vehicle:");
   });
-
-  it("uses the existing empty-day message", () => {
-    const element = renderDepartures({ ...SEARCH_RESULT, departures: [] });
-    expect(element.textContent).toContain("No departures are available for this day");
-  });
-
-  it("renders the server reason for an unselectable return without calculating chronology", () => {
-    const reason = "This departure leaves before your outbound trip arrives.";
-    const unavailable = { ...DEPARTURE, selectable: false, unselectable_reason: reason };
-    const element = renderDepartures({ ...SEARCH_RESULT, departures: [unavailable] }, "return");
-    expect(element.textContent).toContain(reason);
-    expect(element.querySelector<HTMLButtonElement>(".departure-section.return button")?.disabled)
-      .toBe(true);
-  });
 });
 
-describe("on-request shuttle presentation", () => {
-  it("uses one time field and compact server-priced rows without a date field", () => {
-    const result = { ...SEARCH_RESULT, departures: [], on_request: null,
-      on_request_options: [SHARED_OPTION, PRIVATE_OPTION] };
-    const element = renderDepartures(result);
-    expect(element.textContent).toContain("Choose Departure · Fri, Oct 30");
-    expect(element.querySelector('input[type="date"]')).toBeNull();
-    expect(element.querySelectorAll('input[type="time"]')).toHaveLength(1);
-    expect(element.querySelectorAll(".any-time-departure")).toHaveLength(2);
-    expect(element.textContent).toContain("Executive Van");
-    expect(element.textContent).toContain("Private Van");
-    expect(element.textContent).toContain("Shared");
-    expect(element.textContent).toContain("Private");
-    expect(element.textContent).toContain("$38.50 USD");
-    expect(element.textContent).toContain("$150.00 USD");
-    expect(element.textContent).toContain("6 seats · 60 min");
-    expect(element.textContent).not.toContain("From $");
-    for (const button of element.querySelectorAll<HTMLButtonElement>(".any-time-departure button")) {
-      expect(button.disabled).toBe(true);
-      expect(button.title).toBe("Pick a time first");
-    }
+describe("fixed-only shuttle departures", () => {
+  it("shows the fixed-departure empty message and ignores any-time cars", () => {
+    const privateCar = {
+      departure_type: "on_request" as const, route_id: SEARCH_RESULT.route.id,
+      vehicle_type_id: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      vehicle_type_name: "Private Van", seat_capacity: 6, from_price: "150.00",
+      effective_min_passengers: 1, service_mode: "private" as const,
+    };
+    const element = renderDepartures({ ...SEARCH_RESULT, departures: [],
+      on_request: privateCar, on_request_options: [privateCar] });
+    expect(element.textContent).toContain(
+      "No scheduled departures on this date. Please try another date.",
+    );
+    expect(element.querySelector('input[type="time"]')).toBeNull();
+    expect(element.textContent).not.toContain("Private Van");
+    expect(element.textContent).not.toContain("Or pick your own time");
   });
 
-  it("shows fixed rows first, then one any-time subsection with field errors", () => {
-    const result = { ...SEARCH_RESULT, departures: [DEPARTURE], on_request: null,
-      on_request_options: [SHARED_OPTION, PRIVATE_OPTION] };
-    const element = renderDepartures(result);
-    const fixed = element.querySelector(".shuttle-departures");
-    const anyTime = element.querySelector(".on-request-section");
-    expect(element.textContent).toContain("Or pick your own time");
-    expect(fixed).not.toBeNull();
-    expect(anyTime).not.toBeNull();
-    expect(fixed!.compareDocumentPosition(anyTime!) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
-    const picker = element.querySelector<HTMLInputElement>('[data-shuttle-time="outbound"]');
-    expect(picker?.min).toBe("11:00");
-    change(picker!, "10:30");
-    expect(element.textContent).toContain("Choose a time at or after 11:00");
-  });
-});
-
-describe("on-request shuttle selection", () => {
-  it("chooses the Trip-step date and shared time and marks the selected row", () => {
-    const choose = vi.fn();
-    const selected = {
-      kind: "on_request", date: "2026-10-30", time: "12:15", serviceMode: "private",
-      routeId: PRIVATE_OPTION.route_id, route: SEARCH_RESULT.route,
-      vehicleTypeId: PRIVATE_OPTION.vehicle_type_id,
-      vehicleTypeName: PRIVATE_OPTION.vehicle_type_name,
-    } satisfies SelectedShuttleLeg;
-    const result = { ...SEARCH_RESULT, departures: [], on_request: null,
-      on_request_options: [SHARED_OPTION, PRIVATE_OPTION] };
-    const element = renderDepartures(result, "outbound", choose, selected);
-    const picker = element.querySelector<HTMLInputElement>('[data-shuttle-time="outbound"]')!;
-    change(picker, "12:15");
-    expect(picker.hasAttribute("aria-describedby")).toBe(false);
-    const rows = element.querySelectorAll<HTMLElement>(".any-time-departure");
-    expect(rows[1]?.classList.contains("selected")).toBe(true);
-    expect(rows[1]?.querySelector("button")?.textContent).toBe("Selected");
-    act(() => rows[0]?.querySelector<HTMLButtonElement>("button")?.click());
-    expect(choose).toHaveBeenCalledWith(expect.objectContaining({
-      kind: "on_request", date: "2026-10-30", time: "12:15",
-      vehicleTypeId: SHARED_OPTION.vehicle_type_id,
-    }));
-  });
-
-  it("renders one independent time field for each round-trip leg", () => {
-    const result = { ...SEARCH_RESULT, departures: [], on_request: null,
-      on_request_options: [PRIVATE_OPTION] };
+  it("renders no pickup-time input for either round-trip leg", () => {
+    const result = { ...SEARCH_RESULT, departures: [DEPARTURE] };
     const element = root();
     render(<ShuttleDepartures currency="USD" notice={null} loadingOutbound={false}
       outboundData={{ result, date: "2026-11-04", direction: "outbound" }}
@@ -392,9 +307,19 @@ describe("on-request shuttle selection", () => {
       passengerCount={1} selectedOutbound={null} selectedReturn={null}
       onBack={() => undefined} onChooseOutbound={() => undefined}
       onChooseReturn={() => undefined} />, element);
-    expect(element.querySelectorAll('input[type="date"]')).toHaveLength(0);
-    expect(element.querySelectorAll('input[type="time"]')).toHaveLength(2);
+    expect(element.querySelectorAll('input[type="time"]')).toHaveLength(0);
     expect(element.textContent).toContain("Choose Departure · Wed, Nov 4");
     expect(element.textContent).toContain("Choose Return · Sat, Nov 7");
+  });
+});
+
+describe("return shuttle departures", () => {
+  it("renders the server reason for an unselectable return without calculating chronology", () => {
+    const reason = "This departure leaves before your outbound trip arrives.";
+    const unavailable = { ...DEPARTURE, selectable: false, unselectable_reason: reason };
+    const element = renderDepartures({ ...SEARCH_RESULT, departures: [unavailable] }, "return");
+    expect(element.textContent).toContain(reason);
+    expect(element.querySelector<HTMLButtonElement>(".departure-section.return button")?.disabled)
+      .toBe(true);
   });
 });

@@ -132,7 +132,14 @@ describe("passenger panel CSS", () => {
   });
 
   it("uses equal popup padding and border-box geometry without stepper overflow", () => {
+    const widgetCss = readFileSync(resolve("src/styles/widget.css"), "utf8");
     const shuttleCss = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
+    expect(widgetCss).toMatch(
+      /\.party-fields \.counter-controls:not\(\.passenger-popup-stepper\)\s*\{/,
+    );
+    expect(widgetCss).not.toMatch(
+      /\.party-fields \.counter-controls\s*\{[^}]*grid-template-columns:\s*28px/s,
+    );
     expect(shuttleCss).toMatch(/\.passenger-menu\s*\{[^}]*box-sizing:\s*border-box;[^}]*padding:\s*14px/s);
     expect(shuttleCss).toMatch(/\.passenger-row\s*\{[^}]*box-sizing:\s*border-box;[^}]*gap:\s*12px;[^}]*min-width:\s*0;[^}]*width:\s*100%/s);
     expect(shuttleCss).toMatch(/\.passenger-row \.counter-controls\s*\{[^}]*box-sizing:\s*border-box;[^}]*max-width:\s*100%;[^}]*min-width:\s*0;[^}]*width:\s*132px/s);

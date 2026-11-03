@@ -332,34 +332,6 @@
   margin: 0;
 }
 
-.on-request-section {
-  border-top: 1px solid var(--border);
-  margin-top: 16px;
-  min-width: 0;
-  padding-top: 14px;
-  width: 100%;
-}
-
-.on-request-section > h3 {
-  font-size: 17px;
-  margin: 0 0 10px;
-}
-
-.shuttle-pickup-time {
-  margin: 0 0 12px;
-  max-width: 280px;
-}
-
-.any-time-departures {
-  margin-bottom: 0;
-  margin-top: 0;
-}
-
-.any-time-departure .form-error {
-  grid-column: 1 / -1;
-  margin: 0;
-}
-
 .shuttle-summary {
   padding: 12px 18px;
 }
@@ -409,10 +381,6 @@
   max-width: 100%;
   right: auto;
   width: 100%;
-}
-
-:is(.layout-narrow, .layout-micro) .shuttle-pickup-time {
-  max-width: none;
 }
 
 :is(.layout-narrow, .layout-micro) .shuttle-departure {

@@ -52,7 +52,7 @@ function renderAtWidth(child: ComponentChildren, width: number) {
 
 beforeEach(() => document.body.replaceChildren());
 
-describe.each([320, 360])("passenger controls at %ipx", (width) => {
+describe.each([320, 360, 375, 400])("passenger controls at %ipx", (width) => {
   it("renders every shuttle popup stepper inside its constrained row", () => {
     const root = renderAtWidth(<ShuttleHarness />, width);
     act(() => root.querySelector<HTMLButtonElement>(".passenger-trigger")?.click());
