@@ -218,9 +218,13 @@ describe("shuttle passenger dropdown interactions", () => {
 
   it("keeps all three steppers inside the solid popup", () => {
     const element = renderPassengers();
-    const popup = element.querySelector(".passenger-menu-solid");
+    const popup = element.querySelector(".passenger-menu-solid.passenger-popup-box");
     expect(popup).not.toBeNull();
-    const steppers = popup?.querySelectorAll(".counter-controls") ?? [];
+    const rows = popup?.querySelectorAll(".passenger-row.passenger-popup-row") ?? [];
+    const steppers = popup?.querySelectorAll(
+      ".counter-controls.passenger-popup-stepper",
+    ) ?? [];
+    expect(rows).toHaveLength(3);
     expect(steppers).toHaveLength(3);
     for (const stepper of steppers) {
       expect(stepper.querySelectorAll("button")).toHaveLength(2);

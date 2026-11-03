@@ -20,9 +20,10 @@ function PassengerCounter(props: {
   update: PassengerDropdownProps["update"];
   value: number;
 }) {
-  return <div class="passenger-row">
+  return <div class="passenger-row passenger-popup-row">
     <span id={`${props.field}-label`}>{props.label}</span>
-    <div class="counter-controls" role="group" aria-labelledby={`${props.field}-label`}>
+    <div class="counter-controls passenger-popup-stepper" role="group"
+      aria-labelledby={`${props.field}-label`}>
       <button type="button" aria-label={`Decrease ${props.label}`}
         disabled={props.value <= props.minimum}
         onClick={() => props.update(props.field, props.value - 1)}>−</button>
@@ -66,7 +67,8 @@ export function PassengerDropdown(props: PassengerDropdownProps) {
       <span class="passenger-trigger-text">{passengerLabel(total)}</span>
       <FieldChevron open={open} />
     </button>
-    {open && <div id="passenger-menu" class="passenger-menu passenger-menu-solid" role="dialog"
+    {open && <div id="passenger-menu"
+      class="passenger-menu passenger-menu-solid passenger-popup-box" role="dialog"
       aria-label="Passenger counts">
       <PassengerCounter field="paxAdult" label="Adults" minimum={0}
         value={props.form.paxAdult} update={props.update} />
