@@ -67,7 +67,8 @@ function updatedForm<Key extends keyof TripFormState>(
 ): TripFormState {
   const updated = { ...form, [key]: value };
   if (key === "service") {
-    return { ...updated, pickupAirportLocation: null, dropoffAirportLocation: null };
+    return { ...updated, pickupAirportLocation: null, dropoffAirportLocation: null,
+      ...(value === "round_trip" ? {} : { returnDate: "", returnTime: "" }) };
   }
   if (key === "pickupAirportId") return { ...updated, pickupAirportLocation: null };
   if (key === "dropoffAirportId") return { ...updated, dropoffAirportLocation: null };

@@ -89,6 +89,16 @@ beforeEach(() => {
 });
 
 describe("quote validation timing", () => {
+  it("clears hidden taxi return values when leaving round trip", async () => {
+    render(<Harness client={clientWith(vi.fn(async () => QUOTE))} service="round_trip" />,
+      document.body);
+    flow().update("returnDate", "2026-12-02");
+    flow().update("returnTime", "10:00");
+    flow().update("service", "one_way");
+    await vi.waitFor(() => expect(flow().state.form.returnDate).toBe(""));
+    expect(flow().state.form.returnTime).toBe("");
+  });
+
   it("reveals errors only after blur or the first Check Pricing attempt", async () => {
     render(<Harness client={clientWith(vi.fn(async () => QUOTE))} />, document.body);
     expect(flow().state.errors).toEqual({});

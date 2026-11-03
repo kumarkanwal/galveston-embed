@@ -20,6 +20,10 @@
   opacity: 1;
 }
 
+.return-date-slot.is-hidden {
+  visibility: hidden;
+}
+
 .stop-field {
   position: relative;
 }

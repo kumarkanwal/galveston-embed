@@ -86,6 +86,23 @@ function mount(client: ShuttleApiClient) {
 
 beforeEach(() => document.body.replaceChildren());
 
+describe("conditional shuttle return date", () => {
+  it("clears and disables Return Date when Round trip is unchecked", async () => {
+    const { client } = clientWith();
+    const root = mount(client);
+    const checkbox = root.querySelector<HTMLInputElement>(".trip-kind input");
+    act(() => checkbox?.click());
+    const returnDate = root.querySelector<HTMLInputElement>("#returnDate");
+    change(returnDate!, "2026-11-08");
+    expect(returnDate?.value).toBe("2026-11-08");
+    act(() => checkbox?.click());
+    await vi.waitFor(() => expect(returnDate?.value).toBe(""));
+    expect(returnDate?.disabled).toBe(true);
+    expect(returnDate?.closest(".return-date-slot")?.getAttribute("aria-hidden")).toBe("true");
+    expect(client.searchShuttle).not.toHaveBeenCalled();
+  });
+});
+
 describe("same-page shuttle departures", () => {
   it("keeps outbound departures above returns and refreshes returns for a new outbound", async () => {
     const second = { ...DEPARTURE,

@@ -13,7 +13,7 @@ import type { SelectedShuttleLeg, ShuttleTripForm } from "../src/app/shuttle/typ
 import { DEPARTURE, LOCATION_GROUPS, SEARCH_RESULT } from "./shuttle-fixtures";
 
 const TRIP: ShuttleTripForm = {
-  fromId: "", toId: "", date: "2026-10-30", returnDate: "2026-11-01",
+  fromId: "", toId: "", date: "2026-10-30", returnDate: "",
   roundTrip: false, largeBags: 0, smallBags: 0,
   paxAdult: 1, paxSenior: 0, paxChild: 0,
 };
@@ -118,7 +118,7 @@ describe("shuttle trip layout", () => {
     expect(children[5]?.textContent).toContain("Find Departures");
   });
 
-  it("keeps Return Date disabled until Round trip is checked", () => {
+  it("keeps the hidden Return Date slot until Round trip is checked", () => {
     const element = renderTrip();
     const checkbox = element.querySelector<HTMLInputElement>('.trip-kind input[type="checkbox"]');
     const returnDate = element.querySelector<HTMLInputElement>("#returnDate");
@@ -127,15 +127,26 @@ describe("shuttle trip layout", () => {
     expect(element.querySelector('.trip-kind input[type="radio"]')).toBeNull();
     expect(returnDate?.disabled).toBe(true);
     expect(returnDate?.required).toBe(false);
+    expect(returnDate?.value).toBe("");
     expect(returnDate?.min).toBe(TRIP.date);
+    const slot = returnDate?.closest(".return-date-slot");
+    expect(slot?.classList.contains("is-hidden")).toBe(true);
+    expect(slot?.getAttribute("aria-hidden")).toBe("true");
+    expect(element.querySelector(".shuttle-trip-fields")?.children).toHaveLength(2);
     expect(element.querySelector(".shuttle-trip-fields")?.classList.contains("date-time-grid"))
       .toBe(true);
     act(() => element.querySelector<HTMLLabelElement>(".trip-kind")?.click());
     expect(checkbox?.checked).toBe(true);
     expect(returnDate?.disabled).toBe(false);
     expect(returnDate?.required).toBe(true);
+    expect(slot?.classList.contains("is-hidden")).toBe(false);
+    expect(slot?.getAttribute("aria-hidden")).toBe("false");
+    expect(element.querySelector(".shuttle-trip-fields")?.children).toHaveLength(2);
   });
 
+});
+
+describe("shuttle round-trip control", () => {
   it("sends false when Round trip is unchecked", () => {
     const update = vi.fn();
     const element = root();
@@ -170,6 +181,11 @@ describe("shuttle trip compact styling", () => {
     expect(css).toMatch(/\.trip-kind\s*\{[^}]*padding:\s*0 10px/s);
     expect(css).toMatch(/\.trip-kind\s*\{[^}]*min-height:\s*38px/s);
     expect(css).toMatch(/\.trip-kind:focus-within\s*\{[^}]*outline:/s);
+  });
+
+  it("hides Return Date without removing its grid column", () => {
+    const css = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
+    expect(css).toMatch(/\.return-date-slot\.is-hidden\s*\{[^}]*visibility:\s*hidden/s);
   });
 
   it("keeps fixed rows full-width in the 360px container layout", () => {
