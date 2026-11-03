@@ -1,5 +1,6 @@
 import type {
   LocationOption,
+  PrivateCarAvailability,
   ShuttleDeparture,
   ShuttleRoute,
   ShuttleSearchResult,
@@ -28,7 +29,14 @@ export interface ScheduledLeg {
   route: ShuttleRoute;
 }
 
-export type SelectedShuttleLeg = ScheduledLeg;
+export interface PrivateLeg {
+  kind: "private";
+  date: string;
+  car: PrivateCarAvailability;
+  route: ShuttleRoute;
+}
+
+export type SelectedShuttleLeg = ScheduledLeg | PrivateLeg;
 
 export interface ShuttleSelection {
   trip: ShuttleTripForm;

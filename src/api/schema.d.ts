@@ -2793,6 +2793,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/routes/{route_id}/businesses/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview Route Businesses
+         * @description Preview fleet links required by a prospective sharing selection.
+         */
+        post: operations["preview_route_businesses_v1_admin_routes__route_id__businesses_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/routes/{route_id}/vehicle-types": {
         parameters: {
             query?: never;
@@ -5079,6 +5099,12 @@ export interface components {
             booking_id: string;
             /** Seats Confirmed */
             seats_confirmed: number;
+            /** Passenger Lines */
+            passenger_lines: components["schemas"]["ShuttlePassengerPriceLine"][];
+            /** Charges */
+            charges: components["schemas"]["ShuttleIncludedChargeLine"][];
+            /** Leg Total */
+            leg_total: string;
         };
         /**
          * BookingLeg
@@ -5098,7 +5124,7 @@ export interface components {
              * @default scheduled
              * @enum {string}
              */
-            departure_type: "scheduled" | "on_request";
+            departure_type: "scheduled" | "private" | "on_request";
             /** Route Id */
             route_id?: string | null;
             /** Vehicle Type Id */
@@ -5185,6 +5211,16 @@ export interface components {
             status: string;
             /** Total */
             total: string;
+            /** Subtotal */
+            subtotal: string;
+            /** Discount Amount */
+            discount_amount: string;
+            /** Insurance Amount */
+            insurance_amount: string;
+            /** Currency */
+            currency: string;
+            /** Adjustments */
+            adjustments?: components["schemas"]["ShuttleAdjustmentLine"][];
             /** Amount Paid */
             amount_paid: string;
             /** Large Bags */
@@ -7668,6 +7704,10 @@ export interface components {
         Envelope_RouteResult_: {
             data: components["schemas"]["RouteResult"];
         };
+        /** Envelope[RouteSharingPreviewResult] */
+        Envelope_RouteSharingPreviewResult_: {
+            data: components["schemas"]["RouteSharingPreviewResult"];
+        };
         /** Envelope[RouteVehicleQuoteResult] */
         Envelope_RouteVehicleQuoteResult_: {
             data: components["schemas"]["RouteVehicleQuoteResult"];
@@ -8873,6 +8913,34 @@ export interface components {
             total: number;
         };
         /**
+         * MissingVehicleLink
+         * @description One active route car unavailable to a prospective partner company.
+         */
+        MissingVehicleLink: {
+            /**
+             * Vehicle Type Id
+             * Format: uuid
+             */
+            vehicle_type_id: string;
+            /** Vehicle Type Name */
+            vehicle_type_name: string;
+        };
+        /**
+         * MissingVehicleLinksCompany
+         * @description Missing route-car links grouped for one company confirmation.
+         */
+        MissingVehicleLinksCompany: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Business Name */
+            business_name: string;
+            /** Cars */
+            cars: components["schemas"]["MissingVehicleLink"][];
+        };
+        /**
          * MoneyTotal
          * @description A run count and its exact attributed order value.
          */
@@ -9728,6 +9796,53 @@ export interface components {
          */
         PricingType: "distance" | "hourly" | "flat";
         /**
+         * PrivateCarAvailability
+         * @description A date-only private car whose pickup time is arranged by phone.
+         */
+        PrivateCarAvailability: {
+            /**
+             * Departure Type
+             * @default private
+             * @constant
+             */
+            departure_type: "private";
+            /**
+             * Route Id
+             * Format: uuid
+             */
+            route_id: string;
+            /**
+             * Vehicle Type Id
+             * Format: uuid
+             */
+            vehicle_type_id: string;
+            /** Vehicle Type Name */
+            vehicle_type_name: string;
+            /**
+             * Service Date
+             * Format: date
+             */
+            service_date: string;
+            /** Pickup Time */
+            pickup_time?: null;
+            /** Seat Capacity */
+            seat_capacity: number;
+            /** Total For Selection */
+            total_for_selection: string;
+            /**
+             * Effective Min Passengers
+             * @default 1
+             */
+            effective_min_passengers: number;
+            /**
+             * Service Mode
+             * @default private
+             * @constant
+             */
+            service_mode: "private";
+            pricing: components["schemas"]["ShuttlePricingSummary"];
+        };
+        /**
          * PromoCreate
          * @description Create a promo; redemption count is deliberately not client-editable.
          */
@@ -10007,7 +10122,7 @@ export interface components {
             /** Schedule Id */
             schedule_id?: string | null;
             /** Departure Type */
-            departure_type?: "on_request" | null;
+            departure_type?: "private" | null;
             /** Route Id */
             route_id?: string | null;
             /** Vehicle Type Id */
@@ -10023,11 +10138,15 @@ export interface components {
             /** Date */
             date: string;
             /** Time */
-            time: string;
+            time: string | null;
             /** Duration Minutes */
             duration_minutes: number;
             /** Pax Summary */
             pax_summary: string;
+            /** Passenger Lines */
+            passenger_lines: components["schemas"]["ShuttlePassengerPriceLine"][];
+            /** Charges */
+            charges: components["schemas"]["ShuttleIncludedChargeLine"][];
             /** Leg Price */
             leg_price: string;
             /** @default shared */
@@ -10041,7 +10160,7 @@ export interface components {
         };
         /**
          * QuoteLegRequest
-         * @description One fixed departure or exact customer-selected on-request time.
+         * @description One fixed departure or date-only private-car selection.
          */
         QuoteLegRequest: {
             /** Schedule Id */
@@ -10051,7 +10170,7 @@ export interface components {
              * @default scheduled
              * @enum {string}
              */
-            departure_type: "scheduled" | "on_request";
+            departure_type: "scheduled" | "private" | "on_request";
             /** Route Id */
             route_id?: string | null;
             /** Vehicle Type Id */
@@ -10127,6 +10246,8 @@ export interface components {
             total: string;
             /** Currency */
             currency: string;
+            /** Adjustments */
+            adjustments?: components["schemas"]["ShuttleAdjustmentLine"][];
             /** Line Items */
             line_items?: components["schemas"]["BreakdownLine"][] | null;
         };
@@ -10485,6 +10606,14 @@ export interface components {
             is_active: boolean;
         };
         /**
+         * RouteBusinessesPreviewRequest
+         * @description Companies considered by a route-sharing preview.
+         */
+        RouteBusinessesPreviewRequest: {
+            /** Business Ids */
+            business_ids: string[];
+        };
+        /**
          * RouteBusinessesResult
          * @description All visible company assignments for one route.
          */
@@ -10496,14 +10625,21 @@ export interface components {
             route_id: string;
             /** Businesses */
             businesses: components["schemas"]["RouteBusinessResult"][];
+            /** Added Vehicle Links */
+            added_vehicle_links?: components["schemas"]["MissingVehicleLinksCompany"][];
         };
         /**
          * RouteBusinessesUpdate
-         * @description Complete set of companies whose websites may sell the route.
+         * @description Complete company set plus explicit permission to create missing car links.
          */
         RouteBusinessesUpdate: {
             /** Business Ids */
             business_ids: string[];
+            /**
+             * Link Missing Cars
+             * @default false
+             */
+            link_missing_cars: boolean;
         };
         /**
          * RouteCreate
@@ -10555,6 +10691,9 @@ export interface components {
              * Format: uuid
              */
             business_id: string;
+            owner_business: components["schemas"]["RouteOwnerBusiness"];
+            /** Shared */
+            shared: boolean;
             /**
              * From Location Id
              * Format: uuid
@@ -10618,6 +10757,19 @@ export interface components {
             service_label: string;
             /** Duration Minutes */
             duration_minutes: number;
+        };
+        /**
+         * RouteOwnerBusiness
+         * @description The company that owns and may edit a shared route.
+         */
+        RouteOwnerBusiness: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
         };
         /**
          * RoutePriceResult
@@ -10690,6 +10842,9 @@ export interface components {
              * Format: uuid
              */
             business_id: string;
+            owner_business: components["schemas"]["RouteOwnerBusiness"];
+            /** Shared */
+            shared: boolean;
             /**
              * From Location Id
              * Format: uuid
@@ -10741,6 +10896,19 @@ export interface components {
              * @default false
              */
             copy_prices: boolean;
+        };
+        /**
+         * RouteSharingPreviewResult
+         * @description A no-write preview of links route sharing would need to create.
+         */
+        RouteSharingPreviewResult: {
+            /**
+             * Route Id
+             * Format: uuid
+             */
+            route_id: string;
+            /** Missing Vehicle Links */
+            missing_vehicle_links: components["schemas"]["MissingVehicleLinksCompany"][];
         };
         /**
          * RouteSummary
@@ -11346,6 +11514,8 @@ export interface components {
             on_request?: components["schemas"]["OnRequestAvailability"] | null;
             /** On Request Options */
             on_request_options?: components["schemas"]["OnRequestAvailability"][];
+            /** Private Cars */
+            private_cars?: components["schemas"]["PrivateCarAvailability"][];
         };
         /**
          * SelectedCharge
@@ -11579,7 +11749,7 @@ export interface components {
          * @description Stable codes for the global service catalog, safe to branch on in code.
          * @enum {string}
          */
-        ServiceTypeCode: "one_way" | "round_trip" | "hourly" | "airport_pickup" | "airport_dropoff";
+        ServiceTypeCode: "shuttle" | "one_way" | "round_trip" | "hourly" | "airport_pickup" | "airport_dropoff";
         /**
          * ServiceTypeOption
          * @description One service the business offers, for the step-one picker.
@@ -11635,11 +11805,54 @@ export interface components {
             updated_at: string;
         };
         /**
+         * ShuttleAdjustmentLine
+         * @description One cart-level discount, insurance amount, or payment surcharge.
+         */
+        ShuttleAdjustmentLine: {
+            /** Label */
+            label: string;
+            /** Amount */
+            amount: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "discount" | "insurance" | "surcharge";
+            /**
+             * Included In Total
+             * @default true
+             * @constant
+             */
+            included_in_total: true;
+        };
+        /**
          * ShuttleDepartureMode
          * @description Whether a route sells generated departures or customer-selected times.
          * @enum {string}
          */
         ShuttleDepartureMode: "fixed" | "on_request";
+        /**
+         * ShuttleIncludedChargeLine
+         * @description One leg-local charge counted once inside that leg and cart total.
+         */
+        ShuttleIncludedChargeLine: {
+            /** Label */
+            label: string;
+            /** Amount */
+            amount: string;
+            /**
+             * Kind
+             * @default surcharge
+             * @constant
+             */
+            kind: "surcharge";
+            /**
+             * Included In Total
+             * @default true
+             * @constant
+             */
+            included_in_total: true;
+        };
         /**
          * ShuttleJourneyDetail
          * @description Shuttle-only journey and seat fields.
@@ -11679,6 +11892,19 @@ export interface components {
             dropoff_address: string | null;
             /** Address */
             address: string | null;
+        };
+        /**
+         * ShuttlePassengerPriceLine
+         * @description One passenger-type fare line before separately listed leg charges.
+         */
+        ShuttlePassengerPriceLine: {
+            passenger_type: components["schemas"]["PassengerType"];
+            /** Count */
+            count: number;
+            /** Unit Price */
+            unit_price: string;
+            /** Line Total */
+            line_total: string;
         };
         /**
          * ShuttlePriceTierResult
@@ -13292,6 +13518,7 @@ export interface operations {
                 pax_senior?: number;
                 pax_adult?: number;
                 pax_child?: number;
+                trip_type?: "one_way" | "round_trip";
             };
             header?: {
                 "X-Business-Key"?: string | null;
@@ -19489,6 +19716,45 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_RouteBusinessesResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_route_businesses_v1_admin_routes__route_id__businesses_preview_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                route_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RouteBusinessesPreviewRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_RouteSharingPreviewResult_"];
                 };
             };
             /** @description Validation Error */

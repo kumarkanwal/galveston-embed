@@ -104,9 +104,12 @@ separate while contact fields, promo presentation, server-line rendering,
 errors and idempotency may be shared. Scheduled shuttle cards hide the internal
 `service_label`; when B-38D's nullable `vehicle_type` is present, they render its
 `name` as the vehicle display text and retain the server-provided duration.
-The Departures step renders fixed scheduled departures only. Public on-request,
-any-time, and private-car options are ignored, and shuttle return-search, quote,
-and booking requests contain scheduled ids only (ED-034).
+The Departures step renders shared service as fixed scheduled departures only.
+It also renders B-51 private cars on every searched date as date-only rows with
+no customer-selected time; pickup time is arranged by phone. Generic on-request
+options remain ignored. Shuttle quote and booking requests use scheduled ids for
+shared legs and the selected date without a time or schedule id for private legs
+(ED-034, ED-035).
 Shuttle passenger categories remain separate request counts inside one dropdown.
 Each search result's `route.from_requires_address` and
 `route.to_requires_address` flags control separate precise Places pickup and

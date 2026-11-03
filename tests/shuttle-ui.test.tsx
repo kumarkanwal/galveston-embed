@@ -10,10 +10,10 @@ import { ShuttleDepartures } from "../src/app/shuttle/Departures";
 import { PassengerDropdown } from "../src/app/shuttle/PassengerDropdown";
 import { ShuttleTrip } from "../src/app/shuttle/Trip";
 import type { SelectedShuttleLeg, ShuttleTripForm } from "../src/app/shuttle/types";
-import { DEPARTURE, LOCATION_GROUPS, SEARCH_RESULT } from "./shuttle-fixtures";
+import { DEPARTURE, LOCATION_GROUPS, PRIVATE_CAR, SEARCH_RESULT } from "./shuttle-fixtures";
 
 const TRIP: ShuttleTripForm = {
-  fromId: "", toId: "", date: "2026-10-30", returnDate: "2026-11-01",
+  fromId: "", toId: "", date: "2026-10-30", returnDate: "",
   roundTrip: false, largeBags: 0, smallBags: 0,
   paxAdult: 1, paxSenior: 0, paxChild: 0,
 };
@@ -118,7 +118,7 @@ describe("shuttle trip layout", () => {
     expect(children[5]?.textContent).toContain("Find Departures");
   });
 
-  it("keeps Return Date disabled until Round trip is checked", () => {
+  it("keeps the hidden Return Date slot until Round trip is checked", () => {
     const element = renderTrip();
     const checkbox = element.querySelector<HTMLInputElement>('.trip-kind input[type="checkbox"]');
     const returnDate = element.querySelector<HTMLInputElement>("#returnDate");
@@ -127,15 +127,26 @@ describe("shuttle trip layout", () => {
     expect(element.querySelector('.trip-kind input[type="radio"]')).toBeNull();
     expect(returnDate?.disabled).toBe(true);
     expect(returnDate?.required).toBe(false);
+    expect(returnDate?.value).toBe("");
     expect(returnDate?.min).toBe(TRIP.date);
+    const slot = returnDate?.closest(".return-date-slot");
+    expect(slot?.classList.contains("is-hidden")).toBe(true);
+    expect(slot?.getAttribute("aria-hidden")).toBe("true");
+    expect(element.querySelector(".shuttle-trip-fields")?.children).toHaveLength(2);
     expect(element.querySelector(".shuttle-trip-fields")?.classList.contains("date-time-grid"))
       .toBe(true);
     act(() => element.querySelector<HTMLLabelElement>(".trip-kind")?.click());
     expect(checkbox?.checked).toBe(true);
     expect(returnDate?.disabled).toBe(false);
     expect(returnDate?.required).toBe(true);
+    expect(slot?.classList.contains("is-hidden")).toBe(false);
+    expect(slot?.getAttribute("aria-hidden")).toBe("false");
+    expect(element.querySelector(".shuttle-trip-fields")?.children).toHaveLength(2);
   });
 
+});
+
+describe("shuttle round-trip control", () => {
   it("sends false when Round trip is unchecked", () => {
     const update = vi.fn();
     const element = root();
@@ -170,6 +181,11 @@ describe("shuttle trip compact styling", () => {
     expect(css).toMatch(/\.trip-kind\s*\{[^}]*padding:\s*0 10px/s);
     expect(css).toMatch(/\.trip-kind\s*\{[^}]*min-height:\s*38px/s);
     expect(css).toMatch(/\.trip-kind:focus-within\s*\{[^}]*outline:/s);
+  });
+
+  it("hides Return Date without removing its grid column", () => {
+    const css = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
+    expect(css).toMatch(/\.return-date-slot\.is-hidden\s*\{[^}]*visibility:\s*hidden/s);
   });
 
   it("keeps fixed rows full-width in the 360px container layout", () => {
@@ -278,6 +294,30 @@ describe("shuttle departures", () => {
     expect(element.textContent).toContain("60 min");
     expect(element.textContent).not.toContain("Vehicle:");
   });
+
+  it("shows the server mix total instead of the cheapest seat price", () => {
+    const departure = { ...DEPARTURE, total_for_selection: "91.00",
+      prices: { adult: "10.00", senior: "12.00", child: "8.00" } };
+    const element = renderDepartures({ ...SEARCH_RESULT, departures: [departure] });
+    expect(element.textContent).toContain("$91.00 USD");
+    expect(element.textContent).not.toContain("$8.00 USD");
+  });
+
+  it("shows each round-trip direction's own server price", () => {
+    const outbound = { ...DEPARTURE, total_for_selection: "130.00" };
+    const returning = { ...DEPARTURE, schedule_id: "return", total_for_selection: "145.00" };
+    const element = root();
+    render(<ShuttleDepartures currency="USD" notice={null} loadingOutbound={false}
+      outboundData={{ result: { ...SEARCH_RESULT, departures: [outbound] },
+        date: "2026-11-04", direction: "outbound" }}
+      returnData={{ result: { ...SEARCH_RESULT, departures: [returning] },
+        date: "2026-11-07", direction: "return" }} loadingReturn={false}
+      passengerCount={2} selectedOutbound={null} selectedReturn={null}
+      onBack={() => undefined} onChooseOutbound={() => undefined}
+      onChooseReturn={() => undefined} />, element);
+    expect(element.textContent).toContain("$130.00 USD");
+    expect(element.textContent).toContain("$145.00 USD");
+  });
 });
 
 describe("fixed-only shuttle departures", () => {
@@ -310,6 +350,26 @@ describe("fixed-only shuttle departures", () => {
     expect(element.querySelectorAll('input[type="time"]')).toHaveLength(0);
     expect(element.textContent).toContain("Choose Departure · Wed, Nov 4");
     expect(element.textContent).toContain("Choose Return · Sat, Nov 7");
+  });
+});
+
+describe("date-only private shuttle cars", () => {
+  it("shows a private row on its date without a time field", () => {
+    const onChoose = vi.fn();
+    const car = { ...PRIVATE_CAR, service_date: "2026-12-25" };
+    const element = renderDepartures(
+      { ...SEARCH_RESULT, departures: [], private_cars: [car] }, "outbound", onChoose,
+    );
+    expect(element.textContent).toContain("Private SUV");
+    expect(element.textContent).toContain("Private");
+    expect(element.textContent).toContain("Up to 5 passengers");
+    expect(element.textContent).toContain("Pickup time will be arranged by phone");
+    expect(element.textContent).toContain("$165.00 USD");
+    expect(element.querySelector('input[type="time"]')).toBeNull();
+    act(() => element.querySelector<HTMLButtonElement>(".shuttle-departure.private button")?.click());
+    expect(onChoose).toHaveBeenCalledWith(expect.objectContaining({
+      kind: "private", date: "2026-12-25", car,
+    }));
   });
 });
 

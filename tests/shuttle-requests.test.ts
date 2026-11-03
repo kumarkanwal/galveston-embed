@@ -9,7 +9,7 @@ import {
 } from "../src/app/shuttle/requests";
 import type { ShuttleSelection, ShuttleTripForm } from "../src/app/shuttle/types";
 import {
-  DEPARTURE, DESTINATION_LOCATION, ORIGIN_LOCATION, SEARCH_RESULT,
+  DEPARTURE, DESTINATION_LOCATION, ORIGIN_LOCATION, PRIVATE_CAR, SEARCH_RESULT,
 } from "./shuttle-fixtures";
 
 const TRIP: ShuttleTripForm = {
@@ -25,6 +25,8 @@ const TRIP: ShuttleTripForm = {
   paxChild: 0,
 };
 const SCHEDULED = { kind: "scheduled", date: TRIP.date, departure: DEPARTURE,
+  route: SEARCH_RESULT.route } as const;
+const PRIVATE = { kind: "private", date: TRIP.date, car: PRIVATE_CAR,
   route: SEARCH_RESULT.route } as const;
 const BASE_SELECTION = {
   trip: TRIP,
@@ -42,13 +44,15 @@ describe("shuttle request builders", () => {
   it("builds the documented outbound search query", () => {
     expect(buildShuttleSearchQuery(TRIP)).toEqual({
       from_location_id: TRIP.fromId, to_location_id: TRIP.toId, date: TRIP.date,
+      trip_type: "round_trip",
       pax_adult: 2, pax_senior: 1, pax_child: 0,
     });
   });
 
   it("keeps a zero-adult senior party in the search request", () => {
-    expect(buildShuttleSearchQuery({ ...TRIP, paxAdult: 0, paxSenior: 1 })).toMatchObject({
-      pax_adult: 0, pax_senior: 1, pax_child: 0,
+    expect(buildShuttleSearchQuery({ ...TRIP, roundTrip: false,
+      paxAdult: 0, paxSenior: 1 })).toMatchObject({
+      pax_adult: 0, pax_senior: 1, pax_child: 0, trip_type: "one_way",
     });
   });
 
@@ -60,6 +64,22 @@ describe("shuttle request builders", () => {
     });
   });
 
+});
+
+describe("private return-search request builder", () => {
+  it("identifies a date-only private outbound car for return search", () => {
+    expect(buildReturnQuery(TRIP, PRIVATE)).toEqual({
+      from_location_id: TRIP.fromId, to_location_id: TRIP.toId,
+      date: TRIP.returnDate, outbound_route_id: PRIVATE_CAR.route_id,
+      outbound_vehicle_type_id: PRIVATE_CAR.vehicle_type_id,
+      outbound_pickup_date: TRIP.date,
+      pax_adult: 2, pax_senior: 1, pax_child: 0,
+    });
+  });
+
+});
+
+describe("shuttle quote request builder", () => {
   it("builds scheduled-only quote legs without customer pickup times", () => {
     const selection = { ...BASE_SELECTION, returnLeg: SCHEDULED };
     expect(buildShuttleQuote(selection, "SAVE10")).toEqual({
@@ -81,9 +101,33 @@ describe("shuttle request builders", () => {
       expect(leg).not.toHaveProperty("dropoff_address");
     }
   });
+
+  it("builds date-only private quote legs without a time or schedule", () => {
+    const quote = buildShuttleQuote({ ...BASE_SELECTION, outbound: PRIVATE }, null);
+    expect(quote.legs).toEqual([{
+      departure_type: "private", route_id: PRIVATE_CAR.route_id,
+      vehicle_type_id: PRIVATE_CAR.vehicle_type_id, pickup_date: TRIP.date,
+      pax_adult: 2, pax_senior: 1, pax_child: 0,
+    }]);
+    expect(quote.legs[0]).not.toHaveProperty("pickup_time");
+    expect(quote.legs[0]).not.toHaveProperty("schedule_id");
+  });
 });
 
 describe("shuttle booking request builder", () => {
+  it("sends only the selected date and identifiers for a private leg", () => {
+    const selection = { ...BASE_SELECTION, outbound: PRIVATE };
+    const body = buildShuttleBooking(selection, CONTACT, {
+      outboundPickup: null, outboundDropoff: null, returnPickup: null, returnDropoff: null,
+    }, null);
+    expect(body.legs[0]).toMatchObject({
+      departure_type: "private", route_id: PRIVATE_CAR.route_id,
+      vehicle_type_id: PRIVATE_CAR.vehicle_type_id, pickup_date: TRIP.date,
+    });
+    expect(body.legs[0]).not.toHaveProperty("pickup_time");
+    expect(body.legs[0]).not.toHaveProperty("schedule_id");
+  });
+
   it("puts separate addresses inside each booking leg and omits the deprecated top level", () => {
     const addressRoute = { ...SEARCH_RESULT.route,
       from_requires_address: true, to_requires_address: true };

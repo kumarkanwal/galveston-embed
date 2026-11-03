@@ -67,7 +67,9 @@ export function ShuttleTrip(props: ShuttleTripProps) {
             onInput={(event) => props.update("date", event.currentTarget.value)} />
           <FieldError id="date-error" message={props.errors.date} />
         </div>
-        <div class="field"><label for="returnDate">Return Date</label>
+        <div class={`field return-date-slot${props.form.roundTrip ? "" : " is-hidden"}`}
+          aria-hidden={!props.form.roundTrip}>
+          <label for="returnDate">Return Date</label>
           <input id="returnDate" type="date" min={props.form.date}
             value={props.form.returnDate} disabled={!props.form.roundTrip}
             required={props.form.roundTrip} aria-invalid={props.errors.returnDate !== undefined}

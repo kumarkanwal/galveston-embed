@@ -20,6 +20,10 @@
   opacity: 1;
 }
 
+.return-date-slot.is-hidden {
+  visibility: hidden;
+}
+
 .stop-field {
   position: relative;
 }
@@ -339,6 +343,25 @@
 .shuttle-summary h3,
 .shuttle-summary p {
   margin: 0 0 10px;
+}
+
+.shuttle-price-lines,
+.shuttle-leg-price-lines {
+  display: grid;
+  gap: 8px;
+}
+
+.shuttle-price-lines {
+  margin-bottom: 12px;
+}
+
+.shuttle-passenger-line {
+  line-height: 1.5;
+}
+
+.shuttle-included-charge small {
+  color: var(--muted);
+  font-weight: 400;
 }
 
 .shuttle-addresses {

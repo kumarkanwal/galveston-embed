@@ -9,7 +9,7 @@ import type {
 } from "../../api/client";
 import type { ConfirmFormState } from "../confirm/types";
 import { requiredShuttleAddresses, type ShuttleAddressValues } from "./address";
-import type { ScheduledLeg, ShuttleSelection, ShuttleTripForm } from "./types";
+import type { SelectedShuttleLeg, ShuttleSelection, ShuttleTripForm } from "./types";
 
 function passengerCounts(trip: ShuttleTripForm) {
   return {
@@ -24,27 +24,44 @@ export function buildShuttleSearchQuery(trip: ShuttleTripForm): ShuttleSearchQue
     from_location_id: trip.fromId,
     to_location_id: trip.toId,
     date: trip.date,
+    trip_type: trip.roundTrip ? "round_trip" : "one_way",
     ...passengerCounts(trip),
   };
 }
 
 export function buildReturnQuery(
   trip: ShuttleTripForm,
-  outbound: ScheduledLeg,
+  outbound: SelectedShuttleLeg,
 ): ShuttleReturnQuery {
+  const selection = outbound.kind === "scheduled"
+    ? { outbound_schedule_id: outbound.departure.schedule_id }
+    : {
+        outbound_route_id: outbound.car.route_id,
+        outbound_vehicle_type_id: outbound.car.vehicle_type_id,
+        outbound_pickup_date: outbound.date,
+      };
   return {
     from_location_id: trip.fromId,
     to_location_id: trip.toId,
     date: trip.returnDate,
-    outbound_schedule_id: outbound.departure.schedule_id,
+    ...selection,
     ...passengerCounts(trip),
   };
 }
 
 export function buildShuttleLeg(
-  selected: ScheduledLeg,
+  selected: SelectedShuttleLeg,
   trip: ShuttleTripForm,
 ): ShuttleQuoteLeg {
+  if (selected.kind === "private") {
+    return {
+      departure_type: "private",
+      route_id: selected.car.route_id,
+      vehicle_type_id: selected.car.vehicle_type_id,
+      pickup_date: selected.date,
+      ...passengerCounts(trip),
+    };
+  }
   return {
     departure_type: "scheduled",
     schedule_id: selected.departure.schedule_id,

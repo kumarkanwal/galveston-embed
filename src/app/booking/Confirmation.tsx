@@ -5,6 +5,7 @@ import type {
 } from "../../api/client";
 import { formatMoney } from "../../money";
 import { ProgressSteps } from "../trip/ProgressSteps";
+import { ShuttlePriceLines } from "../shuttle/ShuttlePriceLines";
 import { useLayoutEffect, useRef, useState } from "preact/hooks";
 
 interface ConfirmationProps {
@@ -14,6 +15,7 @@ interface ConfirmationProps {
   customerEmail: string;
   emailsEnabled?: boolean;
   logoUrl?: string | null | undefined;
+  journeyLines?: string[] | undefined;
   paymentMethod?: PaymentMethod;
   requestQuote: boolean;
   response: TaxiBookingResponse | ShuttleBookingResponse;
@@ -39,6 +41,7 @@ export function Confirmation(props: ConfirmationProps) {
     const copied = await copyReference(props.response.order_number);
     setCopyStatus(copied ? "Copied" : "Copy unavailable. Select the reference to copy it.");
   }
+  const currency = "currency" in props.response ? props.response.currency : props.currency;
   return <section class="widget confirmation">
     {props.logoUrl != null && props.logoUrl !== "" && <img class="business-logo"
       src={props.logoUrl} alt={props.businessName ?? "Business"} />}
@@ -58,8 +61,11 @@ export function Confirmation(props: ConfirmationProps) {
         <button type="button" onClick={() => { void handleCopy(); }}>Copy</button>
         <span class="copy-status" aria-live="polite">{copyStatus}</span>
       </p>
+      {props.journeyLines?.map((line) => <p class="confirmation-journey" key={line}>{line}</p>)}
+      {"legs" in props.response && <ShuttlePriceLines adjustments={props.response.adjustments}
+        currency={props.response.currency} legs={props.response.legs} />}
       {!props.requestQuote && <p class="confirmation-total">
-        Total: <strong>{formatMoney(props.response.total, props.currency)}</strong>
+        Total: <strong>{formatMoney(props.response.total, currency)}</strong>
       </p>}
       {"large_bags" in props.response && <p class="confirmation-luggage">
         <span aria-hidden="true">▣ </span>{props.response.large_bags} check-in

@@ -2,6 +2,7 @@ import type {
   Business,
   LocationGroup,
   LocationOption,
+  PrivateCarAvailability,
   ShuttleBookingResponse,
   ShuttleDeparture,
   ShuttleQuoteResponse,
@@ -74,6 +75,20 @@ export const DEPARTURE = {
   },
 } satisfies ShuttleDeparture;
 
+export const PRIVATE_CAR = {
+  departure_type: "private",
+  route_id: "77777777-7777-7777-7777-777777777777",
+  vehicle_type_id: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+  vehicle_type_name: "Private SUV",
+  service_date: "2026-10-30",
+  pickup_time: null,
+  seat_capacity: 5,
+  total_for_selection: "165.00",
+  effective_min_passengers: 1,
+  service_mode: "private",
+  pricing: { mode: "fixed_vehicle", fixed_price: "165.00" },
+} satisfies PrivateCarAvailability;
+
 export const SEARCH_RESULT = {
   route: {
     id: "77777777-7777-7777-7777-777777777777",
@@ -86,6 +101,7 @@ export const SEARCH_RESULT = {
   },
   date_strip: [],
   departures: [DEPARTURE],
+  private_cars: [],
   filtered_summary: null,
   on_request: null,
 } satisfies ShuttleSearchResult;
@@ -96,6 +112,11 @@ export const SHUTTLE_QUOTE = {
     time: "09:30", duration_minutes: 60, pax_summary: "2 adults, 1 senior",
     leg_price: "70.50", schedule_id: DEPARTURE.schedule_id,
     service_mode: "shared", effective_min_passengers: 1,
+    passenger_lines: [
+      { passenger_type: "adult", count: 1, unit_price: "38.50", line_total: "38.50" },
+      { passenger_type: "senior", count: 1, unit_price: "32.00", line_total: "32.00" },
+    ],
+    charges: [],
   }],
   large_bags: 2,
   small_bags: 1,
@@ -115,9 +136,22 @@ export const SHUTTLE_BOOKED = {
   order_number: "SH-2026-001",
   status: "confirmed",
   total: "70.50",
+  subtotal: "70.50",
+  discount_amount: "0.00",
+  insurance_amount: "0.00",
+  currency: "USD",
   amount_paid: "0.00",
   large_bags: 2,
   small_bags: 1,
-  legs: [{ booking_id: "99999999-9999-9999-9999-999999999999", seats_confirmed: 2 }],
+  legs: [{
+    booking_id: "99999999-9999-9999-9999-999999999999",
+    seats_confirmed: 2,
+    passenger_lines: [
+      { passenger_type: "adult", count: 1, unit_price: "38.50", line_total: "38.50" },
+      { passenger_type: "senior", count: 1, unit_price: "32.00", line_total: "32.00" },
+    ],
+    charges: [],
+    leg_total: "70.50",
+  }],
   confirmation_email_sent: true,
 } satisfies ShuttleBookingResponse;

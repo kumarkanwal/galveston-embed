@@ -211,7 +211,13 @@ Why: the value is an internal route label, not customer-facing trip information,
 Consequences: fixed and return rows never display `service_label`; on-request rows remain identified by `vehicle_type_name`. The widget does not rename or derive a replacement route label.
 
 ## ED-034 — Shuttle exposes fixed schedules only
-Date: 2026-11-03 · Status: accepted (supersedes the on-request presentation consequences of ED-029 and ED-033)
+Date: 2026-11-03 · Status: superseded by ED-035 (for private cars; shared cars remain fixed-only)
 Decision: show and book only fixed scheduled shuttle departures; do not expose customer-selected pickup times, on-request options, or private any-time cars.
 Why: on-request and private cars require a customer pickup time, and that input has been removed from the shuttle booking flow.
 Consequences: Departures ignores `on_request` and `on_request_options` even when the public search response includes them. Return-search uses only `outbound_schedule_id`, and quote and booking legs use only `departure_type: "scheduled"` with `schedule_id`. Taxi pickup-time behavior is unchanged.
+
+## ED-035 — Private shuttle cars are date-only bookings
+Date: 2026-11-03 · Status: accepted (supersedes ED-034 for private cars)
+Decision: show private shuttle cars on every date as date-only bookings with no customer-selected time; pickup time is arranged by phone, while shared cars remain fixed scheduled departures only.
+Why: backend B-51 publishes date-only private options and mix-aware prices without requiring the widget to invent a pickup time.
+Consequences: private rows show the public vehicle, capacity, server price, and arranged-by-phone message. Private quote and booking legs send the selected date without a time or schedule id. Shared rows and requests remain fixed-schedule-only, and generic on-request options remain hidden.

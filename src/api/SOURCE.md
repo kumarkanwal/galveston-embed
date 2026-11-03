@@ -4,11 +4,11 @@
 | Field | Value |
 |---|---|
 | Copied from | `galveston-backend/openapi.json` |
-| Backend commit | `5761a81fa0cf549182cbc54c95b4e641c2ce299d` |
-| Copied on | `2026-11-02` |
+| Backend commit | `331436a2e060cfad325a882f98ed586eba0bad28` |
+| Copied on | `2026-11-03` |
 
 Refresh only after a complete backend change is committed and pushed.
 
-This source includes B-50 shuttle large-bag and small-bag tracking on quote and
-booking, plus zero-adult passenger support.
+This source includes B-51 date-only private shuttle cars, passenger-mix search
+prices with trip type, and per-passenger quote and booking breakdowns.
 The copied blob was verified byte-for-byte against backend `origin/main`.
