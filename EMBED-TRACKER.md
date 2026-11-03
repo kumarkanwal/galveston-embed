@@ -71,7 +71,8 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 26 | E-21 Any-time shuttle leg selection | Widget | — | 🔄 Implementation complete — browser verification unverified | — |
 | 27 | E-22 Shuttle luggage, zero adults, Trip layout, route labels | Widget | — | 🔄 Implementation complete — browser verification unverified | — |
 | 28 | E-23 Mobile passenger/luggage rows and passenger popup | Widget | — | 🔄 Implementation complete — browser verification unverified | — |
-| 29 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
+| 29 | E-23.1 Passenger popup overflow hotfix | Widget | — | 🔄 Implementation complete — browser verification unverified | — |
+| 30 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
 | | **Total** | | **100%** | | **87%** |
 
 Weights are estimates. E-9 and E-9b were added after the 100% weighting was
@@ -165,7 +166,7 @@ dependencies: `AGENTS.md` section 3.
 | A-10 | Per-pricing-row airport filter | ⏸ | `pricing_row_airports` exists but nothing uses it |
 | A-11 | Production hosting of `embed.js` on the VPS | ⏸ | Behind Caddy. Config only, no host-specific code |
 | A-12 | Shuttle luggage and Trip-step alignment | ✅ | E-22 tracks large and small bags through quote/booking, allows valid zero-adult parties, aligns Trip fields, and hides internal route names while retaining durations. |
-| A-13 | Mobile party-field layout and passenger popup | ✅ | E-23 gives taxi and shuttle a shared sub-480px Passengers row plus equal Bags/Carry-on row, keeps passenger text on one line, and contains the opaque passenger popup at 360px. |
+| A-13 | Mobile party-field layout and passenger popup | ✅ | E-23 gives taxi and shuttle a shared sub-480px Passengers row plus equal Bags/Carry-on row and keeps passenger text on one line. E-23.1 gives the shuttle category popup equal padding and border-box rows with bounded 132px steppers so button borders remain contained. |
 
 ---
 
@@ -243,6 +244,7 @@ dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 3 Nov 2026 | E-23.1 hotfix complete: corrected the shuttle passenger popup's content-box overflow with equal 14px padding, border-box popup/rows/steppers, flexible label columns, and bounded 132px stepper controls. Taxi retains its native passenger select and unchanged bag steppers, covered at 320px and 360px. Focused gates, full lint, the single build, and dist test pass; the known full-suite airport flake repeated and its two untouched files passed 13/13 alone. Live phone and desktop browser verification is **UNVERIFIED**. |
 | 3 Nov 2026 | E-23 implementation complete: below 480px, taxi and shuttle now place Passengers on its own row and Bags/Carry-on in equal columns while preserving the three-control row at 480px and wider. Passenger labels do not wrap, and the shuttle passenger popup is opaque, layered, trigger-width, and contained at 360px with existing close and keyboard behavior intact. Focused gates, full lint, the single build, and dist tests pass; the known full-suite airport flake repeated and its two untouched files passed 13/13 alone. Live browser verification is **UNVERIFIED**. |
 | 2 Nov 2026 | E-22 implementation complete: refreshed and byte-verified backend B-50, added shuttle Bags/Carry-on through Trip, quote, booking, Confirm, and confirmation, allowed zero adults when another passenger category is non-zero, aligned the Trip rows with a persistent disabled Return Date, and hid internal route names while retaining server durations. Focused gates, full lint, build, and dist tests pass; the known full-suite airport flake repeated and its two untouched files passed 13/13 alone. Recorded that backend contract prose remains at B-49 despite B-50 OpenAPI. Live browser/reference verification is **UNVERIFIED**. |
 | 2 Nov 2026 | E-21 implementation complete: removed repeated date controls from shuttle Departures, placed each immutable Trip-step date in its leg title, consolidated one pickup-time picker per any-time leg, rendered server-priced any-time cars as compact full-width Shared/Private rows after fixed departures, and added selected-row, mixed-leg, round-trip, accessibility, and 360px-container coverage. Focused gates, full lint, build, and dist tests pass; the known full-suite airport flake repeated and its two untouched files passed 13/13 alone. Live browser verification is **UNVERIFIED**. |
