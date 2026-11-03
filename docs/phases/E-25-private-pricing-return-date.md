@@ -1,6 +1,6 @@
 # E-25 — Private shuttle pricing and conditional return date
 
-**Status:** Ready to build
+**Status:** Implementation complete — ready for review
 **Scope:** Widget only.
 
 ## Setup
@@ -137,3 +137,84 @@ Report:
 10. everything unverified, marked **UNVERIFIED**.
 
 Then stop.
+
+## Results
+
+### Implementation
+
+- Refreshed `openapi.json` and `API_CONTRACT.md` byte-for-byte from pushed
+  backend B-51 commit `331436a2e060cfad325a882f98ed586eba0bad28` and
+  regenerated the API types. The approved source publishes date-only private
+  cars, search `trip_type`, passenger-mix row totals, per-passenger quote and
+  booking lines, included leg charges, cart adjustments, and server totals.
+- Shuttle Return Date now keeps its second grid slot but is invisible,
+  `aria-hidden`, disabled, empty, and omitted while Round trip is unchecked.
+  Checking Round trip reveals the same control and retains the existing
+  required and on-or-after-departure validation. Taxi already conditionally
+  rendered its return controls; leaving taxi round trip now also clears their
+  values.
+- Shared shuttle service remains fixed-schedule-only. B-51 private cars render
+  after fixed rows on every returned date with a Private badge, public vehicle
+  name, capacity, exact server row price, and the arranged-by-phone message.
+  Private return-search, quote, and booking requests send route, vehicle, and
+  date identifiers without a time or schedule id.
+- Shuttle search sends `trip_type: one_way | round_trip` with the exact adult,
+  senior, and child mix. Scheduled and private rows display only the response's
+  `total_for_selection`; each round-trip direction retains its own response
+  value.
+- Confirm and final confirmation render each leg's `passenger_lines` in server
+  order, each leg-local charge once with a visible included marker, cart
+  adjustments in server order, and the server total. No client-side money math
+  was added.
+
+### Verification
+
+- API refresh gate: 20 focused tests passed; generated-schema typecheck and
+  touched-file lint passed.
+- Return Date gate: 92 focused tests passed; typecheck and touched-file lint
+  passed.
+- Private-car gate: 71 focused tests passed; typecheck and touched-file lint
+  passed.
+- Passenger-mix gate: 38 focused tests passed; typecheck and touched-file lint
+  passed.
+- Per-passenger breakdown gate: 50 focused tests passed; typecheck and
+  touched-file lint passed.
+- Final full lint passed.
+- The one full Vitest run passed 35/37 files and 396/406 tests. Its 10 failures
+  were the documented timing flake in untouched `airport-marker.test.tsx` and
+  `airport-location.test.ts`; the prescribed isolated rerun passed 13/13.
+  A clean single-run full suite without that known flake remains
+  **UNVERIFIED**.
+- Exactly one production build passed, followed by `test:dist` (1/1). `dist/`
+  contains only `embed.js` and `embed.js.map`.
+- Playwright Chromium rendered the built widget at 360px and 1024px. It
+  verified the persistent two-column Return Date grid, unchanged Departure Date
+  geometry, hidden/disabled accessibility state, private rows without time
+  inputs, arranged-by-phone copy, structured Confirm lines, exact server total,
+  and no horizontal widget scroll.
+- Bundle: 144,972 bytes raw and 41,054 bytes gzip. SHA-256:
+  `ffa20fa9e22650ad8874b5d47bcaa9d74e41fd42f391d5575066b2c78efa0fb8`.
+
+### Browser screenshots
+
+- `docs/phases/E-25/trip-unticked-360.png`
+- `docs/phases/E-25/trip-ticked-360.png`
+- `docs/phases/E-25/confirm-360.png`
+- `docs/phases/E-25/trip-unticked-1024.png`
+- `docs/phases/E-25/trip-ticked-1024.png`
+- `docs/phases/E-25/confirm-1024.png`
+
+### Comparison, gaps, and decisions
+
+- The repository has no shuttle BRO reference screenshots. E-25 was compared
+  with the existing approved widget presentation and verified through DOM,
+  behavior, accessibility, layout, and built-browser screenshots. A live BRO
+  side-by-side comparison is **UNVERIFIED**.
+- No widget-blocking backend gap was found in pushed backend B-51. Per explicit
+  developer direction, the live OpenAPI re-check was skipped because B-51 had
+  not deployed yet. **UNVERIFIED — verify after B-51 deploy:** the deployed
+  `openapi.json` matches backend commit
+  `331436a2e060cfad325a882f98ed586eba0bad28`.
+- ED-035 supersedes ED-034 only for date-only private cars. Shared cars remain
+  fixed scheduled departures; generic on-request options remain hidden. No
+  dependency was added and nothing was deployed.
