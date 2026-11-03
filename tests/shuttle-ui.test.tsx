@@ -10,7 +10,7 @@ import { ShuttleDepartures } from "../src/app/shuttle/Departures";
 import { PassengerDropdown } from "../src/app/shuttle/PassengerDropdown";
 import { ShuttleTrip } from "../src/app/shuttle/Trip";
 import type { SelectedShuttleLeg, ShuttleTripForm } from "../src/app/shuttle/types";
-import { DEPARTURE, LOCATION_GROUPS, SEARCH_RESULT } from "./shuttle-fixtures";
+import { DEPARTURE, LOCATION_GROUPS, PRIVATE_CAR, SEARCH_RESULT } from "./shuttle-fixtures";
 
 const TRIP: ShuttleTripForm = {
   fromId: "", toId: "", date: "2026-10-30", returnDate: "",
@@ -326,6 +326,26 @@ describe("fixed-only shuttle departures", () => {
     expect(element.querySelectorAll('input[type="time"]')).toHaveLength(0);
     expect(element.textContent).toContain("Choose Departure · Wed, Nov 4");
     expect(element.textContent).toContain("Choose Return · Sat, Nov 7");
+  });
+});
+
+describe("date-only private shuttle cars", () => {
+  it("shows a private row on its date without a time field", () => {
+    const onChoose = vi.fn();
+    const car = { ...PRIVATE_CAR, service_date: "2026-12-25" };
+    const element = renderDepartures(
+      { ...SEARCH_RESULT, departures: [], private_cars: [car] }, "outbound", onChoose,
+    );
+    expect(element.textContent).toContain("Private SUV");
+    expect(element.textContent).toContain("Private");
+    expect(element.textContent).toContain("Up to 5 passengers");
+    expect(element.textContent).toContain("Pickup time will be arranged by phone");
+    expect(element.textContent).toContain("$165.00 USD");
+    expect(element.querySelector('input[type="time"]')).toBeNull();
+    act(() => element.querySelector<HTMLButtonElement>(".shuttle-departure.private button")?.click());
+    expect(onChoose).toHaveBeenCalledWith(expect.objectContaining({
+      kind: "private", date: "2026-12-25", car,
+    }));
   });
 });
 

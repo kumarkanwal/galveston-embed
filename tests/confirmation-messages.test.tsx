@@ -23,10 +23,12 @@ function mount(
   response: TaxiBookingResponse | typeof SHUTTLE_BOOKED,
   paymentMethod: "cash" | "online",
   emailsEnabled?: boolean,
+  journeyLines?: string[],
 ) {
   const root = document.createElement("div");
   render(<Confirmation currency="USD" customerEmail={CUSTOMER_EMAIL}
     {...(emailsEnabled === undefined ? {} : { emailsEnabled })} paymentMethod={paymentMethod}
+    {...(journeyLines === undefined ? {} : { journeyLines })}
     requestQuote={false} response={response} />, root);
   return root;
 }
@@ -82,5 +84,15 @@ describe.each([
     } else {
       expect(root.querySelector(".confirmation-luggage")).toBeNull();
     }
+  });
+
+});
+
+describe("private shuttle confirmation", () => {
+  it("shows the arranged time supplied for a private leg", () => {
+    const root = mount(SHUTTLE_BOOKED, "cash", false,
+      ["Outbound: 2026-10-30 · Time: to be arranged"]);
+    expect(root.querySelector(".confirmation-journey")?.textContent)
+      .toBe("Outbound: 2026-10-30 · Time: to be arranged");
   });
 });

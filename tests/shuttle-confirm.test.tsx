@@ -12,6 +12,7 @@ import {
   DESTINATION_LOCATION,
   LOCATION_GROUPS,
   ORIGIN_LOCATION,
+  PRIVATE_CAR,
   SEARCH_RESULT,
   SHUTTLE_BOOKED,
   SHUTTLE_BUSINESS,
@@ -62,11 +63,13 @@ function mount(
   client: ShuttleApiClient,
   onUnavailable = vi.fn(),
   business = SHUTTLE_BUSINESS,
+  selection: ShuttleSelection = SELECTION,
+  quote: ShuttleQuoteResponse = SHUTTLE_QUOTE,
 ) {
   const root = document.createElement("div");
   document.body.append(root);
   render(<ShuttleConfirm business={business} client={client}
-    mapsKey="maps-key" quote={SHUTTLE_QUOTE} selection={SELECTION} onBack={() => undefined}
+    mapsKey="maps-key" quote={quote} selection={selection} onBack={() => undefined}
     onBooked={() => undefined} onUnavailable={onUnavailable} />, root);
   return { onUnavailable, root };
 }
@@ -92,6 +95,19 @@ function fill(root: HTMLElement) {
 beforeEach(() => document.body.replaceChildren());
 
 describe("round-trip shuttle summary", () => {
+  it("shows an arranged time for a date-only private leg", () => {
+    const selection = { ...SELECTION, outbound: {
+      kind: "private" as const, date: PRIVATE_CAR.service_date, car: PRIVATE_CAR,
+      route: SELECTION.outbound.route,
+    } };
+    const quote = { ...SHUTTLE_QUOTE, legs: [{ ...SHUTTLE_QUOTE.legs[0]!,
+      departure_type: "private" as const, schedule_id: null, time: null,
+      service_mode: "private" as const,
+    }] };
+    const { root } = mount(clientWith(), vi.fn(), SHUTTLE_BUSINESS, selection, quote);
+    expect(root.textContent).toContain("Outbound: 2026-10-30 · Time: to be arranged");
+  });
+
   it("shows the server-returned Bags and Carry-on counts", () => {
     const { root } = mount(clientWith());
     expect(root.querySelector(".shuttle-summary")?.textContent)

@@ -14,6 +14,7 @@ interface ConfirmationProps {
   customerEmail: string;
   emailsEnabled?: boolean;
   logoUrl?: string | null | undefined;
+  journeyLines?: string[] | undefined;
   paymentMethod?: PaymentMethod;
   requestQuote: boolean;
   response: TaxiBookingResponse | ShuttleBookingResponse;
@@ -65,6 +66,7 @@ export function Confirmation(props: ConfirmationProps) {
         <span aria-hidden="true">▣ </span>{props.response.large_bags} check-in
         <span aria-hidden="true"> · ▫ </span>{props.response.small_bags} carry-on
       </p>}
+      {props.journeyLines?.map((line) => <p class="confirmation-journey" key={line}>{line}</p>)}
     </div>
   </section>;
 }

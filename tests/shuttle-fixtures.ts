@@ -2,6 +2,7 @@ import type {
   Business,
   LocationGroup,
   LocationOption,
+  PrivateCarAvailability,
   ShuttleBookingResponse,
   ShuttleDeparture,
   ShuttleQuoteResponse,
@@ -74,6 +75,20 @@ export const DEPARTURE = {
   },
 } satisfies ShuttleDeparture;
 
+export const PRIVATE_CAR = {
+  departure_type: "private",
+  route_id: "77777777-7777-7777-7777-777777777777",
+  vehicle_type_id: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+  vehicle_type_name: "Private SUV",
+  service_date: "2026-10-30",
+  pickup_time: null,
+  seat_capacity: 5,
+  total_for_selection: "165.00",
+  effective_min_passengers: 1,
+  service_mode: "private",
+  pricing: { mode: "fixed_vehicle", fixed_price: "165.00" },
+} satisfies PrivateCarAvailability;
+
 export const SEARCH_RESULT = {
   route: {
     id: "77777777-7777-7777-7777-777777777777",
@@ -86,6 +101,7 @@ export const SEARCH_RESULT = {
   },
   date_strip: [],
   departures: [DEPARTURE],
+  private_cars: [],
   filtered_summary: null,
   on_request: null,
 } satisfies ShuttleSearchResult;

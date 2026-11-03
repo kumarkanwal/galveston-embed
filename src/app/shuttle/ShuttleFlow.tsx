@@ -6,6 +6,7 @@ import { ShuttleDepartures } from "./Departures";
 import { ShuttleTrip } from "./Trip";
 import { useShuttleFlow } from "./use-shuttle-flow";
 import { passengerTotal } from "./minimum";
+import type { SelectedShuttleLeg, ShuttleSelection } from "./types";
 
 interface ShuttleFlowProps {
   business: Business;
@@ -13,16 +14,30 @@ interface ShuttleFlowProps {
   mapsKey: string;
 }
 
+function confirmationLegLine(label: string, leg: SelectedShuttleLeg): string {
+  if (leg.kind === "private") return `${label}: ${leg.date} · Time: to be arranged`;
+  const end = leg.departure.end_time == null ? "" : ` – ${leg.departure.end_time}`;
+  return `${label}: ${leg.date} at ${leg.departure.start_time}${end}`;
+}
+
+function confirmationJourneyLines(selection: ShuttleSelection | null): string[] | undefined {
+  if (selection === null) return undefined;
+  return [confirmationLegLine("Outbound", selection.outbound),
+    ...(selection.returnLeg === null ? [] : [confirmationLegLine("Return", selection.returnLeg)])];
+}
+
 export function ShuttleFlow(props: ShuttleFlowProps) {
   const flow = useShuttleFlow(props.client, props.business);
   const state = flow.state;
   const minimumDate = businessDateTimeParts(new Date(), props.business.timezone).date;
   if (state.step === "done" && state.confirmation !== null) {
+    const journeyLines = confirmationJourneyLines(flow.selection);
     return <Confirmation currency={props.business.currency} requestQuote={false}
       businessName={props.business.name} logoUrl={props.business.logo_url}
       customerEmail={state.confirmation.customerEmail}
       emailsEnabled={props.business.emails_enabled}
       paymentMethod={state.confirmation.paymentMethod}
+      journeyLines={journeyLines}
       response={state.confirmation.response} steps={["Trip", "Departures", "Confirm"]} />;
   }
   if (state.step === "confirm" && state.quote !== null && flow.selection !== null) {

@@ -56,6 +56,7 @@ function initialPromo(): PromoCodeState {
 }
 
 function legLabel(leg: SelectedShuttleLeg): string {
+  if (leg.kind === "private") return `${leg.date} · Time: to be arranged`;
   const end = leg.departure.end_time == null ? "" : ` – ${leg.departure.end_time}`;
   return `${leg.date} at ${leg.departure.start_time}${end}`;
 }

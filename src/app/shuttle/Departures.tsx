@@ -1,4 +1,8 @@
-import type { ShuttleDeparture, ShuttleRoute } from "../../api/client";
+import type {
+  PrivateCarAvailability,
+  ShuttleDeparture,
+  ShuttleRoute,
+} from "../../api/client";
 import { formatMoney } from "../../money";
 import { formatBusinessLocalDate } from "../../time";
 import { WidgetHeader } from "../shell/WidgetHeader";
@@ -6,7 +10,6 @@ import { ProgressSteps } from "../trip/ProgressSteps";
 import { minimumMessage } from "./minimum";
 import type {
   DepartureViewData,
-  ScheduledLeg,
   SelectedShuttleLeg,
 } from "./types";
 
@@ -23,8 +26,8 @@ interface ShuttleDeparturesProps {
   selectedOutbound: SelectedShuttleLeg | null;
   selectedReturn: SelectedShuttleLeg | null;
   onBack: () => void;
-  onChooseOutbound: (leg: ScheduledLeg) => void;
-  onChooseReturn: (leg: ScheduledLeg) => void;
+  onChooseOutbound: (leg: SelectedShuttleLeg) => void;
+  onChooseReturn: (leg: SelectedShuttleLeg) => void;
 }
 
 interface DepartureSectionProps {
@@ -32,7 +35,7 @@ interface DepartureSectionProps {
   data: DepartureViewData;
   passengerCount: number;
   selected: SelectedShuttleLeg | null;
-  onChoose: (leg: ScheduledLeg) => void;
+  onChoose: (leg: SelectedShuttleLeg) => void;
 }
 
 function departureTime(departure: ShuttleDeparture): string {
@@ -47,6 +50,16 @@ function isScheduledSelected(
 ): boolean {
   return selected?.kind === "scheduled"
     && selected.departure.schedule_id === departure.schedule_id;
+}
+
+function isPrivateSelected(
+  selected: SelectedShuttleLeg | null,
+  car: PrivateCarAvailability,
+): boolean {
+  return selected?.kind === "private"
+    && selected.car.route_id === car.route_id
+    && selected.car.vehicle_type_id === car.vehicle_type_id
+    && selected.date === car.service_date;
 }
 
 function DepartureRow(props: {
@@ -84,22 +97,55 @@ function DepartureRow(props: {
   </article>;
 }
 
+function PrivateRow(props: {
+  car: PrivateCarAvailability;
+  currency: string;
+  onChoose: DepartureSectionProps["onChoose"];
+  passengerCount: number;
+  route: ShuttleRoute;
+  selected: boolean;
+}) {
+  const minimumBlocked = props.passengerCount < props.car.effective_min_passengers;
+  return <article class={`shuttle-departure private${props.selected ? " selected" : ""}`}>
+    <div><strong>{props.car.vehicle_type_name}</strong>
+      <span class="shuttle-mode-badge">Private</span>
+      <span>Pickup time will be arranged by phone</span>
+    </div>
+    <div><span>Up to {props.car.seat_capacity} passengers</span></div>
+    <strong>{formatMoney(props.car.total_for_selection, props.currency)}</strong>
+    <button type="button" aria-pressed={props.selected} disabled={minimumBlocked}
+      onClick={() => props.onChoose({ kind: "private", date: props.car.service_date,
+        car: props.car, route: props.route })}>
+      {props.selected ? "Selected" : "Choose"}
+    </button>
+    {minimumBlocked && <p class="departure-reason">
+      {minimumMessage(props.car.effective_min_passengers)}
+    </p>}
+  </article>;
+}
+
 function DepartureSection(props: DepartureSectionProps) {
   const departures = props.data.direction === "outbound"
     ? props.data.result.departures.filter((departure) => departure.selectable)
     : props.data.result.departures;
   const title = props.data.direction === "outbound" ? "Choose Departure" : "Choose Return";
+  const privateCars = props.data.result.private_cars ?? [];
+  const empty = departures.length === 0 && privateCars.length === 0;
   return <section class={`departure-section ${props.data.direction}`}>
     <h2 class="step-title">{title} · {formatBusinessLocalDate(props.data.date)}</h2>
-    {departures.length === 0 && <div class="empty-vehicles">
+    {empty && <div class="empty-vehicles">
       No scheduled departures on this date. Please try another date.
     </div>}
-    {departures.length > 0 && <div class="shuttle-departures">
+    {!empty && <div class="shuttle-departures">
       {departures.map((departure) => <DepartureRow key={departure.schedule_id}
         currency={props.currency} date={props.data.date} departure={departure}
         onChoose={props.onChoose} passengerCount={props.passengerCount}
         route={props.data.result.route}
         selected={isScheduledSelected(props.selected, departure)} />)}
+      {privateCars.map((car) => <PrivateRow key={`${car.route_id}:${car.vehicle_type_id}`}
+        car={car} currency={props.currency} onChoose={props.onChoose}
+        passengerCount={props.passengerCount} route={props.data.result.route}
+        selected={isPrivateSelected(props.selected, car)} />)}
     </div>}
   </section>;
 }
