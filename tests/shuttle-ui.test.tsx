@@ -32,7 +32,7 @@ function TripHarness() {
   return <ShuttleTrip destinationGroups={LOCATION_GROUPS.slice(1)} errors={{}}
     form={form} formError={null} loadingDestinations={false} loadingLocations={false}
     maximumBags={12} minimumDate="2026-10-23" originGroups={LOCATION_GROUPS}
-    submitting={false} timeZone="America/Chicago" onSubmit={() => undefined}
+    submitting={false} onSubmit={() => undefined}
     update={update} />;
 }
 
@@ -83,14 +83,15 @@ function renderPassengers(props: Parameters<typeof PassengerHarness>[0] = {}) {
 beforeEach(() => document.body.replaceChildren());
 
 describe("shuttle trip fields", () => {
-  it("renders grouped reachable locations and the business timezone date guard", () => {
+  it("renders grouped locations and the date guard without a timezone line", () => {
     const element = renderTrip();
     act(() => element.querySelector<HTMLInputElement>("#fromId")?.click());
     const groups = [...element.querySelectorAll(".stop-category")];
     expect(groups.map((group) => group.textContent?.trim())).toEqual(["Airports", "Galveston"]);
     expect(element.querySelector<HTMLInputElement>("#toId")?.disabled).toBe(true);
     expect(element.querySelector<HTMLInputElement>("#date")?.min).toBe("2026-10-23");
-    expect(element.textContent).toContain("Dates and times use America/Chicago");
+    expect(element.textContent).not.toContain("Dates and times use America/Chicago");
+    expect(element.textContent).toContain("Find Departures");
   });
 
   it("shows adult, senior and child controls before the first search", () => {
@@ -105,7 +106,7 @@ describe("shuttle trip fields", () => {
 });
 
 describe("shuttle trip layout", () => {
-  it("orders locations, dates, party controls, Round trip, note, and action", () => {
+  it("orders locations, dates, party controls, Round trip, and action", () => {
     const form = renderTrip().querySelector<HTMLFormElement>(".shuttle-trip");
     const children = [...(form?.children ?? [])];
     expect(children[0]?.querySelector("#fromId")).not.toBeNull();
@@ -114,8 +115,7 @@ describe("shuttle trip layout", () => {
     expect(children[1]?.querySelector("#returnDate")).not.toBeNull();
     expect(children[2]?.classList.contains("shuttle-party-fields")).toBe(true);
     expect(children[3]?.classList.contains("trip-kind")).toBe(true);
-    expect(children[4]?.classList.contains("field-note")).toBe(true);
-    expect(children[5]?.textContent).toContain("Find Departures");
+    expect(children[4]?.textContent).toContain("Find Departures");
   });
 
   it("keeps the hidden Return Date slot until Round trip is checked", () => {
@@ -155,7 +155,7 @@ describe("shuttle round-trip control", () => {
       loadingLocations={false} maximumBags={12} minimumDate="2026-10-23"
       originGroups={LOCATION_GROUPS}
       submitting={false}
-      timeZone="America/Chicago" onSubmit={() => undefined} update={update} />, element);
+      onSubmit={() => undefined} update={update} />, element);
     act(() => element.querySelector<HTMLLabelElement>('.trip-kind')?.click());
     expect(update).toHaveBeenCalledWith("roundTrip", false);
     expect(element.querySelector<HTMLInputElement>("#returnDate")?.disabled).toBe(false);

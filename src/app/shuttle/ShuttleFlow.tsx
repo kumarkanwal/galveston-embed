@@ -69,7 +69,7 @@ export function ShuttleFlow(props: ShuttleFlowProps) {
     maximumBags={flow.maximumBags}
     minimumDate={minimumDate}
     originGroups={state.originGroups}
-    submitting={state.submitting} timeZone={props.business.timezone}
+    submitting={state.submitting}
     onSubmit={(event) => { void flow.submitTrip(event); }}
     update={(key, value) => { void flow.update(key, value); }} />;
 }

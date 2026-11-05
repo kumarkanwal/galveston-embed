@@ -24,7 +24,6 @@ interface ShuttleTripProps {
   minimumDate: string;
   originGroups: LocationGroup[];
   submitting: boolean;
-  timeZone: string;
   onSubmit: (event: SubmitEvent) => void;
   update: <Key extends keyof ShuttleTripForm>(key: Key, value: ShuttleTripForm[Key]) => void;
 }
@@ -83,7 +82,6 @@ export function ShuttleTrip(props: ShuttleTripProps) {
       <label class="trip-kind"><input type="checkbox" checked={props.form.roundTrip}
         onChange={(event) => props.update("roundTrip", event.currentTarget.checked)} />
         Round trip</label>
-      <p class="field-note">Dates and times use {props.timeZone}.</p>
       {props.formError !== null && <FormError>{props.formError}</FormError>}
       <button class="check-pricing" type="submit" disabled={props.submitting}>
         {props.submitting ? "Finding Departures…" : "Find Departures"}

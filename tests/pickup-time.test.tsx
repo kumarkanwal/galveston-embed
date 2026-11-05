@@ -63,6 +63,8 @@ describe("pickup date and time controls", () => {
     expect(time?.value).toBe("");
     expect(time?.min).toBe(expected.time);
     expect(time?.required).toBe(true);
+    expect(root.textContent).not.toContain("Dates and times use America/Chicago");
+    expect(root.textContent).toContain("Check Pricing");
   });
 
   it("preserves a selected time when the date changes", () => {
