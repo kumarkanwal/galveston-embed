@@ -84,7 +84,16 @@ function mount(client: ShuttleApiClient) {
   return root;
 }
 
-beforeEach(() => document.body.replaceChildren());
+const scrollIntoView = vi.fn();
+
+beforeEach(() => {
+  document.body.replaceChildren();
+  scrollIntoView.mockClear();
+  Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+    configurable: true,
+    value: scrollIntoView,
+  });
+});
 
 describe("conditional shuttle return date", () => {
   it("clears and disables Return Date when Round trip is unchecked", async () => {
@@ -118,6 +127,8 @@ describe("same-page shuttle departures", () => {
 
     act(() => root.querySelectorAll<HTMLButtonElement>(".departure-section.outbound button")[0]?.click());
     await vi.waitFor(() => expect(root.querySelector(".departure-section.return")).not.toBeNull());
+    expect(scrollIntoView).toHaveBeenCalledOnce();
+    expect(root.querySelector(".departure-continue")).toBeNull();
     expect(searchShuttleReturn).toHaveBeenLastCalledWith(expect.objectContaining(
       { outbound_schedule_id: DEPARTURE.schedule_id },
     ));
@@ -131,8 +142,10 @@ describe("same-page shuttle departures", () => {
     expect(root.textContent).not.toContain("Return for second");
     expect(client.quoteShuttle).not.toHaveBeenCalled();
   });
+});
 
-  it("shows no return section or return search for a one-way trip", async () => {
+describe("departure Continue flow", () => {
+  it("shows Continue and advances a selected one-way trip", async () => {
     const { client, searchShuttleReturn } = clientWith();
     const root = mount(client);
     await fillTrip(root, false);
@@ -142,8 +155,27 @@ describe("same-page shuttle departures", () => {
     expect(root.querySelector(".departure-section.return")).toBeNull();
     expect(root.textContent).not.toContain("Choose Return");
     expect(searchShuttleReturn).not.toHaveBeenCalled();
+    act(() => root.querySelector<HTMLButtonElement>(".departure-section.outbound button")?.click());
+    await vi.waitFor(() => expect(root.querySelector(".departure-continue")).not.toBeNull());
+    expect(client.quoteShuttle).not.toHaveBeenCalled();
+    act(() => root.querySelector<HTMLButtonElement>(".departure-continue")?.click());
+    await vi.waitFor(() => expect(client.quoteShuttle).toHaveBeenCalledOnce());
+    await vi.waitFor(() => expect(root.textContent).toContain("Trip Summary"));
   });
 
+  it("shows Continue after both round-trip legs and advances on click", async () => {
+    const { client } = clientWith();
+    const root = mount(client);
+    await fillTrip(root, true);
+    act(() => root.querySelector<HTMLButtonElement>(".departure-section.outbound button")?.click());
+    await vi.waitFor(() => expect(root.querySelector(".departure-section.return")).not.toBeNull());
+    act(() => root.querySelector<HTMLButtonElement>(".departure-section.return button")?.click());
+    await vi.waitFor(() => expect(root.querySelector(".departure-continue")).not.toBeNull());
+    expect(client.quoteShuttle).not.toHaveBeenCalled();
+    act(() => root.querySelector<HTMLButtonElement>(".departure-continue")?.click());
+    await vi.waitFor(() => expect(client.quoteShuttle).toHaveBeenCalledOnce());
+    await vi.waitFor(() => expect(root.textContent).toContain("Trip Summary"));
+  });
 });
 
 describe("stale shuttle availability", () => {
@@ -155,6 +187,8 @@ describe("stale shuttle availability", () => {
     const root = mount(client);
     await fillTrip(root, false);
     act(() => root.querySelector<HTMLButtonElement>(".departure-section.outbound button")?.click());
+    await vi.waitFor(() => expect(root.querySelector(".departure-continue")).not.toBeNull());
+    act(() => root.querySelector<HTMLButtonElement>(".departure-continue")?.click());
     await vi.waitFor(() => expect(client.searchShuttle).toHaveBeenCalledTimes(2));
     await vi.waitFor(() => expect(root.textContent).toContain(SHUTTLE_UNAVAILABLE_MESSAGE));
     expect(root.textContent).toContain("Choose Departure");
@@ -190,6 +224,8 @@ describe("shuttle minimum handling", () => {
     const root = mount(client);
     await fillTrip(root, false);
     act(() => root.querySelector<HTMLButtonElement>(".departure-section.outbound button")?.click());
+    await vi.waitFor(() => expect(root.querySelector(".departure-continue")).not.toBeNull());
+    act(() => root.querySelector<HTMLButtonElement>(".departure-continue")?.click());
     await vi.waitFor(() => expect(root.textContent)
       .toContain("At least 3 passengers are required for this trip."));
     expect(root.textContent).toContain("Choose Departure");

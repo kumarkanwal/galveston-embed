@@ -88,6 +88,11 @@ function selectedTrip(state: ShuttleFlowState, returnLeg: SelectedShuttleLeg | n
   return { trip: state.form, from, to, outbound: state.outbound, returnLeg };
 }
 
+function completeSelection(state: ShuttleFlowState) {
+  if (state.form.roundTrip && state.returnLeg === null) return null;
+  return selectedTrip(state, state.returnLeg);
+}
+
 type SetFlowState = Dispatch<StateUpdater<ShuttleFlowState>>;
 interface FlowContext {
   client: ShuttleApiClient;
@@ -171,14 +176,7 @@ async function chooseOutbound(context: FlowContext, leg: SelectedShuttleLeg) {
       context.setState((current) => ({ ...current, outbound: leg, returnResult: result,
         step: "outbound", submitting: false }));
     } else {
-      const withLeg = { ...context.state, outbound: leg };
-      const selection = selectedTrip(withLeg, null);
-      if (selection === null) return;
-      const quote = await context.client.quoteShuttle(
-        buildShuttleQuote(selection, null, context.paymentMethod),
-      );
-      context.setState((current) => ({ ...current, outbound: leg, quote,
-        step: "confirm", submitting: false }));
+      context.setState((current) => ({ ...current, outbound: leg, submitting: false }));
     }
   } catch (error: unknown) {
     const minimum = minimumPassengerError(error);
@@ -193,20 +191,21 @@ async function chooseOutbound(context: FlowContext, leg: SelectedShuttleLeg) {
 }
 
 async function chooseReturn(context: FlowContext, leg: SelectedShuttleLeg) {
+  context.setState((current) => ({ ...current, notice: null, quote: null,
+    returnLeg: leg, submitting: false }));
+}
+
+async function continueToConfirm(context: FlowContext) {
   if (context.requestInFlight.current) return;
+  const selection = completeSelection(context.state);
+  if (selection === null) return;
   context.requestInFlight.current = true;
   context.setState((current) => ({ ...current, notice: null, submitting: true }));
-  const selection = selectedTrip(context.state, leg);
-  if (selection === null) {
-    context.requestInFlight.current = false;
-    return;
-  }
   try {
     const quote = await context.client.quoteShuttle(
       buildShuttleQuote(selection, null, context.paymentMethod),
     );
-    context.setState((current) => ({ ...current, quote, returnLeg: leg,
-      step: "confirm", submitting: false }));
+    context.setState((current) => ({ ...current, quote, step: "confirm", submitting: false }));
   } catch (error: unknown) {
     const minimum = minimumPassengerError(error);
     if (minimum !== null) {
@@ -251,7 +250,7 @@ export function useShuttleFlow(client: ShuttleApiClient, business: Business) {
   ) => updateTrip(context, key, value);
   const back = () => setState((current) => ({ ...current, notice: null,
     step: current.step === "confirm" ? "outbound" : "trip" }));
-  const selection = selectedTrip(state, state.returnLeg);
+  const selection = completeSelection(state);
   const complete = (
     response: ShuttleBookingResponse,
     paymentMethod: PaymentMethod,
@@ -259,8 +258,8 @@ export function useShuttleFlow(client: ShuttleApiClient, business: Business) {
   ) => setState((current) => (
     { ...current, confirmation: { customerEmail, paymentMethod, response }, step: "done" }));
   return { back, chooseOutbound: (leg: SelectedShuttleLeg) => chooseOutbound(context, leg),
-    chooseReturn: (leg: SelectedShuttleLeg) => chooseReturn(context, leg), complete, maximumBags,
-    selection, state,
+    chooseReturn: (leg: SelectedShuttleLeg) => chooseReturn(context, leg), complete,
+    continueToConfirm: () => continueToConfirm(context), maximumBags, selection, state,
     submitTrip: (event: SubmitEvent) => submitTrip(context, event),
     unavailable: (message: string) => returnToDepartures(context, message), update };
 }

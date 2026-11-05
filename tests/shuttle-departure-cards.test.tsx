@@ -17,10 +17,12 @@ function renderDepartures(
 ) {
   const element = document.createElement("div");
   document.body.append(element);
-  render(<ShuttleDepartures currency="USD" notice={null} loadingOutbound={false}
+  render(<ShuttleDepartures canContinue={selected !== null} continuing={false}
+    currency="USD" notice={null} loadingOutbound={false}
     outboundData={{ result, date: "2026-10-30", direction: "outbound" }}
     returnData={null} loadingReturn={false} passengerCount={1}
     selectedOutbound={selected} selectedReturn={null} onBack={() => undefined}
+    onContinue={() => undefined}
     onChooseOutbound={onChoose} onChooseReturn={() => undefined} />, element);
   return element;
 }
@@ -136,13 +138,15 @@ describe("server departure prices", () => {
     document.body.append(element);
     const outbound = { ...DEPARTURE, total_for_selection: "130.00" };
     const returning = { ...DEPARTURE, schedule_id: "return", total_for_selection: "145.00" };
-    render(<ShuttleDepartures currency="USD" notice={null} loadingOutbound={false}
+    render(<ShuttleDepartures canContinue={false} continuing={false}
+      currency="USD" notice={null} loadingOutbound={false}
       outboundData={{ result: { ...SEARCH_RESULT, departures: [outbound] },
         date: "2026-11-04", direction: "outbound" }}
       returnData={{ result: { ...SEARCH_RESULT, departures: [returning] },
         date: "2026-11-07", direction: "return" }} loadingReturn={false}
       passengerCount={2} selectedOutbound={null} selectedReturn={null}
-      onBack={() => undefined} onChooseOutbound={() => undefined}
+      onBack={() => undefined} onContinue={() => undefined}
+      onChooseOutbound={() => undefined}
       onChooseReturn={() => undefined} />, element);
     expect(element.textContent).toContain("$130.00 USD");
     expect(element.textContent).toContain("$145.00 USD");

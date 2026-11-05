@@ -267,6 +267,30 @@
   margin: 28px 0;
 }
 
+.departure-navigation {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.departure-continue {
+  background: var(--green);
+  border: 1px solid #4cae4c;
+  border-radius: 3px;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  margin-top: 12px;
+  min-height: 38px;
+  min-width: 150px;
+}
+
+.departure-continue:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
 .shuttle-departure {
   align-items: center;
   background: #ffffff;

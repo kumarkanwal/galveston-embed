@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "preact/hooks";
+
 import { formatBusinessLocalDate } from "../../time";
 import { WidgetHeader } from "../shell/WidgetHeader";
 import { ProgressSteps } from "../trip/ProgressSteps";
@@ -9,6 +11,8 @@ import type {
 
 interface ShuttleDeparturesProps {
   businessName?: string | undefined;
+  canContinue: boolean;
+  continuing: boolean;
   currency: string;
   loadingOutbound: boolean;
   loadingReturn: boolean;
@@ -20,6 +24,7 @@ interface ShuttleDeparturesProps {
   selectedOutbound: SelectedShuttleLeg | null;
   selectedReturn: SelectedShuttleLeg | null;
   onBack: () => void;
+  onContinue: () => void;
   onChooseOutbound: (leg: SelectedShuttleLeg) => void;
   onChooseReturn: (leg: SelectedShuttleLeg) => void;
 }
@@ -82,6 +87,15 @@ function DepartureSection(props: DepartureSectionProps) {
 }
 
 export function ShuttleDepartures(props: ShuttleDeparturesProps) {
+  const returnSectionRef = useRef<HTMLDivElement>(null);
+  const previousReturnData = useRef(props.returnData);
+  useEffect(() => {
+    const returnAppeared = previousReturnData.current === null && props.returnData !== null;
+    previousReturnData.current = props.returnData;
+    if (returnAppeared) {
+      returnSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [props.returnData]);
   return <section class="widget">
     <WidgetHeader businessName={props.businessName} logoUrl={props.logoUrl}
       subtitle="Choose your shuttle departure." />
@@ -95,9 +109,17 @@ export function ShuttleDepartures(props: ShuttleDeparturesProps) {
       data={props.outboundData} passengerCount={props.passengerCount}
       selected={props.selectedOutbound} onChoose={props.onChooseOutbound} />}
     {props.loadingReturn && <p class="return-loading" role="status">Finding return departures…</p>}
-    {props.returnData !== null && <DepartureSection currency={props.currency}
-      data={props.returnData} passengerCount={props.passengerCount}
-      selected={props.selectedReturn} onChoose={props.onChooseReturn} />}
-    <button class="back-button" type="button" onClick={props.onBack}>↶ Back</button>
+    {props.returnData !== null && <div class="return-scroll-target" ref={returnSectionRef}>
+      <DepartureSection currency={props.currency}
+        data={props.returnData} passengerCount={props.passengerCount}
+        selected={props.selectedReturn} onChoose={props.onChooseReturn} />
+    </div>}
+    <div class="departure-navigation">
+      <button class="back-button" type="button" onClick={props.onBack}>↶ Back</button>
+      {props.canContinue && <button class="departure-continue" type="button"
+        aria-label="Continue to Confirm" disabled={props.continuing} onClick={props.onContinue}>
+        {props.continuing ? "Loading…" : "Continue"}
+      </button>}
+    </div>
   </section>;
 }

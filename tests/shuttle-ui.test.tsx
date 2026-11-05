@@ -49,7 +49,8 @@ function renderDepartures(
   selected: SelectedShuttleLeg | null = null,
 ) {
   const element = root();
-  render(<ShuttleDepartures currency="USD" notice={null} loadingOutbound={false}
+  render(<ShuttleDepartures canContinue={selected !== null} continuing={false}
+    currency="USD" notice={null} loadingOutbound={false}
     outboundData={{ result: direction === "outbound" ? result
       : { ...SEARCH_RESULT, departures: [] }, date: "2026-10-30", direction: "outbound" }}
     returnData={direction === "return" ? { result, date: "2026-10-30", direction } : null}
@@ -57,6 +58,7 @@ function renderDepartures(
     selectedOutbound={direction === "outbound" ? selected : null}
     selectedReturn={direction === "return" ? selected : null}
     onBack={() => undefined}
+    onContinue={() => undefined}
     onChooseOutbound={onChoose} onChooseReturn={onChoose}
   />, element);
   return element;
@@ -293,11 +295,13 @@ describe("fixed-only shuttle departures", () => {
   it("renders no pickup-time input for either round-trip leg", () => {
     const result = { ...SEARCH_RESULT, departures: [DEPARTURE] };
     const element = root();
-    render(<ShuttleDepartures currency="USD" notice={null} loadingOutbound={false}
+    render(<ShuttleDepartures canContinue={false} continuing={false}
+      currency="USD" notice={null} loadingOutbound={false}
       outboundData={{ result, date: "2026-11-04", direction: "outbound" }}
       returnData={{ result, date: "2026-11-07", direction: "return" }} loadingReturn={false}
       passengerCount={1} selectedOutbound={null} selectedReturn={null}
-      onBack={() => undefined} onChooseOutbound={() => undefined}
+      onBack={() => undefined} onContinue={() => undefined}
+      onChooseOutbound={() => undefined}
       onChooseReturn={() => undefined} />, element);
     expect(element.querySelectorAll('input[type="time"]')).toHaveLength(0);
     expect(element.textContent).toContain("Choose Departure · Wed, Nov 4");
