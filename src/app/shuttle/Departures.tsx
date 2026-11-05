@@ -1,13 +1,7 @@
-import type {
-  PrivateCarAvailability,
-  ShuttleDeparture,
-  ShuttleRoute,
-} from "../../api/client";
-import { formatMoney } from "../../money";
 import { formatBusinessLocalDate } from "../../time";
 import { WidgetHeader } from "../shell/WidgetHeader";
 import { ProgressSteps } from "../trip/ProgressSteps";
-import { minimumMessage } from "./minimum";
+import { PrivateDepartureCard, SharedDepartureCard } from "./DepartureCard";
 import type {
   DepartureViewData,
   SelectedShuttleLeg,
@@ -38,96 +32,32 @@ interface DepartureSectionProps {
   onChoose: (leg: SelectedShuttleLeg) => void;
 }
 
-function departureTime(departure: ShuttleDeparture): string {
-  return departure.end_time == null
-    ? departure.start_time
-    : `${departure.start_time} – ${departure.end_time}`;
-}
-
 function isScheduledSelected(
   selected: SelectedShuttleLeg | null,
-  departure: ShuttleDeparture,
+  scheduleId: string,
 ): boolean {
   return selected?.kind === "scheduled"
-    && selected.departure.schedule_id === departure.schedule_id;
+    && selected.departure.schedule_id === scheduleId;
 }
 
 function isPrivateSelected(
   selected: SelectedShuttleLeg | null,
-  car: PrivateCarAvailability,
+  routeId: string,
+  vehicleTypeId: string,
+  serviceDate: string,
 ): boolean {
   return selected?.kind === "private"
-    && selected.car.route_id === car.route_id
-    && selected.car.vehicle_type_id === car.vehicle_type_id
-    && selected.date === car.service_date;
-}
-
-function DepartureRow(props: {
-  currency: string;
-  date: string;
-  departure: ShuttleDeparture;
-  onChoose: DepartureSectionProps["onChoose"];
-  passengerCount: number;
-  route: ShuttleRoute;
-  selected: boolean;
-}) {
-  const departure = props.departure;
-  const minimum = departure.effective_min_passengers;
-  const minimumBlocked = props.passengerCount < minimum;
-  const rowClass = `shuttle-departure${departure.selectable ? "" : " unavailable"}`
-    + `${props.selected ? " selected" : ""}`;
-  return <article class={rowClass}>
-    <div><strong>{departureTime(departure)}</strong>
-      <span>{departure.duration_minutes} min</span>
-      <span class="shuttle-mode-badge">Shared</span>
-      {departure.vehicle_type !== null && <span>Vehicle: {departure.vehicle_type.name}</span>}
-    </div>
-    <div><span>{departure.seats_remaining} seats left</span>
-      {departure.low_seat_warning !== null && <small>{departure.low_seat_warning}</small>}</div>
-    <strong>{formatMoney(departure.total_for_selection, props.currency)}</strong>
-    <button type="button" aria-pressed={props.selected}
-      disabled={!departure.selectable || minimumBlocked}
-      onClick={() => props.onChoose({ kind: "scheduled", date: props.date, departure,
-        route: props.route })}>
-      {props.selected ? "Selected" : departure.selectable ? "Choose" : "Unavailable"}
-    </button>
-    {!departure.selectable && departure.unselectable_reason !== null &&
-      <p class="departure-reason">{departure.unselectable_reason}</p>}
-    {minimumBlocked && <p class="departure-reason">{minimumMessage(minimum)}</p>}
-  </article>;
-}
-
-function PrivateRow(props: {
-  car: PrivateCarAvailability;
-  currency: string;
-  onChoose: DepartureSectionProps["onChoose"];
-  passengerCount: number;
-  route: ShuttleRoute;
-  selected: boolean;
-}) {
-  const minimumBlocked = props.passengerCount < props.car.effective_min_passengers;
-  return <article class={`shuttle-departure private${props.selected ? " selected" : ""}`}>
-    <div><strong>{props.car.vehicle_type_name}</strong>
-      <span class="shuttle-mode-badge">Private</span>
-      <span>Pickup time will be arranged by phone</span>
-    </div>
-    <div><span>Up to {props.car.seat_capacity} passengers</span></div>
-    <strong>{formatMoney(props.car.total_for_selection, props.currency)}</strong>
-    <button type="button" aria-pressed={props.selected} disabled={minimumBlocked}
-      onClick={() => props.onChoose({ kind: "private", date: props.car.service_date,
-        car: props.car, route: props.route })}>
-      {props.selected ? "Selected" : "Choose"}
-    </button>
-    {minimumBlocked && <p class="departure-reason">
-      {minimumMessage(props.car.effective_min_passengers)}
-    </p>}
-  </article>;
+    && selected.car.route_id === routeId
+    && selected.car.vehicle_type_id === vehicleTypeId
+    && selected.date === serviceDate;
 }
 
 function DepartureSection(props: DepartureSectionProps) {
   const departures = props.data.direction === "outbound"
     ? props.data.result.departures.filter((departure) => departure.selectable)
     : props.data.result.departures;
+  const orderedDepartures = [...departures]
+    .sort((first, second) => first.start_time.localeCompare(second.start_time));
   const title = props.data.direction === "outbound" ? "Choose Departure" : "Choose Return";
   const privateCars = props.data.result.private_cars ?? [];
   const empty = departures.length === 0 && privateCars.length === 0;
@@ -137,15 +67,16 @@ function DepartureSection(props: DepartureSectionProps) {
       No scheduled departures on this date. Please try another date.
     </div>}
     {!empty && <div class="shuttle-departures">
-      {departures.map((departure) => <DepartureRow key={departure.schedule_id}
+      {orderedDepartures.map((departure) => <SharedDepartureCard key={departure.schedule_id}
         currency={props.currency} date={props.data.date} departure={departure}
         onChoose={props.onChoose} passengerCount={props.passengerCount}
         route={props.data.result.route}
-        selected={isScheduledSelected(props.selected, departure)} />)}
-      {privateCars.map((car) => <PrivateRow key={`${car.route_id}:${car.vehicle_type_id}`}
+        selected={isScheduledSelected(props.selected, departure.schedule_id)} />)}
+      {privateCars.map((car) => <PrivateDepartureCard key={`${car.route_id}:${car.vehicle_type_id}`}
         car={car} currency={props.currency} onChoose={props.onChoose}
         passengerCount={props.passengerCount} route={props.data.result.route}
-        selected={isPrivateSelected(props.selected, car)} />)}
+        selected={isPrivateSelected(props.selected, car.route_id, car.vehicle_type_id,
+          car.service_date)} />)}
     </div>}
   </section>;
 }

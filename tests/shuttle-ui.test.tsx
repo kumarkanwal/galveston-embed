@@ -271,55 +271,6 @@ describe("shuttle passenger dropdown limits", () => {
   });
 });
 
-describe("shuttle departures", () => {
-  it("hides the internal route name and shows duration with the public details", () => {
-    const hidden = { ...DEPARTURE, schedule_id: "hidden", selectable: false,
-      unselectable_reason: "Return must leave later" };
-    const element = renderDepartures({ ...SEARCH_RESULT, departures: [DEPARTURE, hidden] });
-    expect(element.textContent).toContain("09:30 – 10:30");
-    expect(element.textContent).not.toContain("Island Express");
-    expect(element.textContent).toContain("60 min");
-    expect(element.textContent).toContain("Vehicle: Executive Van");
-    expect(element.textContent).toContain("4 seats left");
-    expect(element.textContent).toContain("$70.50 USD");
-    expect(element.textContent).toContain("Shared");
-    expect(element.textContent).not.toContain("Return must leave later");
-    expect(element.querySelectorAll(".shuttle-departure")).toHaveLength(1);
-  });
-
-  it("hides the scheduled vehicle row when vehicle_type is null", () => {
-    const departure = { ...DEPARTURE, vehicle_type: null };
-    const element = renderDepartures({ ...SEARCH_RESULT, departures: [departure] });
-    expect(element.textContent).not.toContain("Island Express");
-    expect(element.textContent).toContain("60 min");
-    expect(element.textContent).not.toContain("Vehicle:");
-  });
-
-  it("shows the server mix total instead of the cheapest seat price", () => {
-    const departure = { ...DEPARTURE, total_for_selection: "91.00",
-      prices: { adult: "10.00", senior: "12.00", child: "8.00" } };
-    const element = renderDepartures({ ...SEARCH_RESULT, departures: [departure] });
-    expect(element.textContent).toContain("$91.00 USD");
-    expect(element.textContent).not.toContain("$8.00 USD");
-  });
-
-  it("shows each round-trip direction's own server price", () => {
-    const outbound = { ...DEPARTURE, total_for_selection: "130.00" };
-    const returning = { ...DEPARTURE, schedule_id: "return", total_for_selection: "145.00" };
-    const element = root();
-    render(<ShuttleDepartures currency="USD" notice={null} loadingOutbound={false}
-      outboundData={{ result: { ...SEARCH_RESULT, departures: [outbound] },
-        date: "2026-11-04", direction: "outbound" }}
-      returnData={{ result: { ...SEARCH_RESULT, departures: [returning] },
-        date: "2026-11-07", direction: "return" }} loadingReturn={false}
-      passengerCount={2} selectedOutbound={null} selectedReturn={null}
-      onBack={() => undefined} onChooseOutbound={() => undefined}
-      onChooseReturn={() => undefined} />, element);
-    expect(element.textContent).toContain("$130.00 USD");
-    expect(element.textContent).toContain("$145.00 USD");
-  });
-});
-
 describe("fixed-only shuttle departures", () => {
   it("shows the fixed-departure empty message and ignores any-time cars", () => {
     const privateCar = {

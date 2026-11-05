@@ -72,7 +72,7 @@ export const DEPARTURE = {
   effective_min_passengers: 1,
   selectable: true,
   unselectable_reason: null,
-  low_seat_warning: "Only 4 seats left",
+  low_seat_warning: "Selling fast! Less than 10 seats left",
   vehicle_type: {
     id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
     name: "Executive Van",
