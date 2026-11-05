@@ -17,7 +17,7 @@ const BUSINESS = {
   max_passengers: 8, max_luggage: 8,
   settings: { advance_booking_hours: 0, insurance_enabled: false,
     insurance_pct: "0.00", offer_car_seats: true, max_car_seats: 5,
-    car_seat_price: "15.00", payment_methods: ["cash"],
+    car_seat_price: "15.00", payment_methods: ["cash"], cash_discount_enabled: false,
     show_map: true, show_service_dropdown: true },
 } satisfies Business;
 const QUOTE: TaxiQuoteResponse = {

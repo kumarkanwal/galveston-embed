@@ -4,11 +4,12 @@
 | Field | Value |
 |---|---|
 | Copied from | `galveston-backend/docs/API_CONTRACT.md` |
-| Backend commit | `331436a2e060cfad325a882f98ed586eba0bad28` |
-| Copied on | `2026-11-03` |
+| Backend commit | `28fa989bed9c6ae5e041e2b47cbb7d59f912d623` |
+| Copied on | `2026-11-06` |
 
 Refresh only after a complete backend change is committed and pushed.
 
-This source includes B-51 date-only private shuttle cars, passenger-mix search
-prices with trip type, and per-passenger quote and booking breakdowns.
+This source includes B-53 shuttle search-row vehicle images, customer notes,
+vehicle display names and route durations. It also documents stored cash
+discount settings, which E-26 deliberately does not use.
 The copied blob was verified byte-for-byte against backend `origin/main`.

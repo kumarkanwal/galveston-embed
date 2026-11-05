@@ -5,11 +5,72 @@ Stack: FastAPI (Python) · PostgreSQL · Square payments
 Base URL: `https://api.<domain>.com/v1`
 Consumers: Booking-form embeds (taxi and shuttle)
 
-**Version 1.12** — generated from the implemented schemas, routers, services and
-`openapi.json` through B-51. This document covers the public surface and the B-51
+**Version 1.14** — generated from the implemented schemas, routers, services and
+`openapi.json` through B-53. This document covers the public surface and recent
 admin additions below; older admin endpoints remain defined by OpenAPI.
 
 ---
+
+## B-53 route-car presentation and stored cash discounts
+
+- Admin `GET` and `PUT /admin/routes/{route_id}/vehicle-types` read and write
+  nullable `customer_note` on each route car. The value is trimmed plain text,
+  limited to 200 characters, and rejects HTML. A shared route always uses its
+  owner's route-car note, so every enabled partner company shows the same copy.
+- Fixed shared departures add nullable `customer_note`, nullable `image_url`,
+  and nullable `vehicle_type_name`. They retain `duration_minutes` and
+  `seats_remaining`. Private-car rows add the same presentation fields and
+  retain `seat_capacity`. `image_url` is the existing vehicle-type upload URL,
+  or null when no image is stored.
+- Admin `GET` and `PUT /admin/businesses/{id}/settings/payments` add
+  `cash_discount_enabled`, nullable two-decimal `cash_discount_percent`, and
+  nullable `cash_discount_note`. Percent must be between 0 and 100 and is
+  required when enabled. The note is trimmed plain text with a 200-character
+  limit. Enabling is allowed only for `cash` or `both` payment modes.
+- Changing the payment mode to card-only preserves all three stored values but
+  makes the discount inactive. Admin settings continue to return the stored
+  enabled value; `GET /public/business` exposes the percent and note but reports
+  `settings.cash_discount_enabled: false` while cash is unavailable.
+- **cash discount not applied to pricing until a later phase**. Quote, booking,
+  price-breakdown, payment, and persisted total calculations are unchanged.
+
+Example public search rows:
+
+```json
+{
+  "schedule_id": "uuid",
+  "start_time": "08:00",
+  "end_time": "10:00",
+  "duration_minutes": 120,
+  "service_label": "Direct Service",
+  "vehicle_type_name": "14 PAX Sprinter",
+  "image_url": "https://api.example.com/media/vehicle-types/sprinter.webp",
+  "customer_note": "Call after collecting luggage.",
+  "seats_remaining": 8
+}
+```
+
+```json
+{
+  "departure_type": "private",
+  "vehicle_type_name": "Private SUV",
+  "image_url": null,
+  "customer_note": null,
+  "duration_minutes": 90,
+  "seat_capacity": 6
+}
+```
+
+Example payment-settings fields:
+
+```json
+{
+  "payment_method_mode": "both",
+  "cash_discount_enabled": true,
+  "cash_discount_percent": "10.00",
+  "cash_discount_note": "Get 10% discount on cash payment"
+}
+```
 
 ## B-51 fixed shuttle service, exact pricing, and route sharing
 
@@ -99,6 +160,61 @@ route sharing, explicit widget readiness, and server-priced F-46 reservation con
 
 See `docs/phases/B-49-diagnosis.md` for production root causes and
 `docs/phases/B-49-progress.md` for the verification and F-47 handoff.
+
+## B-52 admin shuttle reservation price breakdown
+
+`GET /v1/admin/reservations/{booking_id}` adds nullable `shuttle_breakdown`.
+For shuttle orders it uses the same B-51 passenger, included-charge, and signed
+adjustment shapes returned by public quote and booking confirmation:
+
+```json
+{
+  "shuttle_breakdown": {
+    "legs": [
+      {
+        "booking_id": "uuid",
+        "leg": "outbound",
+        "passenger_lines": [
+          { "passenger_type": "senior", "count": 1,
+            "unit_price": "45.00", "line_total": "45.00" },
+          { "passenger_type": "adult", "count": 1,
+            "unit_price": "55.00", "line_total": "55.00" }
+        ],
+        "charges": [
+          { "label": "Peak Hours Increase", "amount": "20.00",
+            "kind": "surcharge", "included_in_total": true }
+        ],
+        "leg_total": "120.00"
+      }
+    ],
+    "adjustments": [
+      { "label": "Promo B52TEN", "amount": "-12.00",
+        "kind": "discount", "included_in_total": true },
+      { "label": "CC Surcharge", "amount": "3.24",
+        "kind": "surcharge", "included_in_total": true }
+    ],
+    "total": "111.24",
+    "currency": "USD"
+  }
+}
+```
+
+Every amount is an immutable snapshot. The exact invariant is:
+
+`sum(passenger_lines.line_total) + sum(legs.charges.amount) +
+sum(adjustments.amount) == shuttle_breakdown.total`.
+
+Peak is listed once on its leg. Promo discounts are negative; insurance, card
+fees, and staff-added order charges are positive signed adjustments. Never add
+an `included_in_total` row a second time.
+
+New bookings persist the exact pre-peak passenger allocation. Existing bookings,
+including those created before B-51, have no allocation snapshot; the API
+reconstructs a legacy leg only when exactly one passenger type is non-zero and
+the stored leg total and peak amount prove the result. An ambiguous mixed-passenger order returns
+`shuttle_breakdown: null` rather than reading today's mutable route prices.
+Taxi reservations also return `shuttle_breakdown: null`; their existing journey,
+charges, and payment fields are unchanged.
 
 ## B-48 shuttle modes, passenger pricing, minimums, and admin lifecycle
 
@@ -777,6 +893,9 @@ The core search.
     { "schedule_id": "uuid",
       "start_time": "08:00", "end_time": "10:00",
       "duration_minutes": 120, "service_label": "Direct Service",
+      "vehicle_type_name": "14 PAX Sprinter",
+      "image_url": "https://api.example.com/media/vehicle-types/sprinter.webp",
+      "customer_note": "Call after collecting luggage.",
       "from_price": "82.50",
       "prices": { "senior": "75.00", "adult": "82.50", "child": "60.00" },
       "total_for_selection": "217.50",
@@ -821,6 +940,9 @@ phone after the request:
     "route_id": "uuid",
     "vehicle_type_id": "uuid",
     "vehicle_type_name": "14 PAX Sprinter",
+    "image_url": "https://api.example.com/media/vehicle-types/sprinter.webp",
+    "customer_note": "Call after collecting luggage.",
+    "duration_minutes": 90,
     "service_date": "2026-08-13",
     "pickup_time": null,
     "seat_capacity": 14,

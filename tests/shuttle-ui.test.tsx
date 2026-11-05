@@ -326,6 +326,7 @@ describe("fixed-only shuttle departures", () => {
       departure_type: "on_request" as const, route_id: SEARCH_RESULT.route.id,
       vehicle_type_id: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
       vehicle_type_name: "Private Van", seat_capacity: 6, from_price: "150.00",
+      image_url: null, customer_note: null, duration_minutes: 60,
       effective_min_passengers: 1, service_mode: "private" as const,
     };
     const element = renderDepartures({ ...SEARCH_RESULT, departures: [],

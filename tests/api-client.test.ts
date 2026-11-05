@@ -36,6 +36,7 @@ const BUSINESS = {
     max_car_seats: 5,
     offer_car_seats: true,
     payment_methods: ["cash"],
+    cash_discount_enabled: false,
     show_map: true,
     show_service_dropdown: true,
     terms_and_conditions: "Arrive ten minutes early.",

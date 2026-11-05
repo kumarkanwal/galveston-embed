@@ -14,7 +14,8 @@ const BUSINESS = {
   max_passengers: 10, max_luggage: 8,
   settings: { advance_booking_hours: 0, insurance_enabled: false, insurance_pct: "0.00",
     offer_car_seats: true, max_car_seats: 5, car_seat_price: "15.00",
-    payment_methods: ["cash"], show_map: false, show_service_dropdown: true },
+    payment_methods: ["cash"], cash_discount_enabled: false,
+    show_map: false, show_service_dropdown: true },
 } satisfies Business;
 
 const SERVICES: ServiceTypeOption[] = [
