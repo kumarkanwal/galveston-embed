@@ -37,6 +37,18 @@ describe("desktop departure card styles", () => {
   });
 });
 
+describe("mobile departure card styles", () => {
+  it("uses the three-column 90 by 60 card without horizontal overflow", () => {
+    const css = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
+    const mobile = css.slice(css.indexOf(":is(.layout-narrow, .layout-micro) .shuttle-departure"));
+    expect(mobile).toMatch(/grid-template-columns:\s*90px minmax\(0, 1fr\) minmax\(78px, auto\)/);
+    expect(mobile).toMatch(/\.departure-image-frame\s*\{[^}]*height:\s*60px;[^}]*width:\s*90px/s);
+    expect(mobile).toMatch(/\.departure-capacity\s*\{[^}]*grid-column:\s*2 \/ -1/s);
+    expect(mobile).toMatch(/\.departure-note\s*\{[^}]*grid-column:\s*1 \/ -1;[^}]*width:\s*100%/s);
+    expect(mobile).toMatch(/\.shuttle-departure button\s*\{[^}]*padding:\s*0 8px/s);
+  });
+});
+
 describe("shuttle departure card content", () => {
   it("shows public shared details and the server selling-fast message", () => {
     const hidden = { ...DEPARTURE, schedule_id: "hidden", selectable: false,

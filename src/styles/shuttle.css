@@ -465,13 +465,33 @@
   padding: 12px;
 }
 
-:is(.layout-compact, .layout-narrow, .layout-micro) .shuttle-departure {
-  grid-template-columns: 1fr auto;
+.layout-compact .shuttle-departure {
+  grid-template-columns: 100px minmax(0, 1fr) minmax(112px, auto);
   gap: 12px;
 }
 
 :is(.layout-compact, .layout-narrow, .layout-micro) .shuttle-departure button {
   min-height: 38px;
+}
+
+.layout-compact .departure-image-frame {
+  height: 68px;
+  width: 100px;
+}
+
+.layout-compact .departure-capacity {
+  border-left: 0;
+  grid-column: 2;
+  padding-left: 0;
+}
+
+.layout-compact .departure-action {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+}
+
+.layout-compact .departure-note {
+  grid-column: 2 / -1;
 }
 
 :is(.layout-compact, .layout-narrow, .layout-micro) .passenger-trigger {
@@ -490,8 +510,70 @@
 }
 
 :is(.layout-narrow, .layout-micro) .shuttle-departure {
+  align-items: start;
   gap: 8px;
+  grid-template-columns: 90px minmax(0, 1fr) minmax(78px, auto);
+  min-width: 0;
+  overflow: hidden;
   padding: 10px;
+  width: 100%;
+}
+
+:is(.layout-narrow, .layout-micro) .departure-image-frame {
+  height: 60px;
+  width: 90px;
+}
+
+:is(.layout-narrow, .layout-micro) .departure-details {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+:is(.layout-narrow, .layout-micro) .departure-primary {
+  font-size: 18px;
+}
+
+:is(.layout-narrow, .layout-micro) .departure-vehicle {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+:is(.layout-narrow, .layout-micro) .departure-action {
+  grid-column: 3;
+  grid-row: 1;
+  min-width: 0;
+}
+
+:is(.layout-narrow, .layout-micro) .departure-price {
+  font-size: 14px;
+  white-space: normal;
+}
+
+:is(.layout-narrow, .layout-micro) .shuttle-departure button {
+  padding: 0 8px;
+}
+
+:is(.layout-narrow, .layout-micro) .departure-capacity {
+  border-left: 0;
+  grid-column: 2 / -1;
+  padding-left: 0;
+}
+
+:is(.layout-narrow, .layout-micro) .departure-note {
+  border-radius: 8px;
+  grid-column: 1 / -1;
+  overflow-wrap: anywhere;
+  width: 100%;
+}
+
+.layout-micro .shuttle-departure {
+  grid-template-columns: 78px minmax(0, 1fr) minmax(72px, auto);
+  padding: 8px;
+}
+
+.layout-micro .departure-image-frame {
+  height: 54px;
+  width: 78px;
 }
 
 .shuttle-trip .field-note {
