@@ -9,7 +9,6 @@ import type {
 } from "../../api/client";
 import { ApiError, UnauthorizedError } from "../../api/errors";
 import { IdempotencyKeyManager } from "../../api/idempotency";
-import { formatMoney } from "../../money";
 import { bookingFailure, type BookingFailure } from "../booking/booking-error";
 import { ConfirmForm } from "../confirm/ConfirmForm";
 import { cardPaymentSettings, paymentAvailability, withPaymentToken } from "../confirm/payment";
@@ -19,7 +18,6 @@ import type { PromoCodeState } from "../confirm/use-price-breakdown";
 import type { ConfirmFormState } from "../confirm/types";
 import { SquareCardField } from "../confirm/SquareCardField";
 import { useSquareCard } from "../confirm/use-square-card";
-import { FormError } from "../trip/FieldError";
 import { ProgressSteps } from "../trip/ProgressSteps";
 import { WidgetHeader } from "../shell/WidgetHeader";
 import {
@@ -33,9 +31,10 @@ import {
 import { isShuttleAvailabilityError, SHUTTLE_UNAVAILABLE_MESSAGE } from "./availability";
 import { minimumPassengerError } from "./minimum";
 import { buildShuttleBooking, buildShuttleQuote } from "./requests";
+import { ShuttleCharges } from "./ShuttleCharges";
 import { ShuttleAddressFields } from "./ShuttleAddressFields";
-import { ShuttlePriceLines } from "./ShuttlePriceLines";
-import type { SelectedShuttleLeg, ShuttleSelection } from "./types";
+import { ShuttleTripSummary } from "./ShuttleTripSummary";
+import type { ShuttleSelection } from "./types";
 
 interface ShuttleConfirmProps {
   business: Business;
@@ -54,54 +53,6 @@ interface ShuttleConfirmProps {
 
 function initialPromo(): PromoCodeState {
   return { appliedCode: null, error: undefined, input: "", status: "idle" };
-}
-
-function legLabel(leg: SelectedShuttleLeg): string {
-  if (leg.kind === "private") return `${leg.date} · Time: to be arranged`;
-  const end = leg.departure.end_time == null ? "" : ` – ${leg.departure.end_time}`;
-  return `${leg.date} at ${leg.departure.start_time}${end}`;
-}
-
-function ShuttleSummary(props: { quote: ShuttleQuoteResponse; selection: ShuttleSelection }) {
-  const selection = props.selection;
-  return <section class="trip-summary"><h2 tabIndex={-1}>Trip Summary</h2>
-    <div class="shuttle-summary">
-      <h3>{selection.from.name} → {selection.to.name}</h3>
-      <p>Outbound: {legLabel(selection.outbound)}</p>
-      {selection.returnLeg !== null && <p>Return: {legLabel(selection.returnLeg)}</p>}
-      <p>{selection.trip.paxAdult} adults
-        {selection.trip.paxSenior > 0 ? `, ${selection.trip.paxSenior} seniors` : ""}
-        {selection.trip.paxChild > 0 ? `, ${selection.trip.paxChild} children` : ""}</p>
-      <p><span aria-hidden="true">▣ </span>{props.quote.large_bags} check-in
-        <span aria-hidden="true"> · ▫ </span>{props.quote.small_bags} carry-on</p>
-      {props.quote.legs.map((leg, index) => <p class="shuttle-leg-info" key={index}>
-        {index === 0 ? "Outbound" : "Return"}: {leg.service_mode === "private"
-          ? "Private Shuttle" : "Shared Shuttle"} · {formatMoney(leg.leg_price, props.quote.currency)}
-        {leg.effective_min_passengers > 1
-          ? ` · Minimum ${leg.effective_min_passengers} passengers` : ""}
-      </p>)}
-    </div>
-  </section>;
-}
-
-function ShuttleCharges(props: {
-  currency: string;
-  error: string | null;
-  promo: PromoCodeState;
-  quote: ShuttleQuoteResponse;
-  onApply: () => void;
-  onInput: (value: string) => void;
-  onRemove: () => void;
-}) {
-  return <section class="charges"><h2>Charges</h2>
-    <ShuttlePriceLines adjustments={props.quote.adjustments} currency={props.quote.currency}
-      legs={props.quote.legs} />
-    <PromoCodeField promo={props.promo} error={props.promo.error}
-      onApply={props.onApply} onInput={props.onInput} onRemove={props.onRemove} />
-    {props.error !== null && <FormError>{props.error}</FormError>}
-    <div class="charges-total"><strong>Total</strong>
-      <strong>{formatMoney(props.quote.total, props.currency)}</strong></div>
-  </section>;
 }
 
 function useShuttlePromo(props: ShuttleConfirmProps, paymentMethod: PaymentMethod) {
@@ -219,13 +170,9 @@ export function ShuttleConfirm(props: ShuttleConfirmProps) {
   return <section class="widget"><WidgetHeader businessName={props.business.name}
     logoUrl={props.business.logo_url} subtitle="Review and confirm your shuttle trip." />
     <ProgressSteps activeStep={3} steps={["Trip", "Departures", "Confirm"]} />
-    <div class="confirm-layout"><div>
-      <ShuttleSummary quote={view.quote} selection={props.selection} />
-      <ShuttleCharges currency={props.business.currency} quote={view.quote}
-        promo={view.promo} error={view.quoteError} onApply={() => { void view.apply(); }}
-        onInput={(value) => view.setPromo((current) => current.status === "idle"
-          ? { ...current, error: undefined, input: value } : current)}
-        onRemove={() => { void view.remove(); }} />
+    <div class="confirm-layout shuttle-confirm-layout"><div>
+      <ShuttleTripSummary quote={view.quote} selection={props.selection} />
+      <ShuttleCharges quote={view.quote} error={view.quoteError} />
       <button class="back-button" type="button" onClick={props.onBack}>↶ Back</button>
     </div><ConfirmForm breakdownReady={view.quoteError === null && !view.busy}
       buttonLabel="Create Trip"
@@ -237,6 +184,13 @@ export function ShuttleConfirm(props: ShuttleConfirmProps) {
         <ShuttleAddressFields errorField={view.addressError} mapsKey={props.mapsKey}
           selection={props.selection} values={view.addresses.values}
           onChange={view.changeAddress} />
+        <section class="shuttle-promo"><h2>Promo Code</h2>
+          <PromoCodeField promo={view.promo} error={view.promo.error}
+            onApply={() => { void view.apply(); }}
+            onInput={(value) => view.setPromo((current) => current.status === "idle"
+              ? { ...current, error: undefined, input: value } : current)}
+            onRemove={() => { void view.remove(); }} />
+        </section>
         <PaymentMethodField cardAvailable={view.payment.card} cashAvailable={view.payment.cash}
           method={view.paymentMethod}
           onChange={(method) => { view.setFailure(null); view.setPaymentMethod(method); }} />
