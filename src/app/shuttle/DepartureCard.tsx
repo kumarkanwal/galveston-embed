@@ -99,7 +99,6 @@ export function PrivateDepartureCard(props: CommonCardProps & {
       {car.vehicle_type_name}</strong>
       <Duration minutes={car.duration_minutes} />
       <span class="shuttle-mode-badge">Private</span>
-      <span class="departure-vehicle">Pickup time will be arranged by phone</span>
     </div>
     <div class="departure-capacity"><span><PersonIcon class="departure-icon" />
       Up to {car.seat_capacity} passengers</span></div>
