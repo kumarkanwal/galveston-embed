@@ -97,3 +97,56 @@ Include:
 - screenshot list
 - the standard phase report required by `AGENTS.md`
 
+## Implementation result
+
+**Status:** Complete and ready for review.
+
+### API verification
+
+- Refreshed `src/api/openapi.json` and `docs/api/API_CONTRACT.md` byte-for-byte from backend `origin/main` commit `28fa989bed9c6ae5e041e2b47cbb7d59f912d623` (B-53), and recorded that hash in both source files.
+- Confirmed in the backend source and the deployed `openapi.json` that shared departures and private-car search rows publish `image_url`, `customer_note`, the public vehicle display name, and duration.
+- No E-26 backend gap was found. Cash-discount fields remain unused by the widget.
+
+### Delivered
+
+- Removed only the visible Step 1 timezone sentence in taxi and shuttle modes. Business-timezone date and time handling remains unchanged.
+- Replaced shuttle departure rows with accessible shared/private cards that use server images or a neutral fallback, server durations and prices, capacity copy, exact server low-seat state, optional customer-note pills, and Shared/Private badges.
+- Sorted fixed shared departures by start time and placed private cars after them.
+- Added the responsive sub-480px card layout with 90 x 60 images, full-width notes, contained content, and at least 38px selection targets.
+- Made outbound round-trip selection load and scroll to Return. A clear Continue action appears only after all required legs are selected and advances to Confirm for one-way and round-trip bookings.
+- Preserved server-owned money, Confirm per-passenger lines, luggage, zero-adult support, conditional Return Date, compact spacing, and cash-discount exclusion.
+
+### Verification
+
+- Per-commit focused Vitest, typecheck, and touched-file lint gates passed. The final flow-focused run passed 38 tests; the card-focused run passed 27 tests.
+- Full lint: passed.
+- Full tests: 403 of 413 passed; the only failures were the known airport-marker isolation flake in `tests/airport-marker.test.tsx` and `tests/airport-location.test.ts`. Their allowed isolated rerun passed all 13 tests.
+- Production build: passed, run exactly once. `dist/embed.js` is 150,900 bytes raw and 42,601 bytes gzip; SHA-256 is `8bc9a3b5a6fda330d45d50ca8a4eed32085890eff4e2c9577ec9adf2fc9d9691`.
+- Dist contents test: passed (1 test).
+- Built-widget Playwright: passed at 360px and 1024px, including Shadow DOM assertions for no timezone sentence, card ordering/content, fallback image, customer note, selection, Continue, and no horizontal overflow.
+- The exact Playwright runtime was installed temporarily outside the repository dependency graph and removed after capture; no dependency was added.
+
+### Screenshots
+
+- `docs/phases/E-26/step1-shuttle-360.png`
+- `docs/phases/E-26/step1-shuttle-1024.png`
+- `docs/phases/E-26/step1-taxi-360.png`
+- `docs/phases/E-26/step1-taxi-1024.png`
+- `docs/phases/E-26/departures-360.png`
+- `docs/phases/E-26/departures-1024.png`
+
+### Reference differences
+
+- Step 1 intentionally differs only by removing the timezone sentence; its existing taxi and shuttle layout was otherwise retained.
+- The Departures screen follows the E-26 client mockup rather than BRO because BRO has no equivalent B-53 shuttle-card design. Server-owned values and established widget flow remain authoritative.
+
+### Decisions and gaps
+
+- No new architecture decision or repository dependency was needed.
+- No backend gap was found for the E-26 fields or flow.
+
+### UNVERIFIED
+
+- A pixel-for-pixel archival comparison against the attached client mockup is **UNVERIFIED** because that attachment is not stored in the repository.
+- Real production business image and customer-note payload rendering is **UNVERIFIED**; backend source and deployed schemas were verified, and browser coverage used representative mocked responses.
+
