@@ -12,7 +12,7 @@ const BUSINESS = {
   max_passengers: 8, max_luggage: 8,
   settings: { advance_booking_hours: 6, insurance_enabled: false,
     insurance_pct: "0.00", offer_car_seats: true, max_car_seats: 5,
-    car_seat_price: "15.00", payment_methods: ["cash"],
+    car_seat_price: "15.00", payment_methods: ["cash"], cash_discount_enabled: false,
     show_map: true, show_service_dropdown: true },
 } satisfies Business;
 
@@ -63,6 +63,8 @@ describe("pickup date and time controls", () => {
     expect(time?.value).toBe("");
     expect(time?.min).toBe(expected.time);
     expect(time?.required).toBe(true);
+    expect(root.textContent).not.toContain("Dates and times use America/Chicago");
+    expect(root.textContent).toContain("Check Pricing");
   });
 
   it("preserves a selected time when the date changes", () => {

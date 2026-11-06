@@ -32,7 +32,7 @@ function TripHarness() {
   return <ShuttleTrip destinationGroups={LOCATION_GROUPS.slice(1)} errors={{}}
     form={form} formError={null} loadingDestinations={false} loadingLocations={false}
     maximumBags={12} minimumDate="2026-10-23" originGroups={LOCATION_GROUPS}
-    submitting={false} timeZone="America/Chicago" onSubmit={() => undefined}
+    submitting={false} onSubmit={() => undefined}
     update={update} />;
 }
 
@@ -49,7 +49,8 @@ function renderDepartures(
   selected: SelectedShuttleLeg | null = null,
 ) {
   const element = root();
-  render(<ShuttleDepartures currency="USD" notice={null} loadingOutbound={false}
+  render(<ShuttleDepartures canContinue={selected !== null} continuing={false}
+    currency="USD" notice={null} loadingOutbound={false}
     outboundData={{ result: direction === "outbound" ? result
       : { ...SEARCH_RESULT, departures: [] }, date: "2026-10-30", direction: "outbound" }}
     returnData={direction === "return" ? { result, date: "2026-10-30", direction } : null}
@@ -57,6 +58,7 @@ function renderDepartures(
     selectedOutbound={direction === "outbound" ? selected : null}
     selectedReturn={direction === "return" ? selected : null}
     onBack={() => undefined}
+    onContinue={() => undefined}
     onChooseOutbound={onChoose} onChooseReturn={onChoose}
   />, element);
   return element;
@@ -83,14 +85,15 @@ function renderPassengers(props: Parameters<typeof PassengerHarness>[0] = {}) {
 beforeEach(() => document.body.replaceChildren());
 
 describe("shuttle trip fields", () => {
-  it("renders grouped reachable locations and the business timezone date guard", () => {
+  it("renders grouped locations and the date guard without a timezone line", () => {
     const element = renderTrip();
     act(() => element.querySelector<HTMLInputElement>("#fromId")?.click());
     const groups = [...element.querySelectorAll(".stop-category")];
     expect(groups.map((group) => group.textContent?.trim())).toEqual(["Airports", "Galveston"]);
     expect(element.querySelector<HTMLInputElement>("#toId")?.disabled).toBe(true);
     expect(element.querySelector<HTMLInputElement>("#date")?.min).toBe("2026-10-23");
-    expect(element.textContent).toContain("Dates and times use America/Chicago");
+    expect(element.textContent).not.toContain("Dates and times use America/Chicago");
+    expect(element.textContent).toContain("Find Departures");
   });
 
   it("shows adult, senior and child controls before the first search", () => {
@@ -105,7 +108,7 @@ describe("shuttle trip fields", () => {
 });
 
 describe("shuttle trip layout", () => {
-  it("orders locations, dates, party controls, Round trip, note, and action", () => {
+  it("orders locations, dates, party controls, Round trip, and action", () => {
     const form = renderTrip().querySelector<HTMLFormElement>(".shuttle-trip");
     const children = [...(form?.children ?? [])];
     expect(children[0]?.querySelector("#fromId")).not.toBeNull();
@@ -114,8 +117,7 @@ describe("shuttle trip layout", () => {
     expect(children[1]?.querySelector("#returnDate")).not.toBeNull();
     expect(children[2]?.classList.contains("shuttle-party-fields")).toBe(true);
     expect(children[3]?.classList.contains("trip-kind")).toBe(true);
-    expect(children[4]?.classList.contains("field-note")).toBe(true);
-    expect(children[5]?.textContent).toContain("Find Departures");
+    expect(children[4]?.textContent).toContain("Find Departures");
   });
 
   it("keeps the hidden Return Date slot until Round trip is checked", () => {
@@ -155,7 +157,7 @@ describe("shuttle round-trip control", () => {
       loadingLocations={false} maximumBags={12} minimumDate="2026-10-23"
       originGroups={LOCATION_GROUPS}
       submitting={false}
-      timeZone="America/Chicago" onSubmit={() => undefined} update={update} />, element);
+      onSubmit={() => undefined} update={update} />, element);
     act(() => element.querySelector<HTMLLabelElement>('.trip-kind')?.click());
     expect(update).toHaveBeenCalledWith("roundTrip", false);
     expect(element.querySelector<HTMLInputElement>("#returnDate")?.disabled).toBe(false);
@@ -271,61 +273,13 @@ describe("shuttle passenger dropdown limits", () => {
   });
 });
 
-describe("shuttle departures", () => {
-  it("hides the internal route name and shows duration with the public details", () => {
-    const hidden = { ...DEPARTURE, schedule_id: "hidden", selectable: false,
-      unselectable_reason: "Return must leave later" };
-    const element = renderDepartures({ ...SEARCH_RESULT, departures: [DEPARTURE, hidden] });
-    expect(element.textContent).toContain("09:30 – 10:30");
-    expect(element.textContent).not.toContain("Island Express");
-    expect(element.textContent).toContain("60 min");
-    expect(element.textContent).toContain("Vehicle: Executive Van");
-    expect(element.textContent).toContain("4 seats left");
-    expect(element.textContent).toContain("$70.50 USD");
-    expect(element.textContent).toContain("Shared");
-    expect(element.textContent).not.toContain("Return must leave later");
-    expect(element.querySelectorAll(".shuttle-departure")).toHaveLength(1);
-  });
-
-  it("hides the scheduled vehicle row when vehicle_type is null", () => {
-    const departure = { ...DEPARTURE, vehicle_type: null };
-    const element = renderDepartures({ ...SEARCH_RESULT, departures: [departure] });
-    expect(element.textContent).not.toContain("Island Express");
-    expect(element.textContent).toContain("60 min");
-    expect(element.textContent).not.toContain("Vehicle:");
-  });
-
-  it("shows the server mix total instead of the cheapest seat price", () => {
-    const departure = { ...DEPARTURE, total_for_selection: "91.00",
-      prices: { adult: "10.00", senior: "12.00", child: "8.00" } };
-    const element = renderDepartures({ ...SEARCH_RESULT, departures: [departure] });
-    expect(element.textContent).toContain("$91.00 USD");
-    expect(element.textContent).not.toContain("$8.00 USD");
-  });
-
-  it("shows each round-trip direction's own server price", () => {
-    const outbound = { ...DEPARTURE, total_for_selection: "130.00" };
-    const returning = { ...DEPARTURE, schedule_id: "return", total_for_selection: "145.00" };
-    const element = root();
-    render(<ShuttleDepartures currency="USD" notice={null} loadingOutbound={false}
-      outboundData={{ result: { ...SEARCH_RESULT, departures: [outbound] },
-        date: "2026-11-04", direction: "outbound" }}
-      returnData={{ result: { ...SEARCH_RESULT, departures: [returning] },
-        date: "2026-11-07", direction: "return" }} loadingReturn={false}
-      passengerCount={2} selectedOutbound={null} selectedReturn={null}
-      onBack={() => undefined} onChooseOutbound={() => undefined}
-      onChooseReturn={() => undefined} />, element);
-    expect(element.textContent).toContain("$130.00 USD");
-    expect(element.textContent).toContain("$145.00 USD");
-  });
-});
-
 describe("fixed-only shuttle departures", () => {
   it("shows the fixed-departure empty message and ignores any-time cars", () => {
     const privateCar = {
       departure_type: "on_request" as const, route_id: SEARCH_RESULT.route.id,
       vehicle_type_id: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
       vehicle_type_name: "Private Van", seat_capacity: 6, from_price: "150.00",
+      image_url: null, customer_note: null, duration_minutes: 60,
       effective_min_passengers: 1, service_mode: "private" as const,
     };
     const element = renderDepartures({ ...SEARCH_RESULT, departures: [],
@@ -341,11 +295,13 @@ describe("fixed-only shuttle departures", () => {
   it("renders no pickup-time input for either round-trip leg", () => {
     const result = { ...SEARCH_RESULT, departures: [DEPARTURE] };
     const element = root();
-    render(<ShuttleDepartures currency="USD" notice={null} loadingOutbound={false}
+    render(<ShuttleDepartures canContinue={false} continuing={false}
+      currency="USD" notice={null} loadingOutbound={false}
       outboundData={{ result, date: "2026-11-04", direction: "outbound" }}
       returnData={{ result, date: "2026-11-07", direction: "return" }} loadingReturn={false}
       passengerCount={1} selectedOutbound={null} selectedReturn={null}
-      onBack={() => undefined} onChooseOutbound={() => undefined}
+      onBack={() => undefined} onContinue={() => undefined}
+      onChooseOutbound={() => undefined}
       onChooseReturn={() => undefined} />, element);
     expect(element.querySelectorAll('input[type="time"]')).toHaveLength(0);
     expect(element.textContent).toContain("Choose Departure · Wed, Nov 4");

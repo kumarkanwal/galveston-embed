@@ -267,25 +267,112 @@
   margin: 28px 0;
 }
 
-.shuttle-departure {
-  display: grid;
-  grid-template-columns: minmax(150px, 1.4fr) minmax(130px, 1fr) auto auto;
+.departure-navigation {
   align-items: center;
-  gap: 20px;
-  padding: 12px 18px;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.departure-continue {
+  background: var(--green);
+  border: 1px solid #4cae4c;
+  border-radius: 3px;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  margin-top: 12px;
+  min-height: 38px;
+  min-width: 150px;
+}
+
+.departure-continue:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.shuttle-departure {
+  align-items: center;
+  background: #ffffff;
   border: 1px solid var(--border);
-  border-radius: 4px;
-  background: #fff;
-}
-
-.shuttle-departure > div {
+  border-radius: 8px;
+  column-gap: 18px;
   display: grid;
-  gap: 4px;
+  grid-template-columns: 120px minmax(180px, 1fr) minmax(160px, 0.75fr) minmax(112px, auto);
+  padding: 14px;
+  row-gap: 10px;
 }
 
-.shuttle-departure small,
+.departure-image-frame {
+  align-items: center;
+  background: #eef1f3;
+  border-radius: 8px;
+  color: var(--muted);
+  display: flex;
+  height: 80px;
+  justify-content: center;
+  overflow: hidden;
+  width: 120px;
+}
+
+.departure-image {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.departure-placeholder-icon {
+  fill: currentcolor;
+  height: 30px;
+  width: 60px;
+}
+
+.departure-details,
+.departure-action,
+.departure-capacity {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.departure-primary {
+  font-size: 22px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.departure-duration,
+.departure-capacity > span,
+.departure-note {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+.departure-icon {
+  fill: none;
+  flex: 0 0 17px;
+  height: 17px;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  width: 17px;
+}
+
+.departure-capacity {
+  border-left: 1px solid #e2e2e2;
+  padding-left: 18px;
+}
+
+.departure-capacity small,
 .departure-reason {
   color: var(--error);
+}
+
+.departure-capacity small {
+  font-weight: 700;
 }
 
 .shuttle-mode-badge {
@@ -301,14 +388,34 @@
 }
 
 .shuttle-departure button {
-  min-height: 38px;
-  padding: 0 20px;
+  background: var(--green);
   border: 0;
   border-radius: 3px;
   color: #fff;
-  background: var(--green);
-  font-weight: 700;
   cursor: pointer;
+  font-weight: 700;
+  min-height: 38px;
+  padding: 0 20px;
+  width: 100%;
+}
+
+.departure-action {
+  justify-items: stretch;
+  text-align: right;
+}
+
+.departure-price {
+  font-size: 16px;
+  white-space: nowrap;
+}
+
+.departure-note {
+  background: #e9f5fb;
+  border: 1px solid #c3e4f2;
+  border-radius: 999px;
+  color: #245a72;
+  grid-column: 2 / -1;
+  padding: 7px 10px;
 }
 
 .shuttle-departure.unavailable {
@@ -382,13 +489,33 @@
   padding: 12px;
 }
 
-:is(.layout-compact, .layout-narrow, .layout-micro) .shuttle-departure {
-  grid-template-columns: 1fr auto;
+.layout-compact .shuttle-departure {
+  grid-template-columns: 100px minmax(0, 1fr) minmax(112px, auto);
   gap: 12px;
 }
 
 :is(.layout-compact, .layout-narrow, .layout-micro) .shuttle-departure button {
   min-height: 38px;
+}
+
+.layout-compact .departure-image-frame {
+  height: 68px;
+  width: 100px;
+}
+
+.layout-compact .departure-capacity {
+  border-left: 0;
+  grid-column: 2;
+  padding-left: 0;
+}
+
+.layout-compact .departure-action {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+}
+
+.layout-compact .departure-note {
+  grid-column: 2 / -1;
 }
 
 :is(.layout-compact, .layout-narrow, .layout-micro) .passenger-trigger {
@@ -407,8 +534,70 @@
 }
 
 :is(.layout-narrow, .layout-micro) .shuttle-departure {
+  align-items: start;
   gap: 8px;
+  grid-template-columns: 90px minmax(0, 1fr) minmax(78px, auto);
+  min-width: 0;
+  overflow: hidden;
   padding: 10px;
+  width: 100%;
+}
+
+:is(.layout-narrow, .layout-micro) .departure-image-frame {
+  height: 60px;
+  width: 90px;
+}
+
+:is(.layout-narrow, .layout-micro) .departure-details {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+:is(.layout-narrow, .layout-micro) .departure-primary {
+  font-size: 18px;
+}
+
+:is(.layout-narrow, .layout-micro) .departure-vehicle {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+:is(.layout-narrow, .layout-micro) .departure-action {
+  grid-column: 3;
+  grid-row: 1;
+  min-width: 0;
+}
+
+:is(.layout-narrow, .layout-micro) .departure-price {
+  font-size: 14px;
+  white-space: normal;
+}
+
+:is(.layout-narrow, .layout-micro) .shuttle-departure button {
+  padding: 0 8px;
+}
+
+:is(.layout-narrow, .layout-micro) .departure-capacity {
+  border-left: 0;
+  grid-column: 2 / -1;
+  padding-left: 0;
+}
+
+:is(.layout-narrow, .layout-micro) .departure-note {
+  border-radius: 8px;
+  grid-column: 1 / -1;
+  overflow-wrap: anywhere;
+  width: 100%;
+}
+
+.layout-micro .shuttle-departure {
+  grid-template-columns: 78px minmax(0, 1fr) minmax(72px, auto);
+  padding: 8px;
+}
+
+.layout-micro .departure-image-frame {
+  height: 54px;
+  width: 78px;
 }
 
 .shuttle-trip .field-note {

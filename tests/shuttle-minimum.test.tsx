@@ -9,10 +9,12 @@ import { DEPARTURE, SEARCH_RESULT } from "./shuttle-fixtures";
 
 function renderResult(result: ShuttleSearchResult, passengers: number): HTMLElement {
   const element = document.createElement("div");
-  render(<ShuttleDepartures currency="USD" notice={null} loadingOutbound={false}
+  render(<ShuttleDepartures canContinue={false} continuing={false}
+    currency="USD" notice={null} loadingOutbound={false}
     outboundData={{ result, date: "2026-10-30", direction: "outbound" }} returnData={null}
     loadingReturn={false} passengerCount={passengers}
     selectedOutbound={null} selectedReturn={null} onBack={() => undefined}
+    onContinue={() => undefined}
     onChooseOutbound={() => undefined} onChooseReturn={() => undefined}
   />, element);
   return element;

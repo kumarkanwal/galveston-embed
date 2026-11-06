@@ -2617,7 +2617,11 @@ export interface paths {
          * @description Read non-secret card pricing and tenant location settings.
          */
         get: operations["get_payment_settings_v1_admin_businesses__business_uuid__settings_payments_get"];
-        put?: never;
+        /**
+         * Update Payment Settings
+         * @description Let an owner update card fee and the tenant's Square location.
+         */
+        put: operations["update_payment_settings_v1_admin_businesses__business_uuid__settings_payments_put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -5373,7 +5377,8 @@ export interface components {
              *       "car_seat_price": "15.00",
              *       "show_service_dropdown": true,
              *       "show_map": true,
-             *       "payment_methods": []
+             *       "payment_methods": [],
+             *       "cash_discount_enabled": false
              *     }
              */
             settings: components["schemas"]["BusinessSettingsPublic"];
@@ -5486,6 +5491,12 @@ export interface components {
             round_trip_discount_pct: string;
             /** Card Surcharge Pct */
             card_surcharge_pct: string;
+            /** Cash Discount Enabled */
+            cash_discount_enabled: boolean;
+            /** Cash Discount Percent */
+            cash_discount_percent: string | null;
+            /** Cash Discount Note */
+            cash_discount_note: string | null;
             /** Offer Car Seats */
             offer_car_seats: boolean;
             /** Max Car Seats */
@@ -5608,6 +5619,15 @@ export interface components {
              * @default []
              */
             payment_methods: string[];
+            /**
+             * Cash Discount Enabled
+             * @default false
+             */
+            cash_discount_enabled: boolean;
+            /** Cash Discount Percent */
+            cash_discount_percent?: string | null;
+            /** Cash Discount Note */
+            cash_discount_note?: string | null;
             /** Terms And Conditions */
             terms_and_conditions?: string | null;
         };
@@ -5651,6 +5671,12 @@ export interface components {
             round_trip_discount_pct: string;
             /** Card Surcharge Pct */
             card_surcharge_pct: string;
+            /** Cash Discount Enabled */
+            cash_discount_enabled: boolean;
+            /** Cash Discount Percent */
+            cash_discount_percent: string | null;
+            /** Cash Discount Note */
+            cash_discount_note: string | null;
             /** Offer Car Seats */
             offer_car_seats: boolean;
             /** Max Car Seats */
@@ -6836,6 +6862,12 @@ export interface components {
             /** Service Label */
             service_label: string;
             vehicle_type: components["schemas"]["VehicleTypeReference"] | null;
+            /** Vehicle Type Name */
+            vehicle_type_name: string | null;
+            /** Image Url */
+            image_url: string | null;
+            /** Customer Note */
+            customer_note: string | null;
             /** From Price */
             from_price: string;
             prices: components["schemas"]["PassengerPrices"];
@@ -8973,6 +9005,12 @@ export interface components {
             vehicle_type_id: string;
             /** Vehicle Type Name */
             vehicle_type_name: string;
+            /** Image Url */
+            image_url: string | null;
+            /** Customer Note */
+            customer_note: string | null;
+            /** Duration Minutes */
+            duration_minutes: number;
             /** Seat Capacity */
             seat_capacity: number;
             /** From Price */
@@ -9164,6 +9202,12 @@ export interface components {
             payment_methods: string[];
             /** Card Surcharge Pct */
             card_surcharge_pct: string;
+            /** Cash Discount Enabled */
+            cash_discount_enabled: boolean;
+            /** Cash Discount Percent */
+            cash_discount_percent: string | null;
+            /** Cash Discount Note */
+            cash_discount_note: string | null;
             /** Square Location Id */
             square_location_id: string | null;
             /** Card Ready */
@@ -9179,6 +9223,12 @@ export interface components {
             payment_method_mode?: components["schemas"]["PaymentMethodMode"] | null;
             /** Card Surcharge Pct */
             card_surcharge_pct?: string | null;
+            /** Cash Discount Enabled */
+            cash_discount_enabled?: boolean | null;
+            /** Cash Discount Percent */
+            cash_discount_percent?: string | null;
+            /** Cash Discount Note */
+            cash_discount_note?: string | null;
             /** Square Location Id */
             square_location_id?: string | null;
         };
@@ -9818,6 +9868,12 @@ export interface components {
             vehicle_type_id: string;
             /** Vehicle Type Name */
             vehicle_type_name: string;
+            /** Image Url */
+            image_url: string | null;
+            /** Customer Note */
+            customer_note: string | null;
+            /** Duration Minutes */
+            duration_minutes: number;
             /**
              * Service Date
              * Format: date
@@ -10380,6 +10436,8 @@ export interface components {
             totals_scope: "order";
             /** Leg Prices */
             leg_prices?: components["schemas"]["LegPriceDetail"][];
+            /** @description Exact B-51 shuttle fare projection. Null for taxi reservations or when a legacy shuttle allocation cannot be reconstructed without repricing. */
+            shuttle_breakdown?: components["schemas"]["ShuttleReservationBreakdown"] | null;
             /**
              * Credit Amount
              * @default 0.00
@@ -11059,6 +11117,8 @@ export interface components {
             pricing_mode: components["schemas"]["ShuttlePricingMode"];
             /** Fixed Vehicle Price */
             fixed_vehicle_price: string | null;
+            /** Customer Note */
+            customer_note: string | null;
             /** Tiers */
             tiers: components["schemas"]["ShuttlePriceTierResult"][];
             /** Is Active */
@@ -11082,6 +11142,8 @@ export interface components {
             pricing_mode: components["schemas"]["ShuttlePricingMode"];
             /** Fixed Vehicle Price */
             fixed_vehicle_price?: string | null;
+            /** Customer Note */
+            customer_note?: string | null;
             /** Tiers */
             tiers?: components["schemas"]["ShuttlePriceTierWrite"][];
             /**
@@ -11817,13 +11879,31 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "discount" | "insurance" | "surcharge";
+            kind: "discount" | "insurance" | "surcharge" | "charge";
             /**
              * Included In Total
              * @default true
              * @constant
              */
             included_in_total: true;
+        };
+        /**
+         * ShuttleBreakdownLeg
+         * @description One immutable shuttle leg in the B-51 customer-facing price shape.
+         */
+        ShuttleBreakdownLeg: {
+            /**
+             * Booking Id
+             * Format: uuid
+             */
+            booking_id: string;
+            leg: components["schemas"]["BookingLeg"] | null;
+            /** Passenger Lines */
+            passenger_lines: components["schemas"]["ShuttlePassengerPriceLine"][];
+            /** Charges */
+            charges: components["schemas"]["ShuttleIncludedChargeLine"][];
+            /** Leg Total */
+            leg_total: string;
         };
         /**
          * ShuttleDepartureMode
@@ -11953,6 +12033,20 @@ export interface components {
             tiers?: components["schemas"]["PublicPriceTier"][];
             /** Fixed Price */
             fixed_price?: string | null;
+        };
+        /**
+         * ShuttleReservationBreakdown
+         * @description An exact order-level reconstruction from immutable shuttle snapshots.
+         */
+        ShuttleReservationBreakdown: {
+            /** Legs */
+            legs: components["schemas"]["ShuttleBreakdownLeg"][];
+            /** Adjustments */
+            adjustments: components["schemas"]["ShuttleAdjustmentLine"][];
+            /** Total */
+            total: string;
+            /** Currency */
+            currency: string;
         };
         /**
          * ShuttleServiceMode
@@ -19322,6 +19416,45 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_PaymentSettingsResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_payment_settings_v1_admin_businesses__business_uuid__settings_payments_put: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaymentSettingsUpdate"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
