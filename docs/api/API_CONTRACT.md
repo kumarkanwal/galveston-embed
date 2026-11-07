@@ -5,13 +5,92 @@ Stack: FastAPI (Python) · PostgreSQL · Square payments
 Base URL: `https://api.<domain>.com/v1`
 Consumers: Booking-form embeds (taxi and shuttle)
 
-**Version 1.14** — generated from the implemented schemas, routers, services and
-`openapi.json` through B-53. This document covers the public surface and recent
+**Version 1.16** — generated from the implemented schemas, routers, services and
+`openapi.json` through B-55. This document covers the public surface and recent
 admin additions below; older admin endpoints remain defined by OpenAPI.
 
 ---
 
-## B-53 route-car presentation and stored cash discounts
+## B-55 shuttle cash discounts by payment method
+
+- `POST /public/shuttle/quote` returns `totals_by_payment_method` with one entry
+  for every method configured by `payment_method_mode`. A `cash` or `both`
+  business publishes a `cash` total; a `card` or `both` business publishes an
+  `online` total. Card-only mode never publishes a cash total.
+- Each method entry contains the complete signed `adjustments` list and final
+  `total`. The widget must render these values and must not calculate discounts,
+  fees, or totals itself. Passenger lines plus included leg charges plus the
+  selected method's adjustments equal its total exactly.
+- The fixed shuttle order is passenger fares plus each leg's peak charge, then
+  promo. Selected travel insurance is calculated on the post-promo fare. The
+  final payment adjustment is mutually exclusive: cash discount on the
+  post-promo fare for cash, or the existing card fee on the post-insurance total
+  for online card. Every visible or persisted value is rounded half-up to cents.
+- `cash_discount` always supplies the banner contract: effective `enabled`,
+  configured `percent` and `note`, and this cart's exact `savings_amount`.
+- Cash shuttle booking and staff calculated shuttle booking re-run the same
+  rule. The order snapshots both the discount amount and applied percent, and
+  booking confirmation, admin reservation `shuttle_breakdown`, and booking
+  emails show the signed `Cash discount (15%)` line. Online card charges never
+  receive the cash discount; Square receives the unchanged card total.
+- Taxi quote and booking calculations remain unchanged. Applying cash discount
+  to taxi is explicitly deferred to a later phase.
+
+Example quote money fields for a $10 fare, 15% cash discount, and 3% card fee:
+
+```json
+{
+  "subtotal": "10.00",
+  "totals_by_payment_method": {
+    "online": {
+      "adjustments": [
+        {"label": "CC Surcharge", "amount": "0.30", "kind": "surcharge",
+         "included_in_total": true}
+      ],
+      "total": "10.30"
+    },
+    "cash": {
+      "adjustments": [
+        {"label": "Cash discount (15%)", "amount": "-1.50", "kind": "discount",
+         "included_in_total": true}
+      ],
+      "total": "8.50"
+    }
+  },
+  "cash_discount": {
+    "enabled": true,
+    "percent": "15.00",
+    "note": "Save when you pay the driver",
+    "savings_amount": "1.50"
+  }
+}
+```
+
+## B-54 vehicle-aware weekly shuttle times
+
+- `PUT /admin/routes/{route_id}/departure-templates` accepts several different
+  route cars at the same weekday and local `start_time`. Each template
+  materializes a separate schedule with the selected car's effective capacity,
+  and therefore owns separate seat holds, bookings, and locked inventory.
+- The same car cannot appear twice at one weekday and start time, including
+  overlapping multi-day templates. The response is HTTP 400 with
+  `VALIDATION_ERROR`, names the car and slot, and returns the zero-based index
+  of the clashing input row:
+
+```json
+{ "error": {
+  "code": "VALIDATION_ERROR",
+  "message": "Sprinter is already set for Monday 09:00",
+  "field": "templates",
+  "details": { "template_index": 1 }
+} }
+```
+
+- `GET /public/shuttle/search` returns each same-time car as a separate
+  departure row with its own `schedule_id`, price, seats, image, and customer
+  note. Rows are ordered by departure time and then vehicle name.
+
+## B-53 route-car presentation and cash-discount settings
 
 - Admin `GET` and `PUT /admin/routes/{route_id}/vehicle-types` read and write
   nullable `customer_note` on each route car. The value is trimmed plain text,
@@ -31,8 +110,6 @@ admin additions below; older admin endpoints remain defined by OpenAPI.
   makes the discount inactive. Admin settings continue to return the stored
   enabled value; `GET /public/business` exposes the percent and note but reports
   `settings.cash_discount_enabled: false` while cash is unavailable.
-- **cash discount not applied to pricing until a later phase**. Quote, booking,
-  price-breakdown, payment, and persisted total calculations are unchanged.
 
 Example public search rows:
 
@@ -155,8 +232,10 @@ route sharing, explicit widget readiness, and server-priced F-46 reservation con
   compatibility until F-48; public shared service no longer uses custom times.
 - Shuttle reservation detail exposes the snapshotted `journey.service_mode`; it is not inferred
   from current route configuration.
-- Weekly templates are shared-car only and materialize 180 days immediately. Private cars remain
-  date-only and may offer multiple independently priced cars.
+- Weekly templates are shared-car only and materialize 180 days immediately.
+  Different shared cars may use the same weekday and time, while the same car
+  may not repeat that slot. Private cars remain date-only and may offer multiple
+  independently priced cars.
 
 See `docs/phases/B-49-diagnosis.md` for production root causes and
 `docs/phases/B-49-progress.md` for the verification and F-47 handoff.
@@ -919,6 +998,10 @@ route direction's round-trip fares; clients must not replace these values with
 the cheapest passenger-type entry from `prices`.
 
 No route between the two locations is a **404**, not an empty list.
+
+When several cars depart at the same time, each car is a separate row with its
+own schedule id and inventory. The list is ordered by local `start_time`, then
+vehicle name. Selecting or booking one row never consumes seats from another.
 
 #### Date-only private cars
 

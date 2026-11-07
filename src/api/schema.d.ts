@@ -6141,6 +6141,20 @@ export interface components {
          */
         CardReadinessReason: "square_location_missing" | "square_access_token_missing" | "square_application_id_missing" | "square_webhook_signature_key_missing" | "square_webhook_url_missing";
         /**
+         * CashDiscountQuote
+         * @description Effective banner metadata and the exact saving for this cart.
+         */
+        CashDiscountQuote: {
+            /** Enabled */
+            enabled: boolean;
+            /** Percent */
+            percent: string | null;
+            /** Note */
+            note: string | null;
+            /** Savings Amount */
+            savings_amount: string;
+        };
+        /**
          * CatalogItem
          * @description Named catalog row referenced by a historical booking.
          */
@@ -6978,7 +6992,7 @@ export interface components {
         };
         /**
          * DepartureTemplatesUpdate
-         * @description Complete fixed-time matrix; one route cannot have two cars at one minute.
+         * @description Complete fixed-time matrix with independent slots for each route car.
          */
         DepartureTemplatesUpdate: {
             /** Templates */
@@ -9188,6 +9202,16 @@ export interface components {
          */
         PaymentMethodMode: "cash" | "card" | "both";
         /**
+         * PaymentMethodTotal
+         * @description One complete server-calculated checkout option for the widget.
+         */
+        PaymentMethodTotal: {
+            /** Adjustments */
+            adjustments: components["schemas"]["ShuttleAdjustmentLine"][];
+            /** Total */
+            total: string;
+        };
+        /**
          * PaymentSettingsResult
          * @description Non-secret method selection, readiness, card pricing and routing.
          */
@@ -10304,6 +10328,11 @@ export interface components {
             currency: string;
             /** Adjustments */
             adjustments?: components["schemas"]["ShuttleAdjustmentLine"][];
+            /** Totals By Payment Method */
+            totals_by_payment_method: {
+                [key: string]: components["schemas"]["PaymentMethodTotal"];
+            };
+            cash_discount: components["schemas"]["CashDiscountQuote"];
             /** Line Items */
             line_items?: components["schemas"]["BreakdownLine"][] | null;
         };

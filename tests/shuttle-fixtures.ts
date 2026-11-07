@@ -135,6 +135,15 @@ export const SHUTTLE_QUOTE = {
   discount_amount: "0.00",
   insurance_amount: "0.00",
   total: "70.50",
+  totals_by_payment_method: {
+    cash: { adjustments: [], total: "70.50" },
+  },
+  cash_discount: {
+    enabled: false,
+    percent: null,
+    note: null,
+    savings_amount: "0.00",
+  },
   currency: "USD",
 } satisfies ShuttleQuoteResponse;
 
