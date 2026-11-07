@@ -30,5 +30,7 @@ describe("shuttle Confirm mobile layout", () => {
     expect(mobile).toMatch(/\.terms-label\s*\{[^}]*justify-content:\s*flex-start/s);
     expect(mobile).toMatch(/\.back-button\s*\{[^}]*width:\s*100%/s);
     expect(confirmCss).toMatch(/\.create-trip\s*\{[^}]*min-height:\s*38px/s);
+    expect(mobile).toMatch(/\.cash-discount-banner\s*\{[^}]*grid-template-columns:\s*auto minmax\(0, 1fr\)/s);
+    expect(mobile).toMatch(/\.cash-discount-saving\s*\{[^}]*grid-column:\s*1 \/ -1/s);
   });
 });

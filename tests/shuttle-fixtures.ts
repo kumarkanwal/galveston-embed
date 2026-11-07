@@ -137,6 +137,7 @@ export const SHUTTLE_QUOTE = {
   total: "70.50",
   totals_by_payment_method: {
     cash: { adjustments: [], total: "70.50" },
+    online: { adjustments: [], total: "70.50" },
   },
   cash_discount: {
     enabled: false,

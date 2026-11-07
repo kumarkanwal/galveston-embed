@@ -1,20 +1,22 @@
-import type { ShuttleQuoteResponse } from "../../api/client";
+import type { PaymentMethod, ShuttleQuoteResponse } from "../../api/client";
 import { formatMoney } from "../../money";
 import { FormError } from "../trip/FieldError";
+import { CashDiscountBanner } from "./CashDiscountBanner";
+import { ShuttlePriceLines } from "./ShuttlePriceLines";
 
 export function ShuttleCharges(props: {
   error: string | null;
+  paymentMethod: PaymentMethod;
   quote: ShuttleQuoteResponse;
 }) {
-  const lines = props.quote.line_items?.filter((line) => line.amount !== "0.00") ?? [];
+  const methodTotal = props.quote.totals_by_payment_method[props.paymentMethod];
   return <section class="charges shuttle-charges">
     <h2>Charges</h2>
-    {lines.map((line, index) => <div class="charge-row" key={`${line.label}:${index}`}>
-      <span>{line.label}</span>
-      <span>{formatMoney(line.amount, props.quote.currency)}</span>
-    </div>)}
+    {methodTotal !== undefined && <ShuttlePriceLines adjustments={methodTotal.adjustments}
+      currency={props.quote.currency} legs={props.quote.legs} />}
     {props.error !== null && <FormError>{props.error}</FormError>}
-    <div class="charges-total"><strong>Total</strong>
-      <strong>{formatMoney(props.quote.total, props.quote.currency)}</strong></div>
+    {methodTotal !== undefined && <div class="charges-total"><strong>Total</strong>
+      <strong>{formatMoney(methodTotal.total, props.quote.currency)}</strong></div>}
+    <CashDiscountBanner discount={props.quote.cash_discount} currency={props.quote.currency} />
   </section>;
 }

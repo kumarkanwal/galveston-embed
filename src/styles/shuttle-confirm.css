@@ -74,6 +74,70 @@
   grid-column: 1 / -1;
 }
 
+.cash-discount-banner {
+  align-items: center;
+  background: #eef9e9;
+  border: 1px solid #d5edca;
+  border-radius: 8px;
+  color: #16721b;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  margin-top: 14px;
+  padding: 12px;
+}
+
+.cash-discount-icon {
+  font-size: 34px;
+  font-weight: 700;
+}
+
+.cash-discount-copy > strong {
+  font-size: 18px;
+}
+
+.cash-discount-copy p {
+  color: #333333;
+  margin: 3px 0 0;
+}
+
+.cash-discount-saving {
+  background: var(--green);
+  border-radius: 6px;
+  color: #ffffff;
+  display: grid;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+.payment-option-card {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+}
+
+.payment-option-card.selected {
+  background: #f3f7f9;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 1px var(--blue);
+}
+
+.payment-card-badge {
+  border-radius: 4px;
+  font-size: 12px;
+  justify-self: end;
+  padding: 3px 8px;
+}
+
+.payment-card-badge.recommended {
+  background: var(--green);
+  color: #ffffff;
+}
+
+.payment-card-badge.standard {
+  background: #eeeeee;
+  color: #333333;
+}
+
 :is(.layout-narrow, .layout-micro) .shuttle-confirm-layout {
   gap: 12px;
   min-width: 0;
@@ -131,4 +195,22 @@
 :is(.layout-narrow, .layout-micro) .shuttle-confirm-layout .back-button {
   margin-top: 12px;
   width: 100%;
+}
+
+:is(.layout-narrow, .layout-micro) .cash-discount-banner {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+:is(.layout-narrow, .layout-micro) .cash-discount-saving {
+  grid-column: 1 / -1;
+}
+
+:is(.layout-narrow, .layout-micro) .payment-option-card {
+  grid-template-columns: auto auto minmax(0, 1fr);
+  min-width: 0;
+}
+
+:is(.layout-narrow, .layout-micro) .payment-card-badge {
+  overflow-wrap: anywhere;
+  text-align: center;
 }
