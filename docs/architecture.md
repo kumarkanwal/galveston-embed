@@ -129,12 +129,16 @@ Public `settings.payment_methods` and usable capability jointly determine the
 confirmation payment UI. Cash requires `"cash"`; Card requires both `"online"`
 and `payments.card_available`. Both methods render a choice, one method renders
 plain `Payment: Cash` or `Payment: Card` text, and no usable method blocks
-submission with the contact-company message. Selecting Card re-prices with
-`payment_method: "online"`; Cash uses `"cash"`. Square tokenizes only after a
-valid submit. The one-time token is added only to the booking POST and is
-excluded from the persisted cart fingerprint, so a retry gets a new token while
-reusing the unchanged cart's idempotency key. Cash-only and manual quote paths
-never load Square.
+submission with the contact-company message. Taxi re-prices when its selected
+method changes. A B-55 shuttle quote supplies both methods in
+`totals_by_payment_method`; its Confirm step switches the displayed server
+adjustments and total locally, while promo changes replace the complete quote.
+The shuttle cash banner uses only the quote's `cash_discount` fields. Booking
+still sends `payment_method: "online"` for Card and `"cash"` for Cash. Square
+tokenizes only after a valid submit. The one-time token is added only to the
+booking POST and is excluded from the persisted cart fingerprint, so a retry
+gets a new token while reusing the unchanged cart's idempotency key. Cash-only
+and manual quote paths never load Square.
 
 ## 7. Environments
 

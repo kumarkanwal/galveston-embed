@@ -149,6 +149,43 @@ documented airport flake files if needed. Run exactly one production build,
 then `test:dist`, then Playwright at 360 px and 1024 px. Save Confirm screenshots
 under `docs/phases/E-27/`.
 
+## Progress — 8 November 2026
+
+- Part A is complete: private departure cards no longer show the static pickup
+  sentence, and Confirm now has the responsive route/trip summary and B-51
+  charges layout from the supplied reference.
+- Part B used merged backend commit
+  `50e7174c86a8ca84f2c1482ae386f211e426fcd5`. Both copied source blobs were
+  verified against that commit before the generated API types were refreshed.
+- Confirm now switches the visible server-owned adjustments and total from
+  `totals_by_payment_method` without re-quoting or doing client money math.
+  Promo apply/remove still re-quotes and replaces both method totals and the
+  discount data together.
+- The green banner uses only `cash_discount.percent`, `note`, and
+  `savings_amount`, and is hidden when `cash_discount.enabled` is false.
+- Cash/Card capability gating, Square tokenization, booking payment-method
+  values, address handling, and idempotency behavior remain unchanged.
+- The public response does not provide a card-fee percentage. The Card badge
+  therefore uses the allowed `Standard price` wording rather than deriving a
+  percentage from money strings.
+- No dependency was added. Focused typecheck, lint, and widget tests pass. Full
+  lint, all 416 tests, the single production build, the dist-content test, and
+  the built-widget Playwright checks pass.
+
+### Browser screenshots
+
+- `docs/phases/E-27/confirm-cash-360.png`
+- `docs/phases/E-27/confirm-card-360.png`
+- `docs/phases/E-27/confirm-cash-1024.png`
+- `docs/phases/E-27/confirm-card-1024.png`
+
+The supplied mockup is a structural reference at a wider desktop canvas. The
+built widget keeps its existing maximum width and repository typography,
+colors, form controls, Square card field, exact server text, and responsive
+single-column ordering. At 360 px the left column precedes the form column so
+the summary, charges, banner, Back action, fields, payment cards, terms, and
+Create Trip remain readable without horizontal scrolling.
+
 ## Final report
 
 Include the standard `AGENTS.md` phase report plus:
