@@ -1,0 +1,216 @@
+.shuttle-summary {
+  padding: 12px 18px 4px;
+}
+
+.shuttle-confirm-layout > div,
+.shuttle-confirm-layout .confirm-form {
+  min-width: 0;
+}
+
+.shuttle-confirm-layout :is(.shuttle-trip-summary, .shuttle-charges) {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.shuttle-confirm-layout :is(.shuttle-trip-summary, .shuttle-charges, .confirm-form) h2 {
+  background: #e9f5fb;
+  border: 0;
+  border-radius: 6px;
+  margin: 0 0 12px;
+  padding: 7px 12px;
+}
+
+.shuttle-confirm-layout .shuttle-charges {
+  margin-top: 12px;
+}
+
+.shuttle-summary h3 {
+  font-size: 18px;
+  line-height: 1.35;
+  margin: 0 0 12px;
+}
+
+.shuttle-summary-row {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 20px minmax(0, 1fr);
+  margin: 0 0 9px;
+}
+
+.shuttle-summary-row > span:first-child {
+  color: var(--blue);
+  text-align: center;
+}
+
+.shuttle-summary-leg + .shuttle-summary-leg {
+  border-top: 1px solid #eeeeee;
+  margin-top: 8px;
+  padding-top: 10px;
+}
+
+.shuttle-promo {
+  margin-top: 24px;
+}
+
+.shuttle-promo .promo-code {
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 0 0 16px;
+}
+
+.shuttle-promo .promo-code button {
+  border-radius: 0 3px 3px 0;
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.shuttle-promo .promo-code input {
+  border-radius: 3px 0 0 3px;
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.shuttle-promo .promo-code :is(.field-error, p) {
+  grid-column: 1 / -1;
+}
+
+.cash-discount-banner {
+  align-items: center;
+  background: #eef9e9;
+  border: 1px solid #d5edca;
+  border-radius: 8px;
+  color: #16721b;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  margin-top: 14px;
+  padding: 12px;
+}
+
+.cash-discount-icon {
+  font-size: 34px;
+  font-weight: 700;
+}
+
+.cash-discount-copy > strong {
+  font-size: 18px;
+}
+
+.cash-discount-copy p {
+  color: #333333;
+  margin: 3px 0 0;
+}
+
+.cash-discount-saving {
+  background: var(--green);
+  border-radius: 6px;
+  color: #ffffff;
+  display: grid;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+.payment-option-card {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+}
+
+.payment-option-card.selected {
+  background: #f3f7f9;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 1px var(--blue);
+}
+
+.payment-card-badge {
+  border-radius: 4px;
+  font-size: 12px;
+  justify-self: end;
+  padding: 3px 8px;
+}
+
+.payment-card-badge.recommended {
+  background: var(--green);
+  color: #ffffff;
+}
+
+.payment-card-badge.standard {
+  background: #eeeeee;
+  color: #333333;
+}
+
+:is(.layout-narrow, .layout-micro) .shuttle-confirm-layout {
+  gap: 12px;
+  min-width: 0;
+  padding-top: 10px;
+}
+
+:is(.layout-narrow, .layout-micro)
+  .shuttle-confirm-layout :is(.shuttle-trip-summary, .shuttle-charges) {
+  min-width: 0;
+  padding: 6px;
+}
+
+:is(.layout-narrow, .layout-micro) .shuttle-confirm-layout h2 {
+  font-size: 21px;
+  overflow-wrap: anywhere;
+  padding: 7px 9px;
+}
+
+:is(.layout-narrow, .layout-micro) .shuttle-summary {
+  padding: 8px 7px 0;
+}
+
+:is(.layout-narrow, .layout-micro) .shuttle-summary-row {
+  gap: 7px;
+  grid-template-columns: 18px minmax(0, 1fr);
+}
+
+:is(.layout-narrow, .layout-micro) .shuttle-confirm-layout .charge-row {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+:is(.layout-narrow, .layout-micro) .shuttle-confirm-layout .charge-row span:first-child {
+  overflow-wrap: anywhere;
+}
+
+:is(.layout-narrow, .layout-micro) .shuttle-promo .promo-code {
+  min-width: 0;
+}
+
+:is(.layout-narrow, .layout-micro) .shuttle-promo .promo-code input {
+  min-width: 0;
+  width: 100%;
+}
+
+:is(.layout-narrow, .layout-micro) .shuttle-confirm-layout .payment-options {
+  grid-template-columns: 1fr;
+}
+
+:is(.layout-narrow, .layout-micro) .shuttle-confirm-layout .terms-label {
+  justify-content: flex-start;
+}
+
+:is(.layout-narrow, .layout-micro) .shuttle-confirm-layout .back-button {
+  margin-top: 12px;
+  width: 100%;
+}
+
+:is(.layout-narrow, .layout-micro) .cash-discount-banner {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+:is(.layout-narrow, .layout-micro) .cash-discount-saving {
+  grid-column: 1 / -1;
+}
+
+:is(.layout-narrow, .layout-micro) .payment-option-card {
+  grid-template-columns: auto auto minmax(0, 1fr);
+  min-width: 0;
+}
+
+:is(.layout-narrow, .layout-micro) .payment-card-badge {
+  overflow-wrap: anywhere;
+  text-align: center;
+}

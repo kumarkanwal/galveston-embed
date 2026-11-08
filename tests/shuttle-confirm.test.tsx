@@ -45,6 +45,23 @@ const CARD_BUSINESS = {
   },
 } satisfies Business;
 
+const DISCOUNT_QUOTE = {
+  ...SHUTTLE_QUOTE,
+  total: "55.50",
+  totals_by_payment_method: {
+    cash: { adjustments: [
+      { label: "Cash discount (15%)", amount: "-15.00", kind: "discount" as const,
+        included_in_total: true as const },
+    ], total: "55.50" },
+    online: { adjustments: [
+      { label: "CC Surcharge", amount: "2.12", kind: "surcharge" as const,
+        included_in_total: true as const },
+    ], total: "72.62" },
+  },
+  cash_discount: { enabled: true, percent: "15.00",
+    note: "Save when you pay the driver", savings_amount: "15.00" },
+} satisfies ShuttleQuoteResponse;
+
 function clientWith(
   quoteShuttle: ShuttleApiClient["quoteShuttle"] = vi.fn(async () => SHUTTLE_QUOTE),
   bookShuttle: ShuttleApiClient["bookShuttle"] = vi.fn(async () => SHUTTLE_BOOKED),
@@ -92,6 +109,11 @@ function fill(root: HTMLElement) {
   });
 }
 
+function adjustmentLabels(root: HTMLElement) {
+  return [...root.querySelectorAll(".shuttle-adjustment span:first-child")]
+    .map((element) => element.textContent);
+}
+
 beforeEach(() => document.body.replaceChildren());
 
 describe("round-trip shuttle summary", () => {
@@ -105,16 +127,19 @@ describe("round-trip shuttle summary", () => {
       service_mode: "private" as const,
     }] };
     const { root } = mount(clientWith(), vi.fn(), SHUTTLE_BUSINESS, selection, quote);
-    expect(root.textContent).toContain("Outbound: 2026-10-30 · Time: to be arranged");
+    expect(root.textContent).toContain("Outbound: Fri, Oct 30 · Time: to be arranged");
   });
 
   it("shows the server-returned Bags and Carry-on counts", () => {
     const { root } = mount(clientWith());
     expect(root.querySelector(".shuttle-summary")?.textContent)
-      .toContain("2 check-in · ▫ 1 carry-on");
+      .toContain("Bags: 2 check-in · Carry-on: 1");
   });
 
-  it("shows each round-trip leg mode, server price and effective minimum", () => {
+  it("shows route, formatted legs, vehicles, passenger mix, and server modes", () => {
+    const selection = { ...SELECTION, trip: { ...SELECTION.trip, roundTrip: true },
+      returnLeg: { kind: "private" as const, date: PRIVATE_CAR.service_date, car: PRIVATE_CAR,
+        route: SELECTION.outbound.route } };
     const quote = { ...SHUTTLE_QUOTE, legs: [
       { ...SHUTTLE_QUOTE.legs[0]!, service_mode: "shared" as const,
         leg_price: "50.00", effective_min_passengers: 1 },
@@ -123,18 +148,21 @@ describe("round-trip shuttle summary", () => {
     ] };
     const root = document.createElement("div");
     render(<ShuttleConfirm business={SHUTTLE_BUSINESS} client={clientWith()}
-      mapsKey="maps-key" quote={quote} selection={SELECTION} onBack={() => undefined}
+      mapsKey="maps-key" quote={quote} selection={selection} onBack={() => undefined}
       onBooked={() => undefined} onUnavailable={() => undefined} />, root);
-    expect(root.textContent).toContain("Outbound: Shared Shuttle · $50.00 USD");
-    expect(root.textContent).toContain(
-      "Return: Private Shuttle · $150.00 USD · Minimum 3 passengers",
-    );
+    const summary = root.querySelector(".shuttle-summary")?.textContent ?? "";
+    expect(summary).toContain("Hobby Airport → Cruise Terminal");
+    expect(summary).toContain("Outbound: Friday, October 30, 2026 at 9:30 AM");
+    expect(summary).toContain("Outbound vehicle: Executive VanType: Shared");
+    expect(summary).toContain("Return: Fri, Oct 30 · Time: to be arranged");
+    expect(summary).toContain("Return vehicle: Private SUVType: Private");
+    expect(summary).toContain("Passengers: 1 adult, 1 senior");
   });
 });
 
 describe("shuttle confirmation pricing", () => {
-  it("shows server passenger lines, included peak once, adjustments, and total", () => {
-    const quote = { ...SHUTTLE_QUOTE,
+  it("switches exact B-55 method adjustments and totals without client math", () => {
+    const quote = { ...DISCOUNT_QUOTE,
       legs: [
         { ...SHUTTLE_QUOTE.legs[0]!, passenger_lines: [
           { passenger_type: "adult" as const, count: 1,
@@ -151,65 +179,83 @@ describe("shuttle confirmation pricing", () => {
         ], charges: [] },
       ],
       adjustments: [
-        { label: "Promo SAVE10", amount: "-8.00", kind: "discount" as const,
+        { label: "Cash discount (15%)", amount: "-15.00", kind: "discount" as const,
           included_in_total: true as const },
-        { label: "Card Surcharge", amount: "4.00", kind: "surcharge" as const,
-          included_in_total: true as const },
-      ], total: "119.00",
-      line_items: [{ label: "Peak Hours Increase", amount: "5.00",
-        kind: "surcharge", quantity: 1 }],
+      ],
     } satisfies ShuttleQuoteResponse;
-    const { root } = mount(clientWith(), vi.fn(), SHUTTLE_BUSINESS, SELECTION, quote);
-    const passengerLines = [...root.querySelectorAll(".shuttle-passenger-line")]
-      .map((line) => line.textContent?.replace(/\s+/g, " ").trim());
-    expect(passengerLines).toEqual([
+    const client = clientWith();
+    const { root } = mount(client, vi.fn(), CARD_BUSINESS, SELECTION, quote);
+    expect([...root.querySelectorAll(".shuttle-passenger-line")]
+      .map((line) => line.textContent?.replace(/\s+/g, " ").trim())).toEqual([
       "Outbound: Adult × 1 $18.00 USD · Senior × 1 $22.00 USD",
       "Return: Adult × 1 $40.00 USD · Senior × 1 $38.00 USD",
     ]);
-    expect(root.querySelectorAll(".shuttle-included-charge")).toHaveLength(1);
-    expect(root.querySelector(".shuttle-included-charge")?.textContent)
-      .toContain("Outbound · Peak Hours Increase (included)");
-    expect([...root.querySelectorAll(".shuttle-adjustment span:first-child")]
-      .map((line) => line.textContent)).toEqual(["Promo SAVE10", "Card Surcharge"]);
-    expect(root.querySelector(".charges-total")?.textContent).toContain("$119.00 USD");
+    expect(adjustmentLabels(root)).toEqual(["Cash discount (15%)"]);
+    expect(root.querySelector(".charges-total")?.textContent).toContain("$55.50 USD");
+    act(() => root.querySelector<HTMLInputElement>('input[value="online"]')?.click());
+    expect(adjustmentLabels(root)).toEqual(["CC Surcharge"]);
+    expect(root.querySelector(".charges-total")?.textContent).toContain("$72.62 USD");
+    expect(client.quoteShuttle).not.toHaveBeenCalled();
   });
 
+  it("renders the server cash banner and method-card badges", () => {
+    const { root } = mount(clientWith(), vi.fn(), CARD_BUSINESS, SELECTION, DISCOUNT_QUOTE);
+    const banner = root.querySelector(".cash-discount-banner")?.textContent ?? "";
+    expect(banner).toContain("Save 15.00% with Cash!");
+    expect(banner).toContain("Save when you pay the driver");
+    expect(banner).toContain("You Save$15.00 USD");
+    expect(root.querySelector(".payment-card-badge.recommended")?.textContent)
+      .toBe("Recommended — save 15.00%");
+    expect(root.querySelector(".payment-card-badge.standard")?.textContent)
+      .toBe("Standard price");
+  });
 });
 
 describe("shuttle promo and payment pricing", () => {
   it("preserves server line order, labels and amounts while re-quoting promo changes", async () => {
     const discounted = { ...SHUTTLE_QUOTE,
       adjustments: [{ label: "Promo SAVE10", amount: "-7.05", kind: "discount",
-        included_in_total: true }], total: "63.45", discount_amount: "7.05",
+        included_in_total: true }],
+      line_items: [{ label: "Promo SAVE10", amount: "-7.05", kind: "discount", quantity: 1 }],
+      totals_by_payment_method: {
+        cash: { adjustments: [{ label: "Promo SAVE10", amount: "-7.05",
+          kind: "discount" as const, included_in_total: true as const }], total: "63.45" },
+        online: { adjustments: [{ label: "Promo SAVE10", amount: "-7.05",
+          kind: "discount" as const, included_in_total: true as const }], total: "65.35" },
+      },
+      cash_discount: { enabled: true, percent: "15.00",
+        note: "Updated cash saving", savings_amount: "8.50" },
+      total: "63.45", discount_amount: "7.05",
     } satisfies ShuttleQuoteResponse;
     const quote = vi.fn<ShuttleApiClient["quoteShuttle"]>(async () => discounted);
-    const { root } = mount(clientWith(quote));
-    const labels = [...root.querySelectorAll(".shuttle-adjustment span:first-child")]
-      .map((element) => element.textContent);
-    expect(labels).toEqual([]);
+    const { root } = mount(clientWith(quote), vi.fn(), CARD_BUSINESS);
+    act(() => root.querySelector<HTMLInputElement>('input[value="online"]')?.click());
+    expect(adjustmentLabels(root)).toEqual([]);
+    expect(root.querySelector(".confirm-form .shuttle-promo #promoCode")).not.toBeNull();
     enter(root, "promoCode", "SAVE10");
     act(() => root.querySelector<HTMLButtonElement>(".promo-code button")?.click());
-    await vi.waitFor(() => expect(root.textContent).toContain("$63.45 USD"));
+    await vi.waitFor(() => expect(root.textContent).toContain("$65.35 USD"));
     expect(quote).toHaveBeenCalledWith(expect.objectContaining({
-      payment_method: "cash", promo_code: "SAVE10",
+      payment_method: "online", promo_code: "SAVE10",
     }));
-    expect([...root.querySelectorAll(".shuttle-adjustment span:first-child")]
-      .map((element) => element.textContent))
-      .toEqual(["Promo SAVE10"]);
+    expect(adjustmentLabels(root)).toEqual(["Promo SAVE10"]);
+    expect(root.querySelector(".charges-total")?.textContent).toContain("$65.35 USD");
+    expect(root.querySelector(".cash-discount-banner")?.textContent)
+      .toContain("Updated cash savingYou Save$8.50 USD");
     act(() => root.querySelector<HTMLButtonElement>(".promo-code button")?.click());
     await vi.waitFor(() => expect(quote).toHaveBeenCalledTimes(2));
     expect(quote.mock.calls[1]?.[0]).not.toHaveProperty("promo_code");
   });
 
-  it("re-quotes online only when public card capability is true", async () => {
+  it("switches online locally only when public card capability is true", () => {
     const quote = vi.fn<ShuttleApiClient["quoteShuttle"]>(async () => SHUTTLE_QUOTE);
     const cash = mount(clientWith(quote));
     expect(cash.root.querySelector(".payment-method")).toBeNull();
 
-    const card = mount(clientWith(quote), vi.fn(), CARD_BUSINESS);
-    card.root.querySelector<HTMLInputElement>('input[value="online"]')?.click();
-    await vi.waitFor(() => expect(quote).toHaveBeenCalledOnce());
-    expect(quote.mock.calls[0]?.[0].payment_method).toBe("online");
+    const card = mount(clientWith(quote), vi.fn(), CARD_BUSINESS, SELECTION, DISCOUNT_QUOTE);
+    act(() => card.root.querySelector<HTMLInputElement>('input[value="online"]')?.click());
+    expect(quote).not.toHaveBeenCalled();
+    expect(card.root.querySelector(".charges-total")?.textContent).toContain("$72.62 USD");
   });
 });
 
@@ -231,25 +277,6 @@ describe("shuttle unavailable payment", () => {
     });
     await Promise.resolve();
     expect(book).not.toHaveBeenCalled();
-  });
-});
-
-describe("shuttle payment pricing race", () => {
-  it("keeps the latest method when an older quote finishes last", async () => {
-    const resolvers: Array<(quote: ShuttleQuoteResponse) => void> = [];
-    const quote = vi.fn(() => new Promise<ShuttleQuoteResponse>((resolve) => {
-      resolvers.push(resolve);
-    }));
-    const { root } = mount(clientWith(quote), vi.fn(), CARD_BUSINESS);
-    act(() => root.querySelector<HTMLInputElement>('input[value="online"]')?.click());
-    await vi.waitFor(() => expect(quote).toHaveBeenCalledOnce());
-    act(() => root.querySelector<HTMLInputElement>('input[value="cash"]')?.click());
-    await vi.waitFor(() => expect(quote).toHaveBeenCalledTimes(2));
-    resolvers[1]?.({ ...SHUTTLE_QUOTE, total: "69.00" });
-    await vi.waitFor(() => expect(root.textContent).toContain("$69.00 USD"));
-    resolvers[0]?.({ ...SHUTTLE_QUOTE, total: "99.00" });
-    await Promise.resolve();
-    expect(root.textContent).not.toContain("$99.00 USD");
   });
 });
 

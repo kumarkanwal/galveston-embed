@@ -319,7 +319,7 @@ describe("date-only private shuttle cars", () => {
     expect(element.textContent).toContain("Private SUV");
     expect(element.textContent).toContain("Private");
     expect(element.textContent).toContain("Up to 5 passengers");
-    expect(element.textContent).toContain("Pickup time will be arranged by phone");
+    expect(element.textContent).not.toContain("Pickup time will be arranged by phone");
     expect(element.textContent).toContain("$165.00 USD");
     expect(element.querySelector('input[type="time"]')).toBeNull();
     act(() => element.querySelector<HTMLButtonElement>(".shuttle-departure.private button")?.click());

@@ -443,15 +443,6 @@
   margin: 0;
 }
 
-.shuttle-summary {
-  padding: 12px 18px;
-}
-
-.shuttle-summary h3,
-.shuttle-summary p {
-  margin: 0 0 10px;
-}
-
 .shuttle-price-lines,
 .shuttle-leg-price-lines {
   display: grid;
