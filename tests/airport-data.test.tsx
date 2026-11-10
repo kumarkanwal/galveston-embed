@@ -1,5 +1,6 @@
 import { render } from "preact";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { act } from "preact/test-utils";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ApiClient, Airline, Airport } from "../src/api/client";
 import { createApiClient } from "../src/api/client";
@@ -16,6 +17,7 @@ const SERVICES = [
   { id: "pickup", code: "airport_pickup", name: "Airport Pickup" },
   { id: "dropoff", code: "airport_dropoff", name: "Airport Dropoff" },
 ] as const;
+const mountedRoots = new Set<HTMLElement>();
 
 function formFor(service: CoreServiceCode): TripFormState {
   return {
@@ -64,6 +66,7 @@ function renderTrip(
 ): HTMLElement {
   const root = document.createElement("div");
   document.body.append(root);
+  mountedRoots.add(root);
   render(<TripDetails autoFocusHeading={autoFocusHeading}
     client={client} errors={errors} form={formFor(service)} formError={null}
     isSubmitting={isSubmitting} limits={{ passengers: 8, bags: 8 }} mapsKey=""
@@ -84,6 +87,12 @@ function expectOrder(actual: string[], expected: string[]) {
 }
 
 beforeEach(() => {
+  document.body.replaceChildren();
+});
+
+afterEach(() => {
+  for (const root of mountedRoots) render(null, root);
+  mountedRoots.clear();
   document.body.replaceChildren();
 });
 
@@ -159,7 +168,7 @@ describe("airport API field errors", () => {
   it("exposes the active airline option to assistive technology", async () => {
     const root = renderTrip("airport_pickup", mockClient());
     await vi.waitFor(() => expect(root.querySelector("#airline")).not.toBeNull());
-    root.querySelector<HTMLInputElement>("#airline")?.focus();
+    act(() => root.querySelector<HTMLInputElement>("#airline")?.focus());
     await vi.waitFor(() => expect(root.querySelector("#airline-options")).not.toBeNull());
     expect(root.querySelector("#airline")?.getAttribute("aria-activedescendant"))
       .toBe("airline-options-0");

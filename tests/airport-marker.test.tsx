@@ -1,17 +1,13 @@
 import { render } from "preact";
 import { useState } from "preact/hooks";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { act } from "preact/test-utils";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ApiClient, Airport, Business } from "../src/api/client";
 import { useBookingFlow } from "../src/app/shell/use-booking-flow";
 import { TripDetails } from "../src/app/trip/TripDetails";
 import type { CoreServiceCode, MapPoint } from "../src/app/trip/types";
-
-const mocks = vi.hoisted(() => ({ resolveAirportLocation: vi.fn() }));
-
-vi.mock("../src/maps/airport-location", () => ({
-  resolveAirportLocation: mocks.resolveAirportLocation,
-}));
+import * as airportLocation from "../src/maps/airport-location";
 
 vi.mock("../src/app/trip/MapPanel", () => ({
   MapPanel: ({ dropoff, pickup }: { dropoff: MapPoint | null; pickup: MapPoint | null }) =>
@@ -55,6 +51,7 @@ function client(): ApiClient {
 
 type Flow = ReturnType<typeof useBookingFlow>;
 let latestFlow: Flow | undefined;
+const mountedRoots = new Set<HTMLElement>();
 
 function Harness({ service }: { service: CoreServiceCode }) {
   const [apiClient] = useState(client);
@@ -72,12 +69,22 @@ function flow(): Flow {
   return latestFlow;
 }
 
+function renderHarness(service: CoreServiceCode): HTMLElement {
+  const root = document.createElement("div");
+  document.body.append(root);
+  mountedRoots.add(root);
+  render(<Harness service={service} />, root);
+  return root;
+}
+
 async function chooseAirport(root: HTMLElement, id: string): Promise<void> {
   await vi.waitFor(() => expect(root.querySelector("#airport")).not.toBeNull());
   const select = root.querySelector<HTMLSelectElement>("#airport");
   if (select === null) throw new Error("Airport select missing.");
-  select.value = id;
-  select.dispatchEvent(new Event("change", { bubbles: true }));
+  act(() => {
+    select.value = id;
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+  });
 }
 
 function marker(root: HTMLElement, kind: "pickup" | "dropoff"): MapPoint | null {
@@ -88,7 +95,13 @@ function marker(root: HTMLElement, kind: "pickup" | "dropoff"): MapPoint | null 
 beforeEach(() => {
   document.body.replaceChildren();
   latestFlow = undefined;
-  mocks.resolveAirportLocation.mockReset();
+});
+
+afterEach(() => {
+  for (const root of mountedRoots) render(null, root);
+  mountedRoots.clear();
+  latestFlow = undefined;
+  document.body.replaceChildren();
 });
 
 describe("airport markers", () => {
@@ -98,10 +111,8 @@ describe("airport markers", () => {
     ["airport_dropoff", "iah", { lat: 29.9902, lng: -95.3368 }, "dropoff"],
     ["airport_dropoff", "hou", { lat: 29.6454, lng: -95.2789 }, "dropoff"],
   ] as const)("shows the %s %s marker", async (service, id, point, kind) => {
-    mocks.resolveAirportLocation.mockResolvedValue(point);
-    const root = document.createElement("div");
-    document.body.append(root);
-    render(<Harness service={service} />, root);
+    vi.spyOn(airportLocation, "resolveAirportLocation").mockResolvedValue(point);
+    const root = renderHarness(service);
     await chooseAirport(root, id);
     await vi.waitFor(() => expect(marker(root, kind)).toEqual(point));
     expect(marker(root, kind === "pickup" ? "dropoff" : "pickup")).toBeNull();
@@ -110,10 +121,9 @@ describe("airport markers", () => {
 
 describe("airport lookup failure", () => {
   it("keeps pricing usable without showing an error when every lookup fails", async () => {
-    mocks.resolveAirportLocation.mockRejectedValue(new Error("Places unavailable"));
-    const root = document.createElement("div");
-    document.body.append(root);
-    render(<Harness service="airport_pickup" />, root);
+    vi.spyOn(airportLocation, "resolveAirportLocation")
+      .mockRejectedValue(new Error("Places unavailable"));
+    const root = renderHarness("airport_pickup");
     await chooseAirport(root, "iah");
     await vi.waitFor(() => expect(flow().state.form.pickupAirportId).toBe("iah"));
     expect(marker(root, "pickup")).toBeNull();
@@ -125,11 +135,9 @@ describe("airport lookup failure", () => {
 describe("airport marker lifecycle", () => {
   it("ignores a late result from a previous airport selection", async () => {
     const pending = new Map<string, (point: MapPoint) => void>();
-    mocks.resolveAirportLocation.mockImplementation((airport: Airport) =>
+    vi.spyOn(airportLocation, "resolveAirportLocation").mockImplementation((airport: Airport) =>
       new Promise<MapPoint>((resolve) => pending.set(airport.id, resolve)));
-    const root = document.createElement("div");
-    document.body.append(root);
-    render(<Harness service="airport_pickup" />, root);
+    const root = renderHarness("airport_pickup");
     await chooseAirport(root, "iah");
     await vi.waitFor(() => expect(pending.has("iah")).toBe(true));
     await chooseAirport(root, "hou");
@@ -145,18 +153,16 @@ describe("airport marker lifecycle", () => {
 
   it("clears the old marker on airport and service changes", async () => {
     let resolveNext: ((point: MapPoint) => void) | undefined;
-    mocks.resolveAirportLocation.mockImplementation(() =>
+    vi.spyOn(airportLocation, "resolveAirportLocation").mockImplementation(() =>
       new Promise<MapPoint>((resolve) => { resolveNext = resolve; }));
-    const root = document.createElement("div");
-    document.body.append(root);
-    render(<Harness service="airport_pickup" />, root);
+    const root = renderHarness("airport_pickup");
     await chooseAirport(root, "iah");
     await vi.waitFor(() => expect(resolveNext).toBeTypeOf("function"));
     resolveNext?.({ lat: 29.9902, lng: -95.3368 });
     await vi.waitFor(() => expect(marker(root, "pickup")).not.toBeNull());
     await chooseAirport(root, "hou");
     await vi.waitFor(() => expect(marker(root, "pickup")).toBeNull());
-    flow().update("service", "airport_dropoff");
+    act(() => flow().update("service", "airport_dropoff"));
     await vi.waitFor(() => expect(flow().state.form.pickupAirportLocation).toBeNull());
     expect(marker(root, "pickup")).toBeNull();
   });

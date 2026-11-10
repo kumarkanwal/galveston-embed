@@ -1,7 +1,7 @@
 import { render } from "preact";
 import { useState } from "preact/hooks";
 import { act } from "preact/test-utils";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ApiClient, Business, ServiceTypeOption } from "../src/api/client";
 import { BookingFlow } from "../src/app/shell/BookingFlow";
@@ -23,6 +23,7 @@ const SERVICES: ServiceTypeOption[] = [
   { id: "pickup", code: "airport_pickup", name: "Airport Pickup" },
   { id: "one", code: "one_way", name: "One Way" },
 ];
+const mountedRoots = new Set<HTMLElement>();
 
 function client(): ApiClient {
   return { getBusiness: vi.fn(), getServiceTypes: vi.fn(),
@@ -32,9 +33,14 @@ function client(): ApiClient {
     quote: vi.fn(), priceBreakdown: vi.fn(), book: vi.fn() };
 }
 
-function mount(settings: Partial<Business["settings"]>, services = SERVICES) {
-  const root = document.createElement("div");
-  document.body.append(root);
+function mount(
+  settings: Partial<Business["settings"]>,
+  services = SERVICES,
+  ownerDocument: Document = document,
+) {
+  const root = ownerDocument.createElement("div");
+  ownerDocument.body.append(root);
+  mountedRoots.add(root);
   const business = { ...BUSINESS, settings: { ...BUSINESS.settings, ...settings } };
   render(<BookingFlow business={business} client={client()} mapsKey="maps" services={services} />, root);
   return root;
@@ -59,6 +65,12 @@ function CounterHarness() {
 }
 
 beforeEach(() => document.body.replaceChildren());
+
+afterEach(() => {
+  for (const root of mountedRoots) render(null, root);
+  mountedRoots.clear();
+  document.body.replaceChildren();
+});
 
 describe("taxi responsive field groups", () => {
   it("groups taxi date/time and party controls in responsive ordered rows", () => {
@@ -110,15 +122,21 @@ describe("native date and time pickers", () => {
   });
 
   it("focuses the input when showPicker throws and preserves keyboard input", () => {
-    const root = mount({ show_service_dropdown: true }, [SERVICES[2]!]);
+    const frame = document.createElement("iframe");
+    document.body.append(frame);
+    const isolatedDocument = frame.contentDocument;
+    if (isolatedDocument === null) throw new Error("Missing isolated document");
+    const root = mount({ show_service_dropdown: true }, [SERVICES[2]!], isolatedDocument);
     const input = root.querySelector<HTMLInputElement>("#pickup-date");
     if (input === null) throw new Error("Missing pickup date");
     input.showPicker = () => { throw new DOMException("Not allowed"); };
     act(() => input.click());
-    expect(document.activeElement).toBe(input);
+    expect(isolatedDocument.activeElement).toBe(input);
     act(() => {
       input.value = "2026-11-05";
-      input.dispatchEvent(new Event("input", { bubbles: true }));
+      const inputEvent = isolatedDocument.createEvent("Event");
+      inputEvent.initEvent("input", true, false);
+      input.dispatchEvent(inputEvent);
     });
     expect(input.value).toBe("2026-11-05");
   });
@@ -188,6 +206,7 @@ describe("taxi select arrows", () => {
 describe("split luggage counters", () => {
   it("uses accessible counters, stops at the combined maximum, and never goes below zero", async () => {
     const root = document.createElement("div");
+    mountedRoots.add(root);
     render(<CounterHarness />, root);
     const increaseLarge = root.querySelector<HTMLButtonElement>(
       "[aria-label='Increase Check-in / trunk bags']",
