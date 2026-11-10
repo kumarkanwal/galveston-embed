@@ -7,18 +7,12 @@ import {
   resetAirportLocationWarningForTests,
   resolveAirportLocation,
 } from "../src/maps/airport-location";
+import * as googleMapsLoader from "../src/maps/google-maps-loader";
 
-const mocks = vi.hoisted(() => ({
+const mocks = {
   geocode: vi.fn(),
-  loadGeocodingLibrary: vi.fn(),
-  loadPlacesLibrary: vi.fn(),
   searchByText: vi.fn(),
-}));
-
-vi.mock("../src/maps/google-maps-loader", () => ({
-  loadGeocodingLibrary: mocks.loadGeocodingLibrary,
-  loadPlacesLibrary: mocks.loadPlacesLibrary,
-}));
+};
 
 const IAH: Airport = {
   id: "iah",
@@ -31,13 +25,13 @@ const IAH: Airport = {
 beforeEach(() => {
   resetAirportLocationWarningForTests();
   mocks.geocode.mockReset();
-  mocks.loadGeocodingLibrary.mockReset();
   mocks.searchByText.mockReset();
-  mocks.loadPlacesLibrary.mockReset();
-  mocks.loadGeocodingLibrary.mockResolvedValue({
+  vi.spyOn(googleMapsLoader, "loadGeocodingLibrary").mockResolvedValue({
     Geocoder: class { geocode = mocks.geocode; },
-  });
-  mocks.loadPlacesLibrary.mockResolvedValue({ Place: { searchByText: mocks.searchByText } });
+  } as unknown as google.maps.GeocodingLibrary);
+  vi.spyOn(googleMapsLoader, "loadPlacesLibrary").mockResolvedValue({
+    Place: { searchByText: mocks.searchByText },
+  } as unknown as google.maps.PlacesLibrary);
 });
 
 describe("airport Google Places resolution", () => {
@@ -73,7 +67,7 @@ describe("airport Google Places resolution", () => {
       address: "2800 N Terminal Rd, Houston, TX, 77032",
       region: "US",
     });
-    expect(mocks.loadPlacesLibrary).not.toHaveBeenCalled();
+    expect(googleMapsLoader.loadPlacesLibrary).not.toHaveBeenCalled();
   });
 });
 
@@ -87,13 +81,14 @@ describe("airport location fallback", () => {
       lat: 29.9902,
       lng: -95.3368,
     });
-    expect(mocks.loadGeocodingLibrary).not.toHaveBeenCalled();
+    expect(googleMapsLoader.loadGeocodingLibrary).not.toHaveBeenCalled();
     expect(mocks.searchByText).toHaveBeenCalledWith(airportSearchRequest(airport));
   });
 
   it("falls back when address geocoding fails and warns only once", async () => {
     const warning = vi.spyOn(console, "warn").mockImplementation(() => undefined);
-    mocks.loadGeocodingLibrary.mockRejectedValue(new Error("REQUEST_DENIED"));
+    vi.mocked(googleMapsLoader.loadGeocodingLibrary)
+      .mockRejectedValue(new Error("REQUEST_DENIED"));
     mocks.searchByText.mockResolvedValue({
       places: [{ location: { lat: () => 29.9902, lng: () => -95.3368 } }],
     });
