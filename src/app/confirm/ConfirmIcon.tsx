@@ -1,10 +1,14 @@
 import type { JSX } from "preact";
 
-type ConfirmIconName = "calendar" | "luggage" | "person" | "route" | "vehicle";
+type ConfirmIconName = "calendar" | "coins" | "luggage" | "person" | "route" | "vehicle";
 
 const paths: Record<ConfirmIconName, JSX.Element> = {
   calendar: <><rect x="3" y="5" width="18" height="16" rx="2" />
     <path d="M16 3v4M8 3v4M3 10h18" /></>,
+  coins: <><ellipse cx="9" cy="7" rx="6" ry="3" />
+    <path d="M3 7v4c0 1.7 2.7 3 6 3s6-1.3 6-3V7M3 11v4c0 1.7 2.7 3 6 3 1.1 0 2.1-.1 3-.4" />
+    <path d="M12 13c0-1.7 2.7-3 6-3 1.1 0 2.1.1 3 .4v7.6c0 1.7-2.7 3-6 3s-6-1.3-6-3v-.2" />
+    <path d="M12 13v4c0 1.7 2.7 3 6 3s6-1.3 6-3" /></>,
   luggage: <><rect x="6" y="7" width="12" height="14" rx="2" />
     <path d="M9 7V4h6v3M9 11v6M15 11v6M4 11v6M20 11v6" /></>,
   person: <><circle cx="12" cy="7" r="4" />

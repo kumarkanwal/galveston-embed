@@ -1,5 +1,6 @@
 import type { ComponentChildren } from "preact";
 import type { PaymentMethod, ShuttleQuoteResponse } from "../../api/client";
+import { formatPercent } from "../../money";
 import { PAYMENT_UNAVAILABLE_MESSAGE, paymentLabel } from "../confirm/payment";
 
 interface ShuttlePaymentMethodFieldProps {
@@ -13,7 +14,7 @@ interface ShuttlePaymentMethodFieldProps {
 
 function CashBadge({ discount }: Pick<ShuttlePaymentMethodFieldProps, "discount">) {
   const saving = discount.enabled && discount.percent !== null
-    ? ` — save ${discount.percent}%`
+    ? ` — save ${formatPercent(discount.percent)}%`
     : "";
   return <span class="payment-card-badge recommended">Recommended{saving}</span>;
 }

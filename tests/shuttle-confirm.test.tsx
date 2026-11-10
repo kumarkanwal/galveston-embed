@@ -50,7 +50,7 @@ const DISCOUNT_QUOTE = {
   total: "55.50",
   totals_by_payment_method: {
     cash: { adjustments: [
-      { label: "Cash discount (15%)", amount: "-15.00", kind: "discount" as const,
+      { label: "Cash discount (10%)", amount: "-15.00", kind: "discount" as const,
         included_in_total: true as const },
     ], total: "55.50" },
     online: { adjustments: [
@@ -58,8 +58,26 @@ const DISCOUNT_QUOTE = {
         included_in_total: true as const },
     ], total: "72.62" },
   },
-  cash_discount: { enabled: true, percent: "15.00",
+  cash_discount: { enabled: true, percent: "10.00",
     note: "Save when you pay the driver", savings_amount: "15.00" },
+} satisfies ShuttleQuoteResponse;
+
+const PRICE_LINES_QUOTE = { ...DISCOUNT_QUOTE,
+  legs: [
+    { ...SHUTTLE_QUOTE.legs[0]!, passenger_lines: [
+      { passenger_type: "adult" as const, count: 1,
+        unit_price: "18.00", line_total: "18.00" },
+      { passenger_type: "senior" as const, count: 1,
+        unit_price: "22.00", line_total: "22.00" },
+    ], charges: [{ label: "Peak Hours Increase", amount: "5.00",
+      kind: "surcharge" as const, included_in_total: true as const }] },
+    { ...SHUTTLE_QUOTE.legs[0]!, passenger_lines: [
+      { passenger_type: "adult" as const, count: 1,
+        unit_price: "40.00", line_total: "40.00" },
+      { passenger_type: "senior" as const, count: 1,
+        unit_price: "38.00", line_total: "38.00" },
+    ], charges: [] },
+  ],
 } satisfies ShuttleQuoteResponse;
 
 function clientWith(
@@ -167,35 +185,20 @@ describe("round-trip shuttle summary", () => {
 
 describe("shuttle confirmation pricing", () => {
   it("switches exact B-55 method adjustments and totals without client math", () => {
-    const quote = { ...DISCOUNT_QUOTE,
-      legs: [
-        { ...SHUTTLE_QUOTE.legs[0]!, passenger_lines: [
-          { passenger_type: "adult" as const, count: 1,
-            unit_price: "18.00", line_total: "18.00" },
-          { passenger_type: "senior" as const, count: 1,
-            unit_price: "22.00", line_total: "22.00" },
-        ], charges: [{ label: "Peak Hours Increase", amount: "5.00",
-          kind: "surcharge" as const, included_in_total: true as const }] },
-        { ...SHUTTLE_QUOTE.legs[0]!, passenger_lines: [
-          { passenger_type: "adult" as const, count: 1,
-            unit_price: "40.00", line_total: "40.00" },
-          { passenger_type: "senior" as const, count: 1,
-            unit_price: "38.00", line_total: "38.00" },
-        ], charges: [] },
-      ],
-      adjustments: [
-        { label: "Cash discount (15%)", amount: "-15.00", kind: "discount" as const,
-          included_in_total: true as const },
-      ],
-    } satisfies ShuttleQuoteResponse;
     const client = clientWith();
-    const { root } = mount(client, vi.fn(), CARD_BUSINESS, SELECTION, quote);
+    const { root } = mount(client, vi.fn(), CARD_BUSINESS, SELECTION, PRICE_LINES_QUOTE);
     expect([...root.querySelectorAll(".shuttle-passenger-line")]
       .map((line) => line.textContent?.replace(/\s+/g, " ").trim())).toEqual([
-      "Outbound: Adult × 1 $18.00 USD · Senior × 1 $22.00 USD",
-      "Return: Adult × 1 $40.00 USD · Senior × 1 $38.00 USD",
+      "Adult × 1 ($18.00 USD)$18.00 USD",
+      "Senior × 1 ($22.00 USD)$22.00 USD",
+      "Adult × 1 ($40.00 USD)$40.00 USD",
+      "Senior × 1 ($38.00 USD)$38.00 USD",
     ]);
-    expect(adjustmentLabels(root)).toEqual(["Cash discount (15%)"]);
+    expect([...root.querySelectorAll(".shuttle-price-lines .charge-row")]
+      .every((row) => row.children.length === 2)).toBe(true);
+    expect([...root.querySelectorAll(".shuttle-leg-price-lines h3")]
+      .map((heading) => heading.textContent)).toEqual(["Outbound", "Return"]);
+    expect(adjustmentLabels(root)).toEqual(["Cash discount (10%)"]);
     expect(root.querySelector(".charges-total")?.textContent).toContain("$55.50 USD");
     act(() => root.querySelector<HTMLInputElement>('input[value="online"]')?.click());
     expect(adjustmentLabels(root)).toEqual(["CC Surcharge"]);
@@ -206,13 +209,17 @@ describe("shuttle confirmation pricing", () => {
   it("renders the server cash banner and method-card badges", () => {
     const { root } = mount(clientWith(), vi.fn(), CARD_BUSINESS, SELECTION, DISCOUNT_QUOTE);
     const banner = root.querySelector(".cash-discount-banner")?.textContent ?? "";
-    expect(banner).toContain("Save 15.00% with Cash!");
+    expect(banner).toContain("Save 10% with Cash!");
     expect(banner).toContain("Save when you pay the driver");
     expect(banner).toContain("You Save$15.00 USD");
     expect(root.querySelector(".payment-card-badge.recommended")?.textContent)
-      .toBe("Recommended — save 15.00%");
+      .toBe("Recommended — save 10%");
     expect(root.querySelector(".payment-card-badge.standard")?.textContent)
       .toBe("Standard price");
+    expect(root.querySelector(".cash-discount-icon svg[data-confirm-icon='coins']"))
+      .not.toBeNull();
+    expect(root.querySelector(".cash-discount-icon svg")?.getAttribute("aria-hidden")).toBe("true");
+    expect(root.querySelector(".cash-discount-icon")?.textContent).toBe("");
   });
 });
 
