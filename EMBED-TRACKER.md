@@ -1,6 +1,6 @@
 # Booking Widget (Embed) — Tracker
 
-**Repo:** `galveston-embed` (new, separate) · **Last updated:** 8 November 2026
+**Repo:** `galveston-embed` (new, separate) · **Last updated:** 10 November 2026
 **Talks to:** the hosted `galveston-backend` API on the VPS.
 **Replaces:** the client's live Book Rides Online (BRO) booking form.
 
@@ -76,7 +76,8 @@ Every item has a status and a reason. Nothing is marked buildable unless the bac
 | 31 | E-25 Private date-only cars, passenger-mix prices, conditional return date | Widget | — | ✅ Complete — ready for review | — |
 | 32 | E-26 Departure cards, images, notes + Continue | Widget | — | ✅ Complete — ready for review | — |
 | 33 | E-27 Shuttle Confirm redesign + payment totals | Widget | — | ✅ Complete — ready for review | — |
-| 34 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
+| 34 | E-28 Confirm icons and alignment hotfix | Widget | — | ✅ Complete — ready for review | — |
+| 35 | Hourly (hours + Add Stops), unphased | Both | 4% | ⛔ Backend hourly pricing (C-6) | 0% |
 | | **Total** | | **100%** | | **87%** |
 
 Weights are estimates. E-9 and E-9b were added after the 100% weighting was
@@ -250,6 +251,7 @@ dependencies: `AGENTS.md` section 3.
 
 | Date | Change |
 |---|---|
+| 10 Nov 2026 | E-28 hotfix complete: replaced broken taxi/shuttle Confirm glyphs and contact symbols with decorative inline SVGs; aligned shuttle passenger, included-charge and adjustment rows as label/amount columns; compacted server percent strings without numeric conversion; added the coins banner/read-only Cash treatment; and made the Terms checkbox a centered inline control whose text label toggles it. Focused gates, full lint, one build, dist test, and built-widget Playwright checks pass at 360/1024px with four screenshots. The one full-suite run had 419 passes plus a corrected accessibility-style failure and one unrelated native-picker focus race; both affected files passed 20/20 in isolation afterward. |
 | 8 Nov 2026 | E-27 implementation complete: removed the static private pickup sentence; rebuilt Shuttle Confirm's route, leg, passenger, luggage, vehicle and charges presentation; refreshed and blob-verified merged backend B-55 at `50e7174`; and added server-owned cash-discount presentation plus accessible Cash/Card cards that switch `totals_by_payment_method` locally. Promo re-quotes replace both method totals and discount data, while payment capability, Square and booking behavior remain unchanged. Focused typecheck/lint/tests, full lint, all 416 tests, the single build, dist test, and built-widget Playwright checks pass at 360/1024px with four screenshots. |
 | 6 Nov 2026 | E-26 implementation complete: refreshed and byte-verified backend B-53 and confirmed the deployed OpenAPI fields; removed only the visible taxi/shuttle Step 1 timezone sentence; redesigned shuttle departures as responsive, accessible shared/private cards with server images or neutral placeholders, duration, capacity, low-seat copy, customer-note pills and server prices; time-ordered shared rows before private cars; scrolled round trips to Return; and added explicit Continue after every required leg is selected. Focused gates, full lint, the single build, dist test, and built-widget Playwright checks pass at 360/1024px with six screenshots. The one full suite hit the known 10-test airport flake; its isolated 13-test rerun passed. |
 | 4 Nov 2026 | E-25 implementation complete: refreshed and byte-verified backend B-51; made Return Date hidden, cleared, disabled and unannounced until Round trip without changing its grid slot; restored private cars on every date as date-only selections with pickup arranged by phone; sent search `trip_type`; retained server passenger-mix row prices per direction; and rendered server per-passenger lines, included leg charges, adjustments and totals on Confirm and confirmation. Focused gates, full lint, the single build, dist test, and Playwright checks pass at 360/1024px with six screenshots. The one full suite hit the known 10-test airport flake; its isolated 13-test rerun passed. Live B-51 OpenAPI verification remains **UNVERIFIED** until deployment. |
