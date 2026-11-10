@@ -157,6 +157,11 @@ describe("round-trip shuttle summary", () => {
     expect(summary).toContain("Return: Fri, Oct 30 · Time: to be arranged");
     expect(summary).toContain("Return vehicle: Private SUVType: Private");
     expect(summary).toContain("Passengers: 1 adult, 1 senior");
+    expect([...root.querySelectorAll(".shuttle-summary .confirm-icon")]
+      .map((icon) => icon.getAttribute("data-confirm-icon")))
+      .toEqual(["route", "calendar", "vehicle", "calendar", "vehicle", "person", "luggage"]);
+    expect(root.querySelectorAll(".shuttle-summary svg[aria-hidden='true']")).toHaveLength(7);
+    expect(summary).not.toMatch(/[▣▰●]/);
   });
 });
 

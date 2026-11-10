@@ -89,6 +89,11 @@ function input(root: HTMLElement, id: string, value: string) {
   element.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
+function confirmIconNames(root: HTMLElement) {
+  return [...root.querySelectorAll(".summary-content .confirm-icon")]
+    .map((icon) => icon.getAttribute("data-confirm-icon"));
+}
+
 beforeEach(() => document.body.replaceChildren());
 
 describe("Confirm price breakdown", () => {
@@ -100,7 +105,11 @@ describe("Confirm price breakdown", () => {
     expect(root.textContent).not.toContain("Unrelated Zero");
     expect(root.textContent).toContain("One Way Transfer on Monday, October 12, 2026 at 12:44 AM");
     expect(root.querySelector(".summary-counts")?.textContent)
-      .toBe("♟ 1 passenger· ▣ 0 check-in· ▫ 0 carry-on");
+      .toBe("1 passenger0 check-in · 0 carry-on");
+    expect(confirmIconNames(root))
+      .toEqual(["calendar", "vehicle", "person", "luggage", "route"]);
+    expect(root.querySelectorAll(".summary-content svg[aria-hidden='true']")).toHaveLength(5);
+    expect(root.querySelector(".summary-content")?.textContent).not.toMatch(/[♟▣▫●▰]/);
   });
 
   it("shows the server peak surcharge line unchanged without client math", async () => {

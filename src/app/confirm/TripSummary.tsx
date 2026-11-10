@@ -1,6 +1,7 @@
 import type { QuotedVehicle, TaxiQuoteResponse } from "../../api/client";
 import { formatBusinessLocalDateTime } from "../../time";
 import type { TripFormState } from "../trip/types";
+import { ConfirmIcon } from "./ConfirmIcon";
 
 interface TripSummaryProps {
   form: TripFormState;
@@ -28,21 +29,29 @@ export function TripSummary(props: TripSummaryProps) {
     <h2 tabIndex={-1}>Trip Summary</h2>
     <div class="summary-content">
       <VehiclePhoto vehicle={props.vehicle} />
-      <div>
-        <h3>{props.serviceName} on {formatBusinessLocalDateTime(
-          props.form.pickupDate, props.form.pickupTime,
-        )} - Vehicle: {props.vehicle.name}{distance == null ? "" : ` (${distance} mi)`}</h3>
-        {props.form.service === "round_trip" && <p class="summary-return">
-          Return: {formatBusinessLocalDateTime(props.form.returnDate, props.form.returnTime)}
-        </p>}
+      <div class="summary-details">
+        <div class="confirm-summary-row"><ConfirmIcon name="calendar" />
+          <h3>{props.serviceName} on {formatBusinessLocalDateTime(
+            props.form.pickupDate, props.form.pickupTime,
+          )}</h3></div>
+        <div class="confirm-summary-row"><ConfirmIcon name="vehicle" />
+          <span><strong>Vehicle:</strong> {props.vehicle.name}
+            {distance == null ? "" : ` (${distance} mi)`}</span></div>
+        {props.form.service === "round_trip" && <p class="summary-return confirm-summary-row">
+          <ConfirmIcon name="calendar" /><span>Return: {formatBusinessLocalDateTime(
+            props.form.returnDate, props.form.returnTime,
+          )}</span></p>}
         <div class="summary-counts">
-          <span><span aria-hidden="true">♟ </span>{props.form.passengers}
-            {props.form.passengers === 1 ? " passenger" : " passengers"}</span>
-          <span><span aria-hidden="true">· ▣ </span>{props.form.largeBags} check-in</span>
-          <span><span aria-hidden="true">· ▫ </span>{props.form.smallBags} carry-on</span>
+          <div class="confirm-summary-row"><ConfirmIcon name="person" /><span>
+            {props.form.passengers}{props.form.passengers === 1 ? " passenger" : " passengers"}
+          </span></div>
+          <div class="confirm-summary-row"><ConfirmIcon name="luggage" /><span>
+            {props.form.largeBags} check-in · {props.form.smallBags} carry-on
+          </span></div>
         </div>
-        <div class="summary-address"><span class="pickup-pin">●</span>{tripAddress(props.form, "pickup")}</div>
-        <div class="summary-address"><span class="dropoff-pin">●</span>{tripAddress(props.form, "dropoff")}</div>
+        <div class="summary-address confirm-summary-row"><ConfirmIcon name="route" /><span>
+          {tripAddress(props.form, "pickup")} → {tripAddress(props.form, "dropoff")}
+        </span></div>
       </div>
     </div>
   </section>;

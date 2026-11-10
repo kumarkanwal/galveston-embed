@@ -33,32 +33,40 @@
   margin: 3px 0 4px;
 }
 
+.confirm-summary-row {
+  align-items: center;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 18px minmax(0, 1fr);
+}
+
+.confirm-icon {
+  color: var(--blue);
+  display: block;
+  height: 18px;
+  width: 18px;
+}
+
+.summary-details {
+  display: grid;
+  gap: 7px;
+}
+
 .summary-return {
   font-size: 12px;
   margin: 0 0 3px;
 }
 
 .summary-counts {
-  display: flex;
+  display: grid;
   font-size: 12px;
-  gap: 9px;
+  gap: 7px;
   margin-bottom: 3px;
 }
 
 .summary-address {
-  display: grid;
   font-size: 12px;
-  gap: 6px;
-  grid-template-columns: 10px 1fr;
   margin-top: 2px;
-}
-
-.pickup-pin {
-  color: var(--green);
-}
-
-.dropoff-pin {
-  color: #b52b27;
 }
 
 .charges {
