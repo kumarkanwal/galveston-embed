@@ -1,6 +1,15 @@
 .payment-summary {
-  font-weight: 700;
+  align-items: center;
+  color: #444444;
+  display: flex;
+  font-size: 13px;
+  font-weight: 400;
+  gap: 7px;
   margin: 14px 0;
+}
+
+.payment-summary .confirm-icon {
+  color: var(--green);
 }
 
 .payment-unavailable {

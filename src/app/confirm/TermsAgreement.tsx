@@ -48,15 +48,12 @@ export function TermsAgreement(props: TermsAgreementProps) {
   }, [open]);
   return <div class="terms-field">
     <div class="terms-label">
-      <label class="checkbox-target">
-        <input id="accepted-terms" type="checkbox" checked={props.accepted}
-          data-confirm-field="acceptedTerms"
-          aria-invalid={props.error !== undefined}
-          aria-describedby={props.error === undefined ? undefined : "acceptedTerms-error"}
-          onBlur={props.onBlur}
-          onChange={(event) => props.onChange(event.currentTarget.checked)} />
-        <span class="visually-hidden">Accept Terms &amp; Conditions</span>
-      </label>
+      <input id="accepted-terms" type="checkbox" checked={props.accepted}
+        data-confirm-field="acceptedTerms"
+        aria-invalid={props.error !== undefined}
+        aria-describedby={props.error === undefined ? undefined : "acceptedTerms-error"}
+        onBlur={props.onBlur}
+        onChange={(event) => props.onChange(event.currentTarget.checked)} />
       <span class="terms-copy">
         <label for="accepted-terms">By checking this box you agree to our
           {!hasTerms && " Terms & Conditions"}</label>

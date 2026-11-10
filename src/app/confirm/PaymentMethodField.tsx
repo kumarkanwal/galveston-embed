@@ -1,4 +1,5 @@
 import type { PaymentMethod } from "../../api/client";
+import { ConfirmIcon } from "./ConfirmIcon";
 import { PAYMENT_UNAVAILABLE_MESSAGE, paymentLabel } from "./payment";
 
 interface PaymentMethodFieldProps {
@@ -9,13 +10,20 @@ interface PaymentMethodFieldProps {
   onChange: (method: PaymentMethod) => void;
 }
 
+export function ReadOnlyPaymentMethod({ method }: { method: PaymentMethod }) {
+  return <p class="payment-summary">
+    {method === "cash" && <ConfirmIcon name="coins" />}
+    <span>Payment: {paymentLabel(method)}</span>
+  </p>;
+}
+
 export function PaymentMethodField(props: PaymentMethodFieldProps) {
   if (!props.cashAvailable && !props.cardAvailable) {
     return <p class="payment-unavailable" role="alert">{PAYMENT_UNAVAILABLE_MESSAGE}</p>;
   }
   if (!props.cashAvailable || !props.cardAvailable) {
     const method = props.cardAvailable ? "online" : "cash";
-    return <p class="payment-summary">Payment: {paymentLabel(method)}</p>;
+    return <ReadOnlyPaymentMethod method={method} />;
   }
   return <fieldset class="payment-method">
     <legend>Payment Method</legend>

@@ -262,35 +262,34 @@
 }
 
 .terms-label {
-  align-items: start;
+  align-items: center;
   display: flex;
   font-size: 12px;
   font-style: italic;
   font-weight: 400;
   gap: 7px;
   justify-content: flex-end;
+  min-height: 38px;
+  min-width: 38px;
+}
+
+.terms-copy {
+  line-height: 1.5;
+  min-width: 0;
 }
 
 .terms-copy label {
+  cursor: pointer;
   display: inline;
   font: inherit;
   margin: 0 4px 0 0;
 }
 
 .terms-label input[type="checkbox"] {
+  flex: 0 0 auto;
   height: 18px;
   margin: 0;
   width: 18px;
-}
-
-.checkbox-target {
-  align-items: center;
-  display: inline-flex;
-  flex: 0 0 auto;
-  justify-content: center;
-  margin: 0;
-  min-height: 38px;
-  min-width: 38px;
 }
 
 .terms-link {
@@ -440,22 +439,6 @@
   float: none;
   margin-top: 16px;
   width: 100%;
-}
-
-:is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
-  :is(.checkbox-target, .terms-copy label, .terms-link) {
-  min-height: 38px;
-}
-
-:is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
-  .checkbox-target {
-  min-width: 38px;
-}
-
-:is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)
-  :is(.terms-copy label, .terms-link) {
-  align-items: center;
-  display: inline-flex;
 }
 
 :is(.layout-medium, .layout-full, .layout-compact, .layout-narrow, .layout-micro)

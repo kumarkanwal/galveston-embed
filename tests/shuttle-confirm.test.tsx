@@ -263,6 +263,9 @@ describe("shuttle promo and payment pricing", () => {
     const quote = vi.fn<ShuttleApiClient["quoteShuttle"]>(async () => SHUTTLE_QUOTE);
     const cash = mount(clientWith(quote));
     expect(cash.root.querySelector(".payment-method")).toBeNull();
+    expect(cash.root.querySelector(".payment-summary")?.textContent).toBe("Payment: Cash");
+    expect(cash.root.querySelector(".payment-summary svg[data-confirm-icon='coins']"))
+      .not.toBeNull();
 
     const card = mount(clientWith(quote), vi.fn(), CARD_BUSINESS, SELECTION, DISCOUNT_QUOTE);
     act(() => card.root.querySelector<HTMLInputElement>('input[value="online"]')?.click());
