@@ -118,8 +118,10 @@ describe("private shuttle confirmation", () => {
     const root = mount(response, "online", false);
     expect([...root.querySelectorAll(".shuttle-passenger-line")]
       .map((line) => line.textContent?.replace(/\s+/g, " ").trim())).toEqual([
-      "Outbound: Adult × 1 $18.00 USD · Senior × 1 $22.00 USD",
-      "Return: Adult × 1 $40.00 USD · Senior × 1 $38.00 USD",
+      "Adult × 1 ($18.00 USD)$18.00 USD",
+      "Senior × 1 ($22.00 USD)$22.00 USD",
+      "Adult × 1 ($40.00 USD)$40.00 USD",
+      "Senior × 1 ($38.00 USD)$38.00 USD",
     ]);
     expect(root.querySelectorAll(".shuttle-included-charge")).toHaveLength(1);
     expect(root.querySelector(".shuttle-adjustment")?.textContent)

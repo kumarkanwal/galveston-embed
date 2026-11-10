@@ -1,4 +1,5 @@
 import { FieldError } from "../trip/FieldError";
+import { ConfirmIcon } from "./ConfirmIcon";
 import type { ConfirmErrors, ConfirmFormState } from "./types";
 
 interface CustomerFieldsProps {
@@ -20,7 +21,8 @@ interface TextFieldProps {
 }
 
 function TextField(props: TextFieldProps) {
-  const icon = props.field === "phone" ? "☎" : props.field === "email" ? "@" : null;
+  const icon = props.field === "phone" ? <ConfirmIcon name="phone" />
+    : props.field === "email" ? <ConfirmIcon name="email" /> : null;
   const describedBy = props.error === undefined ? {} : {
     "aria-describedby": `${props.field}-error`,
   };
@@ -32,7 +34,7 @@ function TextField(props: TextFieldProps) {
     onInput={(event) => props.update(props.field, event.currentTarget.value)} />;
   return <div class="field">
     <label for={props.field}>{props.label}</label>
-    {icon === null ? input : <div class="input-with-icon">{input}<span aria-hidden="true">{icon}</span></div>}
+    {icon === null ? input : <div class="input-with-icon">{input}<span>{icon}</span></div>}
     <FieldError id={`${props.field}-error`} message={props.error} />
   </div>;
 }

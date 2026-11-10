@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { formatMoney, formatMoneyAmount } from "../src/money";
+import { formatMoney, formatMoneyAmount, formatPercent } from "../src/money";
 
 describe("formatMoney", () => {
   afterEach(() => vi.unstubAllEnvs());
@@ -31,9 +31,15 @@ describe("formatMoney", () => {
     expect(formatMoneyAmount("1415.00", "USD")).toBe("$1,415.00");
   });
 
+  it.each([
+    ["10.00", "10"], ["12.50", "12.5"], ["12.05", "12.05"], ["8", "8"],
+  ])("formats percent string %s without numeric conversion", (value, expected) => {
+    expect(formatPercent(value)).toBe(expected);
+  });
+
   it("contains none of the banned numeric-money functions", () => {
     const directory = resolve(process.cwd(), "src/money");
-    const source = ["format.ts", "index.ts"]
+    const source = ["format.ts", "index.ts", "percent.ts"]
       .map((file) => readFileSync(resolve(directory, file), "utf8"))
       .join("\n");
     for (const banned of ["parseFloat", "Number(", "toFixed(", "Math."]) {

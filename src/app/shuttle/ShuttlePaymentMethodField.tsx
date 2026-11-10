@@ -1,5 +1,7 @@
 import type { ComponentChildren } from "preact";
 import type { PaymentMethod, ShuttleQuoteResponse } from "../../api/client";
+import { formatPercent } from "../../money";
+import { ReadOnlyPaymentMethod } from "../confirm/PaymentMethodField";
 import { PAYMENT_UNAVAILABLE_MESSAGE, paymentLabel } from "../confirm/payment";
 
 interface ShuttlePaymentMethodFieldProps {
@@ -13,7 +15,7 @@ interface ShuttlePaymentMethodFieldProps {
 
 function CashBadge({ discount }: Pick<ShuttlePaymentMethodFieldProps, "discount">) {
   const saving = discount.enabled && discount.percent !== null
-    ? ` — save ${discount.percent}%`
+    ? ` — save ${formatPercent(discount.percent)}%`
     : "";
   return <span class="payment-card-badge recommended">Recommended{saving}</span>;
 }
@@ -40,7 +42,7 @@ export function ShuttlePaymentMethodField(props: ShuttlePaymentMethodFieldProps)
   }
   if (!props.cashAvailable || !props.cardAvailable) {
     const method = props.cardAvailable ? "online" : "cash";
-    return <p class="payment-summary">Payment: {paymentLabel(method)}</p>;
+    return <ReadOnlyPaymentMethod method={method} />;
   }
   return <fieldset class="payment-method shuttle-payment-method">
     <legend>Payment Method</legend>

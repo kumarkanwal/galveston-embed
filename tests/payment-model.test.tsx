@@ -120,6 +120,9 @@ describe("payment method availability", () => {
     render(<PaymentMethodField cardAvailable={false} cashAvailable
       method="cash" onChange={vi.fn()} />, root);
     expect(root.querySelector(".payment-summary")?.textContent).toBe("Payment: Cash");
+    expect(root.querySelector(".payment-summary svg[data-confirm-icon='coins']"))
+      .not.toBeNull();
+    expect(root.querySelector(".payment-summary svg")?.getAttribute("aria-hidden")).toBe("true");
     render(<PaymentMethodField cardAvailable cashAvailable
       method="cash" onChange={vi.fn()} />, root);
     expect(root.querySelectorAll('.payment-method input[type="radio"]')).toHaveLength(2);
