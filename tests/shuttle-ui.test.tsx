@@ -304,6 +304,9 @@ describe("fixed-only shuttle departures", () => {
       onChooseOutbound={() => undefined}
       onChooseReturn={() => undefined} />, element);
     expect(element.querySelectorAll('input[type="time"]')).toHaveLength(0);
+    expect(element.textContent).toContain(
+      "Service times. Your pickup time is arranged by phone.",
+    );
     expect(element.textContent).toContain("Choose Departure · Wed, Nov 4");
     expect(element.textContent).toContain("Choose Return · Sat, Nov 7");
   });

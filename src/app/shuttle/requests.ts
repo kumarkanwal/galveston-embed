@@ -9,7 +9,12 @@ import type {
 } from "../../api/client";
 import type { ConfirmFormState } from "../confirm/types";
 import { requiredShuttleAddresses, type ShuttleAddressValues } from "./address";
-import type { SelectedShuttleLeg, ShuttleSelection, ShuttleTripForm } from "./types";
+import type {
+  SelectedShuttleLeg,
+  ShuttlePickupTimes,
+  ShuttleSelection,
+  ShuttleTripForm,
+} from "./types";
 
 function passengerCounts(trip: ShuttleTripForm) {
   return {
@@ -52,6 +57,7 @@ export function buildReturnQuery(
 export function buildShuttleLeg(
   selected: SelectedShuttleLeg,
   trip: ShuttleTripForm,
+  requestedPickupTime: string,
 ): ShuttleQuoteLeg {
   if (selected.kind === "private") {
     return {
@@ -59,23 +65,28 @@ export function buildShuttleLeg(
       route_id: selected.car.route_id,
       vehicle_type_id: selected.car.vehicle_type_id,
       pickup_date: selected.date,
+      requested_pickup_time: requestedPickupTime,
       ...passengerCounts(trip),
     };
   }
   return {
     departure_type: "scheduled",
     schedule_id: selected.departure.schedule_id,
+    requested_pickup_time: requestedPickupTime,
     ...passengerCounts(trip),
   };
 }
 
 export function buildShuttleQuote(
   selection: ShuttleSelection,
+  pickupTimes: ShuttlePickupTimes,
   promoCode: string | null,
   paymentMethod: PaymentMethod = "cash",
 ): ShuttleQuoteRequest {
-  const legs = [buildShuttleLeg(selection.outbound, selection.trip)];
-  if (selection.returnLeg !== null) legs.push(buildShuttleLeg(selection.returnLeg, selection.trip));
+  const legs = [buildShuttleLeg(selection.outbound, selection.trip, pickupTimes.outbound)];
+  if (selection.returnLeg !== null) {
+    legs.push(buildShuttleLeg(selection.returnLeg, selection.trip, pickupTimes.return));
+  }
   return {
     legs,
     large_bags: selection.trip.largeBags,
@@ -90,10 +101,11 @@ export function buildShuttleBooking(
   selection: ShuttleSelection,
   form: ConfirmFormState,
   addresses: ShuttleAddressValues,
+  pickupTimes: ShuttlePickupTimes,
   promoCode: string | null,
   paymentMethod: PaymentMethod = "cash",
 ): ShuttleBookingRequest {
-  const quote = buildShuttleQuote(selection, promoCode, paymentMethod);
+  const quote = buildShuttleQuote(selection, pickupTimes, promoCode, paymentMethod);
   const required = requiredShuttleAddresses(selection);
   const legs: ShuttleBookingLeg[] = quote.legs.map((leg, index) => {
     const pickupField = index === 0 ? "outboundPickup" : "returnPickup";

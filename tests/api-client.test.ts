@@ -80,7 +80,7 @@ const BOOKED: TaxiBookingResponse = {
 
 const SHUTTLE_QUOTE: ShuttleQuoteRequest = {
   legs: [{ departure_type: "scheduled", schedule_id: "schedule-1",
-    pax_adult: 1, pax_senior: 0, pax_child: 0 }],
+    requested_pickup_time: "10:30", pax_adult: 1, pax_senior: 0, pax_child: 0 }],
   large_bags: 0,
   small_bags: 0,
   insurance_selected: false,
