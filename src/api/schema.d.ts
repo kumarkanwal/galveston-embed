@@ -2401,6 +2401,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/reservations/{booking_id}/hard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Hard Delete Reservation
+         * @description Permanently remove an eligible reservation and its linked return leg.
+         */
+        delete: operations["hard_delete_reservation_v1_admin_reservations__booking_id__hard_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/schedules": {
         parameters: {
             query?: never;
@@ -2410,7 +2430,7 @@ export interface paths {
         };
         /**
          * List Schedules
-         * @description List departures, defaulting to the next 14 business-local days.
+         * @description List the full departure range unless optional local-date filters are supplied.
          */
         get: operations["list_schedules_v1_admin_schedules_get"];
         put?: never;
@@ -2883,6 +2903,26 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/routes/{route_id}/departure-templates/{template_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Set Route Departure Template Active
+         * @description Toggle one weekly time while preserving booked dated departures.
+         */
+        patch: operations["set_route_departure_template_active_v1_admin_routes__route_id__departure_templates__template_id__patch"];
         trace?: never;
     };
     "/v1/admin/categories": {
@@ -3684,6 +3724,26 @@ export interface paths {
          * @description Replace rate assignments across the resolved business scope.
          */
         put: operations["set_vehicle_type_businesses_v1_admin_vehicle_types__vehicle_type_id__businesses_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/vehicle-types/{vehicle_type_id}/shuttle-usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Preview Vehicle Type Shuttle Usage
+         * @description Preview route, weekly-time, and future-departure unlink impact.
+         */
+        get: operations["preview_vehicle_type_shuttle_usage_v1_admin_vehicle_types__vehicle_type_id__shuttle_usage_get"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -5111,6 +5171,18 @@ export interface components {
             leg_total: string;
         };
         /**
+         * BookingDeleteResult
+         * @description The complete set of legs removed by one booking delete action.
+         */
+        BookingDeleteResult: {
+            /** Booking Reference */
+            booking_reference: string;
+            /** Deleted Booking Ids */
+            deleted_booking_ids: string[];
+            /** Order Deleted */
+            order_deleted: boolean;
+        };
+        /**
          * BookingLeg
          * @description Directional label used only when one order has an outbound and return run.
          * @enum {string}
@@ -5137,6 +5209,11 @@ export interface components {
             pickup_date?: string | null;
             /** Pickup Time */
             pickup_time?: string | null;
+            /**
+             * Requested Pickup Time
+             * Format: time
+             */
+            requested_pickup_time: string;
             /**
              * Pax Senior
              * @default 0
@@ -5927,10 +6004,16 @@ export interface components {
             /** Order Number */
             order_number: string;
             /**
-             * Start
-             * Format: date-time
+             * Pickup Date
+             * Format: date
              */
-            start: string;
+            pickup_date: string;
+            /** Pickup Time */
+            pickup_time: string | null;
+            /** Requested Pickup Time */
+            requested_pickup_time: string | null;
+            /** Start */
+            start: string | null;
             /** End */
             end: string | null;
             /** Passenger */
@@ -6057,10 +6140,16 @@ export interface components {
             /** Client */
             client: string;
             /**
-             * Start
-             * Format: date-time
+             * Pickup Date
+             * Format: date
              */
-            start: string;
+            pickup_date: string;
+            /** Pickup Time */
+            pickup_time: string | null;
+            /** Requested Pickup Time */
+            requested_pickup_time: string | null;
+            /** Start */
+            start: string | null;
             /** End */
             end: string | null;
             /** Pickup Address */
@@ -6840,6 +6929,8 @@ export interface components {
             date: string;
             /** Time */
             time: string | null;
+            /** Requested Pickup Time */
+            requested_pickup_time: string | null;
             /** Passenger */
             passenger: string;
             status: components["schemas"]["BookingStatus"];
@@ -6857,6 +6948,12 @@ export interface components {
             /** Available */
             available: boolean;
         };
+        /**
+         * DeleteAction
+         * @description The authoritative outcome of pressing Delete for a retained identity.
+         * @enum {string}
+         */
+        DeleteAction: "delete" | "archive" | "blocked";
         /**
          * Departure
          * @description A departure the customer may inspect, with return chronology made explicit.
@@ -6902,8 +6999,16 @@ export interface components {
             unselectable_reason: string | null;
         };
         /**
+         * DepartureTemplateActivation
+         * @description Explicit active state for one retained weekly-time row.
+         */
+        DepartureTemplateActivation: {
+            /** Is Active */
+            is_active: boolean;
+        };
+        /**
          * DepartureTemplateMutationResult
-         * @description Template replacement plus idempotent schedule materialization counts.
+         * @description Template replacement plus idempotent future-inventory reconciliation.
          */
         DepartureTemplateMutationResult: {
             /**
@@ -6915,10 +7020,16 @@ export interface components {
             templates: components["schemas"]["DepartureTemplateResult"][];
             /** Generated Through */
             generated_through: string | null;
-            /** Created Count */
-            created_count: number;
-            /** Existing Count */
-            existing_count: number;
+            /** Created */
+            created: number;
+            /** Kept */
+            kept: number;
+            /** Removed */
+            removed: number;
+            /** Deactivated */
+            deactivated: number;
+            /** Kept With Bookings */
+            kept_with_bookings: components["schemas"]["KeptDepartureResult"][];
         };
         /**
          * DepartureTemplateResult
@@ -6958,6 +7069,8 @@ export interface components {
          * @description One local departure time for a route car on selected weekdays.
          */
         DepartureTemplateWrite: {
+            /** Id */
+            id?: string | null;
             /**
              * Vehicle Type Id
              * Format: uuid
@@ -7486,6 +7599,10 @@ export interface components {
         Envelope_AssignmentResult_: {
             data: components["schemas"]["AssignmentResult"];
         };
+        /** Envelope[BookingDeleteResult] */
+        Envelope_BookingDeleteResult_: {
+            data: components["schemas"]["BookingDeleteResult"];
+        };
         /** Envelope[BookingResponse] */
         Envelope_BookingResponse_: {
             data: components["schemas"]["BookingResponse"];
@@ -7742,6 +7859,10 @@ export interface components {
         Envelope_RouteDeactivationResult_: {
             data: components["schemas"]["RouteDeactivationResult"];
         };
+        /** Envelope[RouteDeleteResult] */
+        Envelope_RouteDeleteResult_: {
+            data: components["schemas"]["RouteDeleteResult"];
+        };
         /** Envelope[RouteReadinessResult] */
         Envelope_RouteReadinessResult_: {
             data: components["schemas"]["RouteReadinessResult"];
@@ -7754,9 +7875,17 @@ export interface components {
         Envelope_RouteSharingPreviewResult_: {
             data: components["schemas"]["RouteSharingPreviewResult"];
         };
+        /** Envelope[RouteUsage] */
+        Envelope_RouteUsage_: {
+            data: components["schemas"]["RouteUsage"];
+        };
         /** Envelope[RouteVehicleQuoteResult] */
         Envelope_RouteVehicleQuoteResult_: {
             data: components["schemas"]["RouteVehicleQuoteResult"];
+        };
+        /** Envelope[RouteVehicleTypesMutationResult] */
+        Envelope_RouteVehicleTypesMutationResult_: {
+            data: components["schemas"]["RouteVehicleTypesMutationResult"];
         };
         /** Envelope[RouteVehicleTypesResult] */
         Envelope_RouteVehicleTypesResult_: {
@@ -7862,6 +7991,10 @@ export interface components {
         Envelope_VehicleResult_: {
             data: components["schemas"]["VehicleResult"];
         };
+        /** Envelope[VehicleTypeAssignmentsResult] */
+        Envelope_VehicleTypeAssignmentsResult_: {
+            data: components["schemas"]["VehicleTypeAssignmentsResult"];
+        };
         /** Envelope[VehicleTypeDeactivationResult] */
         Envelope_VehicleTypeDeactivationResult_: {
             data: components["schemas"]["VehicleTypeDeactivationResult"];
@@ -7869,6 +8002,10 @@ export interface components {
         /** Envelope[VehicleTypeResult] */
         Envelope_VehicleTypeResult_: {
             data: components["schemas"]["VehicleTypeResult"];
+        };
+        /** Envelope[VehicleUnlinkPreview] */
+        Envelope_VehicleUnlinkPreview_: {
+            data: components["schemas"]["VehicleUnlinkPreview"];
         };
         /** Envelope[VehicleUsage] */
         Envelope_VehicleUsage_: {
@@ -8069,7 +8206,7 @@ export interface components {
         };
         /**
          * HardDeleteResult
-         * @description Stable confirmation that a configuration identity no longer exists.
+         * @description Stable confirmation that a network identity was deleted or archived.
          */
         HardDeleteResult: {
             /**
@@ -8077,11 +8214,11 @@ export interface components {
              * Format: uuid
              */
             id: string;
-            /**
-             * Deleted
-             * @default true
-             */
+            action: components["schemas"]["DeleteAction"];
+            /** Deleted */
             deleted: boolean;
+            /** Archived */
+            archived: boolean;
         };
         /**
          * HealthResponse
@@ -8117,6 +8254,33 @@ export interface components {
              * @description Hostname match only; browser CORS also requires the correct scheme and port.
              */
             cors_configured: boolean;
+        };
+        /**
+         * KeptDepartureResult
+         * @description A booked obsolete departure preserved for staff follow-up.
+         */
+        KeptDepartureResult: {
+            /**
+             * Route Id
+             * Format: uuid
+             */
+            route_id: string;
+            /** Route Label */
+            route_label: string;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /**
+             * Time
+             * Format: time
+             */
+            time: string;
+            /** Car */
+            car: string;
+            /** Bookings Count */
+            bookings_count: number;
         };
         /**
          * LabelCount
@@ -8199,6 +8363,19 @@ export interface components {
             leg: components["schemas"]["BookingLeg"] | null;
             /** Leg Price */
             leg_price: string;
+        };
+        /**
+         * LinkedBusiness
+         * @description Another company whose active route assignment is removed on delete.
+         */
+        LinkedBusiness: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
         };
         /**
          * LinkedRoute
@@ -8957,6 +9134,11 @@ export interface components {
              * @description Total items matching the query, ignoring pagination.
              */
             total: number;
+            /**
+             * Pages
+             * @description Total pages matching the query at this page size.
+             */
+            pages: number;
         };
         /**
          * MissingVehicleLink
@@ -9512,6 +9694,10 @@ export interface components {
              * Format: date
              */
             pickup_date: string;
+            /** Pickup Time */
+            pickup_time: string | null;
+            /** Requested Pickup Time */
+            requested_pickup_time: string | null;
             passenger: components["schemas"]["PassengerContact"];
             /** Pickup Address */
             pickup_address: string | null;
@@ -9536,7 +9722,7 @@ export interface components {
          * @description A capability an endpoint can require.
          * @enum {string}
          */
-        Permission: "booking:read" | "booking:write" | "booking:assign" | "booking:status" | "communication:send" | "customer:read" | "customer:write" | "customer:manage" | "pricing:read" | "pricing:write" | "vehicle_rate:write" | "vehicle_type_catalog:write" | "service_type_assignment:write" | "service_type_catalog:write" | "taxi_catalog:manage" | "platform_catalog:manage" | "payment:read" | "payment:write" | "payment_settings:read" | "payment_settings:write" | "email:read" | "audit:read" | "config:read" | "config:write" | "zone_price:import" | "company:read" | "company:write" | "company_identity:write" | "business_settings:read" | "business_settings:write" | "team:read" | "team:manage" | "team:write" | "settings:read" | "settings:write" | "integration:read" | "api_keys:read" | "api_keys:write" | "report:read" | "own_runs:read";
+        Permission: "booking:read" | "booking:write" | "booking:assign" | "booking:status" | "booking:delete" | "communication:send" | "customer:read" | "customer:write" | "customer:manage" | "pricing:read" | "pricing:write" | "vehicle_rate:write" | "vehicle_type_catalog:write" | "service_type_assignment:write" | "service_type_catalog:write" | "taxi_catalog:manage" | "platform_catalog:manage" | "payment:read" | "payment:write" | "payment_settings:read" | "payment_settings:write" | "email:read" | "audit:read" | "config:read" | "config:write" | "zone_price:import" | "company:read" | "company:write" | "company_identity:write" | "business_settings:read" | "business_settings:write" | "team:read" | "team:manage" | "team:write" | "settings:read" | "settings:write" | "integration:read" | "api_keys:read" | "api_keys:write" | "report:read" | "own_runs:read";
         /**
          * PreferencesSettingsUpdate
          * @description Taxi booking choices controlled by the selected business.
@@ -10260,6 +10446,11 @@ export interface components {
             /** Pickup Time */
             pickup_time?: string | null;
             /**
+             * Requested Pickup Time
+             * Format: time
+             */
+            requested_pickup_time: string;
+            /**
              * Pax Senior
              * @default 0
              */
@@ -10557,6 +10748,8 @@ export interface components {
             pickup_date?: string | null;
             /** Pickup Time */
             pickup_time?: string | null;
+            /** Requested Pickup Time */
+            requested_pickup_time?: string | null;
             /** Pickup Address */
             pickup_address?: string | null;
             /** Dropoff Address */
@@ -10640,6 +10833,8 @@ export interface components {
             pickup_date: string;
             /** Pickup Time */
             pickup_time: string | null;
+            /** Requested Pickup Time */
+            requested_pickup_time: string | null;
             /** Dropoff Time */
             dropoff_time: string | null;
             /** Duration Minutes */
@@ -10664,14 +10859,25 @@ export interface components {
         };
         /**
          * ResourceUsage
-         * @description Hard-delete readiness with deterministic dependency detail.
+         * @description Delete readiness with deterministic dependency and archive detail.
          */
         ResourceUsage: {
+            action: components["schemas"]["DeleteAction"];
             /** Can Delete */
             can_delete: boolean;
+            /** Booking Count */
+            booking_count: number;
+            /** Upcoming Active Count */
+            upcoming_active_count: number;
+            /** Departure Count */
+            departure_count: number;
             blockers: components["schemas"]["UsageBlockers"];
+            /** Linked Businesses */
+            linked_businesses: components["schemas"]["LinkedBusiness"][];
             /** Linked Routes */
             linked_routes: components["schemas"]["LinkedRoute"][];
+            /** Reason */
+            reason?: string | null;
         };
         /**
          * RouteBusinessResult
@@ -10827,6 +11033,22 @@ export interface components {
             affected_booked_schedule_count: number;
         };
         /**
+         * RouteDeleteResult
+         * @description Stable confirmation of either route deletion or archival.
+         */
+        RouteDeleteResult: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            action: components["schemas"]["DeleteAction"];
+            /** Deleted */
+            deleted: boolean;
+            /** Archived */
+            archived: boolean;
+        };
+        /**
          * RouteDetail
          * @description Snapshot-compatible shuttle route presentation.
          */
@@ -10837,13 +11059,13 @@ export interface components {
              */
             id: string;
             /** From */
-            from: string;
+            from: string | null;
             /** To */
-            to: string;
+            to: string | null;
             /** Service Label */
-            service_label: string;
+            service_label: string | null;
             /** Duration Minutes */
-            duration_minutes: number;
+            duration_minutes: number | null;
         };
         /**
          * RouteOwnerBusiness
@@ -11046,6 +11268,25 @@ export interface components {
             is_active?: boolean | null;
         };
         /**
+         * RouteUsage
+         * @description Route delete readiness separates generated inventory from real bookings.
+         */
+        RouteUsage: {
+            action: components["schemas"]["DeleteAction"];
+            /** Can Delete */
+            can_delete: boolean;
+            /** Booking Count */
+            booking_count: number;
+            /** Upcoming Active Count */
+            upcoming_active_count: number;
+            /** Departure Count */
+            departure_count: number;
+            /** Linked Businesses */
+            linked_businesses: components["schemas"]["LinkedBusiness"][];
+            /** Reason */
+            reason?: string | null;
+        };
+        /**
          * RouteVehicleQuote
          * @description One active any-time car with its journey-specific authoritative fare.
          */
@@ -11120,6 +11361,32 @@ export interface components {
             quotes: components["schemas"]["RouteVehicleQuote"][];
         };
         /**
+         * RouteVehicleRemovalPreview
+         * @description No-write impact of removing one car from one route.
+         */
+        RouteVehicleRemovalPreview: {
+            /**
+             * Route Id
+             * Format: uuid
+             */
+            route_id: string;
+            /** Route Label */
+            route_label: string;
+            /**
+             * Vehicle Type Id
+             * Format: uuid
+             */
+            vehicle_type_id: string;
+            /** Vehicle Type Name */
+            vehicle_type_name: string;
+            /** Weekly Times */
+            weekly_times: number;
+            /** Future Departures */
+            future_departures: number;
+            /** With Bookings Or Holds */
+            with_bookings_or_holds: number;
+        };
+        /**
          * RouteVehicleTypeResult
          * @description A route car with its catalog and effective seat capacities.
          */
@@ -11136,6 +11403,8 @@ export interface components {
             vehicle_type_id: string;
             /** Vehicle Type Name */
             vehicle_type_name: string;
+            /** Vehicle Type Is Active */
+            vehicle_type_is_active: boolean;
             /** Passenger Capacity */
             passenger_capacity: number;
             /** Seat Capacity Override */
@@ -11182,6 +11451,45 @@ export interface components {
             is_active: boolean;
         };
         /**
+         * RouteVehicleTypesMutationResult
+         * @description Route-car replacement plus removed weekly-inventory reconciliation.
+         */
+        RouteVehicleTypesMutationResult: {
+            /**
+             * Route Id
+             * Format: uuid
+             */
+            route_id: string;
+            /** Vehicle Types */
+            vehicle_types: components["schemas"]["RouteVehicleTypeResult"][];
+            /** Added Vehicle Links */
+            added_vehicle_links?: components["schemas"]["MissingVehicleLinksCompany"][];
+            /**
+             * Created
+             * @default 0
+             */
+            created: number;
+            /**
+             * Kept
+             * @default 0
+             */
+            kept: number;
+            /**
+             * Removed
+             * @default 0
+             */
+            removed: number;
+            /**
+             * Deactivated
+             * @default 0
+             */
+            deactivated: number;
+            /** Kept With Bookings */
+            kept_with_bookings?: components["schemas"]["KeptDepartureResult"][];
+            /** Removed Vehicle Impacts */
+            removed_vehicle_impacts?: components["schemas"]["RouteVehicleRemovalPreview"][];
+        };
+        /**
          * RouteVehicleTypesResult
          * @description All configured vehicle types for one route.
          */
@@ -11193,6 +11501,8 @@ export interface components {
             route_id: string;
             /** Vehicle Types */
             vehicle_types: components["schemas"]["RouteVehicleTypeResult"][];
+            /** Added Vehicle Links */
+            added_vehicle_links?: components["schemas"]["MissingVehicleLinksCompany"][];
         };
         /**
          * RouteVehicleTypesUpdate
@@ -11201,6 +11511,16 @@ export interface components {
         RouteVehicleTypesUpdate: {
             /** Vehicle Types */
             vehicle_types: components["schemas"]["RouteVehicleTypeWrite"][];
+            /**
+             * Link Missing Cars
+             * @default false
+             */
+            link_missing_cars: boolean;
+            /**
+             * Confirm Removals
+             * @default false
+             */
+            confirm_removals: boolean;
         };
         /**
          * RunPassenger
@@ -11462,6 +11782,8 @@ export interface components {
             seats_remaining: number;
             /** Is Active */
             is_active: boolean;
+            /** Is In Schedule */
+            is_in_schedule: boolean;
             /**
              * Created At
              * Format: date-time
@@ -11543,6 +11865,8 @@ export interface components {
             seats_remaining: number;
             /** Is Active */
             is_active: boolean;
+            /** Is In Schedule */
+            is_in_schedule: boolean;
             /**
              * Created At
              * Format: date-time
@@ -11687,6 +12011,11 @@ export interface components {
              * @description Total items matching the query, ignoring pagination.
              */
             total: number;
+            /**
+             * Pages
+             * @description Total pages matching the query at this page size.
+             */
+            pages: number;
             /** Everything Is In Area */
             everything_is_in_area: boolean;
             /** Message */
@@ -11977,6 +12306,8 @@ export interface components {
             pickup_date: string;
             /** Pickup Time */
             pickup_time: string | null;
+            /** Requested Pickup Time */
+            requested_pickup_time: string | null;
             /** Dropoff Time */
             dropoff_time: string | null;
             /** Pax Senior */
@@ -12942,6 +13273,29 @@ export interface components {
             pickup_time: string | null;
         };
         /**
+         * VehicleCompanyUsage
+         * @description Display-ready shuttle usage for one linked company.
+         */
+        VehicleCompanyUsage: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Business Name */
+            business_name: string;
+            /** Routes */
+            routes: components["schemas"]["VehicleRouteUsage"][];
+            /** Routes Count */
+            routes_count: number;
+            /** Weekly Times */
+            weekly_times: number;
+            /** Future Departures */
+            future_departures: number;
+            /** With Bookings Or Holds */
+            with_bookings_or_holds: number;
+        };
+        /**
          * VehicleCreate
          * @description A physical vehicle belonging to the selected business.
          */
@@ -13033,6 +13387,38 @@ export interface components {
              * @default true
              */
             deleted: boolean;
+        };
+        /**
+         * VehicleKeptDeparture
+         * @description A protected departure retained while its car is removed from sale.
+         */
+        VehicleKeptDeparture: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Business Name */
+            business_name: string;
+            /**
+             * Route Id
+             * Format: uuid
+             */
+            route_id: string;
+            /** Route Label */
+            route_label: string;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /**
+             * Time
+             * Format: time
+             */
+            time: string;
+            /** Bookings Count */
+            bookings_count: number;
         };
         /**
          * VehicleRateAssignment
@@ -13153,6 +13539,59 @@ export interface components {
             updated_at: string;
         };
         /**
+         * VehicleRouteUsage
+         * @description One route on which a company can currently see the car.
+         */
+        VehicleRouteUsage: {
+            /**
+             * Route Id
+             * Format: uuid
+             */
+            route_id: string;
+            /** Route Label */
+            route_label: string;
+            /** Is Owner */
+            is_owner: boolean;
+        };
+        /**
+         * VehicleTypeAssignmentsResult
+         * @description Rate-link replacement plus confirmed shuttle cleanup.
+         */
+        VehicleTypeAssignmentsResult: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Photo Url */
+            photo_url: string | null;
+            /** Passenger Capacity */
+            passenger_capacity: number;
+            /** Luggage Capacity */
+            luggage_capacity: number;
+            /** Sort Order */
+            sort_order: number;
+            /** Is Active */
+            is_active: boolean;
+            /** Assignments */
+            assignments: components["schemas"]["VehicleRateResult"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            unlink_impact?: components["schemas"]["VehicleUnlinkPreview"] | null;
+            /** Kept With Bookings */
+            kept_with_bookings?: components["schemas"]["VehicleKeptDeparture"][];
+        };
+        /**
          * VehicleTypeAssignmentsUpdate
          * @description Complete rate-assignment set for the caller's resolved business scope.
          */
@@ -13230,6 +13669,9 @@ export interface components {
             updated_at: string;
             /** Affected Available Business Ids */
             affected_available_business_ids: string[];
+            unlink_impact?: components["schemas"]["VehicleUnlinkPreview"] | null;
+            /** Kept With Bookings */
+            kept_with_bookings?: components["schemas"]["VehicleKeptDeparture"][];
         };
         /**
          * VehicleTypeDuplicate
@@ -13323,6 +13765,21 @@ export interface components {
             sort_order?: number | null;
             /** Is Active */
             is_active?: boolean | null;
+        };
+        /**
+         * VehicleUnlinkPreview
+         * @description No-write impact of unlinking or globally deactivating one car.
+         */
+        VehicleUnlinkPreview: {
+            /**
+             * Vehicle Type Id
+             * Format: uuid
+             */
+            vehicle_type_id: string;
+            /** Vehicle Type Name */
+            vehicle_type_name: string;
+            /** Companies */
+            companies: components["schemas"]["VehicleCompanyUsage"][];
         };
         /**
          * VehicleUpdate
@@ -19013,6 +19470,41 @@ export interface operations {
             };
         };
     };
+    hard_delete_reservation_v1_admin_reservations__booking_id__hard_delete: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_BookingDeleteResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_schedules_v1_admin_schedules_get: {
         parameters: {
             query?: {
@@ -19990,7 +20482,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_RouteVehicleTypesResult_"];
+                    "application/json": components["schemas"]["Envelope_RouteVehicleTypesMutationResult_"];
                 };
             };
             /** @description Validation Error */
@@ -20094,6 +20586,46 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["DepartureTemplatesUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_DepartureTemplateMutationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_route_departure_template_active_v1_admin_routes__route_id__departure_templates__template_id__patch: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                route_id: string;
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DepartureTemplateActivation"];
             };
         };
         responses: {
@@ -20981,7 +21513,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_EntityDeleteResult_"];
+                    "application/json": components["schemas"]["Envelope_RouteDeleteResult_"];
                 };
             };
             /** @description Validation Error */
@@ -21160,7 +21692,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_EntityUsage_"];
+                    "application/json": components["schemas"]["Envelope_RouteUsage_"];
                 };
             };
             /** @description Validation Error */
@@ -21921,6 +22453,7 @@ export interface operations {
     deactivate_vehicle_type_v1_admin_vehicle_types__vehicle_type_id__deactivate_post: {
         parameters: {
             query?: {
+                confirm?: boolean;
                 business_id?: string | null;
             };
             header?: {
@@ -22026,6 +22559,7 @@ export interface operations {
     set_vehicle_type_businesses_v1_admin_vehicle_types__vehicle_type_id__businesses_put: {
         parameters: {
             query?: {
+                confirm?: boolean;
                 business_id?: string | null;
             };
             header?: {
@@ -22048,7 +22582,42 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Envelope_VehicleTypeResult_"];
+                    "application/json": components["schemas"]["Envelope_VehicleTypeAssignmentsResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_vehicle_type_shuttle_usage_v1_admin_vehicle_types__vehicle_type_id__shuttle_usage_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                vehicle_type_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_VehicleUnlinkPreview_"];
                 };
             };
             /** @description Validation Error */
