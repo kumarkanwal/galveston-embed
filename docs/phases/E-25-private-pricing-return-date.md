@@ -43,7 +43,7 @@ described below. The backend remains the only pricing authority.
 
 1. Show private shuttle cars as rows on every searched date.
 2. Each private row shows a `Private` tag, vehicle name, capacity, the exact
-   server price, and `Pickup time will be arranged by phone`.
+   server price, with no time input on the departure row.
 3. Private rows have no time field. Choosing a row selects that car for the
    searched date.
 4. Confirm and booking confirmation show `Time: to be arranged` for a private
@@ -89,7 +89,7 @@ described below. The backend remains the only pricing authority.
 1. `docs: E-25 spec`
 2. `chore: refresh API files from backend <hash>`
 3. `feat(widget): return date only when round trip`
-4. `feat(widget): private cars every day, time arranged by phone`
+4. `feat(widget): private cars every day as date-only options`
 5. `feat(widget): passenger-mix prices with trip type`
 6. `feat(widget): per-passenger price lines on confirm and confirmation`
 7. `docs: E-25 progress`
@@ -155,7 +155,7 @@ Then stop.
   values.
 - Shared shuttle service remains fixed-schedule-only. B-51 private cars render
   after fixed rows on every returned date with a Private badge, public vehicle
-  name, capacity, exact server row price, and the arranged-by-phone message.
+  name, capacity, and exact server row price.
   Private return-search, quote, and booking requests send route, vehicle, and
   date identifiers without a time or schedule id.
 - Shuttle search sends `trip_type: one_way | round_trip` with the exact adult,
@@ -190,7 +190,7 @@ Then stop.
 - Playwright Chromium rendered the built widget at 360px and 1024px. It
   verified the persistent two-column Return Date grid, unchanged Departure Date
   geometry, hidden/disabled accessibility state, private rows without time
-  inputs, arranged-by-phone copy, structured Confirm lines, exact server total,
+  inputs, private-service copy, structured Confirm lines, exact server total,
   and no horizontal widget scroll.
 - Bundle: 144,972 bytes raw and 41,054 bytes gzip. SHA-256:
   `ffa20fa9e22650ad8874b5d47bcaa9d74e41fd42f391d5575066b2c78efa0fb8`.

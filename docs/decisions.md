@@ -218,12 +218,18 @@ Consequences: Departures ignores `on_request` and `on_request_options` even when
 
 ## ED-035 — Private shuttle cars are date-only bookings
 Date: 2026-11-03 · Status: superseded by ED-036
-Decision: show private shuttle cars on every date as date-only bookings with no customer-selected time; pickup time is arranged by phone, while shared cars remain fixed scheduled departures only.
+Decision: show private shuttle cars on every date as date-only bookings, while shared cars remain fixed scheduled departures only.
 Why: backend B-51 publishes date-only private options and mix-aware prices without requiring the widget to invent a pickup time.
-Consequences: private rows show the public vehicle, capacity, server price, and arranged-by-phone message. Private quote and booking legs send the selected date without a time or schedule id. Shared rows and requests remain fixed-schedule-only, and generic on-request options remain hidden.
+Consequences: private rows show the public vehicle, capacity, and server price. Private quote and booking legs send the selected date without a time or schedule id. Shared rows and requests remain fixed-schedule-only, and generic on-request options remain hidden.
 
 ## ED-036 — Every shuttle leg has a customer pickup time
-Date: 2026-11-15 · Status: accepted (supersedes ED-034/ED-035 pickup-time consequences)
+Date: 2026-11-15 · Status: superseded by ED-037
 Decision: collect one required customer pickup time per shuttle leg in Step 3 while keeping Step 2 shared departure times as service times.
 Why: backend B-64 requires `requested_pickup_time` on every public shuttle quote and booking leg, for shared and private service. The selected shared schedule still describes when the service runs, not the customer's pickup time.
-Consequences: Step 2 explains the distinction; Step 3 accepts only 15-minute times, requests the quote after those values exist, sends them unchanged per leg, and displays them in the summary and confirmation. Taxi behavior and shuttle departure selection remain unchanged.
+Consequences: superseded by ED-037 after B-65 made the field optional for quote requests.
+
+## ED-037 — Shuttle pickup times belong on Confirm
+Date: 2026-11-16 · Status: accepted (supersedes ED-036)
+Decision: collect each required customer pickup time directly below Email in the Confirm step, not on a separate screen.
+Why: B-65 permits the quote to load without pickup times, while booking still requires one 15-minute time per shuttle leg.
+Consequences: Departures goes directly to Confirm and triggers the quote without `requested_pickup_time`. Confirm shows one input per leg, updates the summary live with an em dash until entered, maps booking field errors to those inputs, and sends the values unchanged on booking. Taxi behavior and shuttle departure selection remain unchanged.

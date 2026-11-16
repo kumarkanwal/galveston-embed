@@ -23,7 +23,7 @@ Render each shuttle search row as a card.
 - Left: a rounded car image, approximately 120 × 80 px on desktop and 90 × 60 px on mobile, with `object-fit: cover`. When `image_url` is null, show a neutral placeholder car icon. Use the vehicle name as image alt text and lazy-load the image.
 - Middle:
   - Shared: show the departure time in large bold text, followed by a clock icon and `60 min`, a Shared badge, and `Vehicle: <name>`.
-  - Private: show the vehicle name in bold, a clock icon and `60 min`, a Private badge, and `Pickup time will be arranged by phone`.
+  - Private: show the vehicle name in bold, a clock icon and `60 min`, and a Private badge.
 - Seats column on desktop, after a thin vertical divider:
   - Shared: seat icon and `6 seats left`.
   - Private: person icon and `Up to 6 passengers`.
