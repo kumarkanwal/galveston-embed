@@ -24,7 +24,7 @@ function clientWith(departures = [DEPARTURE]) {
       schedule_id: `aaaaaaaa-aaaa-aaaa-aaaa-${suffix === "first" ? "aaaaaaaaaaaa" : "bbbbbbbbbbbb"}`,
       service_label: `Return for ${suffix}` }] };
   });
-  const client = {
+  const client: ShuttleApiClient = {
     getBusiness: vi.fn(async () => SHUTTLE_BUSINESS), getServiceTypes: vi.fn(async () => []),
     getAirports: vi.fn(async () => []), getAirlines: vi.fn(async () => []), quote: vi.fn(),
     priceBreakdown: vi.fn(), book: vi.fn(),
@@ -33,7 +33,7 @@ function clientWith(departures = [DEPARTURE]) {
     searchShuttle: vi.fn(async () => ({ ...SEARCH_RESULT, departures })),
     searchShuttleReturn, quoteShuttle: vi.fn(async () => SHUTTLE_QUOTE),
     bookShuttle: vi.fn(async () => SHUTTLE_BOOKED),
-  } satisfies ShuttleApiClient;
+  };
   return { client, searchShuttleReturn };
 }
 
@@ -82,6 +82,31 @@ function mount(client: ShuttleApiClient) {
   document.body.append(root);
   render(<ShuttleFlow business={SHUTTLE_BUSINESS} client={client} mapsKey="maps-key" />, root);
   return root;
+}
+
+function enterPickup(root: HTMLElement, id: string, value: string) {
+  change(root.querySelector<HTMLInputElement>(`#${id}`)!, value);
+}
+
+function submitPickup(root: HTMLElement) {
+  act(() => {
+    root.querySelector<HTMLFormElement>(".shuttle-pickup-form")
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+  });
+}
+
+async function openOneWayPickup(root: HTMLElement) {
+  await fillTrip(root, false);
+  act(() => root.querySelector<HTMLButtonElement>(".departure-section.outbound button")?.click());
+  act(() => root.querySelector<HTMLButtonElement>(".departure-continue")?.click());
+}
+
+function fillConfirmContact(root: HTMLElement) {
+  change(root.querySelector<HTMLInputElement>("#firstName")!, "Ada");
+  change(root.querySelector<HTMLInputElement>("#lastName")!, "Lovelace");
+  change(root.querySelector<HTMLInputElement>("#email")!, "ada@example.com");
+  act(() => root.querySelector<HTMLInputElement>(
+    '[data-confirm-field="acceptedTerms"]')?.click());
 }
 
 const scrollIntoView = vi.fn();
@@ -159,10 +184,24 @@ describe("departure Continue flow", () => {
     await vi.waitFor(() => expect(root.querySelector(".departure-continue")).not.toBeNull());
     expect(client.quoteShuttle).not.toHaveBeenCalled();
     act(() => root.querySelector<HTMLButtonElement>(".departure-continue")?.click());
+    await vi.waitFor(() => expect(root.querySelector("#outbound-pickup-time")).not.toBeNull());
+    expect(root.querySelector<HTMLInputElement>("#outbound-pickup-time")?.step).toBe("900");
+    expect(root.textContent).toContain("We'll call you to confirm your pickup time.");
+    submitPickup(root);
+    expect(root.textContent).toContain("Enter a pickup time.");
+    expect(client.quoteShuttle).not.toHaveBeenCalled();
+    enterPickup(root, "outbound-pickup-time", "10:30");
+    submitPickup(root);
     await vi.waitFor(() => expect(client.quoteShuttle).toHaveBeenCalledOnce());
     await vi.waitFor(() => expect(root.textContent).toContain("Trip Summary"));
+    expect(root.textContent).toContain("Pickup time: 10:30 AM");
+    expect(client.quoteShuttle).toHaveBeenCalledWith(expect.objectContaining({
+      legs: [expect.objectContaining({ requested_pickup_time: "10:30" })],
+    }));
   });
+});
 
+describe("round-trip pickup times", () => {
   it("shows Continue after both round-trip legs and advances on click", async () => {
     const { client } = clientWith();
     const root = mount(client);
@@ -173,8 +212,90 @@ describe("departure Continue flow", () => {
     await vi.waitFor(() => expect(root.querySelector(".departure-continue")).not.toBeNull());
     expect(client.quoteShuttle).not.toHaveBeenCalled();
     act(() => root.querySelector<HTMLButtonElement>(".departure-continue")?.click());
+    await vi.waitFor(() => expect(root.querySelectorAll('input[type="time"]')).toHaveLength(2));
+    submitPickup(root);
+    expect(root.querySelector("#outbound-pickup-time-error")?.textContent)
+      .toBe("Enter a pickup time.");
+    expect(root.querySelector("#return-pickup-time-error")?.textContent)
+      .toBe("Enter a pickup time.");
+    enterPickup(root, "outbound-pickup-time", "10:30");
+    enterPickup(root, "return-pickup-time", "14:45");
+    submitPickup(root);
     await vi.waitFor(() => expect(client.quoteShuttle).toHaveBeenCalledOnce());
     await vi.waitFor(() => expect(root.textContent).toContain("Trip Summary"));
+    expect(client.quoteShuttle).toHaveBeenCalledWith(expect.objectContaining({
+      legs: [
+        expect.objectContaining({ requested_pickup_time: "10:30" }),
+        expect.objectContaining({ requested_pickup_time: "14:45" }),
+      ],
+    }));
+  });
+});
+
+describe("pickup time quote errors", () => {
+  it("shows a quote 422 pickup-time error under the matching leg", async () => {
+    const { client } = clientWith();
+    client.quoteShuttle = vi.fn(async () => {
+      throw new ApiError(422, { code: "INVALID_PICKUP_TIME",
+        field: "legs.0.requested_pickup_time", message: "Choose another pickup time." });
+    });
+    const root = mount(client);
+    await fillTrip(root, false);
+    act(() => root.querySelector<HTMLButtonElement>(".departure-section.outbound button")?.click());
+    act(() => root.querySelector<HTMLButtonElement>(".departure-continue")?.click());
+    enterPickup(root, "outbound-pickup-time", "10:10");
+    submitPickup(root);
+    expect(root.textContent).toContain("Choose a pickup time in 15-minute steps.");
+    expect(client.quoteShuttle).not.toHaveBeenCalled();
+    enterPickup(root, "outbound-pickup-time", "10:30");
+    submitPickup(root);
+    await vi.waitFor(() => expect(root.querySelector("#outbound-pickup-time-error")?.textContent)
+      .toBe("Choose another pickup time."));
+    expect(client.quoteShuttle).toHaveBeenCalledOnce();
+  });
+});
+
+describe("pickup time booking", () => {
+  it("sends the selected time and shows it on the success screen", async () => {
+    const { client } = clientWith();
+    client.searchShuttle = vi.fn(async () => ({ ...SEARCH_RESULT, route: {
+      ...SEARCH_RESULT.route, from_requires_address: false, to_requires_address: false,
+    } }));
+    const root = mount(client);
+    await openOneWayPickup(root);
+    enterPickup(root, "outbound-pickup-time", "10:30");
+    submitPickup(root);
+    await vi.waitFor(() => expect(root.textContent).toContain("Trip Summary"));
+    fillConfirmContact(root);
+    act(() => root.querySelector<HTMLButtonElement>(".create-trip")?.click());
+    await vi.waitFor(() => expect(client.bookShuttle).toHaveBeenCalledOnce());
+    expect(client.bookShuttle).toHaveBeenCalledWith(expect.objectContaining({
+      legs: [expect.objectContaining({ requested_pickup_time: "10:30" })],
+    }), expect.any(String));
+    await vi.waitFor(() => expect(root.textContent).toContain("Confirmation"));
+    expect(root.textContent).toContain("Pickup time: 10:30 AM");
+  });
+});
+
+describe("pickup time booking errors", () => {
+  it("returns a booking 422 pickup-time error to the Step 3 field", async () => {
+    const { client } = clientWith();
+    client.searchShuttle = vi.fn(async () => ({ ...SEARCH_RESULT, route: {
+      ...SEARCH_RESULT.route, from_requires_address: false, to_requires_address: false,
+    } }));
+    client.bookShuttle = vi.fn(async () => {
+      throw new ApiError(422, { code: "INVALID_PICKUP_TIME",
+        field: "legs.0.requested_pickup_time", message: "Pickup time is unavailable." });
+    });
+    const root = mount(client);
+    await openOneWayPickup(root);
+    enterPickup(root, "outbound-pickup-time", "10:30");
+    submitPickup(root);
+    await vi.waitFor(() => expect(root.textContent).toContain("Trip Summary"));
+    fillConfirmContact(root);
+    act(() => root.querySelector<HTMLButtonElement>(".create-trip")?.click());
+    await vi.waitFor(() => expect(root.querySelector("#outbound-pickup-time-error")?.textContent)
+      .toBe("Pickup time is unavailable."));
   });
 });
 
@@ -189,6 +310,8 @@ describe("stale shuttle availability", () => {
     act(() => root.querySelector<HTMLButtonElement>(".departure-section.outbound button")?.click());
     await vi.waitFor(() => expect(root.querySelector(".departure-continue")).not.toBeNull());
     act(() => root.querySelector<HTMLButtonElement>(".departure-continue")?.click());
+    enterPickup(root, "outbound-pickup-time", "10:30");
+    submitPickup(root);
     await vi.waitFor(() => expect(client.searchShuttle).toHaveBeenCalledTimes(2));
     await vi.waitFor(() => expect(root.textContent).toContain(SHUTTLE_UNAVAILABLE_MESSAGE));
     expect(root.textContent).toContain("Choose Departure");
@@ -226,9 +349,11 @@ describe("shuttle minimum handling", () => {
     act(() => root.querySelector<HTMLButtonElement>(".departure-section.outbound button")?.click());
     await vi.waitFor(() => expect(root.querySelector(".departure-continue")).not.toBeNull());
     act(() => root.querySelector<HTMLButtonElement>(".departure-continue")?.click());
+    enterPickup(root, "outbound-pickup-time", "10:30");
+    submitPickup(root);
     await vi.waitFor(() => expect(root.textContent)
       .toContain("At least 3 passengers are required for this trip."));
-    expect(root.textContent).toContain("Choose Departure");
+    expect(root.querySelector("#outbound-pickup-time")).not.toBeNull();
     expect(client.quoteShuttle).toHaveBeenCalledOnce();
   });
 

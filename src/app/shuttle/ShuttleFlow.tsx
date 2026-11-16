@@ -1,12 +1,23 @@
-import type { Business, ShuttleApiClient } from "../../api/client";
+import type {
+  Business,
+  PaymentMethod,
+  ShuttleApiClient,
+  ShuttleBookingResponse,
+} from "../../api/client";
 import { businessDateTimeParts } from "../../time";
 import { Confirmation } from "../booking/Confirmation";
 import { ShuttleConfirm } from "./ShuttleConfirm";
 import { ShuttleDepartures } from "./Departures";
+import { ShuttlePickupTimeForm } from "./ShuttlePickupTimeForm";
 import { ShuttleTrip } from "./Trip";
 import { useShuttleFlow } from "./use-shuttle-flow";
 import { passengerTotal } from "./minimum";
-import type { SelectedShuttleLeg, ShuttleSelection } from "./types";
+import { formatPickupTime } from "./pickup-time";
+import type {
+  SelectedShuttleLeg,
+  ShuttlePickupTimes,
+  ShuttleSelection,
+} from "./types";
 
 interface ShuttleFlowProps {
   business: Business;
@@ -14,37 +25,64 @@ interface ShuttleFlowProps {
   mapsKey: string;
 }
 
-function confirmationLegLine(label: string, leg: SelectedShuttleLeg): string {
-  if (leg.kind === "private") return `${label}: ${leg.date} · Time: to be arranged`;
+function confirmationLegLine(
+  label: string,
+  leg: SelectedShuttleLeg,
+  pickupTime: string,
+): string {
+  const pickup = ` · Pickup time: ${formatPickupTime(pickupTime)}`;
+  if (leg.kind === "private") return `${label}: ${leg.date} · Time: to be arranged${pickup}`;
   const end = leg.departure.end_time == null ? "" : ` – ${leg.departure.end_time}`;
-  return `${label}: ${leg.date} at ${leg.departure.start_time}${end}`;
+  return `${label}: ${leg.date} at ${leg.departure.start_time}${end}${pickup}`;
 }
 
-function confirmationJourneyLines(selection: ShuttleSelection | null): string[] | undefined {
+function confirmationJourneyLines(
+  selection: ShuttleSelection | null,
+  pickupTimes: ShuttlePickupTimes,
+): string[] | undefined {
   if (selection === null) return undefined;
-  return [confirmationLegLine("Outbound", selection.outbound),
-    ...(selection.returnLeg === null ? [] : [confirmationLegLine("Return", selection.returnLeg)])];
+  return [confirmationLegLine("Outbound", selection.outbound, pickupTimes.outbound),
+    ...(selection.returnLeg === null ? []
+      : [confirmationLegLine("Return", selection.returnLeg, pickupTimes.return)])];
+}
+
+function ShuttleConfirmation(props: {
+  business: Business;
+  customerEmail: string;
+  paymentMethod: PaymentMethod;
+  pickupTimes: ShuttlePickupTimes;
+  response: ShuttleBookingResponse;
+  selection: ShuttleSelection | null;
+}) {
+  return <Confirmation currency={props.business.currency} requestQuote={false}
+    businessName={props.business.name} logoUrl={props.business.logo_url}
+    customerEmail={props.customerEmail} emailsEnabled={props.business.emails_enabled}
+    paymentMethod={props.paymentMethod}
+    journeyLines={confirmationJourneyLines(props.selection, props.pickupTimes)}
+    response={props.response} steps={["Trip", "Departures", "Confirm"]} />;
 }
 
 export function ShuttleFlow(props: ShuttleFlowProps) {
   const flow = useShuttleFlow(props.client, props.business);
-  const state = flow.state;
-  const minimumDate = businessDateTimeParts(new Date(), props.business.timezone).date;
+  const state = flow.state,
+    minimumDate = businessDateTimeParts(new Date(), props.business.timezone).date;
   if (state.step === "done" && state.confirmation !== null) {
-    const journeyLines = confirmationJourneyLines(flow.selection);
-    return <Confirmation currency={props.business.currency} requestQuote={false}
-      businessName={props.business.name} logoUrl={props.business.logo_url}
-      customerEmail={state.confirmation.customerEmail}
-      emailsEnabled={props.business.emails_enabled}
-      paymentMethod={state.confirmation.paymentMethod}
-      journeyLines={journeyLines}
-      response={state.confirmation.response} steps={["Trip", "Departures", "Confirm"]} />;
+    return <ShuttleConfirmation business={props.business} selection={flow.selection}
+      {...state.confirmation} />;
   }
   if (state.step === "confirm" && state.quote !== null && flow.selection !== null) {
     return <ShuttleConfirm business={props.business} client={props.client}
       mapsKey={props.mapsKey}
-      quote={state.quote} selection={flow.selection} onBack={flow.back}
-      onBooked={flow.complete} onUnavailable={(message) => { void flow.unavailable(message); }} />;
+      pickupTimes={state.pickupTimes} quote={state.quote} selection={flow.selection}
+      onBack={flow.back} onBooked={flow.complete}
+      onPickupTimeError={flow.showPickupTimeError}
+      onUnavailable={(message) => { void flow.unavailable(message); }} />;
+  }
+  if (state.step === "confirm" && flow.selection !== null) {
+    return <ShuttlePickupTimeForm business={props.business} busy={state.submitting}
+      errors={state.pickupErrors} formError={state.notice} selection={flow.selection}
+      values={state.pickupTimes} onBack={flow.back} onChange={flow.updatePickupTime}
+      onSubmit={(event) => { void flow.quotePickupTimes(event); }} />;
   }
   if (state.step === "outbound") {
     return <ShuttleDepartures businessName={props.business.name}
@@ -69,10 +107,8 @@ export function ShuttleFlow(props: ShuttleFlowProps) {
     destinationGroups={state.destinationGroups} errors={state.errors}
     form={state.form} formError={state.formError} loadingDestinations={state.loadingDestinations}
     loadingLocations={state.loadingLocations} logoUrl={props.business.logo_url}
-    maximumBags={flow.maximumBags}
-    minimumDate={minimumDate}
-    originGroups={state.originGroups}
-    submitting={state.submitting}
+    maximumBags={flow.maximumBags} minimumDate={minimumDate}
+    originGroups={state.originGroups} submitting={state.submitting}
     onSubmit={(event) => { void flow.submitTrip(event); }}
     update={(key, value) => { void flow.update(key, value); }} />;
 }

@@ -47,8 +47,9 @@ function clientWith(
 
 function view(client: ShuttleApiClient, selection: ShuttleSelection = REQUIRED_SELECTION) {
   return <ShuttleConfirm business={SHUTTLE_BUSINESS} client={client} mapsKey="maps-key"
-    quote={SHUTTLE_QUOTE} selection={selection} onBack={() => undefined}
-    onBooked={() => undefined} onUnavailable={() => undefined} />;
+    pickupTimes={{ outbound: "10:30", return: "" }} quote={SHUTTLE_QUOTE}
+    selection={selection} onBack={() => undefined} onBooked={() => undefined}
+    onPickupTimeError={() => undefined} onUnavailable={() => undefined} />;
 }
 
 function mount(client: ShuttleApiClient, selection: ShuttleSelection = REQUIRED_SELECTION) {

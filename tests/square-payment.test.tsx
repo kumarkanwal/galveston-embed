@@ -219,7 +219,8 @@ describe("shuttle card booking and confirmation", () => {
       payments: CARD_BUSINESS.payments } satisfies Business;
     const root = addRoot(); const onBooked = vi.fn();
     render(<ShuttleConfirm business={business} client={client} mapsKey="maps-key" quote={SHUTTLE_QUOTE}
-      selection={SELECTION} onBack={vi.fn()} onBooked={onBooked} onUnavailable={vi.fn()} />, root);
+      pickupTimes={{ outbound: "10:30", return: "" }} selection={SELECTION} onBack={vi.fn()}
+      onBooked={onBooked} onPickupTimeError={vi.fn()} onUnavailable={vi.fn()} />, root);
     chooseCard(root); await vi.waitFor(() => expect(card.attach).toHaveBeenCalledOnce());
     fillContact(root);
     act(() => root.querySelector<HTMLButtonElement>(".create-trip")?.click());
@@ -228,7 +229,9 @@ describe("shuttle card booking and confirmation", () => {
       .toEqual({ method: "online", payment_method_token: "shuttle-token" });
     expect(onBooked).toHaveBeenCalledWith(SHUTTLE_BOOKED, "online", "ada@example.com");
   });
+});
 
+describe("shuttle card confirmation", () => {
   it("replaces provider decline details with a stable customer-safe message", () => {
     const failure = bookingFailure(new ApiError(402, {
       code: "PAYMENT_FAILED", message: "provider-detail-that-must-not-render",

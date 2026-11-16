@@ -39,6 +39,7 @@ const CONTACT = {
   acceptedTerms: true, comments: "Dock 2", email: "ada@example.com",
   firstName: " Ada ", lastName: " Lovelace ", phone: " 555-0100 ",
 };
+const PICKUP_TIMES = { outbound: "10:30", return: "14:45" };
 
 describe("shuttle request builders", () => {
   it("builds the documented outbound search query", () => {
@@ -80,20 +81,22 @@ describe("private return-search request builder", () => {
 });
 
 describe("shuttle quote request builder", () => {
-  it("builds scheduled-only quote legs without customer pickup times", () => {
+  it("sends a separate customer pickup time for every scheduled leg", () => {
     const selection = { ...BASE_SELECTION, returnLeg: SCHEDULED };
-    expect(buildShuttleQuote(selection, "SAVE10")).toEqual({
+    expect(buildShuttleQuote(selection, PICKUP_TIMES, "SAVE10")).toEqual({
       legs: [{
         departure_type: "scheduled", schedule_id: DEPARTURE.schedule_id,
+        requested_pickup_time: "10:30",
         pax_adult: 2, pax_senior: 1, pax_child: 0,
       }, {
         departure_type: "scheduled", schedule_id: DEPARTURE.schedule_id,
+        requested_pickup_time: "14:45",
         pax_adult: 2, pax_senior: 1, pax_child: 0,
       }],
       large_bags: 2, small_bags: 1,
       insurance_selected: false, payment_method: "cash", promo_code: "SAVE10",
     });
-    for (const leg of buildShuttleQuote(selection, null).legs) {
+    for (const leg of buildShuttleQuote(selection, PICKUP_TIMES, null).legs) {
       expect(leg.departure_type).toBe("scheduled");
       expect(leg).not.toHaveProperty("pickup_time");
       expect(leg).not.toHaveProperty("vehicle_type_id");
@@ -103,10 +106,15 @@ describe("shuttle quote request builder", () => {
   });
 
   it("builds date-only private quote legs without a time or schedule", () => {
-    const quote = buildShuttleQuote({ ...BASE_SELECTION, outbound: PRIVATE }, null);
+    const quote = buildShuttleQuote(
+      { ...BASE_SELECTION, outbound: PRIVATE },
+      PICKUP_TIMES,
+      null,
+    );
     expect(quote.legs).toEqual([{
       departure_type: "private", route_id: PRIVATE_CAR.route_id,
       vehicle_type_id: PRIVATE_CAR.vehicle_type_id, pickup_date: TRIP.date,
+      requested_pickup_time: "10:30",
       pax_adult: 2, pax_senior: 1, pax_child: 0,
     }]);
     expect(quote.legs[0]).not.toHaveProperty("pickup_time");
@@ -119,10 +127,11 @@ describe("shuttle booking request builder", () => {
     const selection = { ...BASE_SELECTION, outbound: PRIVATE };
     const body = buildShuttleBooking(selection, CONTACT, {
       outboundPickup: null, outboundDropoff: null, returnPickup: null, returnDropoff: null,
-    }, null);
+    }, PICKUP_TIMES, null);
     expect(body.legs[0]).toMatchObject({
       departure_type: "private", route_id: PRIVATE_CAR.route_id,
       vehicle_type_id: PRIVATE_CAR.vehicle_type_id, pickup_date: TRIP.date,
+      requested_pickup_time: "10:30",
     });
     expect(body.legs[0]).not.toHaveProperty("pickup_time");
     expect(body.legs[0]).not.toHaveProperty("schedule_id");
@@ -142,7 +151,7 @@ describe("shuttle booking request builder", () => {
         location: { lat: 3, lng: 4 } },
       returnDropoff: { address: " Airport terminal ", zipcode: null,
         location: { lat: 1, lng: 2 } },
-    }, null);
+    }, PICKUP_TIMES, null);
     expect(body).toMatchObject({
       payment: { method: "cash" }, insurance_selected: false,
       large_bags: 2, small_bags: 1,
@@ -150,8 +159,10 @@ describe("shuttle booking request builder", () => {
         email: "ada@example.com", phone: "555-0100" },
       comments: "Dock 2", accepted_terms: true,
       legs: [
-        { pickup_address: "Airport curb", dropoff_address: "Hotel lobby" },
-        { pickup_address: "Hotel side door", dropoff_address: "Airport terminal" },
+        { pickup_address: "Airport curb", dropoff_address: "Hotel lobby",
+          requested_pickup_time: "10:30" },
+        { pickup_address: "Hotel side door", dropoff_address: "Airport terminal",
+          requested_pickup_time: "14:45" },
       ],
     });
     expect(body).not.toHaveProperty("address");
@@ -167,7 +178,7 @@ describe("shuttle cart idempotency", () => {
     const manager = new IdempotencyKeyManager(() => `key-${++next}`, null, fingerprints);
     const body = buildShuttleBooking(BASE_SELECTION, CONTACT, {
       outboundPickup: null, outboundDropoff: null, returnPickup: null, returnDropoff: null,
-    }, null);
+    }, PICKUP_TIMES, null);
     const first = await manager.getKey(body);
     await expect(manager.getKey({ ...body })).resolves.toBe(first);
     await expect(manager.getKey({ ...body, promo_code: "SAVE10" })).resolves.not.toBe(first);

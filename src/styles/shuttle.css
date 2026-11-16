@@ -274,6 +274,46 @@
   justify-content: space-between;
 }
 
+.service-time-note {
+  background: #e9f5fb;
+  border: 1px solid #c3e4f2;
+  border-radius: 6px;
+  color: #245a72;
+  font-size: 13px;
+  margin: 8px 0 14px;
+  padding: 7px 10px;
+}
+
+.shuttle-pickup-form {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 0 auto;
+  max-width: 620px;
+  padding: 16px;
+}
+
+.shuttle-pickup-form h2 {
+  margin-top: 0;
+}
+
+.shuttle-pickup-fields {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.shuttle-pickup-field strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.shuttle-pickup-field .field-note {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 4px 0 0;
+}
+
 .departure-continue {
   background: var(--green);
   border: 1px solid #4cae4c;
@@ -487,6 +527,15 @@
 
 :is(.layout-compact, .layout-narrow, .layout-micro) .shuttle-trip {
   padding: 12px;
+}
+
+:is(.layout-narrow, .layout-micro) .shuttle-pickup-form {
+  padding: 12px;
+}
+
+:is(.layout-narrow, .layout-micro) .shuttle-pickup-fields {
+  gap: 10px;
+  grid-template-columns: 1fr;
 }
 
 .layout-compact .shuttle-departure {

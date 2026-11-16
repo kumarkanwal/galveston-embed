@@ -29,17 +29,23 @@ import {
 } from "./address";
 import { isShuttleAvailabilityError, SHUTTLE_UNAVAILABLE_MESSAGE } from "./availability";
 import { minimumPassengerError } from "./minimum";
+import { pickupTimeError } from "./pickup-time";
 import { buildShuttleBooking, buildShuttleQuote } from "./requests";
 import { ShuttleCharges } from "./ShuttleCharges";
 import { ShuttleAddressFields } from "./ShuttleAddressFields";
 import { ShuttlePaymentMethodField } from "./ShuttlePaymentMethodField";
 import { ShuttleTripSummary } from "./ShuttleTripSummary";
-import type { ShuttleSelection } from "./types";
+import type {
+  ShuttlePickupTimeErrors,
+  ShuttlePickupTimes,
+  ShuttleSelection,
+} from "./types";
 
 interface ShuttleConfirmProps {
   business: Business;
   client: ShuttleApiClient;
   mapsKey: string;
+  pickupTimes: ShuttlePickupTimes;
   quote: ShuttleQuoteResponse;
   selection: ShuttleSelection;
   onBack: () => void;
@@ -49,6 +55,7 @@ interface ShuttleConfirmProps {
     customerEmail: string,
   ) => void;
   onUnavailable: (message: string) => void;
+  onPickupTimeError: (error: ShuttlePickupTimeErrors) => void;
 }
 
 function initialPromo(): PromoCodeState {
@@ -67,13 +74,18 @@ function useShuttlePromo(props: ShuttleConfirmProps, paymentMethod: PaymentMetho
     setQuoteError(null); setBusy(true);
     try {
       const result = await props.client.quoteShuttle(
-        buildShuttleQuote(props.selection, code, paymentMethod),
+        buildShuttleQuote(props.selection, props.pickupTimes, code, paymentMethod),
       );
       if (latestRequest.current !== requestId) return false;
       setQuote(result); return true;
     }
     catch (error: unknown) {
       if (latestRequest.current !== requestId) return false;
+      const pickupError = pickupTimeError(error);
+      if (pickupError !== null) {
+        props.onPickupTimeError(pickupError);
+        return false;
+      }
       const minimum = minimumPassengerError(error);
       if (minimum !== null) setQuoteError(minimum);
       else if (isShuttleAvailabilityError(error)) {
@@ -145,7 +157,8 @@ function useShuttleConfirm(props: ShuttleConfirmProps) {
     if (missing !== undefined) { address.setAddressError(missing); return; }
     inFlight.current = true; setFailure(null); setSubmitting(true);
     const cart = buildShuttleBooking(
-      props.selection, form, address.addresses.values, pricing.promo.appliedCode, paymentMethod,
+      props.selection, form, address.addresses.values, props.pickupTimes,
+      pricing.promo.appliedCode, paymentMethod,
     );
     try {
       const key = await manager.current.getKey(cart);
@@ -154,6 +167,11 @@ function useShuttleConfirm(props: ShuttleConfirmProps) {
         : cart;
       props.onBooked(await props.client.bookShuttle(body, key), paymentMethod, form.email.trim());
     } catch (error: unknown) {
+      const pickupError = pickupTimeError(error);
+      if (pickupError !== null) {
+        props.onPickupTimeError(pickupError);
+        return;
+      }
       if (error instanceof UnauthorizedError) {
         console.error("Galveston booking widget configuration was rejected.");
       }
@@ -177,7 +195,8 @@ export function ShuttleConfirm(props: ShuttleConfirmProps) {
     logoUrl={props.business.logo_url} subtitle="Review and confirm your shuttle trip." />
     <ProgressSteps activeStep={3} steps={["Trip", "Departures", "Confirm"]} />
     <div class="confirm-layout shuttle-confirm-layout"><div>
-      <ShuttleTripSummary quote={view.quote} selection={props.selection} />
+      <ShuttleTripSummary quote={view.quote} selection={props.selection}
+        pickupTimes={props.pickupTimes} />
       <ShuttleCharges quote={view.quote} paymentMethod={view.paymentMethod}
         error={view.methodTotal === undefined && view.quoteError === null
           ? "Pricing is unavailable for this payment method." : view.quoteError} />

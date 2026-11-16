@@ -46,6 +46,13 @@ export interface ShuttleSelection {
   returnLeg: SelectedShuttleLeg | null;
 }
 
+export interface ShuttlePickupTimes {
+  outbound: string;
+  return: string;
+}
+
+export type ShuttlePickupTimeErrors = Partial<Record<keyof ShuttlePickupTimes, string>>;
+
 export interface DepartureViewData {
   result: ShuttleSearchResult;
   date: string;

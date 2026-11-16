@@ -170,10 +170,11 @@ describe("payment request models", () => {
       .toBe("online");
     expect(buildBookingRequest(TRIP, "vehicle-1", 0, CONTACT, null, "online").payment)
       .toEqual({ method: "online" });
-    expect(buildShuttleQuote(SELECTION, null, "online").payment_method).toBe("online");
+    const pickupTimes = { outbound: "10:30", return: "" };
+    expect(buildShuttleQuote(SELECTION, pickupTimes, null, "online").payment_method).toBe("online");
     expect(buildShuttleBooking(SELECTION, CONTACT, {
       outboundPickup: null, outboundDropoff: null, returnPickup: null, returnDropoff: null,
-    }, null, "online").payment)
+    }, pickupTimes, null, "online").payment)
       .toEqual({ method: "online" });
   });
 

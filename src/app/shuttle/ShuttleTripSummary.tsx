@@ -1,12 +1,14 @@
 import type { ShuttleQuoteResponse } from "../../api/client";
 import { formatBusinessLocalDate, formatBusinessLocalDateTime } from "../../time";
 import { ConfirmIcon } from "../confirm/ConfirmIcon";
-import type { SelectedShuttleLeg, ShuttleSelection } from "./types";
+import { formatPickupTime } from "./pickup-time";
+import type { SelectedShuttleLeg, ShuttlePickupTimes, ShuttleSelection } from "./types";
 
 interface SummaryLegProps {
   direction: "Outbound" | "Return";
   leg: SelectedShuttleLeg;
   mode: "shared" | "private";
+  pickupTime: string;
 }
 
 function vehicleName(leg: SelectedShuttleLeg): string {
@@ -31,6 +33,8 @@ function SummaryLeg(props: SummaryLegProps) {
   return <div class="shuttle-summary-leg">
     <p class="shuttle-summary-row"><ConfirmIcon name="calendar" />
       <span><strong>{props.direction}:</strong> {departureText(props.leg)}</span></p>
+    <p class="shuttle-summary-row customer-pickup-time"><ConfirmIcon name="time" />
+      <span><strong>Pickup time:</strong> {formatPickupTime(props.pickupTime)}</span></p>
     <p class="shuttle-summary-row"><ConfirmIcon name="vehicle" />
       <span><strong>{props.direction} vehicle:</strong> {vehicleName(props.leg)}<br />
         <strong>Type:</strong> {modeLabel(props.mode)}</span></p>
@@ -52,6 +56,7 @@ function passengerText(selection: ShuttleSelection): string {
 export function ShuttleTripSummary(props: {
   quote: ShuttleQuoteResponse;
   selection: ShuttleSelection;
+  pickupTimes: ShuttlePickupTimes;
 }) {
   const legs = [props.selection.outbound,
     ...(props.selection.returnLeg === null ? [] : [props.selection.returnLeg])];
@@ -63,7 +68,8 @@ export function ShuttleTripSummary(props: {
           {props.selection.to.name}</h3></div>
       {legs.map((leg, index) => <SummaryLeg key={`${leg.kind}:${leg.date}:${index}`}
         direction={index === 0 ? "Outbound" : "Return"} leg={leg}
-        mode={props.quote.legs[index]?.service_mode ?? (leg.kind === "private" ? "private" : "shared")} />)}
+        mode={props.quote.legs[index]?.service_mode ?? (leg.kind === "private" ? "private" : "shared")}
+        pickupTime={index === 0 ? props.pickupTimes.outbound : props.pickupTimes.return} />)}
       <p class="shuttle-summary-row"><ConfirmIcon name="person" />
         <span><strong>Passengers:</strong> {passengerText(props.selection)}</span></p>
       <p class="shuttle-summary-row"><ConfirmIcon name="luggage" />

@@ -104,8 +104,9 @@ function mount(
   const root = document.createElement("div");
   document.body.append(root);
   render(<ShuttleConfirm business={business} client={client}
-    mapsKey="maps-key" quote={quote} selection={selection} onBack={() => undefined}
-    onBooked={() => undefined} onUnavailable={onUnavailable} />, root);
+    mapsKey="maps-key" pickupTimes={{ outbound: "10:30", return: "14:45" }} quote={quote}
+    selection={selection} onBack={() => undefined} onBooked={() => undefined}
+    onPickupTimeError={() => undefined} onUnavailable={onUnavailable} />, root);
   return { onUnavailable, root };
 }
 
@@ -153,7 +154,9 @@ describe("round-trip shuttle summary", () => {
     expect(root.querySelector(".shuttle-summary")?.textContent)
       .toContain("Bags: 2 check-in · Carry-on: 1");
   });
+});
 
+describe("customer pickup time summary", () => {
   it("shows route, formatted legs, vehicles, passenger mix, and server modes", () => {
     const selection = { ...SELECTION, trip: { ...SELECTION.trip, roundTrip: true },
       returnLeg: { kind: "private" as const, date: PRIVATE_CAR.service_date, car: PRIVATE_CAR,
@@ -166,19 +169,23 @@ describe("round-trip shuttle summary", () => {
     ] };
     const root = document.createElement("div");
     render(<ShuttleConfirm business={SHUTTLE_BUSINESS} client={clientWith()}
-      mapsKey="maps-key" quote={quote} selection={selection} onBack={() => undefined}
-      onBooked={() => undefined} onUnavailable={() => undefined} />, root);
+      mapsKey="maps-key" pickupTimes={{ outbound: "10:30", return: "14:45" }} quote={quote}
+      selection={selection} onBack={() => undefined} onBooked={() => undefined}
+      onPickupTimeError={() => undefined} onUnavailable={() => undefined} />, root);
     const summary = root.querySelector(".shuttle-summary")?.textContent ?? "";
     expect(summary).toContain("Hobby Airport → Cruise Terminal");
     expect(summary).toContain("Outbound: Friday, October 30, 2026 at 9:30 AM");
+    expect(summary).toContain("Pickup time: 10:30 AM");
     expect(summary).toContain("Outbound vehicle: Executive VanType: Shared");
     expect(summary).toContain("Return: Fri, Oct 30 · Time: to be arranged");
     expect(summary).toContain("Return vehicle: Private SUVType: Private");
     expect(summary).toContain("Passengers: 1 adult, 1 senior");
-    expect([...root.querySelectorAll(".shuttle-summary .confirm-icon")]
-      .map((icon) => icon.getAttribute("data-confirm-icon")))
-      .toEqual(["route", "calendar", "vehicle", "calendar", "vehicle", "person", "luggage"]);
-    expect(root.querySelectorAll(".shuttle-summary svg[aria-hidden='true']")).toHaveLength(7);
+    const icons = [...root.querySelectorAll(".shuttle-summary .confirm-icon")]
+      .map((icon) => icon.getAttribute("data-confirm-icon"));
+    expect(icons)
+      .toEqual(["route", "calendar", "time", "vehicle", "calendar", "time", "vehicle",
+        "person", "luggage"]);
+    expect(root.querySelectorAll(".shuttle-summary svg[aria-hidden='true']")).toHaveLength(9);
     expect(summary).not.toMatch(/[▣▰●]/);
   });
 });

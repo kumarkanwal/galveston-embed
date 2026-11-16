@@ -100,6 +100,9 @@ export function ShuttleDepartures(props: ShuttleDeparturesProps) {
     <WidgetHeader businessName={props.businessName} logoUrl={props.logoUrl}
       subtitle="Choose your shuttle departure." />
     <ProgressSteps activeStep={2} steps={["Trip", "Departures", "Confirm"]} />
+    <p class="service-time-note">
+      Service times. Your pickup time is arranged by phone.
+    </p>
     {props.notice !== null && <div class="service-area-note" role="alert">{props.notice}</div>}
     {props.loadingOutbound && <p class="return-loading" role="status">Refreshing departures…</p>}
     {props.outboundData === null && !props.loadingOutbound && <div class="empty-vehicles">
