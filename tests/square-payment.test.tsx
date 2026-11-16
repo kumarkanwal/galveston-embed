@@ -219,8 +219,9 @@ describe("shuttle card booking and confirmation", () => {
       payments: CARD_BUSINESS.payments } satisfies Business;
     const root = addRoot(); const onBooked = vi.fn();
     render(<ShuttleConfirm business={business} client={client} mapsKey="maps-key" quote={SHUTTLE_QUOTE}
-      pickupTimes={{ outbound: "10:30", return: "" }} selection={SELECTION} onBack={vi.fn()}
-      onBooked={onBooked} onPickupTimeError={vi.fn()} onUnavailable={vi.fn()} />, root);
+      pickupErrors={{}} pickupTimes={{ outbound: "10:30", return: "" }} selection={SELECTION}
+      onBack={vi.fn()} onBooked={onBooked} onPickupTimeChange={vi.fn()}
+      onPickupTimeError={vi.fn()} onUnavailable={vi.fn()} />, root);
     chooseCard(root); await vi.waitFor(() => expect(card.attach).toHaveBeenCalledOnce());
     fillContact(root);
     act(() => root.querySelector<HTMLButtonElement>(".create-trip")?.click());

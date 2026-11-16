@@ -104,9 +104,11 @@ function mount(
   const root = document.createElement("div");
   document.body.append(root);
   render(<ShuttleConfirm business={business} client={client}
-    mapsKey="maps-key" pickupTimes={{ outbound: "10:30", return: "14:45" }} quote={quote}
+    mapsKey="maps-key" pickupErrors={{}}
+    pickupTimes={{ outbound: "10:30", return: "14:45" }} quote={quote}
     selection={selection} onBack={() => undefined} onBooked={() => undefined}
-    onPickupTimeError={() => undefined} onUnavailable={onUnavailable} />, root);
+    onPickupTimeChange={() => undefined} onPickupTimeError={() => undefined}
+    onUnavailable={onUnavailable} />, root);
   return { onUnavailable, root };
 }
 
@@ -136,7 +138,7 @@ function adjustmentLabels(root: HTMLElement) {
 beforeEach(() => document.body.replaceChildren());
 
 describe("round-trip shuttle summary", () => {
-  it("shows an arranged time for a date-only private leg", () => {
+  it("shows only the date for a date-only private leg", () => {
     const selection = { ...SELECTION, outbound: {
       kind: "private" as const, date: PRIVATE_CAR.service_date, car: PRIVATE_CAR,
       route: SELECTION.outbound.route,
@@ -146,7 +148,7 @@ describe("round-trip shuttle summary", () => {
       service_mode: "private" as const,
     }] };
     const { root } = mount(clientWith(), vi.fn(), SHUTTLE_BUSINESS, selection, quote);
-    expect(root.textContent).toContain("Outbound: Fri, Oct 30 · Time: to be arranged");
+    expect(root.textContent).toContain("Outbound: Fri, Oct 30");
   });
 
   it("shows the server-returned Bags and Carry-on counts", () => {
@@ -169,15 +171,18 @@ describe("customer pickup time summary", () => {
     ] };
     const root = document.createElement("div");
     render(<ShuttleConfirm business={SHUTTLE_BUSINESS} client={clientWith()}
-      mapsKey="maps-key" pickupTimes={{ outbound: "10:30", return: "14:45" }} quote={quote}
+      mapsKey="maps-key" pickupErrors={{}}
+      pickupTimes={{ outbound: "10:30", return: "14:45" }} quote={quote}
       selection={selection} onBack={() => undefined} onBooked={() => undefined}
-      onPickupTimeError={() => undefined} onUnavailable={() => undefined} />, root);
+      onPickupTimeChange={() => undefined} onPickupTimeError={() => undefined}
+      onUnavailable={() => undefined} />, root);
     const summary = root.querySelector(".shuttle-summary")?.textContent ?? "";
     expect(summary).toContain("Hobby Airport → Cruise Terminal");
     expect(summary).toContain("Outbound: Friday, October 30, 2026 at 9:30 AM");
     expect(summary).toContain("Pickup time: 10:30 AM");
     expect(summary).toContain("Outbound vehicle: Executive VanType: Shared");
-    expect(summary).toContain("Return: Fri, Oct 30 · Time: to be arranged");
+    expect(summary).toContain("Return: Fri, Oct 30");
+    expect(summary).toContain("Return pickup time: 2:45 PM");
     expect(summary).toContain("Return vehicle: Private SUVType: Private");
     expect(summary).toContain("Passengers: 1 adult, 1 senior");
     const icons = [...root.querySelectorAll(".shuttle-summary .confirm-icon")]

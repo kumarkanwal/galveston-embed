@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 describe("shuttle Confirm mobile layout", () => {
   const confirmCss = readFileSync(resolve("src/styles/confirm.css"), "utf8");
   const shuttleCss = readFileSync(resolve("src/styles/shuttle-confirm.css"), "utf8");
+  const shuttleFormCss = readFileSync(resolve("src/styles/shuttle.css"), "utf8");
   const widgetCss = readFileSync(resolve("src/styles/widget.css"), "utf8");
   const mobile = shuttleCss.slice(shuttleCss.indexOf(
     ":is(.layout-narrow, .layout-micro) .shuttle-confirm-layout",
@@ -32,5 +33,14 @@ describe("shuttle Confirm mobile layout", () => {
     expect(confirmCss).toMatch(/\.create-trip\s*\{[^}]*min-height:\s*38px/s);
     expect(mobile).toMatch(/\.cash-discount-banner\s*\{[^}]*grid-template-columns:\s*auto minmax\(0, 1fr\)/s);
     expect(mobile).toMatch(/\.cash-discount-saving\s*\{[^}]*grid-column:\s*1 \/ -1/s);
+  });
+
+  it("places round-trip pickup times side by side and stacks them on mobile", () => {
+    expect(shuttleFormCss).toMatch(
+      /\.shuttle-pickup-fields\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s,
+    );
+    expect(shuttleFormCss).toMatch(
+      /\.layout-micro\) \.shuttle-pickup-fields\s*\{[^}]*grid-template-columns:\s*1fr/s,
+    );
   });
 });

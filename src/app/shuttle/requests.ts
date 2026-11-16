@@ -57,35 +57,37 @@ export function buildReturnQuery(
 export function buildShuttleLeg(
   selected: SelectedShuttleLeg,
   trip: ShuttleTripForm,
-  requestedPickupTime: string,
+  requestedPickupTime: string | null,
 ): ShuttleQuoteLeg {
+  const pickupTime = requestedPickupTime === null || requestedPickupTime === ""
+    ? {} : { requested_pickup_time: requestedPickupTime };
   if (selected.kind === "private") {
     return {
       departure_type: "private",
       route_id: selected.car.route_id,
       vehicle_type_id: selected.car.vehicle_type_id,
       pickup_date: selected.date,
-      requested_pickup_time: requestedPickupTime,
+      ...pickupTime,
       ...passengerCounts(trip),
     };
   }
   return {
     departure_type: "scheduled",
     schedule_id: selected.departure.schedule_id,
-    requested_pickup_time: requestedPickupTime,
+    ...pickupTime,
     ...passengerCounts(trip),
   };
 }
 
 export function buildShuttleQuote(
   selection: ShuttleSelection,
-  pickupTimes: ShuttlePickupTimes,
+  pickupTimes: ShuttlePickupTimes | null,
   promoCode: string | null,
   paymentMethod: PaymentMethod = "cash",
 ): ShuttleQuoteRequest {
-  const legs = [buildShuttleLeg(selection.outbound, selection.trip, pickupTimes.outbound)];
+  const legs = [buildShuttleLeg(selection.outbound, selection.trip, pickupTimes?.outbound ?? null)];
   if (selection.returnLeg !== null) {
-    legs.push(buildShuttleLeg(selection.returnLeg, selection.trip, pickupTimes.return));
+    legs.push(buildShuttleLeg(selection.returnLeg, selection.trip, pickupTimes?.return ?? null));
   }
   return {
     legs,
@@ -108,11 +110,12 @@ export function buildShuttleBooking(
   const quote = buildShuttleQuote(selection, pickupTimes, promoCode, paymentMethod);
   const required = requiredShuttleAddresses(selection);
   const legs: ShuttleBookingLeg[] = quote.legs.map((leg, index) => {
+    const requestedPickupTime = index === 0 ? pickupTimes.outbound : pickupTimes.return;
     const pickupField = index === 0 ? "outboundPickup" : "returnPickup";
     const dropoffField = index === 0 ? "outboundDropoff" : "returnDropoff";
     const pickup = required.includes(pickupField) ? addresses[pickupField] : null;
     const dropoff = required.includes(dropoffField) ? addresses[dropoffField] : null;
-    return { ...leg,
+    return { ...leg, requested_pickup_time: requestedPickupTime,
       pickup_address: pickup?.address.trim() || null,
       dropoff_address: dropoff?.address.trim() || null };
   });

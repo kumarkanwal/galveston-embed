@@ -19,9 +19,7 @@ function vehicleName(leg: SelectedShuttleLeg): string {
 }
 
 function departureText(leg: SelectedShuttleLeg): string {
-  if (leg.kind === "private") {
-    return `${formatBusinessLocalDate(leg.date)} · Time: to be arranged`;
-  }
+  if (leg.kind === "private") return formatBusinessLocalDate(leg.date);
   return formatBusinessLocalDateTime(leg.date, leg.departure.start_time.slice(0, 5));
 }
 
@@ -30,11 +28,12 @@ function modeLabel(mode: SummaryLegProps["mode"]): string {
 }
 
 function SummaryLeg(props: SummaryLegProps) {
+  const pickupLabel = props.direction === "Return" ? "Return pickup time" : "Pickup time";
   return <div class="shuttle-summary-leg">
     <p class="shuttle-summary-row"><ConfirmIcon name="calendar" />
       <span><strong>{props.direction}:</strong> {departureText(props.leg)}</span></p>
     <p class="shuttle-summary-row customer-pickup-time"><ConfirmIcon name="time" />
-      <span><strong>Pickup time:</strong> {formatPickupTime(props.pickupTime)}</span></p>
+      <span><strong>{pickupLabel}:</strong> {formatPickupTime(props.pickupTime)}</span></p>
     <p class="shuttle-summary-row"><ConfirmIcon name="vehicle" />
       <span><strong>{props.direction} vehicle:</strong> {vehicleName(props.leg)}<br />
         <strong>Type:</strong> {modeLabel(props.mode)}</span></p>

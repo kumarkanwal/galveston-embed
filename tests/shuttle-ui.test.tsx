@@ -304,9 +304,7 @@ describe("fixed-only shuttle departures", () => {
       onChooseOutbound={() => undefined}
       onChooseReturn={() => undefined} />, element);
     expect(element.querySelectorAll('input[type="time"]')).toHaveLength(0);
-    expect(element.textContent).toContain(
-      "Service times. Your pickup time is arranged by phone.",
-    );
+    expect(element.querySelector(".service-time-note")).toBeNull();
     expect(element.textContent).toContain("Choose Departure · Wed, Nov 4");
     expect(element.textContent).toContain("Choose Return · Sat, Nov 7");
   });
@@ -322,7 +320,7 @@ describe("date-only private shuttle cars", () => {
     expect(element.textContent).toContain("Private SUV");
     expect(element.textContent).toContain("Private");
     expect(element.textContent).toContain("Up to 5 passengers");
-    expect(element.textContent).not.toContain("Pickup time will be arranged by phone");
+    expect(element.querySelector(".service-time-note")).toBeNull();
     expect(element.textContent).toContain("$165.00 USD");
     expect(element.querySelector('input[type="time"]')).toBeNull();
     act(() => element.querySelector<HTMLButtonElement>(".shuttle-departure.private button")?.click());

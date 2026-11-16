@@ -8,6 +8,7 @@ import { TermsAgreement } from "./TermsAgreement";
 import { useConfirmForm } from "./use-confirm-form";
 
 interface ConfirmFormProps {
+  afterEmailFields?: ComponentChildren;
   breakdownReady: boolean;
   buttonLabel: string;
   failure: BookingFailure | null;
@@ -42,7 +43,8 @@ export function ConfirmForm(props: ConfirmFormProps) {
       <FieldError id="comments-error" message={errors.comments} />
     </div>
     <h2>Personal Info</h2>
-    <CustomerFields blur={state.blur} errors={errors} form={state.form} update={state.update} />
+    <CustomerFields afterEmail={props.afterEmailFields} blur={state.blur} errors={errors}
+      form={state.form} update={state.update} />
     {props.extraFields}
     <TermsAgreement accepted={state.form.acceptedTerms} error={errors.acceptedTerms}
       terms={props.terms} onBlur={() => state.blur("acceptedTerms")}

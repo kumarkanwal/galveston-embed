@@ -8,7 +8,6 @@ import { businessDateTimeParts } from "../../time";
 import { Confirmation } from "../booking/Confirmation";
 import { ShuttleConfirm } from "./ShuttleConfirm";
 import { ShuttleDepartures } from "./Departures";
-import { ShuttlePickupTimeForm } from "./ShuttlePickupTimeForm";
 import { ShuttleTrip } from "./Trip";
 import { useShuttleFlow } from "./use-shuttle-flow";
 import { passengerTotal } from "./minimum";
@@ -30,8 +29,9 @@ function confirmationLegLine(
   leg: SelectedShuttleLeg,
   pickupTime: string,
 ): string {
-  const pickup = ` · Pickup time: ${formatPickupTime(pickupTime)}`;
-  if (leg.kind === "private") return `${label}: ${leg.date} · Time: to be arranged${pickup}`;
+  const pickupLabel = label === "Return" ? "Return pickup time" : "Pickup time";
+  const pickup = ` · ${pickupLabel}: ${formatPickupTime(pickupTime)}`;
+  if (leg.kind === "private") return `${label}: ${leg.date}${pickup}`;
   const end = leg.departure.end_time == null ? "" : ` – ${leg.departure.end_time}`;
   return `${label}: ${leg.date} at ${leg.departure.start_time}${end}${pickup}`;
 }
@@ -73,16 +73,12 @@ export function ShuttleFlow(props: ShuttleFlowProps) {
   if (state.step === "confirm" && state.quote !== null && flow.selection !== null) {
     return <ShuttleConfirm business={props.business} client={props.client}
       mapsKey={props.mapsKey}
-      pickupTimes={state.pickupTimes} quote={state.quote} selection={flow.selection}
+      pickupErrors={state.pickupErrors} pickupTimes={state.pickupTimes}
+      quote={state.quote} selection={flow.selection}
       onBack={flow.back} onBooked={flow.complete}
       onPickupTimeError={flow.showPickupTimeError}
+      onPickupTimeChange={flow.updatePickupTime}
       onUnavailable={(message) => { void flow.unavailable(message); }} />;
-  }
-  if (state.step === "confirm" && flow.selection !== null) {
-    return <ShuttlePickupTimeForm business={props.business} busy={state.submitting}
-      errors={state.pickupErrors} formError={state.notice} selection={flow.selection}
-      values={state.pickupTimes} onBack={flow.back} onChange={flow.updatePickupTime}
-      onSubmit={(event) => { void flow.quotePickupTimes(event); }} />;
   }
   if (state.step === "outbound") {
     return <ShuttleDepartures businessName={props.business.name}
