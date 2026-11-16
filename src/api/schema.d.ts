@@ -10057,7 +10057,7 @@ export interface components {
         PricingType: "distance" | "hourly" | "flat";
         /**
          * PrivateCarAvailability
-         * @description A date-only private car whose pickup time is arranged by phone.
+         * @description A date-only private-car option returned by shuttle search.
          */
         PrivateCarAvailability: {
             /**
@@ -10445,11 +10445,8 @@ export interface components {
             pickup_date?: string | null;
             /** Pickup Time */
             pickup_time?: string | null;
-            /**
-             * Requested Pickup Time
-             * Format: time
-             */
-            requested_pickup_time: string;
+            /** Requested Pickup Time */
+            requested_pickup_time?: string | null;
             /**
              * Pax Senior
              * @default 0
