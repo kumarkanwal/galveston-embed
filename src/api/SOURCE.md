@@ -4,11 +4,11 @@
 | Field | Value |
 |---|---|
 | Copied from | `galveston-backend/openapi.json` |
-| Backend commit | `04cbfec` |
-| Copied on | `2026-11-15` |
+| Backend commit | `ad215f1` |
+| Copied on | `2026-11-16` |
 
 Refresh only after a complete backend change is committed and pushed.
 
-This source includes the B-64 per-leg `requested_pickup_time` contract in
-addition to the earlier shuttle quote, search, vehicle and route data.
-The copied blob was verified byte-for-byte against the local B-64 worktree.
+This source includes B-65: shuttle quotes may omit `requested_pickup_time`,
+while shuttle bookings still require it on every leg.
+The copied blob was verified byte-for-byte against the local B-65 worktree.

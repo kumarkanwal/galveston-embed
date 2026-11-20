@@ -27,7 +27,7 @@ remains authoritative for every label and money value.
 
 ### 1. Departures cleanup
 
-- Remove the static `Pickup time will be arranged by phone` sentence from
+- Remove the obsolete static pickup-time sentence from
   private departure cards.
 - Preserve the Private badge, vehicle name, duration, capacity, server price,
   image, customer note, selection behavior, and date-only request behavior.

@@ -1,8 +1,11 @@
+import type { ComponentChildren } from "preact";
+
 import { FieldError } from "../trip/FieldError";
 import { ConfirmIcon } from "./ConfirmIcon";
 import type { ConfirmErrors, ConfirmFormState } from "./types";
 
 interface CustomerFieldsProps {
+  afterEmail?: ComponentChildren;
   blur: (field: keyof ConfirmFormState) => void;
   errors: ConfirmErrors;
   form: ConfirmFormState;
@@ -39,7 +42,7 @@ function TextField(props: TextFieldProps) {
   </div>;
 }
 
-export function CustomerFields({ blur, errors, form, update }: CustomerFieldsProps) {
+export function CustomerFields({ afterEmail, blur, errors, form, update }: CustomerFieldsProps) {
   return <>
     <div class="field-row">
       <TextField field="firstName" label="First Name" placeholder="First Name" maxLength={100}
@@ -51,5 +54,6 @@ export function CustomerFields({ blur, errors, form, update }: CustomerFieldsPro
       value={form.phone} error={errors.phone} blur={blur} update={update} />
     <TextField field="email" label="Email" placeholder="Email address"
       maxLength={undefined} value={form.email} error={errors.email} blur={blur} update={update} />
+    {afterEmail}
   </>;
 }

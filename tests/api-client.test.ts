@@ -88,7 +88,8 @@ const SHUTTLE_QUOTE: ShuttleQuoteRequest = {
 };
 
 const SHUTTLE_BOOKING: ShuttleBookingRequest = {
-  legs: SHUTTLE_QUOTE.legs,
+  legs: [{ departure_type: "scheduled", schedule_id: "schedule-1",
+    requested_pickup_time: "10:30", pax_adult: 1, pax_senior: 0, pax_child: 0 }],
   large_bags: 0,
   small_bags: 0,
   insurance_selected: false,

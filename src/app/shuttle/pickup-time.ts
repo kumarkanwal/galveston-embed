@@ -32,6 +32,7 @@ export function pickupTimeError(error: unknown): ShuttlePickupTimeErrors | null 
 }
 
 export function formatPickupTime(value: string): string {
+  if (value === "") return "—";
   const [hourText = "0", minute = "00"] = value.split(":");
   const hour = Number(hourText);
   const period = hour >= 12 ? "PM" : "AM";

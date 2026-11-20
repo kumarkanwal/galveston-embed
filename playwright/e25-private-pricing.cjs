@@ -210,13 +210,11 @@ async function reachConfirm(page) {
   if (await row.locator('input[type="time"]').count() !== 0) {
     throw new Error("Private rows must not contain a time input.");
   }
-  if (!await row.textContent().then((text) => text?.includes("Pickup time will be arranged by phone"))) {
-    throw new Error("Private arranged-by-phone text is missing.");
-  }
   await row.locator("button").click();
+  await page.locator(".departure-continue").click();
   await page.locator(".confirm-layout").waitFor();
   const content = await page.locator(".widget").textContent();
-  for (const expected of ["Time: to be arranged", "Outbound: Adult × 1 $165.00 USD",
+  for (const expected of ["Pickup time", "Outbound: Adult × 1 $165.00 USD",
     "Peak Hours Increase", "(included)", "Total$180.00 USD"]) {
     if (!content?.replace(/\s+/g, " ").includes(expected)) {
       throw new Error(`Confirm is missing: ${expected}`);

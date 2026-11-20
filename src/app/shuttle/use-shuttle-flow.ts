@@ -18,7 +18,7 @@ import { BAG_COUNT_SCHEMA_LIMIT } from "../trip/limits";
 import { buildReturnQuery, buildShuttleQuote, buildShuttleSearchQuery } from "./requests";
 import { isShuttleAvailabilityError, SHUTTLE_UNAVAILABLE_MESSAGE } from "./availability";
 import { minimumPassengerError } from "./minimum";
-import { EMPTY_PICKUP_TIMES, pickupTimeError, validatePickupTimes } from "./pickup-time";
+import { EMPTY_PICKUP_TIMES } from "./pickup-time";
 import type {
   SelectedShuttleLeg,
   ShuttlePickupTimeErrors,
@@ -201,41 +201,20 @@ async function chooseReturn(context: FlowContext, leg: SelectedShuttleLeg) {
     returnLeg: leg, submitting: false }));
 }
 
-function continueToConfirm(context: FlowContext) {
+async function continueToConfirm(context: FlowContext) {
   if (context.requestInFlight.current) return;
   const selection = completeSelection(context.state);
   if (selection === null) return;
-  context.setState((current) => ({ ...current, notice: null, pickupErrors: {},
-    quote: null, step: "confirm", submitting: false }));
-}
-
-async function quotePickupTimes(context: FlowContext, event: SubmitEvent) {
-  event.preventDefault();
-  if (context.requestInFlight.current) return;
-  const selection = completeSelection(context.state);
-  if (selection === null) return;
-  const errors = validatePickupTimes(
-    context.state.pickupTimes,
-    selection.returnLeg !== null,
-  );
-  if (Object.keys(errors).length > 0) {
-    context.setState((current) => ({ ...current, pickupErrors: errors }));
-    return;
-  }
   context.requestInFlight.current = true;
   context.setState((current) => ({ ...current, notice: null, pickupErrors: {}, submitting: true }));
   try {
     const quote = await context.client.quoteShuttle(
-      buildShuttleQuote(selection, context.state.pickupTimes, null, context.paymentMethod),
+      buildShuttleQuote(selection, null, null, context.paymentMethod),
     );
-    context.setState((current) => ({ ...current, quote, submitting: false }));
+    context.setState((current) => ({ ...current, quote, step: "confirm", submitting: false }));
   } catch (error: unknown) {
-    const pickupError = pickupTimeError(error);
     const minimum = minimumPassengerError(error);
-    if (pickupError !== null) {
-      context.setState((current) => ({ ...current, pickupErrors: pickupError,
-        submitting: false }));
-    } else if (minimum !== null) {
+    if (minimum !== null) {
       context.setState((current) => ({ ...current, notice: minimum, submitting: false }));
     } else if (isShuttleAvailabilityError(error)) {
       await returnToDepartures(context, SHUTTLE_UNAVAILABLE_MESSAGE);
@@ -289,15 +268,14 @@ export function useShuttleFlow(client: ShuttleApiClient, business: Business) {
   const updatePickupTime = (field: keyof ShuttlePickupTimes, value: string) => {
     setState((current) => ({ ...current, notice: null,
       pickupErrors: { ...current.pickupErrors, [field]: undefined },
-      pickupTimes: { ...current.pickupTimes, [field]: value }, quote: null }));
+      pickupTimes: { ...current.pickupTimes, [field]: value } }));
   };
   const showPickupTimeError = (errors: ShuttlePickupTimeErrors) => {
-    setState((current) => ({ ...current, pickupErrors: errors, quote: null }));
+    setState((current) => ({ ...current, pickupErrors: errors }));
   };
   return { back, chooseOutbound: (leg: SelectedShuttleLeg) => chooseOutbound(context, leg),
     chooseReturn: (leg: SelectedShuttleLeg) => chooseReturn(context, leg), complete,
-    continueToConfirm: () => continueToConfirm(context), maximumBags,
-    quotePickupTimes: (event: SubmitEvent) => quotePickupTimes(context, event), selection,
+    continueToConfirm: () => continueToConfirm(context), maximumBags, selection,
     showPickupTimeError, state,
     submitTrip: (event: SubmitEvent) => submitTrip(context, event),
     unavailable: (message: string) => returnToDepartures(context, message), update,

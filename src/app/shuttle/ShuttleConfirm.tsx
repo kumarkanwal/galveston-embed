@@ -29,11 +29,12 @@ import {
 } from "./address";
 import { isShuttleAvailabilityError, SHUTTLE_UNAVAILABLE_MESSAGE } from "./availability";
 import { minimumPassengerError } from "./minimum";
-import { pickupTimeError } from "./pickup-time";
+import { pickupTimeError, validatePickupTimes } from "./pickup-time";
 import { buildShuttleBooking, buildShuttleQuote } from "./requests";
 import { ShuttleCharges } from "./ShuttleCharges";
 import { ShuttleAddressFields } from "./ShuttleAddressFields";
 import { ShuttlePaymentMethodField } from "./ShuttlePaymentMethodField";
+import { ShuttlePickupTimeFields } from "./ShuttlePickupTimeFields";
 import { ShuttleTripSummary } from "./ShuttleTripSummary";
 import type {
   ShuttlePickupTimeErrors,
@@ -45,6 +46,7 @@ interface ShuttleConfirmProps {
   business: Business;
   client: ShuttleApiClient;
   mapsKey: string;
+  pickupErrors: ShuttlePickupTimeErrors;
   pickupTimes: ShuttlePickupTimes;
   quote: ShuttleQuoteResponse;
   selection: ShuttleSelection;
@@ -56,6 +58,7 @@ interface ShuttleConfirmProps {
   ) => void;
   onUnavailable: (message: string) => void;
   onPickupTimeError: (error: ShuttlePickupTimeErrors) => void;
+  onPickupTimeChange: (field: keyof ShuttlePickupTimes, value: string) => void;
 }
 
 function initialPromo(): PromoCodeState {
@@ -141,6 +144,16 @@ function useShuttleAddresses(selection: ShuttleSelection) {
   return { addressError, addresses, changeAddress, setAddressError };
 }
 
+function hasInvalidPickupTimes(props: ShuttleConfirmProps): boolean {
+  const errors = validatePickupTimes(
+    props.pickupTimes,
+    props.selection.returnLeg !== null,
+  );
+  if (Object.keys(errors).length === 0) return false;
+  props.onPickupTimeError(errors);
+  return true;
+}
+
 function useShuttleConfirm(props: ShuttleConfirmProps) {
   const { card, payment, paymentMethod, setPaymentMethod } = useShuttlePayment(props.business);
   const pricing = useShuttlePromo(props, paymentMethod);
@@ -152,6 +165,7 @@ function useShuttleConfirm(props: ShuttleConfirmProps) {
   useEffect(() => setFailure(null), [props.selection]);
   const submit = async (form: ConfirmFormState) => {
     if (inFlight.current || payment.defaultMethod === null || methodTotal === undefined) return;
+    if (hasInvalidPickupTimes(props)) return;
     const missing = requiredShuttleAddresses(props.selection)
       .find((field) => address.addresses.values[field] === null);
     if (missing !== undefined) { address.setAddressError(missing); return; }
@@ -201,7 +215,10 @@ export function ShuttleConfirm(props: ShuttleConfirmProps) {
         error={view.methodTotal === undefined && view.quoteError === null
           ? "Pricing is unavailable for this payment method." : view.quoteError} />
       <button class="back-button" type="button" onClick={props.onBack}>↶ Back</button>
-    </div><ConfirmForm breakdownReady={view.quoteError === null && !view.busy
+    </div><ConfirmForm afterEmailFields={<ShuttlePickupTimeFields
+      errors={props.pickupErrors} hasReturn={props.selection.returnLeg !== null}
+      values={props.pickupTimes} onChange={props.onPickupTimeChange} />}
+      breakdownReady={view.quoteError === null && !view.busy
       && view.methodTotal !== undefined}
       buttonLabel="Create Trip"
       failure={view.failure} isSubmitting={view.submitting} onChange={() => view.setFailure(null)}
