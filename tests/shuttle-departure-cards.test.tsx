@@ -99,13 +99,13 @@ describe("shuttle departure images and notes", () => {
 });
 
 describe("shuttle departure order and selection", () => {
-  it("orders shared departures by time before private cars", () => {
+  it("orders private cars first and shared departures by time", () => {
     const late = { ...DEPARTURE, schedule_id: "late", start_time: "17:00" };
     const early = { ...DEPARTURE, schedule_id: "early", start_time: "08:00" };
     const element = renderDepartures({ ...SEARCH_RESULT,
       departures: [late, early], private_cars: [PRIVATE_CAR] });
     expect([...element.querySelectorAll(".departure-primary")]
-      .map((node) => node.textContent?.trim())).toEqual(["08:00", "17:00", "Private SUV"]);
+      .map((node) => node.textContent?.trim())).toEqual(["Private SUV", "08:00", "17:00"]);
   });
 
   it("changes the labelled Choose state to Selected", () => {

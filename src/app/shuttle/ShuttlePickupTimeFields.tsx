@@ -14,7 +14,7 @@ function PickupTimeField(props: PickupTimeFieldProps) {
   const errorId = `${id}-error`;
   return <div class="field shuttle-pickup-field">
     <label for={id}>{props.label}</label>
-    <input id={id} type="time" step={900} required value={props.value}
+    <input id={id} type="time" required value={props.value}
       aria-invalid={props.error !== undefined}
       aria-describedby={props.error === undefined
         ? "pickup-time-description" : `pickup-time-description ${errorId}`}

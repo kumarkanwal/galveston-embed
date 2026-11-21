@@ -80,7 +80,7 @@ describe.each([
     const root = mount(response, "cash", false);
     if (_mode === "shuttle") {
       expect(root.querySelector(".confirmation-luggage")?.textContent)
-        .toContain("2 check-in · ▫ 1 carry-on");
+        .toContain("Bags: 2 check-in · 1 carry-on");
     } else {
       expect(root.querySelector(".confirmation-luggage")).toBeNull();
     }
@@ -88,16 +88,8 @@ describe.each([
 
 });
 
-describe("private shuttle confirmation", () => {
-  it("shows the arranged time supplied for a private leg", () => {
-    const root = mount(SHUTTLE_BOOKED, "cash", false,
-      ["Outbound: 2026-10-30 · Time: to be arranged"]);
-    expect(root.querySelector(".confirmation-journey")?.textContent)
-      .toBe("Outbound: 2026-10-30 · Time: to be arranged");
-  });
-
-  it("shows booking passenger lines, one included peak, adjustments, and total", () => {
-    const response = { ...SHUTTLE_BOOKED,
+function privateRoundTripResponse(): ShuttleBookingResponse {
+  return { ...SHUTTLE_BOOKED,
       legs: [
         { ...SHUTTLE_BOOKED.legs[0]!, passenger_lines: [
           { passenger_type: "adult" as const, count: 1,
@@ -115,7 +107,18 @@ describe("private shuttle confirmation", () => {
       ], adjustments: [{ label: "Card Surcharge", amount: "4.00",
         kind: "surcharge" as const, included_in_total: true as const }], total: "127.00",
     } satisfies ShuttleBookingResponse;
-    const root = mount(response, "online", false);
+}
+
+describe("private shuttle confirmation", () => {
+  it("shows the arranged time supplied for a private leg", () => {
+    const root = mount(SHUTTLE_BOOKED, "cash", false,
+      ["Outbound: 2026-10-30 · Time: to be arranged"]);
+    expect(root.querySelector(".confirmation-journey")?.textContent)
+      .toBe("Outbound: 2026-10-30 · Time: to be arranged");
+  });
+
+  it("shows booking passenger lines, one included peak, adjustments, and total", () => {
+    const root = mount(privateRoundTripResponse(), "online", false);
     expect([...root.querySelectorAll(".shuttle-passenger-line")]
       .map((line) => line.textContent?.replace(/\s+/g, " ").trim())).toEqual([
       "Adult × 1 ($18.00 USD)$18.00 USD",
@@ -127,5 +130,23 @@ describe("private shuttle confirmation", () => {
     expect(root.querySelector(".shuttle-adjustment")?.textContent)
       .toContain("Card Surcharge$4.00 USD");
     expect(root.querySelector(".confirmation-total")?.textContent).toContain("$127.00 USD");
+  });
+
+  it("shows a private flat-rate line without a passenger split", () => {
+    const response = {
+      ...SHUTTLE_BOOKED,
+      legs: [{
+        ...SHUTTLE_BOOKED.legs[0]!,
+        passenger_lines: [],
+        flat_rate_line: { label: "Private SUV flat rate", amount: "180.00" },
+        charges: [],
+        leg_total: "180.00",
+      }],
+      total: "180.00",
+    } satisfies ShuttleBookingResponse;
+    const root = mount(response, "cash", false);
+    expect(root.querySelector(".shuttle-flat-rate-line")?.textContent)
+      .toBe("Private SUV flat rate$180.00 USD");
+    expect(root.querySelector(".shuttle-passenger-line")).toBeNull();
   });
 });

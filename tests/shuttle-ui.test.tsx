@@ -285,7 +285,7 @@ describe("fixed-only shuttle departures", () => {
     const element = renderDepartures({ ...SEARCH_RESULT, departures: [],
       on_request: privateCar, on_request_options: [privateCar] });
     expect(element.textContent).toContain(
-      "No scheduled departures on this date. Please try another date.",
+      "No departures available for this date. Please choose another date.",
     );
     expect(element.querySelector('input[type="time"]')).toBeNull();
     expect(element.textContent).not.toContain("Private Van");

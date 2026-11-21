@@ -1,5 +1,6 @@
 import type {
   ShuttleAdjustmentLine,
+  ShuttleFlatRateLine,
   ShuttleIncludedChargeLine,
   ShuttlePassengerPriceLine,
 } from "../../api/client";
@@ -7,6 +8,7 @@ import { formatMoney } from "../../money";
 
 interface PriceLeg {
   charges: ShuttleIncludedChargeLine[];
+  flat_rate_line?: ShuttleFlatRateLine | null | undefined;
   passenger_lines: ShuttlePassengerPriceLine[];
 }
 
@@ -46,12 +48,21 @@ function IncludedCharge(props: {
   </div>;
 }
 
+function FlatRateLine(props: { currency: string; line: ShuttleFlatRateLine }) {
+  return <div class="charge-row shuttle-flat-rate-line">
+    <span>{props.line.label}</span>
+    <span>{formatMoney(props.line.amount, props.currency)}</span>
+  </div>;
+}
+
 export function ShuttlePriceLines(props: ShuttlePriceLinesProps) {
   return <div class="shuttle-price-lines">
     {props.legs.map((leg, index) => <div class="shuttle-leg-price-lines" key={index}>
       <h3>{index === 0 ? "Outbound" : "Return"}</h3>
       {leg.passenger_lines.map((line) => <PassengerLine currency={props.currency}
         key={line.passenger_type} line={line} />)}
+      {leg.flat_rate_line != null && <FlatRateLine currency={props.currency}
+        line={leg.flat_rate_line} />}
       {leg.charges.map((charge, chargeIndex) => <IncludedCharge
         key={`${charge.label}:${chargeIndex}`} charge={charge}
         currency={props.currency} />)}
