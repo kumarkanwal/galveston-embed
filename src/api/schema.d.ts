@@ -2261,6 +2261,26 @@ export interface paths {
         patch: operations["change_reservation_status_v1_admin_reservations__booking_id__status_patch"];
         trace?: never;
     };
+    "/v1/admin/reservations/{booking_id}/status-transitions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reservation Status Transitions
+         * @description Return only transitions accepted from the reservation's current state.
+         */
+        get: operations["reservation_status_transitions_v1_admin_reservations__booking_id__status_transitions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/reservations/{booking_id}/check-pricing": {
         parameters: {
             query?: never;
@@ -2787,6 +2807,46 @@ export interface paths {
          * @description Send a fixed message; five attempts/hour/business, including failed sends.
          */
         post: operations["test_email_settings_v1_admin_businesses__business_uuid__settings_test_email_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/businesses/{business_uuid}/settings/email-previews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Preview Email Templates
+         * @description Render all approved templates using sample data and selected branding.
+         */
+        get: operations["preview_email_templates_v1_admin_businesses__business_uuid__settings_email_previews_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/businesses/{business_uuid}/settings/email-previews/{email_type}/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test Email Template
+         * @description Send one approved sample to the authenticated staff member through company SMTP.
+         */
+        post: operations["test_email_template_v1_admin_businesses__business_uuid__settings_email_previews__email_type__test_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5165,6 +5225,7 @@ export interface components {
             seats_confirmed: number;
             /** Passenger Lines */
             passenger_lines: components["schemas"]["ShuttlePassengerPriceLine"][];
+            flat_rate_line?: components["schemas"]["ShuttleFlatRateLine"] | null;
             /** Charges */
             charges: components["schemas"]["ShuttleIncludedChargeLine"][];
             /** Leg Total */
@@ -5623,6 +5684,16 @@ export interface components {
             driver_reminder_hours: number;
             /** Auto Confirm Card Payments */
             auto_confirm_card_payments: boolean;
+            /** Tagline */
+            tagline: string | null;
+            /** Google Review Url */
+            google_review_url: string | null;
+            /** Show Google Review */
+            show_google_review: boolean;
+            /** Send Completed Email */
+            send_completed_email: boolean;
+            /** Booking Page Url */
+            booking_page_url: string | null;
             /** Footer Quote */
             footer_quote: string | null;
             /** Footer Confirmation */
@@ -5803,6 +5874,16 @@ export interface components {
             driver_reminder_hours: number;
             /** Auto Confirm Card Payments */
             auto_confirm_card_payments: boolean;
+            /** Tagline */
+            tagline: string | null;
+            /** Google Review Url */
+            google_review_url: string | null;
+            /** Show Google Review */
+            show_google_review: boolean;
+            /** Send Completed Email */
+            send_completed_email: boolean;
+            /** Booking Page Url */
+            booking_page_url: string | null;
             /** Footer Quote */
             footer_quote: string | null;
             /** Footer Confirmation */
@@ -6188,7 +6269,7 @@ export interface components {
             reason: string;
             /**
              * Notify Customer
-             * @default false
+             * @default true
              */
             notify_customer: boolean;
         };
@@ -7434,9 +7515,11 @@ export interface components {
              * Email Type
              * @enum {string}
              */
-            email_type: "company_alert" | "request_submitted" | "confirmation" | "customer_reminder" | "driver_reminder";
+            email_type: "booking_received" | "booking_confirmed" | "booking_cancelled" | "booking_updated" | "trip_reminder" | "payment_receipt" | "new_booking_alert" | "cancellation_alert" | "driver_trip_sheet" | "ride_completed";
             /** To Email */
-            to_email: string;
+            to_email: string | null;
+            /** Unavailable Reason */
+            unavailable_reason?: string | null;
             /** Subject */
             subject: string;
             /** Text Body */
@@ -7475,6 +7558,16 @@ export interface components {
             driver_reminder_hours?: number | null;
             /** Auto Confirm Card Payments */
             auto_confirm_card_payments?: boolean | null;
+            /** Tagline */
+            tagline?: string | null;
+            /** Google Review Url */
+            google_review_url?: string | null;
+            /** Show Google Review */
+            show_google_review?: boolean | null;
+            /** Send Completed Email */
+            send_completed_email?: boolean | null;
+            /** Booking Page Url */
+            booking_page_url?: string | null;
             /** Footer Quote */
             footer_quote?: string | null;
             /** Footer Confirmation */
@@ -7483,6 +7576,25 @@ export interface components {
             footer_receipt?: string | null;
             /** Footer Invoice */
             footer_invoice?: string | null;
+        };
+        /**
+         * EmailTemplatePreview
+         * @description One branded sample shown on the Email page.
+         */
+        EmailTemplatePreview: {
+            /**
+             * Email Type
+             * @enum {string}
+             */
+            email_type: "booking_received" | "booking_confirmed" | "booking_cancelled" | "booking_updated" | "trip_reminder" | "payment_receipt" | "new_booking_alert" | "cancellation_alert" | "driver_trip_sheet" | "ride_completed";
+            /** Label */
+            label: string;
+            /** Subject */
+            subject: string;
+            /** Text Body */
+            text_body: string;
+            /** Html Body */
+            html_body: string;
         };
         /**
          * EmbedKeyRegeneratedResult
@@ -7939,6 +8051,10 @@ export interface components {
         Envelope_StatusResult_: {
             data: components["schemas"]["StatusResult"];
         };
+        /** Envelope[StatusTransitions] */
+        Envelope_StatusTransitions_: {
+            data: components["schemas"]["StatusTransitions"];
+        };
         /** Envelope[SurchargeResult] */
         Envelope_SurchargeResult_: {
             data: components["schemas"]["SurchargeResult"];
@@ -8042,6 +8158,11 @@ export interface components {
         Envelope_list_ChargeOption__: {
             /** Data */
             data: components["schemas"]["ChargeOption"][];
+        };
+        /** Envelope[list[EmailTemplatePreview]] */
+        Envelope_list_EmailTemplatePreview__: {
+            /** Data */
+            data: components["schemas"]["EmailTemplatePreview"][];
         };
         /** Envelope[list[LocationGroup]] */
         Envelope_list_LocationGroup__: {
@@ -9031,7 +9152,12 @@ export interface components {
             /** Amount */
             amount: string;
             /** Note */
-            note: string;
+            note?: string | null;
+            /**
+             * Confirm Tip
+             * @default false
+             */
+            confirm_tip: boolean;
         };
         /**
          * ManualPaymentResult
@@ -9054,8 +9180,14 @@ export interface components {
             method: string | null;
             /** Amount */
             amount: string;
+            /** Fare Amount */
+            fare_amount: string;
+            /** Tip Amount */
+            tip_amount: string;
             /** Amount Paid */
             amount_paid: string;
+            /** Balance Due */
+            balance_due: string;
         };
         /**
          * ManualPreviewLine
@@ -9086,7 +9218,7 @@ export interface components {
             /** Amount */
             amount: string;
             /** Note */
-            note: string;
+            note?: string | null;
         };
         /**
          * ManualRefundResult
@@ -9106,7 +9238,7 @@ export interface components {
             /** Amount */
             amount: string;
             /** Note */
-            note: string;
+            note: string | null;
             /** Amount Paid */
             amount_paid: string;
             /** Refund Total */
@@ -9177,6 +9309,11 @@ export interface components {
             runs: number;
             /** Amount */
             amount: string;
+            /**
+             * Tip Amount
+             * @default 0.00
+             */
+            tip_amount: string;
         };
         /**
          * OnRequestAvailability
@@ -9357,6 +9494,10 @@ export interface components {
             status: string;
             /** Amount */
             amount: string;
+            /** Fare Amount */
+            fare_amount: string;
+            /** Tip Amount */
+            tip_amount: string;
             /** Settled Amount */
             settled_amount: string | null;
             /** Provider Payment Id */
@@ -10411,6 +10552,7 @@ export interface components {
             pax_summary: string;
             /** Passenger Lines */
             passenger_lines: components["schemas"]["ShuttlePassengerPriceLine"][];
+            flat_rate_line?: components["schemas"]["ShuttleFlatRateLine"] | null;
             /** Charges */
             charges: components["schemas"]["ShuttleIncludedChargeLine"][];
             /** Leg Price */
@@ -10584,10 +10726,17 @@ export interface components {
         RecentEmail: {
             /** Client */
             client: string;
+            /** Recipient */
+            recipient: string;
             /** Subject */
             subject: string | null;
-            /** Sent At */
-            sent_at: string | null;
+            /**
+             * Sent At
+             * Format: date-time
+             */
+            sent_at: string;
+            /** Booking Id */
+            booking_id: string | null;
         };
         /**
          * RefreshRequest
@@ -10728,6 +10877,8 @@ export interface components {
             refunds: components["schemas"]["RefundHistoryItem"][];
             /** Amount Paid */
             amount_paid: string;
+            /** Tip Amount */
+            tip_amount: string;
             /** Refund Total */
             refund_total: string;
             /** Balance Due */
@@ -11920,14 +12071,14 @@ export interface components {
             route: components["schemas"]["RouteSummary"];
             /** Date Strip */
             date_strip: components["schemas"]["DateStripEntry"][];
+            /** Private Cars */
+            private_cars?: components["schemas"]["PrivateCarAvailability"][];
             /** Departures */
             departures: components["schemas"]["Departure"][];
             filtered_summary?: components["schemas"]["FilteredSummary"] | null;
             on_request?: components["schemas"]["OnRequestAvailability"] | null;
             /** On Request Options */
             on_request_options?: components["schemas"]["OnRequestAvailability"][];
-            /** Private Cars */
-            private_cars?: components["schemas"]["PrivateCarAvailability"][];
         };
         /**
          * SelectedCharge
@@ -12185,7 +12336,7 @@ export interface components {
         };
         /**
          * ServiceTypeReorder
-         * @description The complete order of the five fixed engine codes.
+         * @description The complete order of the fixed engine catalog.
          */
         ServiceTypeReorder: {
             /** Service Type Ids */
@@ -12255,6 +12406,7 @@ export interface components {
             leg: components["schemas"]["BookingLeg"] | null;
             /** Passenger Lines */
             passenger_lines: components["schemas"]["ShuttlePassengerPriceLine"][];
+            flat_rate_line?: components["schemas"]["ShuttleFlatRateLine"] | null;
             /** Charges */
             charges: components["schemas"]["ShuttleIncludedChargeLine"][];
             /** Leg Total */
@@ -12266,6 +12418,16 @@ export interface components {
          * @enum {string}
          */
         ShuttleDepartureMode: "fixed" | "on_request";
+        /**
+         * ShuttleFlatRateLine
+         * @description One vehicle-level private-car fare, never divided by passengers.
+         */
+        ShuttleFlatRateLine: {
+            /** Label */
+            label: string;
+            /** Amount */
+            amount: string;
+        };
         /**
          * ShuttleIncludedChargeLine
          * @description One leg-local charge counted once inside that leg and cart total.
@@ -12448,11 +12610,7 @@ export interface components {
          * @description A state transition; confirmation notifies by default and permits opt-out.
          */
         StatusChange: {
-            /**
-             * Status
-             * @enum {string}
-             */
-            status: "quoted" | "confirmed" | "assigned" | "completed" | "no_show" | "cancelled";
+            status: components["schemas"]["StatusValue"];
             /** Notify Customer */
             notify_customer?: boolean | null;
         };
@@ -12470,6 +12628,18 @@ export interface components {
             /** Order Status */
             order_status: string;
         };
+        /**
+         * StatusTransitions
+         * @description Current logical state and the transitions accepted by the write endpoint.
+         */
+        StatusTransitions: {
+            /** Current Status */
+            current_status: string;
+            /** Allowed Statuses */
+            allowed_statuses: components["schemas"]["StatusValue"][];
+        };
+        /** @enum {string} */
+        StatusValue: "quoted" | "confirmed" | "assigned" | "completed" | "no_show" | "cancelled";
         /**
          * SuccessfulPaymentDetail
          * @description Last settled, non-voided collection, including subsequently refunded payments.
@@ -15775,7 +15945,7 @@ export interface operations {
     preview_reservation_email_v1_admin_reservations__booking_id__emails_preview_get: {
         parameters: {
             query: {
-                email_type: "company_alert" | "request_submitted" | "confirmation" | "customer_reminder" | "driver_reminder";
+                email_type: "booking_received" | "booking_confirmed" | "booking_cancelled" | "booking_updated" | "trip_reminder" | "payment_receipt" | "new_booking_alert" | "cancellation_alert" | "driver_trip_sheet" | "ride_completed";
                 business_id?: string | null;
             };
             header?: {
@@ -15856,7 +16026,7 @@ export interface operations {
                 search?: string | null;
                 date_from?: string | null;
                 date_to?: string | null;
-                email_type?: ("request" | "quote" | "confirmation" | "receipt" | "invoice" | "reminder" | "cancellation" | "deposit_receipt" | "total_receipt" | "dispatch" | "company_alert" | "request_submitted" | "customer_reminder" | "driver_reminder") | null;
+                email_type?: ("request" | "quote" | "confirmation" | "receipt" | "invoice" | "reminder" | "cancellation" | "deposit_receipt" | "total_receipt" | "dispatch" | "company_alert" | "request_submitted" | "customer_reminder" | "driver_reminder" | "booking_received" | "booking_confirmed" | "booking_cancelled" | "booking_updated" | "trip_reminder" | "payment_receipt" | "new_booking_alert" | "cancellation_alert" | "driver_trip_sheet" | "ride_completed") | null;
                 status?: ("queued" | "sending" | "sent" | "failed" | "bounced" | "skipped") | null;
             };
             header?: {
@@ -19193,6 +19363,41 @@ export interface operations {
             };
         };
     };
+    reservation_status_transitions_v1_admin_reservations__booking_id__status_transitions_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_StatusTransitions_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     check_reservation_pricing_v1_admin_reservations__booking_id__check_pricing_post: {
         parameters: {
             query?: {
@@ -20285,6 +20490,77 @@ export interface operations {
                 "application/json": components["schemas"]["TestEmailRequest"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_TestEmailResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_email_templates_v1_admin_businesses__business_uuid__settings_email_previews_get: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_list_EmailTemplatePreview__"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    test_email_template_v1_admin_businesses__business_uuid__settings_email_previews__email_type__test_post: {
+        parameters: {
+            query?: {
+                business_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                business_uuid: string;
+                email_type: "booking_received" | "booking_confirmed" | "booking_cancelled" | "booking_updated" | "trip_reminder" | "payment_receipt" | "new_booking_alert" | "cancellation_alert" | "driver_trip_sheet" | "ride_completed";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {

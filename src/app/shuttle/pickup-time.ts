@@ -3,7 +3,7 @@ import type { ShuttlePickupTimeErrors, ShuttlePickupTimes } from "./types";
 
 export const EMPTY_PICKUP_TIMES: ShuttlePickupTimes = { outbound: "", return: "" };
 
-const PICKUP_TIME_PATTERN = /^(?:[01]\d|2[0-3]):(?:00|15|30|45)$/;
+const PICKUP_TIME_PATTERN = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 
 export function validatePickupTimes(
   values: ShuttlePickupTimes,
@@ -12,11 +12,11 @@ export function validatePickupTimes(
   const errors: ShuttlePickupTimeErrors = {};
   if (values.outbound === "") errors.outbound = "Enter a pickup time.";
   else if (!PICKUP_TIME_PATTERN.test(values.outbound)) {
-    errors.outbound = "Choose a pickup time in 15-minute steps.";
+    errors.outbound = "Enter a valid pickup time.";
   }
   if (hasReturn && values.return === "") errors.return = "Enter a pickup time.";
   else if (hasReturn && !PICKUP_TIME_PATTERN.test(values.return)) {
-    errors.return = "Choose a pickup time in 15-minute steps.";
+    errors.return = "Enter a valid pickup time.";
   }
   return errors;
 }

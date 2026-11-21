@@ -190,7 +190,8 @@ describe("departure Continue flow", () => {
     expect(client.quoteShuttle).toHaveBeenCalledWith(expect.objectContaining({
       legs: [expect.not.objectContaining({ requested_pickup_time: expect.anything() })],
     }));
-    expect(root.querySelector<HTMLInputElement>("#outbound-pickup-time")?.step).toBe("900");
+    expect(root.querySelector<HTMLInputElement>("#outbound-pickup-time")?.hasAttribute("step"))
+      .toBe(false);
     expect(root.textContent).toContain("We'll call you to confirm your pickup time.");
     expect(root.textContent).not.toContain("Tell us when you would like to be picked up.");
     expect(root.textContent).not.toContain("Check price");
@@ -202,11 +203,7 @@ describe("departure Continue flow", () => {
     expect(root.textContent).toContain("Enter a pickup time.");
     expect(client.bookShuttle).not.toHaveBeenCalled();
     enterPickup(root, "outbound-pickup-time", "10:10");
-    submitConfirm(root);
-    expect(root.textContent).toContain("Choose a pickup time in 15-minute steps.");
-    expect(client.bookShuttle).not.toHaveBeenCalled();
-    enterPickup(root, "outbound-pickup-time", "10:30");
-    expect(root.textContent).toContain("Pickup time: 10:30 AM");
+    expect(root.textContent).toContain("Pickup time: 10:10 AM");
   });
 });
 
@@ -275,6 +272,7 @@ describe("pickup time booking", () => {
       legs: [expect.objectContaining({ requested_pickup_time: "10:30" })],
     }), expect.any(String));
     await vi.waitFor(() => expect(root.textContent).toContain("Confirmation"));
+    expect(root.textContent).toContain("Outbound: Sat, Nov 21, 2026 · 9:30 AM");
     expect(root.textContent).toContain("Pickup time: 10:30 AM");
   });
 });

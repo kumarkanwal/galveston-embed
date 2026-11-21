@@ -69,19 +69,19 @@ function DepartureSection(props: DepartureSectionProps) {
   return <section class={`departure-section ${props.data.direction}`}>
     <h2 class="step-title">{title} · {formatBusinessLocalDate(props.data.date)}</h2>
     {empty && <div class="empty-vehicles">
-      No scheduled departures on this date. Please try another date.
+      No departures available for this date. Please choose another date.
     </div>}
     {!empty && <div class="shuttle-departures">
-      {orderedDepartures.map((departure) => <SharedDepartureCard key={departure.schedule_id}
-        currency={props.currency} date={props.data.date} departure={departure}
-        onChoose={props.onChoose} passengerCount={props.passengerCount}
-        route={props.data.result.route}
-        selected={isScheduledSelected(props.selected, departure.schedule_id)} />)}
       {privateCars.map((car) => <PrivateDepartureCard key={`${car.route_id}:${car.vehicle_type_id}`}
         car={car} currency={props.currency} onChoose={props.onChoose}
         passengerCount={props.passengerCount} route={props.data.result.route}
         selected={isPrivateSelected(props.selected, car.route_id, car.vehicle_type_id,
           car.service_date)} />)}
+      {orderedDepartures.map((departure) => <SharedDepartureCard key={departure.schedule_id}
+        currency={props.currency} date={props.data.date} departure={departure}
+        onChoose={props.onChoose} passengerCount={props.passengerCount}
+        route={props.data.result.route}
+        selected={isScheduledSelected(props.selected, departure.schedule_id)} />)}
     </div>}
   </section>;
 }

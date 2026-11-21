@@ -233,3 +233,9 @@ Date: 2026-11-16 · Status: accepted (supersedes ED-036)
 Decision: collect each required customer pickup time directly below Email in the Confirm step, not on a separate screen.
 Why: B-65 permits the quote to load without pickup times, while booking still requires one 15-minute time per shuttle leg.
 Consequences: Departures goes directly to Confirm and triggers the quote without `requested_pickup_time`. Confirm shows one input per leg, updates the summary live with an em dash until entered, maps booking field errors to those inputs, and sends the values unchanged on booking. Taxi behavior and shuttle departure selection remain unchanged.
+
+## ED-038 — Shuttle pickup times accept any minute
+Date: 2026-11-21 · Status: accepted (extends ED-037)
+Decision: keep pickup-time entry on Confirm but accept every valid `HH:MM` value instead of restricting customers to 15-minute increments.
+Why: B-69 validates any minute, and the client approved minute-level pickup requests. Browser step metadata and widget validation must agree with the API.
+Consequences: the time input has no `step` attribute, request values remain unchanged, and shared service time remains distinct from customer pickup time. Departures present private cars first in admin vehicle order, followed by shared services in time order, on both legs.

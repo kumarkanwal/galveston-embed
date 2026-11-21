@@ -68,8 +68,8 @@ export function Confirmation(props: ConfirmationProps) {
         Total: <strong>{formatMoney(props.response.total, currency)}</strong>
       </p>}
       {"large_bags" in props.response && <p class="confirmation-luggage">
-        <span aria-hidden="true">▣ </span>{props.response.large_bags} check-in
-        <span aria-hidden="true"> · ▫ </span>{props.response.small_bags} carry-on
+        <strong>Bags:</strong> {props.response.large_bags} check-in
+        <span aria-hidden="true"> · </span>{props.response.small_bags} carry-on
       </p>}
     </div>
   </section>;

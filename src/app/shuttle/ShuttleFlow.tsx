@@ -4,7 +4,7 @@ import type {
   ShuttleApiClient,
   ShuttleBookingResponse,
 } from "../../api/client";
-import { businessDateTimeParts } from "../../time";
+import { businessDateTimeParts, formatBusinessLocalDateFull } from "../../time";
 import { Confirmation } from "../booking/Confirmation";
 import { ShuttleConfirm } from "./ShuttleConfirm";
 import { ShuttleDepartures } from "./Departures";
@@ -31,9 +31,13 @@ function confirmationLegLine(
 ): string {
   const pickupLabel = label === "Return" ? "Return pickup time" : "Pickup time";
   const pickup = ` · ${pickupLabel}: ${formatPickupTime(pickupTime)}`;
-  if (leg.kind === "private") return `${label}: ${leg.date}${pickup}`;
-  const end = leg.departure.end_time == null ? "" : ` – ${leg.departure.end_time}`;
-  return `${label}: ${leg.date} at ${leg.departure.start_time}${end}${pickup}`;
+  const date = formatBusinessLocalDateFull(leg.date);
+  if (leg.kind === "private") return `${label}: ${date}${pickup}`;
+  const start = formatPickupTime(leg.departure.start_time.slice(0, 5));
+  const end = leg.departure.end_time == null
+    ? ""
+    : ` – ${formatPickupTime(leg.departure.end_time.slice(0, 5))}`;
+  return `${label}: ${date} · ${start}${end}${pickup}`;
 }
 
 function confirmationJourneyLines(
