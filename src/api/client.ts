@@ -31,6 +31,7 @@ export type ShuttleBookingRequest = components["schemas"]["BookingRequest"];
 export type ShuttleBookingResponse = components["schemas"]["BookingResponse"];
 export type ShuttleRoute = components["schemas"]["RouteSummary"];
 export type ShuttlePassengerPriceLine = components["schemas"]["ShuttlePassengerPriceLine"];
+export type ShuttleFlatRateLine = components["schemas"]["ShuttleFlatRateLine"];
 export type ShuttleIncludedChargeLine = components["schemas"]["ShuttleIncludedChargeLine"];
 export type ShuttleAdjustmentLine = components["schemas"]["ShuttleAdjustmentLine"];
 export type ShuttleSearchQuery =
